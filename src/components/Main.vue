@@ -27,10 +27,10 @@
                 <el-button type="warning" size="small" icon="el-icon-message-solid" circle></el-button>
               </el-badge>
               <el-dropdown trigger="click">
-                <el-button type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{loginUser}}</el-button>
+                <el-button type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{userEid}}</el-button>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
-                  <el-dropdown-item>
-                    zhongshu.liang
+                  <el-dropdown-item style="border-top:1px solid #ced6e0">
+                    <div class="main-user-info-panel-item"><b>Logout</b></div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -49,7 +49,9 @@ export default {
   data () {
     return {
       logo: 'Project Management Timesheet',
-      loginUser: 'zhongshu.liang',
+      userEid: 'zhongshu.liang',
+      userTeam: 'TOS Team',
+      userTitle: 'Senior Software Engineer',
       msgValue: 50
     }
   }
@@ -112,6 +114,23 @@ export default {
   font-size: 10px;
 }
 .main-user-info-panel {
-  width: 200px;
+  width: 100px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.main-user-info-panel-item {
+  width:100%;
+  height:auto;
+  direction:initial;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.main-user-info-panel-logout {
+  width: 100px;
+}
+/*Common Style*/
+.border-top-line {
+  border-top: 1px solid #dfe4ea;
 }
 </style>
