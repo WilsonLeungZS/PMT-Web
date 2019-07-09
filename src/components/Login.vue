@@ -1,6 +1,6 @@
 <template>
   <div class="login-content">
-    <el-form ref="form" :model="form" label-width="80px" size="medium" @submit.native.prevent>
+    <el-form ref="form" label-width="80px" size="medium" @submit.native.prevent>
       <el-form-item label="EID">
         <el-input v-model="inputUserEid" style="width: 250px"></el-input>
       </el-form-item>
@@ -34,8 +34,15 @@ export default {
         return
       }
       console.log('Login! User Eid: ' + this.$data.inputUserEid)
-      this.$router.push({path: '/Timesheet' + '/MyTimesheet'})
+      this.$store.dispatch('setNewUserEid', reqUserEid)
+      this.$store.dispatch('setShowMainBar')
+      this.$router.replace({path: '/Timesheet' + '/MyTimesheet'})
     }
+  },
+  created () {
+    console.log('Created Login')
+    // Validate login status
+    this.$store.dispatch('setHideMainBar')
   }
 }
 </script>

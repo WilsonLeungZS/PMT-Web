@@ -3,7 +3,7 @@
     <el-container>
       <el-header>
         <el-row class="main-el-row">
-          <el-col :span="1">
+          <el-col :span="1" v-show="this.$store.getters.getIsShowMainBar">
             <div class="main-grid-content">
               <el-dropdown>
                 <el-button class="main-menu-btn" type="primary" icon="el-icon-menu" size="small"></el-button>
@@ -16,12 +16,12 @@
               </el-dropdown>
             </div>
           </el-col>
-          <el-col :span="10" offset="6">
+          <el-col :span="10" :offset="6">
             <div class="main-grid-content">
               <span class="main-logo">{{logo}}</span>
             </div>
           </el-col>
-          <el-col :span="6" offset="1">
+          <el-col :span="6" :offset="1" v-show="this.$store.getters.getIsShowMainBar">
             <div class="main-grid-content" style="justify-content:flex-end;">
               <el-dropdown trigger="click">
                 <el-badge :value="msgValue" :max="10" class="main-user-msg">
@@ -31,7 +31,7 @@
                   <el-dropdown-item>
                     <div class="main-user-msg-panel-i border-bottom-line">You have {{msgValue}} messages !</div>
                   </el-dropdown-item>
-                  <el-dropdown-item v-for="msg in msgList" :key="msg">
+                  <el-dropdown-item v-for="msg in msgList" :key="msg.id">
                     <div class="main-user-msg-panel-item border-bottom-line">
                       <div class="msg-icon"><i class="el-icon-message"></i></div>
                       <div class="msg-content"><span class="msg-content-text">{{msg.msg}}</span></div>
@@ -42,10 +42,10 @@
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
-              <el-dropdown trigger="click" style="padding: 0">
-                <el-button type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{userEid}}</el-button>
+              <el-dropdown trigger="click" style="padding: 0" @command="handleLogoutCommand">
+                <el-button type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
-                  <el-dropdown-item style="border-top:1px solid #ced6e0">
+                  <el-dropdown-item command="logout">
                     <div class="main-user-info-panel-item"><b>Logout</b></div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -62,19 +62,24 @@
 </template>
 
 <script>
+/* eslint-disable */
+import {mapState, mapMutations, mapActions, mapGetters} from 'vuex'
 export default {
   name: 'Main',
   data () {
     return {
       logo: 'Project Management Timesheet',
-      userEid: 'zhongshu.liang',
-      userTeam: 'TOS Team',
-      userTitle: 'Senior Software Engineer',
       msgValue: 3,
       msgList: [{'id': 1, 'msg': 'You have not complete the timesheet from 2019-07-09.'},
         {'id': 2, 'msg': 'TOS Team still need 42 hours to complete the target.'},
         {'id': 3, 'msg': 'Change CGM190061 is over charged.'}]
     }
+  },
+  methods: {
+    handleLogoutCommand(command) {
+      this.$store.dispatch('setHideMainBar')
+      this.$router.replace({path: '/login'})
+    } 
   }
 }
 </script>
