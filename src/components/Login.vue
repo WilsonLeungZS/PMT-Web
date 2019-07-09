@@ -26,6 +26,7 @@ export default {
   },
   methods: {
     onLogin () {
+      this.$data.showErrorMsg = false
       var reqUserEid = this.$data.inputUserEid
       if (reqUserEid === '') {
         this.$data.errorMsg = 'EID could not be empty!'
@@ -33,7 +34,7 @@ export default {
         return
       }
       console.log('Login! User Eid: ' + this.$data.inputUserEid)
-      this.$data.showErrorMsg = false
+      this.$router.push({path: '/Timesheet' + '/MyTimesheet'})
     }
   }
 }
