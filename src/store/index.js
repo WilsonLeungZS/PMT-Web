@@ -4,7 +4,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     userEid: '',
-    isShowMainBar: false
+    isShowMainBar: true
   },
   getters: {
     getUserEid: function (state) {

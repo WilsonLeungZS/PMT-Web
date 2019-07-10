@@ -3,15 +3,15 @@
     <el-container>
       <el-header>
         <el-row class="main-el-row">
-          <el-col :span="1" v-show="this.$store.getters.getIsShowMainBar">
+          <el-col :span="1" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
             <div class="main-grid-content">
-              <el-dropdown>
+              <el-dropdown @command="handleMenuCommand">
                 <el-button class="main-menu-btn" type="primary" icon="el-icon-menu" size="small"></el-button>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item class="main-menu-dropdown-text">Timesheet</el-dropdown-item>
-                  <el-dropdown-item class="main-menu-dropdown-text">Task</el-dropdown-item>
-                  <el-dropdown-item class="main-menu-dropdown-text">Management</el-dropdown-item>
-                  <el-dropdown-item class="main-menu-dropdown-text">Others</el-dropdown-item>
+                  <el-dropdown-item command="timesheet" class="main-menu-dropdown-text">Timesheet</el-dropdown-item>
+                  <el-dropdown-item command="task" class="main-menu-dropdown-text">Task</el-dropdown-item>
+                  <el-dropdown-item command="management" class="main-menu-dropdown-text">Management</el-dropdown-item>
+                  <el-dropdown-item command="others" class="main-menu-dropdown-text">Others</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
@@ -21,7 +21,7 @@
               <span class="main-logo">{{logo}}</span>
             </div>
           </el-col>
-          <el-col :span="6" :offset="1" v-show="this.$store.getters.getIsShowMainBar">
+          <el-col :span="6" :offset="1" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
             <div class="main-grid-content" style="justify-content:flex-end;">
               <el-dropdown trigger="click">
                 <el-badge :value="msgValue" :max="10" class="main-user-msg">
@@ -78,8 +78,22 @@ export default {
   methods: {
     handleLogoutCommand(command) {
       this.$store.dispatch('setHideMainBar')
-      this.$router.replace({path: '/login'})
-    } 
+      this.$router.push({path: '/Login'})
+    },
+    handleMenuCommand(command) {
+      if (command === 'timesheet') {
+        this.$router.push({path: '/Timesheet'})
+      }
+      else if (command === 'task') {
+        this.$router.push({path: '/Task'})
+      }
+      else if (command === 'management') {
+        this.$router.push({path: '/Management'})
+      }
+      else if (command === 'others') {
+        this.$router.push({path: '/Others'})
+      }
+    }
   }
 }
 </script>
@@ -198,5 +212,8 @@ export default {
 /*Common Style*/
 .border-bottom-line {
   border-bottom: 1px solid #dfe4ea;
+}
+.hide-view {
+  visibility: hidden;
 }
 </style>
