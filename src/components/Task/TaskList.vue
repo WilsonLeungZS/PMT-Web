@@ -30,14 +30,23 @@
         </el-row>
         <el-row class="tl-main">
           <el-col :span="24">
-            <el-table :data="tasklistData" class="tl-main-table" fit>
-              <el-table-column prop="task_number" label="Number" width="150"></el-table-column>
-              <el-table-column prop="task_type" label="Type" width="120"></el-table-column>
-              <el-table-column prop="task_desc" label="Description" width="350"></el-table-column>
-              <el-table-column prop="task_status" label="Status" width="150"></el-table-column>
-              <el-table-column prop="task_effort" label="Effort" width="100"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation" width="100"></el-table-column>
-              <el-table-column prop="task_assign_team" label="Assign team" width="150"></el-table-column>
+            <el-table :data="tasklistData" class="tl-main-table" fit="true">
+              <el-table-column prop="task_number" label="Number" :show-overflow-tooltip="true"></el-table-column>
+              <el-table-column prop="task_type" label="Type"></el-table-column>
+              <el-table-column prop="task_desc" label="Description" width="350px" :show-overflow-tooltip="true"></el-table-column>
+              <el-table-column prop="task_status" label="Status"></el-table-column>
+              <el-table-column prop="task_effort" label="Effort" width="80px"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation" width="100px"></el-table-column>
+              <el-table-column prop="task_assign_team" label="Assign team"></el-table-column>
+              <el-table-column
+                fixed="right"
+                label="Edit"
+                width="100">
+                <template slot-scope="scope">
+                  <el-button @click="handleClick(scope.row)" type="text" size="small">Edit</el-button>
+                  <el-button type="text" size="small">Delete</el-button>
+                </template>
+              </el-table-column>
             </el-table>
           </el-col>
         </el-row>
@@ -63,7 +72,7 @@ export default {
         {task_number: 'INC19050632', task_type: 'Incident', task_desc: 'Missing Equipment Movement - MTL (HSU)', task_status: 'Open', task_effort: 4, task_estimation: 4, task_assign_team: 'Billing'},
         {task_number: 'INCTASK15486235', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
         {task_number: 'INC19050632', task_type: 'Service Request', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
-        {task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
+        {task_number: 'CGM190001', task_type: 'Change', task_desc: 'TESTETSTTTTTTTTT eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
         {task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
         {task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'}
       ]
@@ -120,7 +129,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
 }
 .tl-bar-item-input {
   width: 98%;
@@ -155,5 +163,10 @@ export default {
   color: #ff6348;
   border-bottom: 1px solid #ff6348;
   cursor: default;
+}
+.single-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
