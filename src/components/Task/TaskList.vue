@@ -25,36 +25,103 @@
               </el-input>
             </div>
           </el-col>
-          <el-col :span="5"><div class="tl-bar-item"></div></el-col>
+          <el-col :span="5">
+            <div class="tl-bar-item">
+              <el-button-group>
+                <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
+                  <el-button type="success" icon="el-icon-plus"></el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="Import Task" placement="top-start">
+                  <el-button type="primary" icon="el-icon-upload2"></el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="Export Task" placement="top-start">
+                  <el-button type="warning" icon="el-icon-download"></el-button>
+                </el-tooltip>
+              </el-button-group>
+            </div>
+          </el-col>
           <el-col :span="1"><div class="tl-bar-item"></div></el-col>
         </el-row>
         <el-row class="tl-main">
           <el-col :span="24">
-            <el-table :data="tasklistData" class="tl-main-table" fit="true">
+            <el-table :data="tasklistData" class="tl-main-table" fit>
+              <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
               <el-table-column prop="task_number" label="Number" :show-overflow-tooltip="true"></el-table-column>
-              <el-table-column prop="task_type" label="Type"></el-table-column>
-              <el-table-column prop="task_desc" label="Description" width="350px" :show-overflow-tooltip="true"></el-table-column>
+              <el-table-column prop="task_type" label="Type" ></el-table-column>
+              <el-table-column prop="task_desc" label="Description" width="400px" :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="task_status" label="Status"></el-table-column>
-              <el-table-column prop="task_effort" label="Effort" width="80px"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation" width="100px"></el-table-column>
-              <el-table-column prop="task_assign_team" label="Assign team"></el-table-column>
-              <el-table-column
-                fixed="right"
-                label="Edit"
-                width="100">
+              <el-table-column prop="task_effort" label="Effort" width="80px" align="center"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation" width="100px" align="center"></el-table-column>
+              <el-table-column prop="task_assign_team" label="Assign team" align="center"></el-table-column>
+              <el-table-column fixed="right" label="Edit" width="100" align="center">
                 <template slot-scope="scope">
-                  <el-button @click="handleClick(scope.row)" type="text" size="small">Edit</el-button>
-                  <el-button type="text" size="small">Delete</el-button>
+                  <el-button type="primary" size="small" @click="editTask(scope.row)">Edit</el-button>
                 </template>
               </el-table-column>
             </el-table>
           </el-col>
         </el-row>
-        <el-row class="tl-Pagination">
-          <el-col :span="24"></el-col>
+        <el-row class="tl-pagination">
+          <el-col :span="24" class="tl-pagination-col">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-sizes="[100, 200, 300, 400]"
+              :page-size="100"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="3000">
+            </el-pagination>
+          </el-col>
         </el-row>
       </el-main>
     </el-container>
+    <el-dialog title="Edit Task" :visible.sync="editTaskVisible" width="50%">
+      <el-form ref="form" :model="form" label-width="100px" class="tl-edit-form">
+        <el-form-item label="Number">
+          <el-input v-model="form.formNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="Type">
+          <el-select v-model="form.formType">
+            <el-option label="Change" value="1"></el-option>
+            <el-option label="Incident" value="2"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Description">
+          <el-input type="textarea" v-model="form.formDesc" :rows="5"></el-input>
+        </el-form-item>
+        <el-form-item label="Status" v-show="showStatusSelect">
+          <el-select v-model="form.formStatus">
+            <el-option label="Open" value="1"></el-option>
+            <el-option label="In Progress" value="2"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Status" v-show="showStatusInput">
+          <el-input v-model="form.formStatus" disabled="true"></el-input>
+        </el-form-item>
+        <el-col :span="12" >
+          <el-form-item label="Effort">
+            <el-input v-model="form.formEffort"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="Estimation">
+            <el-input v-model="form.formEstimation"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-form-item label="Assign Team">
+          <el-select v-model="form.formAssignTeam">
+            <el-option label="TOS" value="1"></el-option>
+            <el-option label="Billing" value="2"></el-option>
+            <el-option label="BSS" value="3"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="small" @click="editTaskVisible = false">Cancel</el-button>
+        <el-button type="primary" size="small" @click="editTaskVisible = false">Submit</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -67,15 +134,41 @@ export default {
       isActive: true,
       inputTaskVal: '',
       selectTaskType: '',
+      currentPage: 1,
       tasklistData: [
-        {task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'TOS'},
-        {task_number: 'INC19050632', task_type: 'Incident', task_desc: 'Missing Equipment Movement - MTL (HSU)', task_status: 'Open', task_effort: 4, task_estimation: 4, task_assign_team: 'Billing'},
-        {task_number: 'INCTASK15486235', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
-        {task_number: 'INC19050632', task_type: 'Service Request', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
-        {task_number: 'CGM190001', task_type: 'Change', task_desc: 'TESTETSTTTTTTTTT eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
-        {task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'},
-        {task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'ACN-APP-TOS'}
-      ]
+        {task_id: 1, task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'TOS'},
+        {task_id: 2, task_number: 'INC19050632', task_type: 'Incident', task_desc: 'Missing Equipment Movement - MTL (HSU)', task_status: 'Open', task_effort: 4, task_estimation: 4, task_assign_team: 'Billing'},
+        {task_id: 3, task_number: 'INCTASK15486235', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'TOS'},
+        {task_id: 4, task_number: 'INC19050632', task_type: 'Service Request', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'TOS'},
+        {task_id: 5, task_number: 'CGM190001', task_type: 'Change', task_desc: 'TESTETSTTTTTTTTT eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'TOS'},
+        {task_id: 6, task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'BSS'},
+        {task_id: 7, task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'TOS'}
+      ],
+      editTaskVisible: false,
+      showStatusSelect: false,
+      showStatusInput: true,
+      form: {
+        formNumber: 'CGM190001',
+        formType: 'Incident',
+        formDesc: 'eRO urgent change to add flex field to CNEeRO urgent change to add flex field to CNEeRO urgent change to add flex field to CNEeRO urgent change to add flex field to CNEeRO urgent change to add flex field to CNE',
+        formStatus: 'SIT Completed',
+        formEffort: 10,
+        formEstimation: 80,
+        formAssignTeam: ''
+      }
+    }
+  },
+  methods: {
+    editTask (taskRow) {
+      var taskId = taskRow.task_id
+      this.$data.editTaskVisible = true
+      console.log(taskId)
+    },
+    handleSizeChange (val) {
+      console.log(`Each Page ${val} records`)
+    },
+    handleCurrentChange (val) {
+      console.log(`Current Page: ${val}`)
     }
   }
 }
@@ -90,7 +183,7 @@ export default {
   color: #333;
   text-align: center;
   height:auto;
-  padding: 0;
+  padding: 0 5px;
 }
 .content-title-col {
   height: 35px;
@@ -127,7 +220,7 @@ export default {
   height: 50px;
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 .tl-bar-item-input {
@@ -149,11 +242,19 @@ export default {
   width:100%;
   height: auto;
 }
-.tl-Pagination {
-  height: 30px;
+/*Task list pagination style*/
+.tl-pagination {
+  height: 35px;
   width: 100%;
   margin-top: 10px;
-  border: 1px solid red;
+}
+.tl-pagination-col {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.tl-edit-form {
+  text-align: left;
 }
 /*Common Style*/
 .bg-color {
