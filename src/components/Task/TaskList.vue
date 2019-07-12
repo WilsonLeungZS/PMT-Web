@@ -77,9 +77,12 @@
       </el-main>
     </el-container>
     <el-dialog title="Edit Task" :visible.sync="editTaskVisible" width="50%">
-      <el-form ref="form" :model="form" label-width="100px" class="tl-edit-form">
-        <el-form-item label="Number">
+      <el-form ref="form" :model="form" label-width="120px" class="tl-edit-form" >
+        <el-form-item label="Number" v-show="showNewTask">
           <el-input v-model="form.formNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="Number" v-show="showExistingTask">
+          <span style="font-size: 17px">{{form.formNumber}}</span>
         </el-form-item>
         <el-form-item label="Type">
           <el-select v-model="form.formType">
@@ -90,25 +93,38 @@
         <el-form-item label="Description">
           <el-input type="textarea" v-model="form.formDesc" :rows="5"></el-input>
         </el-form-item>
-        <el-form-item label="Status" v-show="showStatusSelect">
+        <el-form-item label="Status" v-show="showNewTask">
           <el-select v-model="form.formStatus">
             <el-option label="Open" value="1"></el-option>
             <el-option label="In Progress" value="2"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="Status" v-show="showStatusInput">
-          <el-input v-model="form.formStatus" disabled="true"></el-input>
+        <el-form-item label="Status" v-show="showExistingTask">
+          <el-input v-model="form.formStatus" disabled></el-input>
         </el-form-item>
-        <el-col :span="12" >
-          <el-form-item label="Effort">
-            <el-input v-model="form.formEffort"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="Estimation">
-            <el-input v-model="form.formEstimation"></el-input>
-          </el-form-item>
-        </el-col>
+        <el-form-item label="Effort">
+          <el-col :span="10">
+            <el-col :span="19">
+              <el-input v-model="form.formEffort"></el-input>
+            </el-col>
+            <el-col :span="5" style="text-align: center; font-size: 16px;">
+              <span>hrs</span>
+            </el-col>
+          </el-col>
+          <el-col :span="14">
+            <el-form-item label="Estimation">
+              <el-col :span="19">
+                <el-input v-model="form.formEstimation"></el-input>
+              </el-col>
+              <el-col :span="5" style="text-align: center; font-size: 16px;">
+                <span>hrs</span>
+              </el-col>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="Progress" >
+          <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="74" status="success"></el-progress>
+        </el-form-item>
         <el-form-item label="Assign Team">
           <el-select v-model="form.formAssignTeam">
             <el-option label="TOS" value="1"></el-option>
@@ -116,10 +132,21 @@
             <el-option label="BSS" value="3"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="Worklog History">
+          <el-button icon="el-icon-more" size="small" type="text" @click="showWorklogHistory" style="font-size: 18px"></el-button>
+        </el-form-item>
       </el-form>
+      <el-card class="box-card">
+        <el-timeline>
+          <el-timeline-item v-for="(activity, index) in activities" :key="index" :timestamp="activity.timestamp">
+            {{activity.content}}
+          </el-timeline-item>
+        </el-timeline>
+      </el-card>
       <span slot="footer" class="dialog-footer">
-        <el-button size="small" @click="editTaskVisible = false">Cancel</el-button>
-        <el-button type="primary" size="small" @click="editTaskVisible = false">Submit</el-button>
+        <el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>
+        <el-button type="primary" size="medium" @click="editTaskVisible = false">Submit</el-button>
+        <el-button type="success" size="medium" @click="editTaskVisible = false">Log Work Done</el-button>
       </span>
     </el-dialog>
   </div>
@@ -145,8 +172,8 @@ export default {
         {task_id: 7, task_number: 'CGM190001', task_type: 'Change', task_desc: 'eRO urgent change to add flex field to CNE', task_status: 'Prod Released', task_effort: 4, task_estimation: 10, task_assign_team: 'TOS'}
       ],
       editTaskVisible: false,
-      showStatusSelect: false,
-      showStatusInput: true,
+      showNewTask: false,
+      showExistingTask: true,
       form: {
         formNumber: 'CGM190001',
         formType: 'Incident',
@@ -155,7 +182,13 @@ export default {
         formEffort: 10,
         formEstimation: 80,
         formAssignTeam: ''
-      }
+      },
+      showHistory: false,
+      activities: [
+        {content: '活动按期开始', timestamp: '2018-04-15'},
+        {content: '通过审核', timestamp: '2018-04-13'},
+        {content: '创建成功', timestamp: '2018-04-11'}
+      ]
     }
   },
   methods: {
@@ -169,6 +202,10 @@ export default {
     },
     handleCurrentChange (val) {
       console.log(`Current Page: ${val}`)
+    },
+    showWorklogHistory () {
+      console.log('Click')
+      this.$data.showHistory = true
     }
   }
 }
@@ -255,6 +292,10 @@ export default {
 }
 .tl-edit-form {
   text-align: left;
+}
+.tl-edit-form-progress {
+  height: 100%;
+  line-height: 40px;
 }
 /*Common Style*/
 .bg-color {
