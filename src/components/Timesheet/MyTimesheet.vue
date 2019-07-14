@@ -15,8 +15,60 @@
             </div>
           </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="24" class="content-main-col">
+            <el-table :data="timesheetData" fit empty-text="No worklog" class="mt-table" show-summary :summary-method="getSummaries"
+              :row-class-name="mtTableRowStyle" :cell-class-name="mtTableCellStyle"
+              :header-row-class-name="mtTableHeaderRowStyle" :header-cell-class-name="mtTableHeaderCellStyle" >
+              <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
+              <el-table-column prop="task" align="left" :show-overflow-tooltip="true">
+                <template slot="header" slot-scope="scope">
+                   <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM"
+                    class="mt-table-month-picker" @change="changeMTMonth"></el-date-picker>
+                </template>
+              </el-table-column>
+              <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
+                align="center" width="40" :class-name="changeCol(timesheetHeader.is_weekday)">
+                <template slot="header" slot-scope="scope">
+                  <span @click="editTimesheetByDate(scope)" style="font-size:16px; text-decoration:underline; cursor:pointer;">{{scope.column.label}}</span>
+                </template>
+                <template slot-scope="scope">
+                  <el-button type="text" @click="editTimesheetByTask(scope)">{{scope.row[scope.column.property] || '00'}}</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
       </el-main>
     </el-container>
+    <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="30%">
+      <el-form :model="form" label-width="70px" class="mt-worklog-form">
+        <el-form-item label="Task" >
+          <el-input v-model="form.worklog_task" v-show="showTask"></el-input>
+          <el-input v-model="form.worklog_task" v-show="!showTask" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Date">
+          <el-date-picker v-model="form.worklog_date" type="date" v-show="showDate"></el-date-picker>
+          <el-date-picker v-model="form.worklog_date" type="date" v-show="!showDate" disabled></el-date-picker>
+        </el-form-item>
+        <el-form-item label="Effort" >
+          <el-col :span="5">
+            <el-input v-model="form.worklog_effort"></el-input>
+          </el-col>
+          <el-col :span="5">
+            <span style="text-align:center; font-size:16px; margin-left:10px">Hrs</span>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="Remark" >
+          <el-input type="textarea" :rows="6" v-model="form.worklog_remark"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="worklogFormVisible = false">Cancel</el-button>
+        <el-button type="danger" @click="worklogFormVisible = false">Delete</el-button>
+        <el-button type="primary" @click="submitWorklog">Submit</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -27,17 +79,183 @@ export default {
     return {
       header1: 'My Timesheet',
       header2: 'Project Timesheet',
-      isActive: true
+      isActive: true,
+      timesheetData: [
+        {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
+        {task_id: 2, task: 'INC890012', day01: '00'},
+        {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
+        {task_id: 2, task: 'INC890012', day01: '00'},
+        {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
+        {task_id: 2, task: 'INC890012', day01: '04'}
+      ],
+      timesheetHeaders: [],
+      timesheetMonth: '',
+      sumHoursArray: [],
+      worklogFormVisible: false,
+      showTask: true,
+      showDate: true,
+      form: {
+        worklog_task: 'CGM190071',
+        worklog_date: '2019-07-13',
+        worklog_effort: 2,
+        worklog_remark: ''
+      }
     }
   },
   methods: {
     switchToPT () {
       this.$data.isActive = false
       this.$router.push({path: 'ProjectTimesheet'})
+    },
+    mtTableCellStyle ({row, column, rowIndex, columnIndex}) {
+      return 'mt-table-cell'
+    },
+    mtTableRowStyle ({row, rowIndex}) {
+      return 'mt-table-row'
+    },
+    mtTableHeaderCellStyle ({row, column, rowIndex, columnIndex}) {
+      if (columnIndex === 0) {
+        return 'mt-table-header-cell-weekday'
+      } else {
+        var isWeekday = this.$data.timesheetHeaders[columnIndex - 1].is_weekday
+        if (isWeekday) {
+          return 'mt-table-header-cell-weekday'
+        } else {
+          return 'mt-table-header-cell'
+        }
+      }
+    },
+    mtTableHeaderRowStyle ({row, rowIndex}) {
+      return 'mt-table-header-row'
+    },
+    changeCol (isWeekday) {
+      if (!isWeekday) {
+        return 'mt-table-col-weekday'
+      } else {
+        return 'mt-table-col-nonweekday'
+      }
+    },
+    changeMTMonth (iDate) {
+      this.resetTimesheet(iDate)
+    },
+    resetTimesheet (iDateVal) {
+      var mtYear = iDateVal.getFullYear()
+      var mtMonth = iDateVal.getMonth() + 1
+      if (mtMonth < 10) {
+        mtMonth = '0' + mtMonth
+      } else {
+        mtMonth = '' + mtMonth
+      }
+      var mtDay = iDateVal.getDay()
+      var resetArray = []
+      var days = 31
+      if (mtMonth === '02' || mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11') {
+        days = 30
+      }
+      console.log('Month[' + mtMonth + '] days: ' + days)
+      console.log('Week: ' + mtDay)
+      for (var i = 1; i <= days; i++) {
+        var resetJson = {}
+        var val = ''
+        if (i < 10) {
+          val = '0' + i
+        } else {
+          val = '' + i
+        }
+        resetJson.label = val
+        resetJson.prop = 'day' + val
+        if (mtDay === 6 || mtDay === 0) {
+          resetJson.is_weekday = false
+        } else {
+          resetJson.is_weekday = true
+        }
+        resetArray.push(resetJson)
+        mtDay++
+        if (mtDay === 7) {
+          mtDay = 0
+        }
+      }
+      this.$data.timesheetHeaders = resetArray
+      this.$data.timesheetMonth = mtYear + '-' + mtMonth
+    },
+    getCurrentMonthFirst () {
+      var date = new Date()
+      date.setDate(1)
+      var month = parseInt(date.getMonth() + 1)
+      console.log('Month: ' + month)
+      var day = date.getDate()
+      if (month < 10) {
+        month = '0' + month
+      }
+      if (day < 10) {
+        day = '0' + day
+      }
+      var firstDate = new Date(date.getFullYear(), month - 1, day)
+      return firstDate
+    },
+    getSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = 'Total Hours'
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        if (!values.every(value => isNaN(value))) {
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr)
+            if (!isNaN(value)) {
+              return prev + curr
+            } else {
+              return prev
+            }
+          }, 0)
+          if (sums[index] < 10) {
+            sums[index] = '0' + sums[index]
+          }
+        } else {
+          sums[index] = '00'
+        }
+      })
+      this.$data.sumHoursArray = sums
+      console.log(sums)
+      return sums
+    },
+    validateOver24Hours (iHours) {
+      return false
+    },
+    editTimesheetByDate (scope) {
+      console.log(scope)
+      this.$data.showTask = true
+      this.$data.showDate = false
+      this.$data.worklogFormVisible = true
+      // this.$data.form.worklog_task = scope.row.
+    },
+    editTimesheetByTask (scope) {
+      this.$data.showTask = false
+      this.$data.showDate = true
+      this.$data.worklogFormVisible = true
+    },
+    submitWorklog () {
+      var reqWorklogEffort = this.$data.form.worklog_effort
+      var reqWorklogDate = this.$data.form.worklog_date
+      if (!this.validateOver24Hours(reqWorklogEffort)) {
+        this.$notify.error({
+          title: 'Warning',
+          message: 'Total worklogs of ' + reqWorklogDate + ' over 24 hours',
+          duration: 1000,
+          showClose: false
+        })
+        return
+      }
+      this.$data.worklogFormVisible = false
     }
   },
   created () {
     console.log('Created My Timesheet')
+    var firstDate = this.getCurrentMonthFirst()
+    this.resetTimesheet(firstDate)
   }
 }
 </script>
@@ -50,7 +268,7 @@ export default {
 .el-main {
   color: #333;
   text-align: center;
-  height: 160px;
+  height: auto;
   padding: 0;
 }
 .content-title-col {
@@ -79,6 +297,17 @@ export default {
   width: auto;
   font-size: 20px;
 }
+/* Main Style */
+.content-main-col {
+  margin-top: 10px;
+}
+.mt-table-month-picker {
+  height:40px;
+  padding-left: 5px;
+  padding-right: 5px;
+  line-height: 46px;
+  font-size: 16px;
+}
 /*Common Style*/
 .bg-color {
   background-color: #eccc68;
@@ -87,5 +316,62 @@ export default {
   color: #ff6348;
   border-bottom: 1px solid #ff6348;
   cursor: default;
+}
+</style>
+<style>
+.mt-table {
+  width: 100%;
+}
+.mt-table-header-row {
+  height: 40px;
+}
+.mt-table-header-cell-weekday {
+  font-size: 13px;
+  border-top: 1px solid #f1f2f6;
+  padding: 0 !important;
+  background-color: #67C23A !important;
+  color: white;
+}
+.mt-table-header-cell {
+  font-size: 13px;
+  border-top: 1px solid #f1f2f6;
+  padding: 0 !important;
+  background-color: #67C23A !important;
+  color: #2f3542;
+}
+.mt-table-row {
+  height: 40px;
+}
+.mt-table-cell {
+  font-size: 13px;
+  padding: 0 !important;
+  border: 1px solid #f1f2f6;
+}
+.mt-table-col-weekday {
+  background-color: #ced6e0;
+}
+.mt-table-col-nonweekday {
+  background-color: white;
+}
+.mt-worklog-form {
+  text-align: left;
+}
+.el-textarea .el-textarea__inner {
+  resize: none;
+}
+.el-form-item {
+  margin-bottom: 12px;
+}
+.el-dialog__body {
+  padding: 10px 20px;
+}
+.el-dialog__footer {
+  padding: 10px;
+}
+.el-table__footer-wrapper tbody td {
+  color: #747d8c;
+  border: 1px solid #f1f2f6;
+  padding: 10px 0;
+  font-weight: bold;
 }
 </style>

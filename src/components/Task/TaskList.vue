@@ -47,15 +47,15 @@
             <el-table :data="tasklistData" class="tl-main-table" fit>
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
               <el-table-column prop="task_number" label="Number" :show-overflow-tooltip="true"></el-table-column>
-              <el-table-column prop="task_type" label="Type" ></el-table-column>
+              <el-table-column prop="task_type" label="Type" :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="task_desc" label="Description" width="400px" :show-overflow-tooltip="true"></el-table-column>
-              <el-table-column prop="task_status" label="Status"></el-table-column>
+              <el-table-column prop="task_status" label="Status" :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="task_effort" label="Effort" width="80px" align="center"></el-table-column>
               <el-table-column prop="task_estimation" label="Estimation" width="100px" align="center"></el-table-column>
-              <el-table-column prop="task_assign_team" label="Assign team" align="center"></el-table-column>
+              <el-table-column prop="task_assign_team" label="Assign team" align="center" :show-overflow-tooltip="true"></el-table-column>
               <el-table-column fixed="right" label="Edit" width="100" align="center">
                 <template slot-scope="scope">
-                  <el-button type="primary" size="small" @click="editTask(scope.row)">Edit</el-button>
+                  <el-button type="primary" size="small" @click="editTask(scope.row)" icon="el-icon-edit">Edit</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -91,7 +91,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Description">
-          <el-input type="textarea" v-model="form.formDesc" :rows="5"></el-input>
+          <el-input type="textarea" v-model="form.formDesc" :rows="4"></el-input>
         </el-form-item>
         <el-form-item label="Status" v-show="showNewTask">
           <el-select v-model="form.formStatus">
@@ -136,17 +136,18 @@
           <el-button icon="el-icon-more" size="small" type="text" @click="showWorklogHistory" style="font-size: 18px"></el-button>
         </el-form-item>
       </el-form>
-      <el-card class="box-card">
+      <el-card class="box-card tl-history-box-card" v-show="showHistory">
         <el-timeline>
-          <el-timeline-item v-for="(activity, index) in activities" :key="index" :timestamp="activity.timestamp">
-            {{activity.content}}
+          <el-timeline-item v-for="(history, index) in histories" :key="index" :timestamp="history.timestamp"
+            icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
+            {{history.content}}
           </el-timeline-item>
         </el-timeline>
       </el-card>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>
-        <el-button type="primary" size="medium" @click="editTaskVisible = false">Submit</el-button>
         <el-button type="success" size="medium" @click="editTaskVisible = false">Log Work Done</el-button>
+        <el-button type="primary" size="medium" @click="editTaskVisible = false">Submit</el-button>
       </span>
     </el-dialog>
   </div>
@@ -181,13 +182,14 @@ export default {
         formStatus: 'SIT Completed',
         formEffort: 10,
         formEstimation: 80,
-        formAssignTeam: ''
+        formAssignTeam: 'TOS'
       },
       showHistory: false,
-      activities: [
-        {content: '活动按期开始', timestamp: '2018-04-15'},
-        {content: '通过审核', timestamp: '2018-04-13'},
-        {content: '创建成功', timestamp: '2018-04-11'}
+      histories: [
+        {content: 'zhongshu.liang record 3 hrs', timestamp: '2018-04-15'},
+        {content: 'tony.ye record 13 hrs', timestamp: '2018-04-13'},
+        {content: 'zhongshu.liang record 3 hrs', timestamp: '2018-04-11'},
+        {content: 'feng.he record 3 hrs', timestamp: '2018-02-15'}
       ]
     }
   },
@@ -205,7 +207,7 @@ export default {
     },
     showWorklogHistory () {
       console.log('Click')
-      this.$data.showHistory = true
+      this.$data.showHistory = !this.$data.showHistory
     }
   }
 }
@@ -296,6 +298,13 @@ export default {
 .tl-edit-form-progress {
   height: 100%;
   line-height: 40px;
+}
+.tl-history {
+  text-align:left;
+}
+.tl-history-box-card {
+  height: 200px;
+  overflow: auto;
 }
 /*Common Style*/
 .bg-color {

@@ -8,10 +8,10 @@
               <el-dropdown @command="handleMenuCommand">
                 <el-button class="main-menu-btn" type="primary" icon="el-icon-menu" size="small"></el-button>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="timesheet" class="main-menu-dropdown-text">Timesheet</el-dropdown-item>
-                  <el-dropdown-item command="task" class="main-menu-dropdown-text">Task</el-dropdown-item>
-                  <el-dropdown-item command="management" class="main-menu-dropdown-text">Management</el-dropdown-item>
-                  <el-dropdown-item command="others" class="main-menu-dropdown-text">Others</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-date" command="timesheet" class="main-menu-dropdown-text">Timesheet</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-tickets" command="task" class="main-menu-dropdown-text">Task</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-edit-outline" command="management" class="main-menu-dropdown-text">Management</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-paperclip" command="others" class="main-menu-dropdown-text">Others</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
