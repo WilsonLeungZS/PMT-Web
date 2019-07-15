@@ -21,14 +21,14 @@
               :row-class-name="mtTableRowStyle" :cell-class-name="mtTableCellStyle"
               :header-row-class-name="mtTableHeaderRowStyle" :header-cell-class-name="mtTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
-              <el-table-column prop="task" align="left" :show-overflow-tooltip="true">
+              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
                 <template slot="header" slot-scope="scope">
                    <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM"
                     class="mt-table-month-picker" @change="changeMTMonth"></el-date-picker>
                 </template>
               </el-table-column>
               <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
-                align="center" width="40" :class-name="changeCol(timesheetHeader.is_weekday)">
+                align="center" min-width="40" :class-name="changeCol(timesheetHeader.is_weekday)">
                 <template slot="header" slot-scope="scope">
                   <span @click="editTimesheetByDate(scope)" style="font-size:16px; text-decoration:underline; cursor:pointer;">{{scope.column.label}}</span>
                 </template>
@@ -307,6 +307,8 @@ export default {
   padding-right: 5px;
   line-height: 46px;
   font-size: 16px;
+  margin: 0 5px;
+  width: auto;
 }
 /*Common Style*/
 .bg-color {
