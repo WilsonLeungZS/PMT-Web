@@ -299,7 +299,7 @@ export default {
 }
 /* Main Style */
 .content-main-col {
-  margin-top: 10px;
+  margin-top: 20px;
 }
 .mt-table-month-picker {
   height:40px;
@@ -331,14 +331,14 @@ export default {
   font-size: 13px;
   border-top: 1px solid #f1f2f6;
   padding: 0 !important;
-  background-color: #67C23A !important;
+  background-color: #2980b9 !important;
   color: white;
 }
 .mt-table-header-cell {
   font-size: 13px;
   border-top: 1px solid #f1f2f6;
   padding: 0 !important;
-  background-color: #67C23A !important;
+  background-color: #2980b9 !important;
   color: #2f3542;
 }
 .mt-table-row {
