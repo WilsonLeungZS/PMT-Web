@@ -4,12 +4,12 @@
       <el-main>
         <el-row>
           <el-col :span="24" class="content-title-col">
-            <div :class="{'content-title-item':true, 'active':isActive}">
+            <div class="content-title-item " @click="switchToUM">
               <i class="el-icon-user content-title-item-icon"></i>
               <span class="content-title-item-header">{{header1}}</span>
             </div>
             <el-divider direction="vertical"></el-divider>
-            <div class="content-title-item " @click="switchToTM">
+            <div :class="{'content-title-item':true, 'active':isActive}">
               <i class="el-icon-data-analysis content-title-item-icon"></i>
               <span class="content-title-item-header">{{header2}}</span>
             </div>
@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: 'UserManagement',
+  name: 'TaskManagement',
   data () {
     return {
       header1: 'User Related',
@@ -31,9 +31,9 @@ export default {
     }
   },
   methods: {
-    switchToTM () {
+    switchToUM () {
       this.$data.isActive = false
-      this.$router.push({path: 'TaskManagement'})
+      this.$router.push({path: 'UserManagement'})
     }
   }
 }

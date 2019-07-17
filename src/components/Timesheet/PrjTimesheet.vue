@@ -29,7 +29,7 @@
                     @change="changePtMonth"></el-date-picker>
                 </el-col>
                 <el-col :span="2" class="pt-title-item">
-                  <el-button type="success" icon="el-icon-check" circle></el-button>
+                  <el-button type="success" icon="el-icon-arrow-right" circle></el-button>
                 </el-col>
               </el-row>
             </el-card>
@@ -78,14 +78,6 @@ export default {
       teamSelect: '',
       teams: [{team_name: 'TOS', team_label: 'TOS'}, {team_name: 'Billing', team_label: 'Billing'}, {team_name: 'BSS', team_label: 'BSS'}],
       monthSelect: '',
-      timesheetData: [
-        {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: '00'},
-        {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: '00'},
-        {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: '04'}
-      ],
       timesheetHeaders: [],
       timesheetMonth: '',
       sumHoursArray: [],
