@@ -75,7 +75,7 @@ export default {
       header1: 'My Timesheet',
       header2: 'Project Timesheet',
       isActive: true,
-      teamSelect: '',
+      teamSelect: 'TOS',
       teams: [{team_name: 'TOS', team_label: 'TOS'}, {team_name: 'Billing', team_label: 'Billing'}, {team_name: 'BSS', team_label: 'BSS'}],
       monthSelect: '',
       timesheetHeaders: [],

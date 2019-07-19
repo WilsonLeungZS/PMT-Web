@@ -29,13 +29,10 @@
             <div class="tl-bar-item">
               <el-button-group>
                 <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
-                  <el-button type="success" icon="el-icon-plus"></el-button>
+                  <el-button type="primary" icon="el-icon-plus" size="small" class="tl-bar-item-btn"></el-button>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="Import Task" placement="top-start">
-                  <el-button type="primary" icon="el-icon-upload2"></el-button>
-                </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="Export Task" placement="top-start">
-                  <el-button type="warning" icon="el-icon-download"></el-button>
+                <el-tooltip class="item" effect="dark" content="Export Tasks" placement="top-start">
+                  <el-button type="success" icon="el-icon-download" size="small" class="tl-bar-item-btn"></el-button>
                 </el-tooltip>
               </el-button-group>
             </div>
@@ -132,6 +129,14 @@
             <el-option label="BSS" value="3"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="Sub Tasks" v-if="form.formSubTasks.length > 0">
+          <el-card class="box-card" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="hover">
+            <el-table :data="form.formSubTasks" fit :show-header="false">
+              <el-table-column prop="task_id" v-if="false"></el-table-column>
+              <el-table-column prop="task_number"></el-table-column>
+            </el-table>
+          </el-card>
+        </el-form-item>
         <el-form-item label="Worklog History">
           <el-button icon="el-icon-more" size="small" type="text" @click="showWorklogHistory" style="font-size: 18px"></el-button>
         </el-form-item>
@@ -182,7 +187,14 @@ export default {
         formStatus: 'SIT Completed',
         formEffort: 10,
         formEstimation: 80,
-        formAssignTeam: 'TOS'
+        formAssignTeam: 'TOS',
+        formSubTasks: [
+          {task_id: 1, task_number: 'CGM190001 - Analysis'},
+          {task_id: 1, task_number: 'CGM190001 - Design'},
+          {task_id: 1, task_number: 'CGM190001 - Build'},
+          {task_id: 1, task_number: 'CGM190001 - Test'},
+          {task_id: 1, task_number: 'CGM190001 - Deploy'}
+        ]
       },
       showHistory: false,
       histories: [
@@ -262,6 +274,9 @@ export default {
   justify-content: flex-start;
   align-items: center;
 }
+.tl-bar-item-btn {
+  font-size: 20px;
+}
 .tl-bar-item-input {
   width: 98%;
   background-color: #fff;
@@ -319,5 +334,16 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.view-hide {
+  display: none;
+}
+</style>
+<style>
+.el-dialog__body {
+  padding: 10px 20px;
+}
+.el-table td, .el-table th {
+  padding: 5px 0;
 }
 </style>

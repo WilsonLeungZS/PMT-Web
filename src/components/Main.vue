@@ -11,7 +11,7 @@
                   <el-dropdown-item icon="el-icon-date" command="timesheet" class="main-menu-dropdown-text">Timesheet</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-tickets" command="task" class="main-menu-dropdown-text">Task</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-edit-outline" command="management" class="main-menu-dropdown-text">Management</el-dropdown-item>
-                  <el-dropdown-item icon="el-icon-paperclip" command="others" class="main-menu-dropdown-text">Others</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-paperclip" command="others" class="main-menu-dropdown-text" v-if="false">Others</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>

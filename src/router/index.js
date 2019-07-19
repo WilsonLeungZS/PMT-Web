@@ -6,7 +6,6 @@ import MyTimesheet from '@/components/Timesheet/MyTimesheet'
 import PrjTimesheet from '@/components/Timesheet/PrjTimesheet'
 import TaskList from '@/components/Task/TaskList'
 import PrjManagement from '@/components/Management/PrjManagement'
-import TaskManagement from '@/components/Management/TaskManagement'
 import Charts from '@/components/Others/Charts'
 import Error from '@/components/Error'
 
@@ -49,11 +48,6 @@ export default new Router({
           path: 'Management/PrjManagement',
           name: 'PrjManagement',
           component: PrjManagement
-        },
-        {
-          path: 'Management/TaskManagement',
-          name: 'TaskManagement',
-          component: TaskManagement
         },
         {
           path: 'Others/Charts',
