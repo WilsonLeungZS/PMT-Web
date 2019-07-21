@@ -73,7 +73,7 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog title="Edit Task" :visible.sync="editTaskVisible" width="50%">
+    <el-dialog title="Edit Task" :visible.sync="editTaskVisible" width="42%">
       <el-form ref="form" :model="form" label-width="120px" class="tl-edit-form" >
         <el-form-item label="Number" v-show="showNewTask">
           <el-input v-model="form.formNumber"></el-input>
@@ -85,6 +85,7 @@
           <el-select v-model="form.formType">
             <el-option label="Change" value="1"></el-option>
             <el-option label="Incident" value="2"></el-option>
+            <el-option label="Service Request" value="3"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Description">
@@ -130,10 +131,17 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Sub Tasks" v-if="form.formSubTasks.length > 0">
-          <el-card class="box-card" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="hover">
+          <el-card class="box-card" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
             <el-table :data="form.formSubTasks" fit :show-header="false">
               <el-table-column prop="task_id" v-if="false"></el-table-column>
-              <el-table-column prop="task_number"></el-table-column>
+              <el-table-column>
+                <template slot-scope="scope">
+                  <el-row style="cursor: pointer;"  @click.native="editTask(scope.row)">
+                    <el-col :span="23"><span>{{scope.row.task_number}}</span></el-col>
+                    <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
+                  </el-row>
+                </template>
+              </el-table-column>
             </el-table>
           </el-card>
         </el-form-item>
@@ -189,11 +197,11 @@ export default {
         formEstimation: 80,
         formAssignTeam: 'TOS',
         formSubTasks: [
-          {task_id: 1, task_number: 'CGM190001 - Analysis'},
-          {task_id: 1, task_number: 'CGM190001 - Design'},
-          {task_id: 1, task_number: 'CGM190001 - Build'},
-          {task_id: 1, task_number: 'CGM190001 - Test'},
-          {task_id: 1, task_number: 'CGM190001 - Deploy'}
+          {task_id: 10, task_number: 'CGM190001 - Analysis'},
+          {task_id: 12, task_number: 'CGM190001 - Design'},
+          {task_id: 13, task_number: 'CGM190001 - Build'},
+          {task_id: 14, task_number: 'CGM190001 - Test'},
+          {task_id: 15, task_number: 'CGM190001 - Deploy'}
         ]
       },
       showHistory: false,
@@ -207,9 +215,15 @@ export default {
   },
   methods: {
     editTask (taskRow) {
+      console.log('Click')
       var taskId = taskRow.task_id
+      var taskNumber = taskRow.task_number
+      this.$data.form.formNumber = taskNumber
       this.$data.editTaskVisible = true
       console.log(taskId)
+    },
+    editSubTask (row, column, event) {
+      console.log('Click 11')
     },
     handleSizeChange (val) {
       console.log(`Each Page ${val} records`)

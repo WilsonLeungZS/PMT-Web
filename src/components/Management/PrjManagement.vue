@@ -369,8 +369,8 @@ export default {
       var index = props.$index
       if (props.row.tasktype_id > 0) {
         props.row.tasktype_name = this.$data.tasktypeResetData[index].tasktype_name
-        props.row.tasktype_category = this.$data.userResetData[index].tasktype_category
-        props.row.tasktype_value = this.$data.userResetData[index].tasktype_value
+        props.row.tasktype_category = this.$data.tasktypeResetData[index].tasktype_category
+        props.row.tasktype_value = this.$data.tasktypeResetData[index].tasktype_value
       } else {
         this.$data.tasktypeData.splice(index, 1)
       }
