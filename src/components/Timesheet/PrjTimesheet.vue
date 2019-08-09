@@ -81,7 +81,7 @@ export default {
       timesheetHeaders: [],
       timesheetMonth: '',
       sumHoursArray: [],
-      timesheetDatas: [{team: 'TOS',
+      timesheetDatas: [{
         user: 'zhongshu.liang',
         month: '2019-07',
         timesheetData: [
@@ -92,7 +92,6 @@ export default {
           {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'},
           {task_id: 2, task: 'INC890012', day01: '4'}
         ]}, {
-        team: 'TOS',
         user: 'zefeng.wu',
         month: '2019-07',
         timesheetData: [
@@ -100,7 +99,6 @@ export default {
           {task_id: 2, task: 'INC890012', day01: '1'},
           {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'}
         ]}, {
-        team: 'TOS',
         user: 'zefeng.wu',
         month: '2019-07',
         timesheetData: [
@@ -108,7 +106,6 @@ export default {
           {task_id: 2, task: 'INC890012', day01: '1'},
           {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'}
         ]}, {
-        team: 'TOS',
         user: 'Jason.junxin.he',
         month: '2019-07',
         timesheetData: [

@@ -33,7 +33,7 @@
                   <span @click="editTimesheetByDate(scope)" style="font-size:16px; text-decoration:underline; cursor:pointer;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <el-button type="text" @click="editTimesheetByTask(scope)">{{scope.row[scope.column.property] || '00'}}</el-button>
+                  <el-button type="text" @click="editTimesheetByTask(scope)">{{scope.row[scope.column.property] || '--'}}</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -82,9 +82,9 @@ export default {
       isActive: true,
       timesheetData: [
         {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: '00'},
+        {task_id: 2, task: 'INC890012', day01: ''},
         {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: '00'},
+        {task_id: 2, task: 'INC890012', day01: ''},
         {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
         {task_id: 2, task: 'INC890012', day01: '04'}
       ],
