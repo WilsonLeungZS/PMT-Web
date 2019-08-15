@@ -4,11 +4,16 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     userEid: '',
+    userId: 0,
+    isLogin: false,
     isShowMainBar: true
   },
   getters: {
     getUserEid: function (state) {
       return state.userEid
+    },
+    getUserId: function (state) {
+      return state.userId
     },
     getIsShowMainBar: function (state) {
       return state.isShowMainBar
@@ -20,6 +25,12 @@ const store = new Vuex.Store({
     },
     clearUserEid: function (state) {
       state.userEid = ''
+    },
+    newUserId: function (state, userId) {
+      state.userId = userId
+    },
+    clearuserId: function (state) {
+      state.userId = ''
     },
     showMainBar: function (state) {
       state.isShowMainBar = true
@@ -34,6 +45,12 @@ const store = new Vuex.Store({
     },
     setClearUserEid: function (context) {
       context.commit('clearUserEid')
+    },
+    setNewUserId: function (context, userId) {
+      context.commit('newUserId', userId)
+    },
+    setClearUserId: function (context) {
+      context.commit('clearuserId')
     },
     setShowMainBar: function (context) {
       context.commit('showMainBar')

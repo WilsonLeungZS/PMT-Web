@@ -27,32 +27,50 @@ export default new Router({
         {
           path: 'Login',
           name: 'Login',
-          component: Login
+          component: Login,
+          meta: {
+            needLogin: false
+          }
         },
         {
           path: 'Timesheet/MyTimesheet',
           name: 'MyTimesheet',
-          component: MyTimesheet
+          component: MyTimesheet,
+          meta: {
+            needLogin: true
+          }
         },
         {
           path: 'Timesheet/ProjectTimesheet',
           name: 'PrjTimesheet',
-          component: PrjTimesheet
+          component: PrjTimesheet,
+          meta: {
+            needLogin: true
+          }
         },
         {
           path: 'Task/TaskList',
           name: 'TaskList',
-          component: TaskList
+          component: TaskList,
+          meta: {
+            needLogin: true
+          }
         },
         {
           path: 'Management/PrjManagement',
           name: 'PrjManagement',
-          component: PrjManagement
+          component: PrjManagement,
+          meta: {
+            needLogin: true
+          }
         },
         {
           path: 'Others/Charts',
           name: 'Charts',
-          component: Charts
+          component: Charts,
+          meta: {
+            needLogin: true
+          }
         }
       ]
     },

@@ -23,7 +23,7 @@
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
               <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
                 <template slot="header" slot-scope="scope">
-                   <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM"
+                   <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM" :clearable="false"
                     class="mt-table-month-picker" @change="changeMTMonth"></el-date-picker>
                 </template>
               </el-table-column>
@@ -41,15 +41,19 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="30%">
+    <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%">
       <el-form :model="form" label-width="70px" class="mt-worklog-form">
         <el-form-item label="Task" >
-          <el-input v-model="form.worklog_task" v-show="showTask"></el-input>
-          <el-input v-model="form.worklog_task" v-show="!showTask" disabled></el-input>
+          <el-autocomplete style="width:100%" :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true"
+            v-model="form.worklog_task" :fetch-suggestions="queryTaskAsync" @select="handleTaskSelect">
+          <template slot-scope="{ item }">
+            <div class="form_list_task_name">{{ item.value }}</div>
+            <span class="form_list_task_desc">{{ item.description }}</span>
+          </template>
+          </el-autocomplete>
         </el-form-item>
         <el-form-item label="Date">
-          <el-date-picker v-model="form.worklog_date" type="date" v-show="showDate"></el-date-picker>
-          <el-date-picker v-model="form.worklog_date" type="date" v-show="!showDate" disabled></el-date-picker>
+          <el-date-picker v-model="form.worklog_date" type="date"></el-date-picker>
         </el-form-item>
         <el-form-item label="Effort" >
           <el-col :span="5">
@@ -73,6 +77,7 @@
 </template>
 
 <script>
+import http from '../../utils/http'
 export default {
   name: 'MyTimesheet',
   data () {
@@ -80,24 +85,17 @@ export default {
       header1: 'My Timesheet',
       header2: 'Project Timesheet',
       isActive: true,
-      timesheetData: [
-        {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: ''},
-        {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: ''},
-        {task_id: 1, task: 'CGM190071 - ERO report help to generated for user and reply user as the result', day01: '01', day02: '08'},
-        {task_id: 2, task: 'INC890012', day01: '04'}
-      ],
+      timesheetData: [],
       timesheetHeaders: [],
       timesheetMonth: '',
       sumHoursArray: [],
       worklogFormVisible: false,
-      showTask: true,
-      showDate: true,
+      taskList: [],
       form: {
-        worklog_task: 'CGM190071',
-        worklog_date: '2019-07-13',
-        worklog_effort: 2,
+        worklog_taskid: 0,
+        worklog_task: '',
+        worklog_date: '',
+        worklog_effort: 0,
         worklog_remark: ''
       }
     }
@@ -138,7 +136,8 @@ export default {
     changeMTMonth (iDate) {
       this.resetTimesheet(iDate)
     },
-    resetTimesheet (iDateVal) {
+    async resetTimesheet (iDateVal) {
+      this.$data.timesheetData = []
       var mtYear = iDateVal.getFullYear()
       var mtMonth = iDateVal.getMonth() + 1
       if (mtMonth < 10) {
@@ -152,8 +151,6 @@ export default {
       if (mtMonth === '02' || mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11') {
         days = 30
       }
-      console.log('Month[' + mtMonth + '] days: ' + days)
-      console.log('Week: ' + mtDay)
       for (var i = 1; i <= days; i++) {
         var resetJson = {}
         var val = ''
@@ -176,7 +173,17 @@ export default {
         }
       }
       this.$data.timesheetHeaders = resetArray
-      this.$data.timesheetMonth = mtYear + '-' + mtMonth
+      var reqMonth = mtYear + '-' + mtMonth
+      this.$data.timesheetMonth = reqMonth
+      var reqUserId = this.$store.getters.getUserId
+      const res = await http.post('/worklogs/getWorklogByUserAndMonthForWeb', {
+        wUserId: reqUserId,
+        wWorklogMonth: reqMonth
+      })
+      if (res.data.status === 0) {
+        this.$data.timesheetData = res.data.data
+        console.log(res.data.data)
+      }
     },
     getCurrentMonthFirst () {
       var date = new Date()
@@ -211,36 +218,61 @@ export default {
               return prev
             }
           }, 0)
-          if (sums[index] < 10) {
-            sums[index] = '0' + sums[index]
-          }
         } else {
-          sums[index] = '00'
+          sums[index] = '0'
         }
       })
       this.$data.sumHoursArray = sums
-      console.log(sums)
       return sums
     },
-    validateOver24Hours (iHours) {
+    // Edit worklog when click the date
+    editTimesheetByDate (scope) {
+      this.$data.worklogFormVisible = true
+      this.$data.form.worklog_taskid = 0
+      this.$data.form.worklog_task = ''
+      this.$data.form.worklog_effort = 0
+      this.$data.form.worklog_remark = ''
+      this.$data.form.worklog_date = this.$data.timesheetMonth + '-' + scope.column.label
+    },
+    // Edit worklog when click the day
+    async editTimesheetByTask (scope) {
+      this.$data.worklogFormVisible = true
+      this.$data.form.worklog_taskid = 0
+      this.$data.form.worklog_task = ''
+      this.$data.form.worklog_effort = 0
+      this.$data.form.worklog_remark = ''
+      this.$data.form.worklog_date = this.$data.timesheetMonth + '-' + scope.column.label
+      var reqUserId = this.$store.getters.getUserId
+      var reqTaskId = scope.row.task_id
+      var reqWorklogMonth = this.$data.timesheetMonth
+      var reqWorklogDay = scope.column.label
+      const res = await http.post('/worklogs/getWorklogForWeb', {
+        wUserId: reqUserId,
+        wTaskId: reqTaskId,
+        wWorklogMonth: reqWorklogMonth,
+        wWorklogDay: reqWorklogDay
+      })
+      if (res.data.status === 0) {
+        this.$data.form.worklog_taskid = res.data.data[0].worklog_task_id
+        this.$data.form.worklog_task = res.data.data[0].worklog_task_name
+        this.$data.form.worklog_effort = res.data.data[0].worklog_effort
+        this.$data.form.worklog_remark = res.data.data[0].worklog_remark
+      } else {
+        this.$data.form.worklog_taskid = 0
+        this.$data.form.worklog_task = ''
+        this.$data.form.worklog_effort = 0
+        this.$data.form.worklog_remark = ''
+      }
+    },
+    validateEffort (iHours) {
       return false
     },
-    editTimesheetByDate (scope) {
-      console.log(scope)
-      this.$data.showTask = true
-      this.$data.showDate = false
-      this.$data.worklogFormVisible = true
-      // this.$data.form.worklog_task = scope.row.
-    },
-    editTimesheetByTask (scope) {
-      this.$data.showTask = false
-      this.$data.showDate = true
-      this.$data.worklogFormVisible = true
-    },
     submitWorklog () {
+      // var reqUserId = this.$store.getters.getUserId
+      // var reqTaskId = this.$data.form.worklog_taskid
       var reqWorklogEffort = this.$data.form.worklog_effort
       var reqWorklogDate = this.$data.form.worklog_date
-      if (!this.validateOver24Hours(reqWorklogEffort)) {
+      if (!this.validateEffort(reqWorklogEffort)) {
         this.$notify.error({
           title: 'Warning',
           message: 'Total worklogs of ' + reqWorklogDate + ' over 24 hours',
@@ -250,6 +282,27 @@ export default {
         return
       }
       this.$data.worklogFormVisible = false
+    },
+    async queryTaskAsync (queryString, cb) {
+      console.log('Query String: ' + queryString)
+      const res = await http.post('/tasks/getTaskByName', {
+        tTaskName: queryString
+      })
+      if (res.data.status === 0) {
+        var queryResult = res.data.data
+        var returnArr = []
+        for (var i = 0; i < queryResult.length; i++) {
+          var returnJson = {}
+          returnJson.value = queryResult[i].task_name
+          returnJson.description = queryResult[i].task_desc
+          returnJson.id = queryResult[i].task_id
+          returnArr.push(returnJson)
+        }
+        cb(returnArr)
+      }
+    },
+    handleTaskSelect (item) {
+      console.log(item)
     }
   },
   created () {
@@ -309,6 +362,16 @@ export default {
   font-size: 16px;
   margin: 0 5px;
   width: auto;
+}
+.form_list_task_name {
+  font-size: 16px;
+  color: #57606f;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.form_list_task_desc {
+  font-size: 14px;
+  color: #bdc3c7;
 }
 /*Common Style*/
 .bg-color {
@@ -375,5 +438,8 @@ export default {
   border: 1px solid #f1f2f6;
   padding: 10px 0;
   font-weight: bold;
+}
+.el-autocomplete-suggestion li {
+  line-height: 28px;
 }
 </style>

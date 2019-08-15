@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import http from '../../utils/http'
 export default {
   name: 'PrjTimesheet',
   data () {
@@ -76,44 +77,12 @@ export default {
       header2: 'Project Timesheet',
       isActive: true,
       teamSelect: 'TOS',
-      teams: [{team_name: 'TOS', team_label: 'TOS'}, {team_name: 'Billing', team_label: 'Billing'}, {team_name: 'BSS', team_label: 'BSS'}],
+      teams: [{team_id: 1, team_label: 'TOS'}, {team_id: 2, team_label: 'Billing'}, {team_id: 3, team_label: 'BSS'}],
       monthSelect: '',
       timesheetHeaders: [],
       timesheetMonth: '',
       sumHoursArray: [],
-      timesheetDatas: [{
-        user: 'zhongshu.liang',
-        month: '2019-07',
-        timesheetData: [
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'},
-          {task_id: 2, task: 'INC890012', day01: '0'},
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'},
-          {task_id: 2, task: 'INC890012', day01: '0'},
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'},
-          {task_id: 2, task: 'INC890012', day01: '4'}
-        ]}, {
-        user: 'zefeng.wu',
-        month: '2019-07',
-        timesheetData: [
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'},
-          {task_id: 2, task: 'INC890012', day01: '1'},
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'}
-        ]}, {
-        user: 'zefeng.wu',
-        month: '2019-07',
-        timesheetData: [
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'},
-          {task_id: 2, task: 'INC890012', day01: '1'},
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'}
-        ]}, {
-        user: 'Jason.junxin.he',
-        month: '2019-07',
-        timesheetData: [
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'},
-          {task_id: 2, task: 'INC890012', day01: '1'},
-          {task_id: 1, task: 'CGM190071 - ERO report help to generated for ', day01: '1', day02: '8'}
-        ]}
-      ]
+      timesheetDatas: []
     }
   },
   methods: {
@@ -152,7 +121,8 @@ export default {
     changePtMonth (iDate) {
       this.resetTimesheet(iDate)
     },
-    resetTimesheet (iDateVal) {
+    async resetTimesheet (iDateVal) {
+      this.$data.timesheetDatas = []
       var ptYear = iDateVal.getFullYear()
       var ptMonth = iDateVal.getMonth() + 1
       if (ptMonth < 10) {
@@ -190,7 +160,16 @@ export default {
         }
       }
       this.$data.timesheetHeaders = resetArray
-      this.$data.monthSelect = ptYear + '-' + ptMonth
+      var reqMonth = ptYear + '-' + ptMonth
+      this.$data.monthSelect = reqMonth
+      const res = await http.post('/worklogs/getWorklogByTeamAndMonthForWeb', {
+        wTeamId: 1,
+        wWorklogMonth: reqMonth
+      })
+      if (res.data.status === 0) {
+        this.$data.timesheetDatas = res.data.data
+        console.log(res.data.data)
+      }
     },
     getCurrentMonthFirst () {
       var date = new Date()

@@ -77,6 +77,10 @@ export default {
   },
   methods: {
     handleLogoutCommand(command) {
+      localStorage.setItem('Flag', '')
+      localStorage.setItem('UserEid', '')
+      this.$store.dispatch('setNewUserEid', '')
+      this.$store.dispatch('setNewUserId', '')
       this.$store.dispatch('setHideMainBar')
       this.$router.push({path: '/Login'})
     },
