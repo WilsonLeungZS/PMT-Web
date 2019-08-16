@@ -41,11 +41,11 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%">
+    <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
       <el-form :model="form" label-width="70px" class="mt-worklog-form">
         <el-form-item label="Task" >
           <el-autocomplete style="width:100%" :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true"
-            v-model="form.worklog_task" :fetch-suggestions="queryTaskAsync" @select="handleTaskSelect">
+            v-model="form.worklog_task" :fetch-suggestions="queryTaskAsync" @select="handleTaskSelect" @clear="clearTask">
           <template slot-scope="{ item }">
             <div class="form_list_task_name">{{ item.value }}</div>
             <span class="form_list_task_desc">{{ item.description }}</span>
@@ -57,7 +57,7 @@
         </el-form-item>
         <el-form-item label="Effort" >
           <el-col :span="5">
-            <el-input v-model="form.worklog_effort"></el-input>
+            <el-input v-model="form.worklog_effort" @keyup.native="number"></el-input>
           </el-col>
           <el-col :span="5">
             <span style="text-align:center; font-size:16px; margin-left:10px">Hrs</span>
@@ -236,6 +236,7 @@ export default {
     },
     // Edit worklog when click the day
     async editTimesheetByTask (scope) {
+      console.log(scope)
       this.$data.worklogFormVisible = true
       this.$data.form.worklog_taskid = 0
       this.$data.form.worklog_task = ''
@@ -258,39 +259,42 @@ export default {
         this.$data.form.worklog_effort = res.data.data[0].worklog_effort
         this.$data.form.worklog_remark = res.data.data[0].worklog_remark
       } else {
-        this.$data.form.worklog_taskid = 0
-        this.$data.form.worklog_task = ''
+        this.$data.form.worklog_taskid = scope.row.task_id
+        this.$data.form.worklog_task = scope.row.task
         this.$data.form.worklog_effort = 0
         this.$data.form.worklog_remark = ''
       }
     },
-    validateEffort (iHours) {
-      return false
+    clearTask () {
+      this.$data.form.worklog_taskid = 0
+      this.$data.form.worklog_task = ''
     },
-    submitWorklog () {
-      // var reqUserId = this.$store.getters.getUserId
-      // var reqTaskId = this.$data.form.worklog_taskid
-      var reqWorklogEffort = this.$data.form.worklog_effort
-      var reqWorklogDate = this.$data.form.worklog_date
-      if (!this.validateEffort(reqWorklogEffort)) {
-        this.$notify.error({
-          title: 'Warning',
-          message: 'Total worklogs of ' + reqWorklogDate + ' over 24 hours',
-          duration: 1000,
-          showClose: false
-        })
-        return
+    showWarnMessage (iTitle, iMsg) {
+      this.$notify.error({
+        title: iTitle,
+        message: iMsg,
+        duration: 2000,
+        showClose: false
+      })
+    },
+    number () {
+      var formEffort = this.$data.form.worklog_effort
+      if (formEffort > 0) {
+        formEffort = Number(formEffort)
+      } else {
+        formEffort = formEffort.replace(/[^\d]/g, '')
+        formEffort = formEffort.replace('.', '')
+        this.$data.form.worklog_effort = formEffort
       }
-      this.$data.worklogFormVisible = false
     },
     async queryTaskAsync (queryString, cb) {
       console.log('Query String: ' + queryString)
+      var returnArr = []
       const res = await http.post('/tasks/getTaskByName', {
         tTaskName: queryString
       })
       if (res.data.status === 0) {
         var queryResult = res.data.data
-        var returnArr = []
         for (var i = 0; i < queryResult.length; i++) {
           var returnJson = {}
           returnJson.value = queryResult[i].task_name
@@ -298,11 +302,49 @@ export default {
           returnJson.id = queryResult[i].task_id
           returnArr.push(returnJson)
         }
-        cb(returnArr)
       }
+      cb(returnArr)
     },
     handleTaskSelect (item) {
-      console.log(item)
+      this.$data.form.worklog_taskid = item.id
+      this.$data.form.worklog_task = item.value
+    },
+    async submitWorklog () {
+      var reqUserId = this.$store.getters.getUserId
+      var reqTaskId = this.$data.form.worklog_taskid
+      var reqRemark = this.form.worklog_remark
+      var reqWorklogEffort = Number(this.$data.form.worklog_effort)
+      var reqWorklogDate = this.$data.form.worklog_date
+      if (reqTaskId === 0 || this.$data.form.task_name === '') {
+        this.showWarnMessage('Warning', 'Task could not empty!')
+        return
+      }
+      if (reqWorklogDate === '' || reqWorklogDate === null) {
+        this.showWarnMessage('Warning', 'Invalid date!')
+        return
+      }
+      var arr = []
+      arr = reqWorklogDate.split('-')
+      var reqWorklogMonth = arr[0] + '-' + arr[1]
+      var reqWorklogDay = arr[2]
+      if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
+        this.showWarnMessage('Warning', 'Invalid effort!')
+        return
+      }
+      console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
+      const res = await http.post('/worklogs/addOrUpdateWorklog', {
+        wUserId: reqUserId,
+        wTaskId: reqTaskId,
+        wWorklogMonth: reqWorklogMonth,
+        wWorklogDay: reqWorklogDay,
+        wEffort: reqWorklogEffort,
+        wRemark: reqRemark
+      })
+      if (res.data.status === 0) {
+        var firstDate = this.getCurrentMonthFirst()
+        this.resetTimesheet(firstDate)
+        this.$data.worklogFormVisible = false
+      }
     }
   },
   created () {
