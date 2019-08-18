@@ -21,7 +21,7 @@
               <el-row :gutter="20">
                 <el-col :span="11" class="pt-title-item">
                   <el-select v-model="teamSelect" placeholder="Select">
-                    <el-option v-for="team in teams" :key="team.team_name" :label="team.team_label" :value="team.team_name"></el-option>
+                    <el-option v-for="team in teams" :key="team.team_name" :label="team.team_name" :value="team.team_id"></el-option>
                   </el-select>
                 </el-col>
                 <el-col :span="11" class="pt-title-item">
@@ -29,7 +29,7 @@
                     @change="changePtMonth"></el-date-picker>
                 </el-col>
                 <el-col :span="2" class="pt-title-item">
-                  <el-button type="success" icon="el-icon-arrow-right" circle></el-button>
+                  <el-button type="success" icon="el-icon-arrow-right" circle @click="showTeamTimesheet"></el-button>
                 </el-col>
               </el-row>
             </el-card>
@@ -76,8 +76,8 @@ export default {
       header1: 'My Timesheet',
       header2: 'Project Timesheet',
       isActive: true,
-      teamSelect: 'TOS',
-      teams: [{team_id: 1, team_label: 'TOS'}, {team_id: 2, team_label: 'Billing'}, {team_id: 3, team_label: 'BSS'}],
+      teamSelect: '',
+      teams: [],
       monthSelect: '',
       timesheetHeaders: [],
       timesheetMonth: '',
@@ -119,9 +119,10 @@ export default {
       }
     },
     changePtMonth (iDate) {
-      this.resetTimesheet(iDate)
+      this.$data.monthSelect = iDate
     },
     async resetTimesheet (iDateVal) {
+      console.log('Date: ' + iDateVal)
       this.$data.timesheetDatas = []
       var ptYear = iDateVal.getFullYear()
       var ptMonth = iDateVal.getMonth() + 1
@@ -136,8 +137,6 @@ export default {
       if (ptMonth === '02' || ptMonth === '04' || ptMonth === '06' || ptMonth === '09' || ptMonth === '11') {
         days = 30
       }
-      console.log('Month[' + ptMonth + '] days: ' + days)
-      console.log('Week: ' + ptDay)
       for (var i = 1; i <= days; i++) {
         var resetJson = {}
         var val = ''
@@ -163,12 +162,13 @@ export default {
       var reqMonth = ptYear + '-' + ptMonth
       this.$data.monthSelect = reqMonth
       const res = await http.post('/worklogs/getWorklogByTeamAndMonthForWeb', {
-        wTeamId: 1,
+        wTeamId: this.$data.teamSelect,
         wWorklogMonth: reqMonth
       })
       if (res.data.status === 0) {
         this.$data.timesheetDatas = res.data.data
-        console.log(res.data.data)
+      } else {
+        this.$data.timesheetDatas = [{user: '', timesheetData: []}]
       }
     },
     getCurrentMonthFirst () {
@@ -212,14 +212,31 @@ export default {
         }
       })
       this.$data.sumHoursArray = sums
-      console.log(sums)
       return sums
+    },
+    async setTeam () {
+      const res = await http.get('/users/getTeamList')
+      if (res.data.status === 0) {
+        res.data.data.splice(0, 1)
+        this.$data.teams = res.data.data
+      }
+      const res1 = await http.post('/users/getUserById', {
+        userId: this.$store.getters.getUserId
+      })
+      if (res1.data.status === 0) {
+        this.$data.teamSelect = res1.data.data[0].user_teamid
+        var firstDate = this.getCurrentMonthFirst()
+        this.resetTimesheet(firstDate)
+      }
+    },
+    showTeamTimesheet () {
+      var date = new Date(this.$data.monthSelect)
+      this.resetTimesheet(date)
     }
   },
   created () {
     console.log('Created Project Timesheet')
-    var firstDate = this.getCurrentMonthFirst()
-    this.resetTimesheet(firstDate)
+    this.setTeam()
   }
 }
 </script>

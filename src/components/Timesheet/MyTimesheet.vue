@@ -69,7 +69,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="worklogFormVisible = false">Cancel</el-button>
-        <el-button type="danger" @click="worklogFormVisible = false">Delete</el-button>
+        <el-button type="danger" @click="deleteWorklog">Delete</el-button>
         <el-button type="primary" @click="submitWorklog">Submit</el-button>
       </div>
     </el-dialog>
@@ -344,6 +344,39 @@ export default {
         var firstDate = this.getCurrentMonthFirst()
         this.resetTimesheet(firstDate)
         this.$data.worklogFormVisible = false
+      } else {
+        this.showWarnMessage('Warning', 'Fail to delete worklog!')
+      }
+    },
+    async deleteWorklog () {
+      var reqUserId = this.$store.getters.getUserId
+      var reqTaskId = this.$data.form.worklog_taskid
+      var reqWorklogDate = this.$data.form.worklog_date
+      if (reqTaskId === 0 || this.$data.form.task_name === '') {
+        this.showWarnMessage('Warning', 'Task could not empty!')
+        return
+      }
+      if (reqWorklogDate === '' || reqWorklogDate === null) {
+        this.showWarnMessage('Warning', 'Invalid date!')
+        return
+      }
+      var arr = []
+      arr = reqWorklogDate.split('-')
+      var reqWorklogMonth = arr[0] + '-' + arr[1]
+      var reqWorklogDay = arr[2]
+      console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
+      const res = await http.post('/worklogs/removeWorklog', {
+        wUserId: reqUserId,
+        wTaskId: reqTaskId,
+        wWorklogMonth: reqWorklogMonth,
+        wWorklogDay: reqWorklogDay
+      })
+      if (res.data.status === 0) {
+        var firstDate = this.getCurrentMonthFirst()
+        this.resetTimesheet(firstDate)
+        this.$data.worklogFormVisible = false
+      } else {
+        this.showWarnMessage('Warning', 'Fail to delete worklog!')
       }
     }
   },
