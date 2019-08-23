@@ -33,7 +33,7 @@
                   <span @click="editTimesheetByDate(scope)" style="font-size:16px; text-decoration:underline; cursor:pointer;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <el-button type="text" @click="editTimesheetByTask(scope)">{{scope.row[scope.column.property] || '--'}}</el-button>
+                  <el-button style="font-size:16px" type="text" @click="editTimesheetByTask(scope)">{{scope.row[scope.column.property] || '--'}}</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -189,7 +189,6 @@ export default {
       var date = new Date()
       date.setDate(1)
       var month = parseInt(date.getMonth() + 1)
-      console.log('Month: ' + month)
       var day = date.getDate()
       if (month < 10) {
         month = '0' + month
@@ -345,7 +344,7 @@ export default {
         this.resetTimesheet(firstDate)
         this.$data.worklogFormVisible = false
       } else {
-        this.showWarnMessage('Warning', 'Fail to delete worklog!')
+        this.showWarnMessage('Warning', 'Fail to add/update worklog!')
       }
     },
     async deleteWorklog () {

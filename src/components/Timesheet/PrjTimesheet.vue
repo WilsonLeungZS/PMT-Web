@@ -36,8 +36,7 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24" class="content-main-col"
-            v-for="(timesheet, tIndex) in timesheetDatas" :key="tIndex" >
+          <el-col :span="24" class="content-main-col" v-for="(timesheet, tIndex) in timesheetDatas" :key="tIndex" >
             <el-table :data="timesheet.timesheetData" fit empty-text="No worklog" class="pt-table" show-summary :summary-method="getSummaries"
               :row-class-name="ptTableRowStyle" :cell-class-name="ptTableCellStyle"
               :header-row-class-name="ptTableHeaderRowStyle" :header-cell-class-name="ptTableHeaderCellStyle" >
@@ -56,7 +55,7 @@
                   <span style="font-size:16px; cursor:default;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <span>{{scope.row[scope.column.property] || '--'}}</span>
+                  <span style="font-size:16px">{{scope.row[scope.column.property] || '--'}}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -168,7 +167,7 @@ export default {
       if (res.data.status === 0) {
         this.$data.timesheetDatas = res.data.data
       } else {
-        this.$data.timesheetDatas = [{user: '', timesheetData: []}]
+        this.$data.timesheetDatas = [{user: 'Empty', timesheetData: []}]
       }
     },
     getCurrentMonthFirst () {
