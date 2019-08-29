@@ -2,7 +2,7 @@
   <div class="login-content">
     <el-form ref="form" label-width="80px" size="medium" @submit.native.prevent>
       <el-form-item label="EID">
-        <el-input v-model="inputUserEid" style="width: 300px"></el-input>
+        <el-input v-model="inputUserEid" style="width: 300px" @keyup.enter.native="onLogin"></el-input>
       </el-form-item>
       <el-form-item>
         <span class="login-content-errormsg" v-show="showErrorMsg">{{errorMsg}}</span>

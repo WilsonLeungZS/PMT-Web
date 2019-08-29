@@ -13,7 +13,7 @@
         <el-row class="tl-bar">
           <el-col :span="14">
             <div class="tl-bar-item">
-              <el-input placeholder="Search task..." v-model="inputTaskVal" class="tl-bar-item-input" clearable>
+              <el-input placeholder="Search task..." v-model="inputTaskVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
                 <el-select v-model="selectTaskType" slot="prepend" placeholder="Select" class="tl-bar-item-input-select">
                   <el-option label="All Types" value="0"></el-option>
                   <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
@@ -44,8 +44,8 @@
               <el-table-column prop="task_type" label="Type" width="150px" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
               <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="task_status" label="Status" width="180px" align="center" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
-              <el-table-column prop="task_effort" label="Effort" width="70px" align="center" :sortable="showSortable"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation" width="92px" align="center"></el-table-column>
+              <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation(hrs)" width="128px" align="center"></el-table-column>
               <el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
               <el-table-column fixed="right" label="Edit" width="100" align="center">
                 <template slot-scope="scope">
@@ -70,10 +70,10 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog title="Edit Task" :visible.sync="editTaskVisible" width="50%" style="min-width: 500px;">
+    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="50%" style="min-width: 500px;" :close-on-click-modal="false">
       <el-form ref="form" :model="form" label-width="120px" class="tl-edit-form" >
         <el-form-item label="Number" v-show="showForNewTask">
-          <el-input v-model="form.formNumber"></el-input>
+          <el-input v-model="form.formNumber" :disabled="disabledNumber"></el-input>
         </el-form-item>
         <el-form-item label="Number" v-show="showForExistingTask">
           <span style="font-size: 17px">{{form.formNumber}}</span>
@@ -82,12 +82,12 @@
           <el-button type="text" style="font-size: 15px;text-decoration: underline">{{form.formParent}}</el-button>
         </el-form-item>
         <el-form-item label="Type">
-          <el-select v-model="form.formType">
+          <el-select v-model="form.formType" :disabled="taskDisabledStaus">
             <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Description">
-          <el-input type="textarea" v-model="form.formDesc" :rows="4"></el-input>
+          <el-input type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
         </el-form-item>
         <el-form-item label="Status" v-show="showForNewTask">
           <el-select v-model="form.formStatus">
@@ -114,7 +114,7 @@
           <el-col :span="14">
             <el-form-item label="Estimation">
               <el-col :span="19">
-                <el-input v-model="form.formEstimation"></el-input>
+                <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
               </el-col>
               <el-col :span="5" style="text-align: center; font-size: 16px;">
                 <span>hrs</span>
@@ -122,11 +122,11 @@
             </el-form-item>
           </el-col>
         </el-form-item>
-        <el-form-item label="Progress" >
+        <el-form-item label="Progress">
           <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
         </el-form-item>
         <el-form-item label="Assign Team">
-          <el-select v-model="form.formAssignTeam">
+          <el-select v-model="form.formAssignTeam" :disabled="taskDisabledStaus">
             <el-option v-for="(assignteam, index) in taskAssignTeamArray" :key="index" :label="assignteam.team_name" :value="assignteam.team_id"></el-option>
           </el-select>
         </el-form-item>
@@ -145,7 +145,7 @@
             </el-table>
           </el-card>
         </el-form-item>
-        <el-form-item label="Worklog History" v-show="showForExistingTask">
+        <el-form-item label="Worklog History" v-show="showForHistory">
           <el-button icon="el-icon-more" size="small" type="text" @click="showWorklogHistory" style="font-size: 18px"></el-button>
         </el-form-item>
       </el-form>
@@ -159,8 +159,8 @@
       </el-card>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>
-        <el-button type="success" size="medium" @click="logWorkDone" v-show="showForExistingTask">Log Work Done</el-button>
-        <el-button type="primary" size="medium" @click="submitTask">Submit</el-button>
+        <el-button type="success" size="medium" @click="logWorkDone" v-show="showLogWorkDoneBtn">Log Work Done</el-button>
+        <el-button type="primary" size="medium" @click="submitTask" v-show="showForNewTask">Submit</el-button>
       </span>
     </el-dialog>
     <el-dialog title="Add Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
@@ -211,6 +211,8 @@ export default {
       showForExistingTask: true,
       showPagination: true,
       showSortable: false,
+      showLogWorkDoneBtn: true,
+      showForHistory: true,
       form: {
         formId: 0,
         formNumber: '',
@@ -234,12 +236,7 @@ export default {
       taskTypeArray: [],
       taskAssignTeamArray: [],
       showHistory: false,
-      histories: [
-        {content: 'zhongshu.liang record 3 hrs', timestamp: '2018-04-15'},
-        {content: 'tony.ye record 13 hrs', timestamp: '2018-04-13'},
-        {content: 'zhongshu.liang record 3 hrs', timestamp: '2018-04-11'},
-        {content: 'feng.he record 3 hrs', timestamp: '2018-02-15'}
-      ],
+      histories: [],
       worklogFormVisible: false,
       wlForm: {
         worklog_task: '',
@@ -247,7 +244,10 @@ export default {
         worklog_date: '',
         worklog_effort: 0,
         worklog_remark: ''
-      }
+      },
+      taskDialogTitle: 'Edit Task',
+      taskDisabledStaus: true,
+      disabledNumber: false
     }
   },
   methods: {
@@ -290,18 +290,30 @@ export default {
       }
     },
     async editTask (taskRow) {
+      this.$data.taskDialogTitle = 'Edit Task'
       this.resetTaskForm()
       this.getTaskType()
       this.getTeamList()
       var taskId = taskRow.task_id
+      this.$data.showLogWorkDoneBtn = true
+      this.$data.showForHistory = true
       this.$data.editTaskVisible = true
-      this.$data.showForExistingTask = true
-      this.$data.showForNewTask = false
       const res = await http.post('/tasks/getTaskById', {
         tId: taskId
       })
       if (res.data.status === 0) {
         var taskData = res.data.data[0]
+        var taskCreator = taskData.task_creator
+        if (taskCreator === 'PMT') {
+          this.$data.showForNewTask = true
+          this.$data.taskDisabledStaus = false
+          this.$data.showForExistingTask = false
+          this.$data.disabledNumber = true
+        } else {
+          this.$data.showForNewTask = false
+          this.$data.taskDisabledStaus = true
+          this.$data.showForExistingTask = true
+        }
         this.$data.form.formId = taskData.task_id
         this.$data.form.formNumber = taskData.task_name
         this.$data.form.formParent = taskData.task_parenttaskname
@@ -327,8 +339,16 @@ export default {
       this.$data.currentPage = val
       this.getTaskList(val, pageSize)
     },
-    showWorklogHistory () {
+    async showWorklogHistory () {
+      this.$data.histories = []
       this.$data.showHistory = !this.$data.showHistory
+      var reqTaskId = this.$data.form.formId
+      const res = await http.post('/worklogs/getWorklogHistoryByTaskId', {
+        wTaskId: reqTaskId
+      })
+      if (res.data.status === 0) {
+        this.$data.histories = res.data.data
+      }
     },
     resetTaskForm () {
       this.$data.form.formId = 0
@@ -495,12 +515,15 @@ export default {
       }
     },
     addNewTask () {
+      this.$data.taskDialogTitle = 'Add New Task'
+      this.$data.taskDisabledStaus = false
       this.resetTaskForm()
       this.getTaskType()
       this.getTeamList()
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.editTaskVisible = true
+      this.$data.disabledNumber = false
     }
   },
   created () {

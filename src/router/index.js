@@ -69,7 +69,7 @@ export default new Router({
           name: 'Charts',
           component: Charts,
           meta: {
-            needLogin: true
+            needLogin: false
           }
         }
       ]

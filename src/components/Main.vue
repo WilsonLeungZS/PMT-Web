@@ -23,7 +23,7 @@
           </el-col>
           <el-col :span="6" :offset="1" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
             <div class="main-grid-content" style="justify-content:flex-end;">
-              <el-dropdown trigger="click">
+              <!-- <el-dropdown trigger="click">
                 <el-badge :value="msgValue" :max="10" class="main-user-msg">
                   <el-button type="warning" size="small" icon="el-icon-message-solid" circle></el-button>
                 </el-badge>
@@ -41,7 +41,7 @@
                     <div class="main-user-msg-panel-i"><b>Show All</b></div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
-              </el-dropdown>
+              </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleLogoutCommand">
                 <el-button type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
