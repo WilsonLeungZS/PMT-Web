@@ -8,6 +8,11 @@
               <i class="el-icon-user content-title-item-icon"></i>
               <span class="content-title-item-header">{{header1}}</span>
             </div>
+            <el-divider direction="vertical"></el-divider>
+            <div class="content-title-item " @click="switchToTM">
+              <i class="el-icon-data-analysis content-title-item-icon"></i>
+              <span class="content-title-item-header">{{header2}}</span>
+            </div>
           </el-col>
         </el-row>
         <el-row>
@@ -84,7 +89,7 @@
               </el-card>
             </div>
           </el-col><!-- Team list -->
-          <el-col :span="14">
+          <el-col :span="15">
             <div class="pm-content">
               <el-card class="box-card">
                 <div slot="header" class="clearfix">
@@ -180,7 +185,7 @@
               </el-card>
             </div>
           </el-col><!-- User list -->
-          <el-col :span="10">
+          <el-col :span="9">
             <div class="pm-content">
               <el-card class="box-card">
                 <div slot="header" class="clearfix">
@@ -253,6 +258,7 @@ export default {
   data () {
     return {
       header1: 'Project Management',
+      header2: 'Timesheet Management',
       isActive: true,
       userData: [],
       userResetData: [],
@@ -272,6 +278,10 @@ export default {
     }
   },
   methods: {
+    switchToTM () {
+      this.$data.isActive = false
+      this.$router.push({path: 'PmtManagement'})
+    },
     async getUserList () {
       this.$data.userData = []
       const res = await http.get('/users/getUserList', {IsActive: 0})
