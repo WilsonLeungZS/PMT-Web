@@ -10,7 +10,7 @@
             </div>
             <el-divider direction="vertical"></el-divider>
             <div class="content-title-item " @click="switchToTM">
-              <i class="el-icon-data-analysis content-title-item-icon"></i>
+              <i class="el-icon-monitor content-title-item-icon"></i>
               <span class="content-title-item-header">{{header2}}</span>
             </div>
           </el-col>
