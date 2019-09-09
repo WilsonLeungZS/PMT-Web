@@ -1,6 +1,8 @@
 import axios from 'axios'
 import qs from 'qs'
-const iBaseUrl = 'https://pmt.gzatcc.com:3000/'
+import res from './res'
+
+const iBaseUrl = res.resBaseUrl
 
 axios.interceptors.request.use(config => {
   return config
