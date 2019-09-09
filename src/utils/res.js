@@ -1,5 +1,5 @@
 const resBaseUrl = 'https://pmt.gzatcc.com:3000/'
-const testValue = '1'
+const testValue = '2'
 
 export default {
   resBaseUrl,
