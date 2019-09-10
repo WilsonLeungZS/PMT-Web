@@ -18,12 +18,12 @@
         <el-row>
           <el-col :span="24" class="content-main-col">
             <el-card class="box-card pt-title" shadow="never">
-              <el-row :gutter="20">
+              <el-row :gutter="10" type="flex" justify="flex-start">
                 <el-col :span="3">
-                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select"
-                    @change="changePtMonth"></el-date-picker>
+                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select" style="width:100%"
+                  @change="changePtMonth"></el-date-picker>
                 </el-col>
-                <el-col :span="9">
+                <el-col :span="10">
                   <el-autocomplete style="width:100%" :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true"
                     v-model="taskSelect" :fetch-suggestions="queryTaskWorklogAsync" @select="handleTaskSelect" @clear="clearTask">
                     <template slot-scope="{ item }">
@@ -36,6 +36,63 @@
                   <el-button type="success" icon="el-icon-edit-outline" style="font-size: 14px">Show Worklog</el-button>
                 </el-col>
               </el-row>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="7" style="margin-top:1px; padding: 0 5px 0 5px;">
+            <el-card class="box-card" shadow="hover">
+              <div slot="header" class="clearfix">
+                <span>{{taskForm.taskName}}</span>
+                <el-button style="float: right; padding: 3px 0" type="text">Refresh</el-button>
+              </div>
+              <div class="pt-task-box">
+                <el-form :label-position="labelPosition" label-width="100px" :model="taskForm" size="mini">
+                  <el-form-item label="Status">
+                    <el-col :span="24" class="pt-task-box-content-item">
+                      <span>{{taskForm.taskStatus}}</span>
+                    </el-col>
+                  </el-form-item>
+                  <el-form-item label="Type">
+                     <el-col :span="24" class="pt-task-box-content-item">
+                      <span>{{taskForm.taskType}}</span>
+                    </el-col>
+                  </el-form-item>
+                  <el-form-item label="Assign Team">
+                     <el-col :span="24" class="pt-task-box-content-item">
+                      <span>{{taskForm.taskAssignTeam}}</span>
+                    </el-col>
+                  </el-form-item>
+                  <el-form-item label="Effort">
+                     <el-col :span="24" class="pt-task-box-content-item">
+                      <span>{{taskForm.taskEffort}} / {{taskForm.taskEstimation}} hrs</span>
+                    </el-col>
+                  </el-form-item>
+                  <el-form-item label="Description">
+                    <el-col :span="24" class="pt-task-box-content-item">
+                      <span>{{taskForm.taskDescription}}</span>
+                    </el-col>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-card>
+          </el-col><!-- Task Box -->
+          <el-col :span="17" style="margin-top:1px; padding: 0 5px 0 5px;">
+            <el-card class="box-card" shadow="never">
+              <el-table :data="taskWorklogList" style="width: 100%">
+                <el-table-column prop="worklog_id" label="Id" v-if="false"></el-table-column>
+                <el-table-column prop="worklog_user" sortable label="User" align="center"></el-table-column>
+                <el-table-column prop="worklog_date" sortable label="Date" align="center" ></el-table-column>
+                <el-table-column prop="worklog_effort" sortable label="Effort" align="center"></el-table-column>
+                <el-table-column label="Worklog Management" align="center" width="400">
+                  <template slot-scope="scope">
+                    <el-input type="number" size="small" v-model="scope.row.worklog_change_effort" class="pt-worklog">
+                      <template slot="append">Hours</template>
+                    </el-input>
+                    <el-button size="small" type="primary" icon="el-icon-edit">Move Effort To Next Month</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
             </el-card>
           </el-col>
         </el-row>
@@ -54,8 +111,25 @@ export default {
       header2: 'Timesheet Management',
       isActive: true,
       monthSelect: '',
-      taskIdSelect: 0,
-      taskSelect: ''
+      taskSelect: '',
+      taskWorklogList: [
+        {worklog_id: 1, worklog_user: 'zhongshu.liang', worklog_date: '2019-09-10', worklog_effort: 10, worklog_change_effort: 10},
+        {worklog_id: 2, worklog_user: 'zhongshu.liang', worklog_date: '2019-09-10', worklog_effort: 10, worklog_change_effort: 10},
+        {worklog_id: 3, worklog_user: 'zhongshu.liang', worklog_date: '2019-09-10', worklog_effort: 10, worklog_change_effort: 10},
+        {worklog_id: 4, worklog_user: 'zhongshu.liang', worklog_date: '2019-09-10', worklog_effort: 10, worklog_change_effort: 10},
+        {worklog_id: 5, worklog_user: 'zhongshu.liang', worklog_date: '2019-09-10', worklog_effort: 10, worklog_change_effort: 10}
+      ],
+      labelPosition: 'left',
+      taskForm: {
+        taskId: 0,
+        taskName: 'CGM190012',
+        taskDescription: 'Task for ACN-App-BSS team to create SAP role for new staff Steve Sze, the role same with Much Yeung (Staff no. 9028)',
+        taskStatus: 'Awaiting Internal Action',
+        taskType: 'Change',
+        taskEffort: 10,
+        taskEstimation: 100,
+        taskAssignTeam: 'BSS'
+      }
     }
   },
   methods: {
@@ -85,7 +159,7 @@ export default {
       cb(returnArr)
     },
     handleTaskSelect (item) {
-      this.$data.taskIdSelect = item.id
+      this.$data.taskForm.taskId = item.id
       this.$data.taskSelect = item.value
     },
     clearTask () {
@@ -144,13 +218,6 @@ export default {
   width: 100%;
   height: auto;
 }
-.pt-title-item {
-  width: auto;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  font-size: 18px;
-}
 .list_task_name {
   font-size: 16px;
   color: #57606f;
@@ -160,6 +227,20 @@ export default {
 .list_task_desc {
   font-size: 14px;
   color: #bdc3c7;
+}
+.pt-worklog {
+  width: 160px;
+}
+.pt-task-box {
+  margin-top: 10px;
+}
+.pt-task-box-content-item {
+  width: auto;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
 }
 /*Common Style*/
 .bg-color {
@@ -173,6 +254,23 @@ export default {
 </style>
 <style>
 .el-card__body {
-  padding: 20px;
+  padding: 5px;
+}
+.el-divider {
+  background-color: #57606f;
+}
+.el-table th {
+  padding: 5px 0;
+  font-size: 15px;
+}
+/* google、safari */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button{
+  -webkit-appearance: none !important;
+  margin: 0;
+}
+/* Firefox */
+input[type="number"]{
+  -moz-appearance: textfield;
 }
 </style>

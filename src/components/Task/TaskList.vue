@@ -45,7 +45,7 @@
               <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="task_status" label="Status" width="180px" align="center" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
               <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation(hrs)" width="128px" align="center"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation(hrs)" width="132px" align="center"></el-table-column>
               <el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
               <el-table-column fixed="right" label="Edit" width="100" align="center">
                 <template slot-scope="scope">
