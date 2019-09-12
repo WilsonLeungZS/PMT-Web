@@ -314,6 +314,8 @@ export default {
       var reqRemark = this.form.worklog_remark
       var reqWorklogEffort = Number(this.$data.form.worklog_effort)
       var reqWorklogDate = this.$data.form.worklog_date
+      console.log('Date: ' + reqWorklogDate)
+      console.log('Date Type: ' + typeof (reqWorklogDate))
       if (reqTaskId === 0 || this.$data.form.task_name === '') {
         this.showWarnMessage('Warning', 'Task could not empty!')
         return
