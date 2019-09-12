@@ -28,9 +28,9 @@
                 <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
                   <el-button type="primary" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="Export Tasks" placement="top-start">
+                <!--<el-tooltip class="item" effect="dark" content="Export Tasks" placement="top-start">
                   <el-button type="success" icon="el-icon-download" size="small" class="tl-bar-item-btn"></el-button>
-                </el-tooltip>
+                </el-tooltip>-->
               </el-button-group>
             </div>
           </el-col>

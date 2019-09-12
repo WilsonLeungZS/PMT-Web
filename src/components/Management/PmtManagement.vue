@@ -23,7 +23,7 @@
                   <el-date-picker v-model="monthSelect" type="month" placeholder="Select" style="width:100%"
                   @change="changePtMonth"></el-date-picker>
                 </el-col>
-                <el-col :span="10">
+                <el-col :span="7">
                   <el-autocomplete style="width:100%" :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true"
                     v-model="taskSelect" :fetch-suggestions="queryTaskWorklogAsync" @select="handleTaskSelect" @clear="clearTask">
                     <template slot-scope="{ item }">
@@ -32,8 +32,15 @@
                     </template>
                   </el-autocomplete>
                 </el-col>
-                <el-col :span="2">
-                  <el-button type="success" icon="el-icon-edit-outline" style="font-size: 14px">Show Worklog</el-button>
+                <el-col :span="1">
+                  <el-tooltip effect="dark" content="Show Worklog" placement="top">
+                    <el-button type="success" icon="el-icon-search" circle></el-button>
+                  </el-tooltip>
+                </el-col>
+                <el-col :span="1">
+                  <el-tooltip effect="dark" content="Export Report" placement="top">
+                    <el-button type="primary" icon="el-icon-download" circle></el-button>
+                  </el-tooltip>
                 </el-col>
               </el-row>
             </el-card>
@@ -128,7 +135,8 @@ export default {
         taskType: 'Change',
         taskEffort: 10,
         taskEstimation: 100,
-        taskAssignTeam: 'BSS'
+        taskAssignTeam: 'BSS',
+        taskCurrentEffort: 20
       }
     }
   },
@@ -250,6 +258,9 @@ export default {
   color: #ff6348;
   border-bottom: 1px solid #ff6348;
   cursor: default;
+}
+.item {
+  margin: 4px;
 }
 </style>
 <style>
