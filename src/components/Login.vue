@@ -53,9 +53,8 @@ export default {
       }
     }
   },
-  created () {
+  async created () {
     console.log('Created Login')
-    // Validate login status
     this.$store.dispatch('setHideMainBar')
   }
 }

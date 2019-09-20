@@ -26,6 +26,10 @@ router.beforeEach(async (to, from, next) => {
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
         store.dispatch('setShowMainBar')
+        if (to.meta.page != null && to.meta.page === 'Login') {
+          console.log('Login')
+          next('/Timesheet')
+        }
         next()
       } else {
         alert('Your EID is not found or inactive! Please retry or contact administrator!')

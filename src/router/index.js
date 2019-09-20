@@ -30,7 +30,8 @@ export default new Router({
           name: 'Login',
           component: Login,
           meta: {
-            needLogin: false
+            needLogin: false,
+            page: 'Login'
           }
         },
         {
