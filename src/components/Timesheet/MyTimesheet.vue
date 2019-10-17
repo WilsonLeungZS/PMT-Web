@@ -53,7 +53,7 @@
           </el-autocomplete>
         </el-form-item>
         <el-form-item label="Date">
-          <el-date-picker v-model="form.worklog_date" type="date"></el-date-picker>
+          <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate"></el-date-picker>
         </el-form-item>
         <el-form-item label="Effort" >
           <el-col :span="5">
@@ -365,7 +365,7 @@ export default {
       arr = reqWorklogDate.split('-')
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
-      console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
+      // console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
       const res = await http.post('/worklogs/removeWorklog', {
         wUserId: reqUserId,
         wTaskId: reqTaskId,
@@ -379,6 +379,23 @@ export default {
       } else {
         this.showWarnMessage('Warning', 'Fail to delete worklog!')
       }
+    },
+    changeWorklogDate () {
+      var changeDate = this.$data.form.worklog_date
+      var changeDateYear = changeDate.getFullYear()
+      var changeDateMonth = changeDate.getMonth() + 1
+      var changeDateDay = changeDate.getDate()
+      if (changeDateMonth < 10) {
+        changeDateMonth = '0' + changeDateMonth
+      } else {
+        changeDateMonth = '' + changeDateMonth
+      }
+      if (changeDateDay < 10) {
+        changeDateDay = '0' + changeDateDay
+      } else {
+        changeDateDay = '' + changeDateDay
+      }
+      this.$data.form.worklog_date = changeDateYear + '-' + changeDateMonth + '-' + changeDateDay
     }
   },
   created () {
