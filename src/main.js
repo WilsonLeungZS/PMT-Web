@@ -14,7 +14,8 @@ Vue.config.productionTip = false
 router.beforeEach(async (to, from, next) => {
   let getFlag = localStorage.getItem('Flag')
   let reqUserEid = localStorage.getItem('UserEid')
-  console.log(to.meta)
+  var needAdmin = to.meta.needAdmin
+  console.log(from)
   if (to.meta.needLogin) {
     if (getFlag === 'isLogin') {
       const res = await http.get('/users/login', {
@@ -23,6 +24,7 @@ router.beforeEach(async (to, from, next) => {
       if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
         var resUserEid = res.data.user.Name
         var resUserId = res.data.user.Id
+        var resUserRole = res.data.user.Role
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
         store.dispatch('setShowMainBar')
@@ -30,7 +32,16 @@ router.beforeEach(async (to, from, next) => {
           console.log('Login')
           next('/Timesheet')
         }
-        next()
+        if (needAdmin) {
+          if (resUserRole === 'Admin') {
+            next()
+          } else {
+            alert('You can not access these pages as you are not admin user!')
+            next(from.path)
+          }
+        } else {
+          next()
+        }
       } else {
         alert('Your EID is not found or inactive! Please retry or contact administrator!')
         next('/Login')

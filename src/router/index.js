@@ -30,6 +30,7 @@ export default new Router({
           name: 'Login',
           component: Login,
           meta: {
+            needAdmin: false,
             needLogin: false,
             page: 'Login'
           }
@@ -39,6 +40,7 @@ export default new Router({
           name: 'MyTimesheet',
           component: MyTimesheet,
           meta: {
+            needAdmin: false,
             needLogin: true
           }
         },
@@ -47,6 +49,7 @@ export default new Router({
           name: 'PrjTimesheet',
           component: PrjTimesheet,
           meta: {
+            needAdmin: false,
             needLogin: true
           }
         },
@@ -55,6 +58,7 @@ export default new Router({
           name: 'TaskList',
           component: TaskList,
           meta: {
+            needAdmin: false,
             needLogin: true
           }
         },
@@ -63,6 +67,7 @@ export default new Router({
           name: 'PrjManagement',
           component: PrjManagement,
           meta: {
+            needAdmin: true,
             needLogin: true
           }
         },
@@ -71,6 +76,7 @@ export default new Router({
           name: 'PmtManagement',
           component: PmtManagement,
           meta: {
+            needAdmin: true,
             needLogin: true
           }
         },
@@ -79,6 +85,7 @@ export default new Router({
           name: 'Charts',
           component: Charts,
           meta: {
+            needAdmin: true,
             needLogin: false
           }
         }
