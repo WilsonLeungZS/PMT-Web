@@ -14,7 +14,7 @@
           <el-col :span="14">
             <div class="tl-bar-item">
               <el-input placeholder="Search task..." v-model="inputTaskVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
-                <el-select v-model="selectTaskType" slot="prepend" placeholder="Select" class="tl-bar-item-input-select">
+                <el-select v-model="selectTaskType" slot="prepend" placeholder="Select" class="tl-bar-item-input-select" @change="changeSearchTaskType">
                   <el-option label="All Types" value="0"></el-option>
                   <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
                 </el-select>
@@ -524,6 +524,10 @@ export default {
       this.$data.showForNewTask = true
       this.$data.editTaskVisible = true
       this.$data.disabledNumber = false
+    },
+    async changeSearchTaskType () {
+      console.log('Changed Type: ' + this.$data.selectTaskType)
+      this.searchTask()
     }
   },
   created () {
