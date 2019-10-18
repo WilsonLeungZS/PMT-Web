@@ -210,9 +210,15 @@
                       </el-row>
                       <el-row :gutter="15" style="margin-top:10px">
                         <el-col :span="4" class="pm-table-expand-label">
+                          <span>Prefix</span>
+                        </el-col>
+                        <el-col :span="8" class="pm-table-expand-item">
+                          <el-input v-model="props.row.type_prefix" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="4" class="pm-table-expand-label">
                           <span>Category</span>
                         </el-col>
-                        <el-col :span="20" class="pm-table-expand-item">
+                        <el-col :span="8" class="pm-table-expand-item">
                           <el-select v-model="props.row.type_category" size="small" style="width: 100%">
                             <el-option label="AD" value="AD"></el-option>
                             <el-option label="AM" value="AM"></el-option>
@@ -238,8 +244,9 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="Id" prop="type_id" v-if="false"></el-table-column>
-                  <el-table-column label="Name" prop="type_name" min-width="150" show-overflow-tooltip></el-table-column>
-                  <el-table-column label="Category" prop="type_category" min-width="70"></el-table-column>
+                  <el-table-column label="Name" prop="type_name" min-width="130" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Prefix" prop="type_prefix" align="center" min-width="30"></el-table-column>
+                  <el-table-column label="Category" prop="type_category" align="center" min-width="70"></el-table-column>
                   <el-table-column label="Value" prop="type_value" align="center" min-width="50"></el-table-column>
                 </el-table>
               </el-card>
@@ -437,6 +444,7 @@ export default {
       const res = await http.post('/tasks/addTaskType', {
         taskTypeId: tasktype.type_id,
         taskTypeName: tasktype.type_name,
+        taskTypePrefix: tasktype.type_prefix,
         taskTypeCategory: tasktype.type_category,
         taskTypeValue: tasktype.type_value !== '' ? tasktype.type_value : 0
       })
@@ -454,6 +462,7 @@ export default {
       var index = props.$index
       if (props.row.type_id > 0) {
         props.row.type_name = this.$data.tasktypeResetData[index].type_name
+        props.row.type_prefix = this.$data.tasktypeResetData[index].type_prefix
         props.row.type_category = this.$data.tasktypeResetData[index].type_category
         props.row.type_value = this.$data.tasktypeResetData[index].type_value
       } else {
@@ -464,6 +473,7 @@ export default {
       var tasktype = {
         type_id: 0,
         type_name: 'N/A',
+        type_prefix: '',
         type_category: 'AD',
         type_value: 0
       }
