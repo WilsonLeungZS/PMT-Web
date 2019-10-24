@@ -19,12 +19,18 @@
           <el-col :span="24" class="content-main-col" style="margin-bottom:0 !important">
             <el-card class="box-card pt-title" shadow="hover">
               <el-row :gutter="20">
-                <el-col :span="11" class="pt-title-item">
+                <el-col :span="6" class="pt-title-item">
+                  <el-select v-model="projectSelect" placeholder="Select" @change="changeProject">
+                    <el-option v-for="project in projects" :key="project.project_name" :label="project.project_name" :value="project.project_name"></el-option>
+                  </el-select>
+                </el-col>
+                <el-col :span="8" class="pt-title-item">
                   <el-select v-model="teamSelect" placeholder="Select">
+                    <el-option label="--" value="0"></el-option>
                     <el-option v-for="team in teams" :key="team.team_name" :label="team.team_name" :value="team.team_id"></el-option>
                   </el-select>
                 </el-col>
-                <el-col :span="11" class="pt-title-item">
+                <el-col :span="8" class="pt-title-item">
                   <el-date-picker v-model="monthSelect" type="month" placeholder="Select"
                     @change="changePtMonth"></el-date-picker>
                 </el-col>
@@ -75,8 +81,11 @@ export default {
       header1: 'My Timesheet',
       header2: 'Project Timesheet',
       isActive: true,
-      teamSelect: '',
+      teamSelect: '--',
+      projectSelect: '',
       teams: [],
+      allTeams: [],
+      projects: [],
       monthSelect: '',
       timesheetHeaders: [],
       timesheetMonth: '',
@@ -162,6 +171,7 @@ export default {
       this.$data.monthSelect = reqMonth
       const res = await http.post('/worklogs/getWorklogByTeamAndMonthForWeb', {
         wTeamId: this.$data.teamSelect,
+        wProject: this.$data.projectSelect,
         wWorklogMonth: reqMonth
       })
       if (res.data.status === 0) {
@@ -216,17 +226,51 @@ export default {
     async setTeam () {
       const res = await http.get('/users/getTeamList')
       if (res.data.status === 0) {
+        var resResult = []
         res.data.data.splice(0, 1)
-        this.$data.teams = res.data.data
+        var teamArray = res.data.data
+        for (var i = 0; i < teamArray.length; i++) {
+          var resJson = {}
+          var flag = 0
+          for (var a = 0; a < resResult.length; a++) {
+            if (resResult[a].project_name === teamArray[i].team_project) {
+              flag = 1
+              break
+            }
+          }
+          if (flag === 0) {
+            resJson.project_name = teamArray[i].team_project
+            resResult.push(resJson)
+          }
+        }
+        this.$data.projects = resResult
+        this.$data.teams = teamArray
+        this.$data.allTeams = teamArray
       }
       const res1 = await http.post('/users/getUserById', {
         userId: this.$store.getters.getUserId
       })
       if (res1.data.status === 0) {
         this.$data.teamSelect = res1.data.data[0].user_teamid
+        this.$data.projectSelect = res1.data.data[0].user_teamproject
+        this.changeProject()
         var firstDate = this.getCurrentMonthFirst()
         this.resetTimesheet(firstDate)
       }
+    },
+    changeProject () {
+      console.log('Change Project')
+      var teams = []
+      var teamArray = this.$data.allTeams
+      console.log(teamArray)
+      var project = this.$data.projectSelect
+      for (var i = 0; i < teamArray.length; i++) {
+        if (teamArray[i].team_project === project) {
+          teams.push(teamArray[i])
+        }
+      }
+      this.$data.teams = teams
+      this.$data.teamSelect = teams[0].team_id
     },
     showTeamTimesheet () {
       var date = new Date(this.$data.monthSelect)

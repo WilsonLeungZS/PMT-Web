@@ -35,8 +35,14 @@
                         <el-col :span="4" class="pm-table-expand-label">
                           <span>Name</span>
                         </el-col>
-                        <el-col :span="20" class="pm-table-expand-item">
+                        <el-col :span="8" class="pm-table-expand-item">
                           <el-input v-model="props.row.team_name" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="4" class="pm-table-expand-label">
+                          <span>Project</span>
+                        </el-col>
+                        <el-col :span="8" class="pm-table-expand-item">
+                          <el-input v-model="props.row.team_project" size="small" style="width: 100%"></el-input>
                         </el-col>
                       </el-row>
                       <el-row :gutter="15" style="margin-top:10px">
@@ -72,9 +78,10 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="Id" prop="team_id" v-if="false"></el-table-column>
-                  <el-table-column label="Name" prop="team_name" min-width="70" show-overflow-tooltip></el-table-column>
-                  <el-table-column label="Description" prop="team_desc" min-width="150" show-overflow-tooltip></el-table-column>
-                  <el-table-column label="Mapping" prop="team_mapping" min-width="100" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Name" prop="team_name" min-width="50" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Project" prop="team_project" min-width="50" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Description" prop="team_desc" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Mapping" prop="team_mapping" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Active" align="center"
                       :filters="activeFilter"
                       :filter-method="activefilterHandler">
@@ -244,10 +251,10 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="Id" prop="type_id" v-if="false"></el-table-column>
-                  <el-table-column label="Name" prop="type_name" min-width="130" show-overflow-tooltip></el-table-column>
-                  <el-table-column label="Prefix" prop="type_prefix" align="center" min-width="30"></el-table-column>
-                  <el-table-column label="Category" prop="type_category" align="center" min-width="70"></el-table-column>
-                  <el-table-column label="Value" prop="type_value" align="center" min-width="50"></el-table-column>
+                  <el-table-column label="Name" prop="type_name" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Prefix" prop="type_prefix" align="center" min-width="45" ></el-table-column>
+                  <el-table-column label="Category" prop="type_category" align="center" min-width="55"></el-table-column>
+                  <el-table-column label="Value" prop="type_value" align="center" min-width="35"></el-table-column>
                 </el-table>
               </el-card>
             </div>
@@ -397,9 +404,14 @@ export default {
         this.$message.error('Add/Update team Failed!')
         return
       }
+      if (team.team_project === 'N/A' || team.team_project === '') {
+        this.$message.error('Add/Update team Failed!')
+        return
+      }
       const res = await http.post('/users/addOrUpdateTeam', {
         reqTeamId: team.team_id,
         reqTeamName: team.team_name,
+        reqTeamProject: team.team_project,
         reqTeamDesc: team.team_desc,
         reqTeamMapping: team.team_mapping,
         reqTeamIsActive: team.team_isactive
@@ -418,6 +430,7 @@ export default {
       var index = props.$index
       if (props.row.team_id > 0) {
         props.row.team_name = this.$data.teamResetData[index].team_name
+        props.row.team_project = this.$data.teamResetData[index].team_project
         props.row.team_desc = this.$data.teamResetData[index].team_desc
         props.row.team_mapping = this.$data.teamResetData[index].team_mapping
         props.row.team_isactive = this.$data.teamResetData[index].team_isactive
@@ -429,6 +442,7 @@ export default {
       var team = {
         team_id: 0,
         team_name: 'N/A',
+        team_project: 'N/A',
         team_desc: 'N/A',
         team_mapping: '',
         team_isactive: false

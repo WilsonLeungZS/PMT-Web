@@ -18,7 +18,7 @@
         <el-row>
           <el-col :span="24" class="content-main-col">
             <el-card class="box-card pt-title" shadow="never">
-              <el-row :gutter="10" type="flex" justify="flex-start">
+              <el-row :gutter="10" type="flex" justify="flex-start" align="center">
                 <el-col :span="3">
                   <el-date-picker v-model="monthSelect" type="month" placeholder="Select" style="width:100%"
                   @change="changePtMonth"></el-date-picker>
@@ -59,10 +59,13 @@
                     <el-button type="success" icon="el-icon-search" circle @click="getTaskWorklogs(null)"></el-button>
                   </el-tooltip>
                 </el-col>
-                <el-col :span="1">
+                <!--<el-col :span="1">
                   <el-tooltip effect="dark" content="Export Report" placement="top">
                     <el-button type="primary" icon="el-icon-download" circle></el-button>
                   </el-tooltip>
+                </el-col> -->
+                <el-col :span="5" :offset="6" class="pt-effort-progress">
+                  <span>AD Target: <span style="font-size: 20px;font-weight:bold;margin-left:5px"> {{monthADTotal}} / {{monthADTarget}} </span> hrs</span>
                 </el-col>
               </el-row>
             </el-card>
@@ -73,7 +76,7 @@
             <el-card class="box-card" shadow="hover">
               <div slot="header" class="clearfix">
                 <span>{{taskForm.taskName}}</span>
-                <el-button style="float: right; padding: 3px 0" type="text">Refresh</el-button>
+                <el-button style="float: right; padding: 3px 0" type="text" v-show="false">Refresh</el-button>
               </div>
               <div class="pt-task-box">
                 <el-form :label-position="labelPosition" label-width="100px" :model="taskForm" size="mini">
@@ -161,7 +164,9 @@ export default {
         taskMonthEffort: 0
       },
       taskListData: [],
-      showList: false
+      showList: false,
+      monthADTotal: 0,
+      monthADTarget: 0
     }
   },
   methods: {
@@ -180,8 +185,27 @@ export default {
           pmtMonth = '' + pmtMonth
         }
         this.$data.monthValue = pmtYear + '-' + pmtMonth
+        this.getMonthADEffort()
       } else {
         this.$data.monthValue = ''
+      }
+    },
+    async getMonthADEffort () {
+      var reqMonth = this.$data.monthValue
+      if (reqMonth === '') {
+        this.$data.monthADTotal = 0
+        this.$data.monthADTarget = 0
+      } else {
+        const res = await http.post('/worklogs/getMonthAdEffort', {
+          wWorklogMonth: reqMonth
+        })
+        if (res.data.status === 0 && res.data.data != null) {
+          this.$data.monthADTotal = res.data.data[0].month_effort
+          this.$data.monthADTarget = res.data.data[0].month_target
+        } else {
+          this.$data.monthADTotal = 0
+          this.$data.monthADTarget = 0
+        }
       }
     },
     async queryTaskWorklogAsync (queryString, cb) {
@@ -306,6 +330,7 @@ export default {
           duration: 1000
         })
         this.getTaskWorklogs(this.$data.taskSelect)
+        this.getMonthADEffort()
       } else {
         this.$message.error('Fail to adjust worklog!')
       }
@@ -378,6 +403,7 @@ export default {
 .pt-task-box {
   margin-top: 10px;
 }
+
 .pt-task-box-content-item {
   width: auto;
   height: 100%;
@@ -385,6 +411,11 @@ export default {
   justify-content: flex-start;
   align-items: center;
   text-align: left;
+}
+.pt-effort-progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 /*Common Style*/
 .bg-color {
