@@ -59,12 +59,38 @@
                     <el-button type="success" icon="el-icon-search" circle @click="getTaskWorklogs(null)"></el-button>
                   </el-tooltip>
                 </el-col>
-                <!--<el-col :span="1">
-                  <el-tooltip effect="dark" content="Export Report" placement="top">
-                    <el-button type="primary" icon="el-icon-download" circle></el-button>
-                  </el-tooltip>
-                </el-col> -->
-                <el-col :span="5" :offset="6" class="pt-effort-progress">
+                <el-col :span="1">
+                  <el-popover placement="bottom" v-model="reportFormVisible">
+                    <el-form label-width="60px">
+                      <el-form-item label="Range">
+                        <el-date-picker
+                          v-model="reportRangeValue"
+                          type="monthrange"
+                          align="right"
+                          unlink-panels
+                          range-separator="-"
+                          start-placeholder="Start Month"
+                          end-placeholder="End Month"
+                          format="yyyy-MM"
+                          value-format="yyyy-MM"
+                          :picker-options="pickerOptions">
+                        </el-date-picker>
+                      </el-form-item>
+                      <el-form-item label="Report">
+                        <el-radio-group v-model="reportType">
+                          <el-radio :label="1">Report 1 (Default)</el-radio>
+                          <el-radio :label="2">Report 2 (SI Project)</el-radio>
+                        </el-radio-group>
+                      </el-form-item>
+                    </el-form>
+                    <div style="text-align: right; margin: 0">
+                      <el-button size="mini" type="text" @click="reportFormVisible = false; reportRangeValue = []; reportType = 1">Cancel</el-button>
+                      <el-button type="success" size="mini" @click="extractReport">Extract</el-button>
+                    </div>
+                    <el-button slot="reference" type="primary" icon="el-icon-download" circle></el-button>
+                  </el-popover>
+                </el-col>
+                <el-col :span="5" :offset="5" class="pt-effort-progress">
                   <span>AD Target: <span style="font-size: 20px;font-weight:bold;margin-left:5px"> {{monthADTotal}} / {{monthADTarget}} </span> hrs</span>
                 </el-col>
               </el-row>
@@ -140,6 +166,7 @@
 
 <script>
 import http from '../../utils/http'
+import utils from '../../utils/utils'
 export default {
   name: 'Charts',
   data () {
@@ -166,7 +193,33 @@ export default {
       taskListData: [],
       showList: false,
       monthADTotal: 0,
-      monthADTarget: 0
+      monthADTarget: 0,
+      reportFormVisible: false,
+      reportRangeValue: '',
+      reportType: 1,
+      pickerOptions: {
+        shortcuts: [{
+          text: 'Current Month',
+          onClick (picker) {
+            picker.$emit('pick', [new Date(), new Date()])
+          }
+        }, {
+          text: 'Last Month',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setMonth(start.getMonth() - 1)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: 'Current Year (Up to now)',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date(new Date().getFullYear(), 0)
+            picker.$emit('pick', [start, end])
+          }
+        }]
+      }
     }
   },
   methods: {
@@ -334,6 +387,49 @@ export default {
       } else {
         this.$message.error('Fail to adjust worklog!')
       }
+    },
+    // Export report to excel
+    async extractReport () {
+      var reportTimeRange = this.$data.reportRangeValue
+      var reportType = this.$data.reportType
+      if (reportTimeRange != null && reportTimeRange.length > 0) {
+        var reportStartMonth = reportTimeRange[0]
+        var reportEndMonth = reportTimeRange[1]
+      } else {
+        this.$message.error('Please select month!')
+        return
+      }
+      var url = '/worklogs/extractReport1ForWeb'
+      var reportTitle = 'PMT Report ' + reportStartMonth + '-' + reportEndMonth
+      if (reportType === 2) {
+        url = '/worklogs/extractReport2ForWeb'
+        reportTitle = 'PMT Report(SI Project) ' + reportStartMonth + '-' + reportEndMonth
+      }
+      const reportHeader = ['Name', 'Date', 'Month', 'Task Number', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Change Business Area', 'AD Task Category']
+      const reportValue = ['report_username', 'report_date', 'report_month', 'report_task', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_businessarea', 'report_taskcategory']
+      const res = await http.post(url, {
+        wReportStartMonth: reportStartMonth,
+        wReportEndMonth: reportEndMonth
+      })
+      if (res.data.status === 0) {
+        this.$message({
+          message: 'Start to extract report...',
+          type: 'success',
+          duration: 3000
+        })
+        if (res.data.data != null && res.data.data.length > 0) {
+          utils.exportExcel(reportTitle, reportHeader, reportValue, res.data.data)
+        } else {
+          this.$message.error('No worklog to extract!')
+        }
+      } else if (res.data.status === 1) {
+        this.$message.error('No worklog to extract!')
+      } else {
+        this.$message.error('Error to extract!')
+      }
+      this.$data.reportFormVisible = false
+      this.$data.reportRangeValue = []
+      this.$data.reportType = 1
     }
   },
   created () {
