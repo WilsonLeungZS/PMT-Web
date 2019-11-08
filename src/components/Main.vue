@@ -2,11 +2,11 @@
   <div class="main-body">
     <el-container>
       <el-header>
-        <el-row class="main-el-row">
+        <el-row class="main-el-row" :style="{'background': mainColor}">
           <el-col :span="1" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
             <div class="main-grid-content">
               <el-dropdown @command="handleMenuCommand">
-                <el-button class="main-menu-btn" type="primary" icon="el-icon-menu" size="small"></el-button>
+                <el-button :style="{'background-color': btnColor}" class="main-menu-btn" type="primary" icon="el-icon-menu" size="small"></el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item icon="el-icon-date" command="timesheet" class="main-menu-dropdown-text">Timesheet</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-tickets" command="task" class="main-menu-dropdown-text">Task</el-dropdown-item>
@@ -43,8 +43,10 @@
                 </el-dropdown-menu>
               </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleLogoutCommand">
-                <el-button type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
+                <el-button :style="{'background-color': btnColor}" type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
+                  <el-dropdown-item command="theme">
+                  </el-dropdown-item>
                   <el-dropdown-item command="logout">
                     <div class="main-user-info-panel-item"><b>Logout</b></div>
                   </el-dropdown-item>
@@ -64,6 +66,7 @@
 <script>
 /* eslint-disable */
 import {mapState, mapMutations, mapActions, mapGetters} from 'vuex'
+import res from '../utils/res'
 export default {
   name: 'Main',
   data () {
@@ -72,7 +75,9 @@ export default {
       msgValue: 3,
       msgList: [{'id': 1, 'msg': 'You have not complete the timesheet from 2019-07-09.'},
         {'id': 2, 'msg': 'TOS Team still need 42 hours to complete the target.'},
-        {'id': 3, 'msg': 'Change CGM190061 is over charged.'}]
+        {'id': 3, 'msg': 'Change CGM190061 is over charged.'}],
+      mainColor: res.themeStyle[0].mainColor,
+      btnColor: res.themeStyle[0].btnColor
     }
   },
   methods: {
@@ -117,7 +122,6 @@ export default {
   padding: 0;
 }
 .main-el-row {
-  background-color: #409EFF;
   width: 100%;
   height: 50px;
 }
