@@ -61,7 +61,7 @@
         <router-view/>
       </el-main>
     </el-container>
-    <el-dialog title="Theme Style" :visible.sync="centerDialogVisible" width="18%" center>
+    <el-dialog title="Theme Style" :visible.sync="centerDialogVisible" width="360px" center>
       <el-table ref="themeTable" :data="themeData" highlight-current-row @current-change="selectTheme"
       style="width: 100%">
         <el-table-column property="themeValue" width="20" v-if="false"></el-table-column>
