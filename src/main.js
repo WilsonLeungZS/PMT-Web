@@ -37,6 +37,8 @@ router.beforeEach(async (to, from, next) => {
         next('/Login')
       }
     }
+    console.log('Debug')
+    store.dispatch('setNewThemeStyle', 0)
   }
   if (to.meta.needLogin) {
     if (getFlag === 'isLogin') {
