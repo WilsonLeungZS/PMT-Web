@@ -33,6 +33,11 @@ Date.prototype.Format = function(fmt)
   return fmt;   
 }
 
+const themeStyle = [
+  {'themeName': 'Default Style', 'mainColor': '#409EFF', 'headerColor': '#2980b9', 'btnColor': '#1e90ff'}
+]
+
 module.exports = {
-    exportExcel
+    exportExcel,
+    themeStyle
 }

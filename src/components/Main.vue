@@ -66,7 +66,7 @@
 <script>
 /* eslint-disable */
 import {mapState, mapMutations, mapActions, mapGetters} from 'vuex'
-import res from '../utils/res'
+import utils from '../utils/utils'
 export default {
   name: 'Main',
   data () {
@@ -76,8 +76,8 @@ export default {
       msgList: [{'id': 1, 'msg': 'You have not complete the timesheet from 2019-07-09.'},
         {'id': 2, 'msg': 'TOS Team still need 42 hours to complete the target.'},
         {'id': 3, 'msg': 'Change CGM190061 is over charged.'}],
-      mainColor: res.themeStyle[0].mainColor,
-      btnColor: res.themeStyle[0].btnColor
+      mainColor: utils.themeStyle[0].mainColor,
+      btnColor: utils.themeStyle[0].btnColor
     }
   },
   methods: {

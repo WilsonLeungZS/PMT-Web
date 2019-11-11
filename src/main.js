@@ -18,7 +18,26 @@ router.beforeEach(async (to, from, next) => {
   let getFlag = localStorage.getItem('Flag')
   let reqUserEid = localStorage.getItem('UserEid')
   var needAdmin = to.meta.needAdmin
-  console.log(from)
+  console.log(to)
+  if (to.meta.page != null && to.meta.page === 'Login') {
+    if (getFlag === 'isLogin') {
+      const res = await http.get('/users/login', {
+        userEid: reqUserEid
+      })
+      if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
+        var resUserEid = res.data.user.Name
+        var resUserId = res.data.user.Id
+        var resUserRole = res.data.user.Role
+        store.dispatch('setNewUserEid', resUserEid)
+        store.dispatch('setNewUserId', resUserId)
+        store.dispatch('setShowMainBar')
+        next('/Timesheet')
+      } else {
+        alert('Your EID is not found or inactive! Please retry or contact administrator!')
+        next('/Login')
+      }
+    }
+  }
   if (to.meta.needLogin) {
     if (getFlag === 'isLogin') {
       const res = await http.get('/users/login', {
@@ -31,10 +50,6 @@ router.beforeEach(async (to, from, next) => {
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
         store.dispatch('setShowMainBar')
-        if (to.meta.page != null && to.meta.page === 'Login') {
-          console.log('Login')
-          next('/Timesheet')
-        }
         if (needAdmin) {
           if (resUserRole === 'Admin') {
             next()
