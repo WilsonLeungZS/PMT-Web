@@ -8,7 +8,7 @@ import router from './router'
 import store from './store'
 import http from './utils/http'
 import Blob from './excel/Blob'
-// import Export2Excel from './excel/Export2Excel.js'
+import Export2Excel from './excel/Export2Excel.js'
 
 Vue.use(ElementUI, { locale })
 
@@ -47,8 +47,10 @@ router.beforeEach(async (to, from, next) => {
         var resUserEid = res.data.user.Name
         var resUserId = res.data.user.Id
         var resUserRole = res.data.user.Role
+        var resUserThemeStyle = Number(res.data.user.ThemeStyle)
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
+        store.dispatch('setNewThemeStyle', resUserThemeStyle)
         store.dispatch('setShowMainBar')
         if (needAdmin) {
           if (resUserRole === 'Admin') {

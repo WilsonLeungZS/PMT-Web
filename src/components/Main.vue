@@ -6,7 +6,7 @@
           <el-col :span="1" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
             <div class="main-grid-content">
               <el-dropdown @command="handleMenuCommand">
-                <el-button :style="{'background-color': btnColor}" class="main-menu-btn" type="primary" icon="el-icon-menu" size="small"></el-button>
+                <el-button :style="{'background-color': btnColor}" class="main-menu-btn" icon="el-icon-menu" size="small"></el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item icon="el-icon-date" command="timesheet" class="main-menu-dropdown-text">Timesheet</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-tickets" command="task" class="main-menu-dropdown-text">Task</el-dropdown-item>
@@ -42,12 +42,13 @@
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown> -->
-              <el-dropdown trigger="click" style="padding: 0" @command="handleLogoutCommand">
-                <el-button :style="{'background-color': btnColor}" type="primary" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
+              <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
+                <el-button :style="{'background-color': btnColor}" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
                   <el-dropdown-item command="theme">
+                    <div class="main-user-info-panel-item"><span>Theme Style</span><div class="main-user-info-panel-colorbox" :style="{'background': mainColor}"></div></div>
                   </el-dropdown-item>
-                  <el-dropdown-item command="logout">
+                  <el-dropdown-item command="logout" divided>
                     <div class="main-user-info-panel-item"><b>Logout</b></div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -60,12 +61,31 @@
         <router-view/>
       </el-main>
     </el-container>
+    <el-dialog title="Theme Style" :visible.sync="centerDialogVisible" width="18%" center>
+      <el-table ref="themeTable" :data="themeData" highlight-current-row @current-change="selectTheme"
+      style="width: 100%">
+        <el-table-column property="themeValue" width="20" v-if="false"></el-table-column>
+        <el-table-column property="themeName" label="Theme Name" align="center"></el-table-column>
+        <el-table-column property="mainColor" label="Color" width="120" align="center">
+          <template slot-scope="scope">
+            <div class="main-themestyle">
+              <div class="main-themestyle-colorbox" :style="{'background': scope.row.mainColor}"></div>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">Cancel</el-button>
+        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitTheme">Submit</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 /* eslint-disable */
 import {mapState, mapMutations, mapActions, mapGetters} from 'vuex'
+import http from '../utils/http'
 import utils from '../utils/utils'
 export default {
   name: 'Main',
@@ -73,23 +93,55 @@ export default {
     return {
       logo: 'Project Management Timesheet',
       msgValue: 3,
+      centerDialogVisible: false,
       msgList: [{'id': 1, 'msg': 'You have not complete the timesheet from 2019-07-09.'},
         {'id': 2, 'msg': 'TOS Team still need 42 hours to complete the target.'},
         {'id': 3, 'msg': 'Change CGM190061 is over charged.'}],
-      mainColor: utils.themeStyle[0].mainColor,
-      btnColor: utils.themeStyle[0].btnColor
+      themeData: utils.themeStyle,
+      currentRow: null,
+      mainColor: utils.themeStyle[this.$store.getters.getThemeStyle].mainColor,
+      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
   },
   methods: {
-    handleLogoutCommand(command) {
-      localStorage.setItem('Flag', '')
-      localStorage.setItem('UserEid', '')
-      this.$store.dispatch('setNewUserEid', '')
-      this.$store.dispatch('setNewUserId', '')
-      this.$store.dispatch('setHideMainBar')
-      this.$router.push({path: '/Login'})
+    setCurrent (row) {
+      console.log(this.$refs)
+      this.$nextTick(() => {
+        this.$refs.themeTable.setCurrentRow(row);
+      })
     },
-    handleMenuCommand(command) {
+    selectTheme (val) {
+      this.$data.currentRow = Number(val.themeValue)
+    },
+    async submitTheme() {
+      const res = await http.get('/users/setUserThemeStyle', {
+        userEid: this.$store.getters.getUserEid,
+        uThemeStyle: this.$data.currentRow
+      })
+      console.log(res)
+      if (res.data.status === 0) {
+        this.$data.centerDialogVisible = false
+        var resUserThemeStyle = Number(res.data.data.ThemeStyle)
+        this.$store.dispatch('setNewThemeStyle', resUserThemeStyle)
+        this.$router.go(0)
+      }
+    },
+    handleCommand (command) {
+      if (command === 'logout') {
+        localStorage.setItem('Flag', '')
+        localStorage.setItem('UserEid', '')
+        this.$store.dispatch('setNewUserEid', '')
+        this.$store.dispatch('setNewUserId', '')
+        this.$store.dispatch('setHideMainBar')
+        this.$router.push({path: '/Login'})
+      }
+      else if (command === 'theme') {
+        this.$data.centerDialogVisible = true
+        var index = Number(utils.themeStyle[this.$store.getters.getThemeStyle].themeValue)
+        this.setCurrent(this.$data.themeData[index])
+      }
+    },
+    handleMenuCommand (command) {
       if (command === 'timesheet') {
         this.$router.push({path: '/Timesheet'})
       }
@@ -137,6 +189,8 @@ export default {
   height:40px;
   text-align: center;
   font-size: 20px;
+  color: white;
+  border: none;
 }
 .main-menu-dropdown-text {
   font-size: 18px;
@@ -152,6 +206,8 @@ export default {
   margin-right: 10px;
   width:auto;
   font-size: 15px;
+  color: white;
+  border: none;
 }
 .main-user-msg {
   margin-top: 5px;
@@ -159,8 +215,8 @@ export default {
   font-size: 10px;
 }
 .main-user-info-panel {
-  width: 120px;
-  padding-top: 0;
+  width: 150px;
+  padding-top: 6px;
   padding-bottom: 0;
 }
 .main-user-info-panel-item {
@@ -169,6 +225,26 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.main-user-info-panel-colorbox {
+  margin-left: 7px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #bdc3c7;
+  border-radius: 6px;
+}
+.main-themestyle {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.main-themestyle-colorbox {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #bdc3c7;
+  border-radius: 6px;
 }
 .main-user-info-panel-logout {
   width: 120px;

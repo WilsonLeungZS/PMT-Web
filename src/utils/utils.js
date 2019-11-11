@@ -34,7 +34,12 @@ Date.prototype.Format = function(fmt)
 }
 
 const themeStyle = [
-  {'themeName': 'Default Style', 'mainColor': '#409EFF', 'headerColor': '#2980b9', 'btnColor': '#1e90ff'}
+  {'themeValue': 0, 'themeName': 'Limpid Water', 'mainColor': '#409EFF', 'headerColor': '#2980b9', 'btnColor': '#1e90ff', 'btnColor2': '#1e3799'},
+  {'themeValue': 1, 'themeName': 'Resplendent Emerald', 'mainColor': '#44bd32', 'headerColor': '#009432', 'btnColor': '#2ed573', 'btnColor2': '#27ae60'},
+  {'themeValue': 2, 'themeName': 'Deep Night', 'mainColor': '#000000', 'headerColor': '#718093', 'btnColor': '#a4b0be', 'btnColor2': '#7f8c8d'},
+  {'themeValue': 3, 'themeName': 'Charming Cherry', 'mainColor': '#ff7979', 'headerColor': '#fd79a8', 'btnColor': '#fab1a0', 'btnColor2': '#ff7675'},
+  {'themeValue': 4, 'themeName': 'Fresh Juice', 'mainColor': '#ffa502', 'headerColor': '#EE5A24', 'btnColor': '#eccc68', 'btnColor2': '#f39c12'},
+  {'themeValue': 5, 'themeName': 'Enthusiastic Fire', 'mainColor': '#EA2027', 'headerColor': '#b71540', 'btnColor': '#ff6348', 'btnColor2': '#c0392b'}
 ]
 
 module.exports = {

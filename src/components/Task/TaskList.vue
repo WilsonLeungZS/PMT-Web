@@ -26,7 +26,7 @@
             <div class="tl-bar-item">
               <el-button-group>
                 <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
-                  <el-button type="primary" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
+                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
                 </el-tooltip>
                 <!--<el-tooltip class="item" effect="dark" content="Export Tasks" placement="top-start">
                   <el-button type="success" icon="el-icon-download" size="small" class="tl-bar-item-btn"></el-button>
@@ -49,7 +49,7 @@
               <el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
               <el-table-column fixed="right" label="Edit" width="100" align="center">
                 <template slot-scope="scope">
-                  <el-button type="primary" size="small" @click="editTask(scope.row)" icon="el-icon-edit">Edit</el-button>
+                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" @click="editTask(scope.row)" icon="el-icon-edit">Edit</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -141,8 +141,8 @@
       </el-card>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>
-        <el-button type="success" size="medium" @click="logWorkDone" v-show="showForExistingTask">Log Work Done</el-button>
-        <el-button type="primary" size="medium" @click="submitTask" v-show="showForPmtTask">Submit</el-button>
+        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium" @click="logWorkDone" v-show="showForExistingTask">Log Work Done</el-button>
+        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTask" v-show="showForPmtTask">Submit</el-button>
       </span>
     </el-dialog>
     <el-dialog title="Add Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
@@ -167,7 +167,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="worklogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="submitWorklog">Submit</el-button>
+        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitWorklog">Submit</el-button>
       </div>
     </el-dialog>
   </div>
@@ -175,6 +175,7 @@
 
 <script>
 import http from '../../utils/http'
+import utils from '../../utils/utils'
 export default {
   name: 'TaskList',
   data () {
@@ -222,7 +223,9 @@ export default {
         worklog_remark: ''
       },
       taskDialogTitle: 'Edit Task',
-      taskDisabledStaus: true
+      taskDisabledStaus: true,
+      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
     }
   },
   methods: {

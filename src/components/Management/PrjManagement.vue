@@ -23,7 +23,7 @@
                   <span class="pm-content-header">
                     Teams List
                     <el-tooltip class="item" effect="dark" content="Add New Team" placement="top">
-                      <el-button type="primary" icon="el-icon-plus" size="mini" circle
+                      <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini" circle
                         class="pm-content-header-btn" @click="addTeam"></el-button>
                     </el-tooltip>
                   </span>
@@ -69,7 +69,7 @@
                           <el-switch v-model="props.row.team_isactive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                         </el-col>
                         <el-col :span="11" class="pm-table-expand-item">
-                          <el-button type="primary" size="small"
+                          <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small"
                             style="width:100%" @click="saveTeam(props)">Save</el-button>
                           <el-button type="info" size="small"
                             style="width:100%" @click="cancelTeam(props)">Cancel</el-button>
@@ -103,7 +103,7 @@
                   <span class="pm-content-header">
                     Users List
                     <el-tooltip class="item" effect="dark" content="Add New User" placement="top">
-                      <el-button type="primary" icon="el-icon-plus" size="mini" circle
+                      <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini" circle
                         class="pm-content-header-btn" @click="addUser"></el-button>
                     </el-tooltip>
                     <!-- <el-tooltip class="item" effect="dark" content="Expoet Users List" placement="top">
@@ -155,7 +155,7 @@
                           <el-switch v-model="props.row.user_isactive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                         </el-col>
                         <el-col :span="10" class="pm-table-expand-item">
-                          <el-button type="primary" size="small"
+                          <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small"
                             style="width:100%" @click="saveUser(props)">Save</el-button>
                           <el-button type="info" size="small"
                             style="width:100%" @click="cancelUser(props)">Cancel</el-button>
@@ -199,7 +199,7 @@
                   <span class="pm-content-header">
                     Task Types List
                     <el-tooltip class="item" effect="dark" content="Add New Task Type" placement="top">
-                      <el-button type="primary" icon="el-icon-plus" size="mini" circle
+                      <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini" circle
                         class="pm-content-header-btn" @click="addTasktype"></el-button>
                     </el-tooltip>
                   </span>
@@ -242,7 +242,7 @@
                           <el-input type="number" v-model="props.row.type_value" size="small" style="width: 100%"></el-input>
                         </el-col>
                         <el-col :span="10" class="pm-table-expand-item">
-                          <el-button type="primary" size="small"
+                          <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small"
                             style="width:100%" @click="saveTasktype(props)">Save</el-button>
                           <el-button type="info" size="small"
                             style="width:100%" @click="cancelTasktype(props)">Cancel</el-button>
@@ -267,6 +267,7 @@
 
 <script>
 import http from '../../utils/http'
+import utils from '../../utils/utils'
 export default {
   name: 'Projecpmanagement',
   data () {
@@ -288,7 +289,9 @@ export default {
       ],
       teamFilter: [],
       tasktypeData: [],
-      tasktypeResetData: []
+      tasktypeResetData: [],
+      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
     }
   },
   methods: {

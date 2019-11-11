@@ -56,7 +56,7 @@
                 </el-col>
                 <el-col :span="1">
                   <el-tooltip effect="dark" content="Show Worklog" placement="top">
-                    <el-button type="success" icon="el-icon-search" circle @click="getTaskWorklogs(null)"></el-button>
+                    <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-search" circle @click="getTaskWorklogs(null)"></el-button>
                   </el-tooltip>
                 </el-col>
                 <el-col :span="1">
@@ -85,9 +85,9 @@
                     </el-form>
                     <div style="text-align: right; margin: 0">
                       <el-button size="mini" type="text" @click="reportFormVisible = false; reportRangeValue = []; reportType = 1">Cancel</el-button>
-                      <el-button type="success" size="mini" @click="extractReport">Extract</el-button>
+                      <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="mini" @click="extractReport">Extract</el-button>
                     </div>
-                    <el-button slot="reference" type="primary" icon="el-icon-download" circle></el-button>
+                    <el-button slot="reference" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" icon="el-icon-download" circle></el-button>
                   </el-popover>
                 </el-col>
                 <el-col :span="5" :offset="5" class="pt-effort-progress">
@@ -152,7 +152,7 @@
                     <el-input type="number" size="small" v-model="scope.row.worklog_change_effort" class="pt-worklog">
                       <template slot="append">Hours</template>
                     </el-input>
-                    <el-button size="small" type="primary" icon="el-icon-edit" style="margin-left:10px" @click="adjustEffort(scope)">Adjust Effort</el-button>
+                    <el-button size="small" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-edit" style="margin-left:10px" @click="adjustEffort(scope)">Adjust Effort</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -209,6 +209,7 @@ export default {
             const end = new Date()
             const start = new Date()
             start.setMonth(start.getMonth() - 1)
+            end.setMonth(end.getMonth() - 1)
             picker.$emit('pick', [start, end])
           }
         }, {
@@ -219,7 +220,9 @@ export default {
             picker.$emit('pick', [start, end])
           }
         }]
-      }
+      },
+      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
     }
   },
   methods: {

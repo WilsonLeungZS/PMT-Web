@@ -35,7 +35,7 @@
                     @change="changePtMonth"></el-date-picker>
                 </el-col>
                 <el-col :span="2" class="pt-title-item">
-                  <el-button type="success" icon="el-icon-arrow-right" circle @click="showTeamTimesheet"></el-button>
+                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-arrow-right" circle @click="showTeamTimesheet"></el-button>
                 </el-col>
               </el-row>
             </el-card>
@@ -43,7 +43,7 @@
         </el-row>
         <el-row>
           <el-col :span="24" class="content-main-col" v-for="(timesheet, tIndex) in timesheetDatas" :key="tIndex" >
-            <el-table :data="timesheet.timesheetData" fit empty-text="No worklog" class="pt-table" show-summary :summary-method="getSummaries"
+            <el-table :data="timesheet.timesheetData" fit empty-text="No worklog" class="pt-table" show-summary :summary-method="getSummaries" :header-cell-style="{'background-color': headerColor}"
               :row-class-name="ptTableRowStyle" :cell-class-name="ptTableCellStyle"
               :header-row-class-name="ptTableHeaderRowStyle" :header-cell-class-name="ptTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
@@ -74,6 +74,7 @@
 
 <script>
 import http from '../../utils/http'
+import utils from '../../utils/utils'
 export default {
   name: 'PrjTimesheet',
   data () {
@@ -90,7 +91,9 @@ export default {
       timesheetHeaders: [],
       timesheetMonth: '',
       sumHoursArray: [],
-      timesheetDatas: []
+      timesheetDatas: [],
+      headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
+      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
   },
   methods: {
@@ -373,14 +376,12 @@ export default {
   font-size: 13px;
   border-top: 1px solid #f1f2f6;
   padding: 0 !important;
-  background-color: #2980b9 !important;
   color: white;
 }
 .pt-table-header-cell {
   font-size: 13px;
   border-top: 1px solid #f1f2f6;
   padding: 0 !important;
-  background-color: #2980b9 !important;
   color: #2f3542;
 }
 .pt-table-row {

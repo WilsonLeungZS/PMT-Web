@@ -17,7 +17,7 @@
         </el-row>
         <el-row>
           <el-col :span="24" class="content-main-col">
-            <el-table :data="timesheetData" fit empty-text="No worklog" class="mt-table" show-summary :summary-method="getSummaries"
+            <el-table :data="timesheetData" fit empty-text="No worklog" class="mt-table" show-summary :summary-method="getSummaries" :header-cell-style="{'background-color': headerColor}"
               :row-class-name="mtTableRowStyle" :cell-class-name="mtTableCellStyle"
               :header-row-class-name="mtTableHeaderRowStyle" :header-cell-class-name="mtTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
@@ -69,8 +69,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="worklogFormVisible = false">Cancel</el-button>
-        <el-button type="danger" @click="deleteWorklog">Delete</el-button>
-        <el-button type="primary" @click="submitWorklog">Submit</el-button>
+        <el-button style="color: red;font-weight: bold" v-if="showDeleteBtn" @click="deleteWorklog">Delete</el-button>
+        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitWorklog">Submit</el-button>
       </div>
     </el-dialog>
   </div>
@@ -78,6 +78,7 @@
 
 <script>
 import http from '../../utils/http'
+import utils from '../../utils/utils'
 export default {
   name: 'MyTimesheet',
   data () {
@@ -91,13 +92,16 @@ export default {
       sumHoursArray: [],
       worklogFormVisible: false,
       taskList: [],
+      showDeleteBtn: false,
       form: {
         worklog_taskid: 0,
         worklog_task: '',
         worklog_date: '',
         worklog_effort: 0,
         worklog_remark: ''
-      }
+      },
+      headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
+      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
   },
   methods: {
@@ -227,6 +231,7 @@ export default {
     // Edit worklog when click the date
     editTimesheetByDate (scope) {
       this.$data.worklogFormVisible = true
+      this.$data.showDeleteBtn = false
       this.$data.form.worklog_taskid = 0
       this.$data.form.worklog_task = ''
       this.$data.form.worklog_effort = 0
@@ -237,6 +242,7 @@ export default {
     async editTimesheetByTask (scope) {
       console.log(scope)
       this.$data.worklogFormVisible = true
+      this.$data.showDeleteBtn = false
       this.$data.form.worklog_taskid = 0
       this.$data.form.worklog_task = ''
       this.$data.form.worklog_effort = 0
@@ -256,6 +262,9 @@ export default {
         this.$data.form.worklog_taskid = res.data.data[0].worklog_task_id
         this.$data.form.worklog_task = res.data.data[0].worklog_task_name
         this.$data.form.worklog_effort = res.data.data[0].worklog_effort
+        if (res.data.data[0].worklog_effort > 0) {
+          this.$data.showDeleteBtn = true
+        }
         this.$data.form.worklog_remark = res.data.data[0].worklog_remark
       } else {
         this.$data.form.worklog_taskid = scope.row.task_id
@@ -487,14 +496,12 @@ export default {
   font-size: 13px;
   border-top: 1px solid #f1f2f6;
   padding: 0 !important;
-  background-color: #2980b9 !important;
   color: white;
 }
 .mt-table-header-cell {
   font-size: 13px;
   border-top: 1px solid #f1f2f6;
   padding: 0 !important;
-  background-color: #2980b9 !important;
   color: #2f3542;
 }
 .mt-table-row {
