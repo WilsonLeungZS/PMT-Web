@@ -138,6 +138,7 @@ export default {
       }
     },
     changeMTMonth (iDate) {
+      console.log('Change month: ' + iDate)
       this.resetTimesheet(iDate)
     },
     async resetTimesheet (iDateVal) {
@@ -351,8 +352,9 @@ export default {
         wRemark: reqRemark
       })
       if (res.data.status === 0) {
-        var firstDate = this.getCurrentMonthFirst()
-        this.resetTimesheet(firstDate)
+        var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
+        var dateConvert = new Date(Date.parse(firstDate))
+        this.resetTimesheet(dateConvert)
         this.$data.worklogFormVisible = false
       } else {
         this.showWarnMessage('Warning', 'Fail to add/update worklog!')
