@@ -384,8 +384,9 @@ export default {
         wWorklogDay: reqWorklogDay
       })
       if (res.data.status === 0) {
-        var firstDate = this.getCurrentMonthFirst()
-        this.resetTimesheet(firstDate)
+        var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
+        var dateConvert = new Date(Date.parse(firstDate))
+        this.resetTimesheet(dateConvert)
         this.$data.worklogFormVisible = false
       } else {
         this.showWarnMessage('Warning', 'Fail to delete worklog!')
