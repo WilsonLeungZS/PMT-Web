@@ -38,7 +38,7 @@
                       </el-table-column>
                       <el-table-column align="center" width="50">
                         <template slot-scope="scope">
-                          <el-button size="mini" type="primary" icon="el-icon-arrow-right" circle @click="getTaskWorklogs(scope.row.tl_task)"></el-button>
+                          <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="mini" icon="el-icon-arrow-right" circle @click="getTaskWorklogs(scope.row.tl_task)"></el-button>
                         </template>
                       </el-table-column>
                     </el-table>
