@@ -39,6 +39,10 @@
             </el-table>
           </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="24" class="content-task-col">
+          </el-col>
+        </el-row>
       </el-main>
     </el-container>
     <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
@@ -477,6 +481,12 @@ export default {
 .form_list_task_desc {
   font-size: 14px;
   color: #bdc3c7;
+}
+.content-task-col {
+  margin-top:40px;
+  height:400px;
+  width: 100%;
+  border: 1px solid black
 }
 /*Common Style*/
 .bg-color {
