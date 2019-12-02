@@ -22,8 +22,8 @@
               :header-row-class-name="mtTableHeaderRowStyle" :header-cell-class-name="mtTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
               <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
-                <template slot="header" slot-scope="scope">
-                   <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM" :clearable="false"
+                <template slot="header" >
+                    <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM" :clearable="false"
                     class="mt-table-month-picker" @change="changeMTMonth"></el-date-picker>
                 </template>
               </el-table-column>
@@ -41,6 +41,29 @@
         </el-row>
         <el-row>
           <el-col :span="24" class="content-task-col">
+              <el-date-picker v-model="timesheetMemo" type="month" size="small" format="yyyy-MM" :clearable="false"
+                class="assin-month-picker" ></el-date-picker>
+              <template>
+                 <div class="cards" v-for="j in 17" :key="j" >
+                    <el-col :span="4">
+                    <el-card class="box-card" @click.native="addToAssin">
+                      <div slot="header" class="clearfix">
+                        <span>Task Name</span>
+                      </div>
+                      <div class="text item">
+                        <el-row>
+                          <el-col class="title" :span="12">Date</el-col>
+                          <el-col class="content"  :span="12">{{assin.assin_date}}</el-col>
+                        </el-row>
+                        <el-row >
+                          <el-col class="title"  :span="12">Description</el-col>
+                          <el-col class="content" :title="assin.assin_remark" :span="12">{{assin.assin_remark|ellipsis}}</el-col>
+                        </el-row>
+                      </div>
+                    </el-card>
+                    </el-col>
+                  </div>
+              </template>
           </el-col>
         </el-row>
       </el-main>
@@ -93,6 +116,7 @@ export default {
       timesheetData: [],
       timesheetHeaders: [],
       timesheetMonth: '',
+      timesheetMemo: '',
       sumHoursArray: [],
       worklogFormVisible: false,
       taskList: [],
@@ -104,10 +128,28 @@ export default {
         worklog_effort: 0,
         worklog_remark: ''
       },
+      assin: {
+        assin_taskid: 0,
+        assin_task: '',
+        assin_date: '2019.12.2',
+        assin_effort: 0,
+        assin_remark: '拉拉拉拉拉阿拉啦啦啦啦啦啦啦啦拉拉拉拉拉拉喇喇喇拉阿拉啦啦啦啦啦啦啦啦啦'
+      },
       headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
   },
+  filters: {
+      ellipsis (value) {
+        if(!value){
+          return '';
+        }
+        if(value.length > 18) {
+          return value.slice(0,18) + "...";
+        }
+        return value;
+      }
+    },
   methods: {
     switchToPT () {
       this.$data.isActive = false
@@ -412,6 +454,11 @@ export default {
         changeDateDay = '' + changeDateDay
       }
       this.$data.form.worklog_date = changeDateYear + '-' + changeDateMonth + '-' + changeDateDay
+    },
+    addToAssin () {
+      console.log('click')
+      this.$data.worklogFormVisible = true
+      this.$data.form.worklog_task_id = 0
     }
   },
   created () {
@@ -486,7 +533,7 @@ export default {
   margin-top:40px;
   height:400px;
   width: 100%;
-  border: 1px solid black
+  border-top: 1px solid rgb(168, 168, 168) ;
 }
 /*Common Style*/
 .bg-color {
@@ -555,4 +602,44 @@ export default {
 .el-autocomplete-suggestion li {
   line-height: 28px;
 }
+/**assin功能 */
+
+.assin-month-picker{
+  height:40px;
+  padding-left: 5px;
+  padding-right: 5px;
+  line-height: 46px;
+  font-size: 16px;
+  margin: 10px 5px;
+  width: auto;
+}
+  .text {
+    font-size: 14px;
+    font-family: "Helvetica Neue";
+    text-align: left;
+  }
+
+  .item {
+    margin-bottom: 10px;
+  }
+  .content{
+    float: left;
+  }
+  .clearfix:before,
+  .clearfix:after {
+    display: table;
+    content: "";
+  }
+  .clearfix:after {
+    clear: both
+  }
+  .box-card{
+
+    margin:10px 20px;
+    cursor: pointer;
+    background-color: #d9e1eb;
+  }
+  .box-card:hover {
+    transform: scale(1.1);
+  }
 </style>
