@@ -41,29 +41,36 @@
         </el-row>
         <el-row>
           <el-col :span="24" class="content-task-col">
-              <el-date-picker v-model="timesheetMemo" type="month" size="small" format="yyyy-MM" :clearable="false"
-                class="assin-month-picker" ></el-date-picker>
-              <template>
-                 <div class="cards" v-for="j in 17" :key="j" >
-                    <el-col :span="4">
-                    <el-card class="box-card" @click.native="addToAssin">
+              <div class="datePicker">
+                <el-button size="small" round  icon="el-icon-arrow-left" @click="ChangePeriod(-1)"></el-button>
+                <el-date-picker v-model="timesheetMemo" type="month" size="small" format="yyyy-MM" :clearable="false"
+                  class="assin-month-picker" @change="changeMemoMonth"></el-date-picker>
+                <el-button size="small" round @click="ChangePeriod(1)"><i class="el-icon-arrow-right el-icon--right" ></i></el-button>
+              </div>
+                <div class="cards" v-for="(assignToTask,index) in assignToTasks" :key="index" >
+                    <el-col :span="span_card">    
+                    <el-card  class="box-card" @click.native="addToAssign(assignToTask)">
                       <div slot="header" class="clearfix">
-                        <span>Task Name</span>
+                        <span class="title">{{assignToTask.taskName}}</span>
                       </div>
                       <div class="text item">
                         <el-row>
-                          <el-col class="title" :span="12">Date</el-col>
-                          <el-col class="content"  :span="12">{{assin.assin_date}}</el-col>
+                          <el-col class="title" :span="8">Date</el-col>
+                          <el-col class="content"  :span="16">{{assignToTask.date}}</el-col>
                         </el-row>
                         <el-row >
-                          <el-col class="title"  :span="12">Description</el-col>
-                          <el-col class="content" :title="assin.assin_remark" :span="12">{{assin.assin_remark|ellipsis}}</el-col>
-                        </el-row>
+                          <el-col class="title"  :span="8">Progress</el-col>
+                          <el-col class="content" :span="16"><el-progress :percentage="assignToTask.progress"></el-progress></el-col>
+                        </el-row>                        
+                        <el-row >
+                          <el-col class="title"  :span="8">Description</el-col>
+                          <el-col class="content" :title="assignToTask.Description" :span="16"><div class="overflow">{{assignToTask.Description}}</div></el-col> 
+                        </el-row >
                       </div>
-                    </el-card>
+                    </el-card>  
                     </el-col>
                   </div>
-              </template>
+                  
           </el-col>
         </el-row>
       </el-main>
@@ -112,8 +119,10 @@ export default {
     return {
       header1: 'My Timesheet',
       header2: 'Project Timesheet',
+      span_card:4,
       isActive: true,
       timesheetData: [],
+      memoTimesheetDate:[],
       timesheetHeaders: [],
       timesheetMonth: '',
       timesheetMemo: '',
@@ -126,15 +135,10 @@ export default {
         worklog_task: '',
         worklog_date: '',
         worklog_effort: 0,
-        worklog_remark: ''
+        worklog_remark: '',
+        worklog_progress: 0
       },
-      assin: {
-        assin_taskid: 0,
-        assin_task: '',
-        assin_date: '2019.12.2',
-        assin_effort: 0,
-        assin_remark: '拉拉拉拉拉阿拉啦啦啦啦啦啦啦啦拉拉拉拉拉拉喇喇喇拉阿拉啦啦啦啦啦啦啦啦啦'
-      },
+      assignToTasks:[],
       headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
@@ -144,8 +148,8 @@ export default {
         if(!value){
           return '';
         }
-        if(value.length > 18) {
-          return value.slice(0,18) + "...";
+        if(value.length >32) {
+          return value.slice(0,32) + "...";
         }
         return value;
       }
@@ -183,9 +187,93 @@ export default {
         return 'mt-table-col-nonweekday'
       }
     },
+    changeMemoMonth(iDate){
+      console.log('Change MemoMonth: '+iDate)
+      this.resetMemoTimeSheet(iDate)
+    },
     changeMTMonth (iDate) {
       console.log('Change month: ' + iDate)
       this.resetTimesheet(iDate)
+    },
+    ChangePeriod (value){
+      console.log(value)
+      console.log("clicked ChangePeriod")
+      var month = Number(this.$data.timesheetMemo.slice(5,7))
+      var year = Number(this.$data.timesheetMemo.slice(0,4))
+      if(value == -1){
+        if(month == 1){
+          year--
+          month = 12
+        }else{
+          month -- 
+        }
+      }else if(value == 1){
+        if(month == 12){
+          year ++
+          month = 1
+        }else{
+          month++
+        }
+      }
+      year = String(year)
+      month = String(month)
+      this.$data.timesheetMemo = year + '-' + month ;
+      var PeriodDate = this.$data.timesheetMemo + '-01 00:00:00'
+      var dateConvert = new Date(Date.parse(PeriodDate))
+      this.resetMemoTimeSheet(dateConvert)
+    },
+    async resetMemoTimeSheet(iDateVal){
+      this.$data.memoTimesheetDate = []
+      console.log(iDateVal)
+      var mtYear = iDateVal.getFullYear()
+      var mtMonth = iDateVal.getMonth() + 1
+      console.log(mtYear + " " +mtMonth)
+      if(mtMonth < 10){
+        mtMonth = '0' + mtMonth
+      }else{
+        mtMonth = ''+ mtMonth
+      }
+      var mtDay = iDateVal.getDay()
+      /*var days = 31
+      var isLeap = false
+      if(mtYear % 4 ===0 && mtYear % 100 !=0 || mtYear % 400 ===0){
+        isLeap = true
+      }
+      if(mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11'){
+        days = 30
+      }else if(mtMonth ==='02' && isLeap === false){
+        days = 28
+      }else if(mtMonth ==='02' && isLeap === true){
+        days = 29
+      }*/
+      var mtUpdatedAt = mtYear+'-'+mtMonth;
+      var mtEndUpdated 
+      if(mtMonth<12){
+        mtMonth = Number(mtMonth)
+        mtMonth++
+      }else if(mtMonth == 12){
+        mtYear = Number(mtYear)
+        mtMonth = Number(mtMonth)
+        mtYear++ 
+        mtMonth = 1
+      }
+      mtEndUpdated =  mtYear+'-'+mtMonth;
+      console.log('mtEndUpdated :'+mtEndUpdated)
+      console.log('mtUpdatedAt :'+mtUpdatedAt)
+      var AssignUserId = this.$store.getters.getUserId
+      console.log('Assign To: ' + AssignUserId)
+      const res = await http.post('/tasks/getTaskByAssignUserId', {
+        wUserId: AssignUserId,
+        wmtUpdatedAt: mtUpdatedAt,
+        wmtEndUpdated:mtEndUpdated
+      })
+      console.log(res.data)
+      if(res.data.status === 0){
+        this.$data.assignToTasks = res.data.data;
+        console.log(this.$data.assignToTasks)
+      }else{
+        this.$data.assignToTasks = [];
+      }
     },
     async resetTimesheet (iDateVal) {
       this.$data.timesheetData = []
@@ -226,6 +314,7 @@ export default {
       this.$data.timesheetHeaders = resetArray
       var reqMonth = mtYear + '-' + mtMonth
       this.$data.timesheetMonth = reqMonth
+      this.$data.timesheetMemo = reqMonth
       var reqUserId = this.$store.getters.getUserId
       const res = await http.post('/worklogs/getWorklogByUserAndMonthForWeb', {
         wUserId: reqUserId,
@@ -277,6 +366,7 @@ export default {
     },
     // Edit worklog when click the date
     editTimesheetByDate (scope) {
+      console.log('editTimesheetByDate')
       this.$data.worklogFormVisible = true
       this.$data.showDeleteBtn = false
       this.$data.form.worklog_taskid = 0
@@ -287,6 +377,7 @@ export default {
     },
     // Edit worklog when click the day
     async editTimesheetByTask (scope) {
+      console.log('editTimesheetByTask')
       console.log(scope)
       this.$data.worklogFormVisible = true
       this.$data.showDeleteBtn = false
@@ -383,7 +474,7 @@ export default {
       var arr = []
       arr = reqWorklogDate.split('-')
       var reqWorklogMonth = arr[0] + '-' + arr[1]
-      var reqWorklogDay = arr[2]
+      var reqWorklogDay = arr[2].slice(0,2)
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
         this.showWarnMessage('Warning', 'Invalid effort!')
         return
@@ -397,6 +488,7 @@ export default {
         wEffort: reqWorklogEffort,
         wRemark: reqRemark
       })
+      console.log(res.data)
       if (res.data.status === 0) {
         var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
         var dateConvert = new Date(Date.parse(firstDate))
@@ -405,6 +497,7 @@ export default {
       } else {
         this.showWarnMessage('Warning', 'Fail to add/update worklog!')
       }
+      this.$router.go(0)
     },
     async deleteWorklog () {
       var reqUserId = this.$store.getters.getUserId
@@ -455,16 +548,42 @@ export default {
       }
       this.$data.form.worklog_date = changeDateYear + '-' + changeDateMonth + '-' + changeDateDay
     },
-    addToAssin () {
+    async addToAssign (assignToTask) {
       console.log('click')
+      var currentDate = new Date()
+      console.log(currentDate)
       this.$data.worklogFormVisible = true
-      this.$data.form.worklog_task_id = 0
-    }
+      console.log(assignToTask)
+      this.$data.form.worklog_taskid = assignToTask.taskId
+      this.$data.form.worklog_task = assignToTask.taskName
+      this.$data.form.worklog_date = currentDate
+      this.$data.form.worklog_effort = 0
+      this.$data.form.worklog_remark = ''
+      // var reqWorklogMonth = assignToTask.date.slice(0,7)
+      // var reqWorklogDay = assignToTask.date.slice(8,10)
+      // const res = await http.post('/worklogs/getWorklogForWeb', {
+      //   wUserId: this.$store.getters.getUserId,
+      //   wTaskId: assignToTask.taskId,
+      //   wWorklogMonth: reqWorklogMonth,
+      //   wWorklogDay: reqWorklogDay
+      // })
+      // console.log(res)
+
+    },
+    // $(window).resize(function(){ 
+    // var Height = $(window).height();
+    // var Width = $(window).width();
+    // console.log('Height'+Height);
+    // console.log('Width'+VWidth);
+    // })
   },
   created () {
     console.log('Created My Timesheet')
     var firstDate = this.getCurrentMonthFirst()
     this.resetTimesheet(firstDate)
+    this.resetMemoTimeSheet(firstDate)
+    var winWidth = document.body.clientWidth || document.documentElement.clientWidth;
+  
   }
 }
 </script>
@@ -544,6 +663,56 @@ export default {
   border-bottom: 1px solid #ff6348;
   cursor: default;
 }
+/**assin功能 */
+
+.overflow{
+      overflow: hidden;
+    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+.assin-month-picker{
+  height:40px;
+  padding-left: 5px;
+  padding-right: 5px;
+  line-height: 46px;
+  font-size: 16px;
+  margin: 10px 5px;
+  width: auto;
+}
+  .text {
+    font-size: 14px;
+    font-family: "Helvetica Neue";
+    text-align: left;
+  }
+  .title{
+    word-wrap: break-word;
+    font-weight: bold;
+  }
+
+  .item {
+    margin-bottom: 10px;
+  }
+  .content{
+    float: left;
+  }
+  .clearfix:before,
+  .clearfix:after {
+    display: table;
+    content: "";
+  }
+  .clearfix:after {
+    clear: both
+  }
+  .box-card{
+    margin:10px 20px;
+    cursor: pointer;
+    background-color: #d9e1eb;
+  }
+  .box-card:hover {
+    transform: scale(1.1);
+  }
 </style>
 <style>
 .mt-table {
@@ -602,44 +771,5 @@ export default {
 .el-autocomplete-suggestion li {
   line-height: 28px;
 }
-/**assin功能 */
 
-.assin-month-picker{
-  height:40px;
-  padding-left: 5px;
-  padding-right: 5px;
-  line-height: 46px;
-  font-size: 16px;
-  margin: 10px 5px;
-  width: auto;
-}
-  .text {
-    font-size: 14px;
-    font-family: "Helvetica Neue";
-    text-align: left;
-  }
-
-  .item {
-    margin-bottom: 10px;
-  }
-  .content{
-    float: left;
-  }
-  .clearfix:before,
-  .clearfix:after {
-    display: table;
-    content: "";
-  }
-  .clearfix:after {
-    clear: both
-  }
-  .box-card{
-
-    margin:10px 20px;
-    cursor: pointer;
-    background-color: #d9e1eb;
-  }
-  .box-card:hover {
-    transform: scale(1.1);
-  }
 </style>
