@@ -39,10 +39,6 @@
             </el-table>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="24" class="content-task-col">
-          </el-col>
-        </el-row>
       </el-main>
     </el-container>
     <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
