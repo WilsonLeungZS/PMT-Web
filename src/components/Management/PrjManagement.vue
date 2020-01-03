@@ -149,6 +149,14 @@
                       </el-row>
                       <el-row :gutter="15" style="margin-top: 10px">
                         <el-col :span="2" class="pm-table-expand-label">
+                          <span>Mapping</span>
+                        </el-col>
+                        <el-col :span="22" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_namemapping" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                      </el-row>
+                      <el-row :gutter="15" style="margin-top: 10px">
+                        <el-col :span="2" class="pm-table-expand-label">
                           <span>Active</span>
                         </el-col>
                         <el-col :span="12" class="pm-table-expand-item">
@@ -366,6 +374,7 @@ export default {
         userEmail: user.user_email,
         reqUserTeam: user.user_team,
         reqUserRole: user.user_role,
+        reqUserNameMapping: user.user_namemapping,
         reqUserIsActive: user.user_isactive
       })
       if (res.data.status === 0) {
@@ -385,6 +394,7 @@ export default {
         props.row.user_email = this.$data.userResetData[index].user_email
         props.row.user_team = this.$data.userResetData[index].user_team
         props.row.user_role = this.$data.userResetData[index].user_role
+        props.row.user_namemapping = this.$data.userResetData[index].user_namemapping
         props.row.user_isactive = this.$data.userResetData[index].user_isactive
       } else {
         this.$data.userData.splice(index, 1)
@@ -397,6 +407,7 @@ export default {
         user_email: 'N/A',
         user_team: 'TOS',
         user_role: 'General',
+        user_namemapping: '',
         user_isactive: false
       }
       this.$data.userData.unshift(user)

@@ -40,7 +40,11 @@
           <el-col :span="24">
             <el-table v-loading="loading" :data="tasklistData" class="tl-main-table" fit empty-text="No Data">
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
-              <el-table-column prop="task_name" label="Number" width="150px" :show-overflow-tooltip="true"></el-table-column>
+              <el-table-column prop="task_name" label="Number" width="150px" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                   <el-button type="text" @click="editTask(scope.row)">{{scope.row.task_name}}</el-button>
+                </template>
+              </el-table-column>
               <el-table-column prop="task_type" label="Type" width="150px" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
               <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable"></el-table-column>
@@ -127,6 +131,21 @@
             <el-option v-for="(assignteam, index) in taskAssignTeamArray" :key="index" :label="assignteam.team_name" :value="assignteam.team_id"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="Sub Tasks" v-if="form.formSubTasks.length > 0" v-show="showForExistingTask">
+          <el-card class="box-card" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
+            <el-table :data="form.formSubTasks" fit :show-header="false">
+              <el-table-column prop="task_id" v-if="false"></el-table-column>
+              <el-table-column>
+                <template slot-scope="scope">
+                  <el-row style="cursor: pointer;"  @click.native="editTask(scope.row)">
+                    <el-col :span="23"><span>{{scope.row.task_number}}</span></el-col>
+                    <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
+                  </el-row>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </el-form-item>
         <el-form-item label="Worklog History" v-show="showForExistingTask">
           <el-button icon="el-icon-more" size="small" type="text" @click="showWorklogHistory" style="font-size: 18px"></el-button>
         </el-form-item>
@@ -207,7 +226,13 @@ export default {
         formEstimation: 0,
         formPercentage: 0,
         formAssignTeam: '',
-        formSubTasks: []
+        formSubTasks: [
+          {task_id: 10, task_number: 'CGM190001 - Analysis'},
+          {task_id: 12, task_number: 'CGM190001 - Design'},
+          {task_id: 13, task_number: 'CGM190001 - Build'},
+          {task_id: 14, task_number: 'CGM190001 - Test'},
+          {task_id: 15, task_number: 'CGM190001 - Deploy'}
+        ]
       },
       taskTypeArray: [],
       taskTypeArrayForPMT: [],
