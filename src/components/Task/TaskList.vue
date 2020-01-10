@@ -76,8 +76,14 @@
     </el-container>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="50%" style="min-width: 500px;" :close-on-click-modal="false">
       <el-form ref="form" :model="form" label-width="120px" class="tl-edit-form" >
+        <el-form-item label="Parent Task" >
+          <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true">{{form.formParent}}</el-button>
+        </el-form-item>
         <el-form-item label="Number">
           <span style="font-size: 17px">{{form.formNumber}}</span>
+        </el-form-item>
+        <el-form-item label="Task Level">
+          <span style="font-size: 17px">{{form.formTaskLevel}}</span>
         </el-form-item>
         <el-form-item label="Type">
           <el-select v-model="form.formType" v-show="showForExistingTask" disabled>
@@ -123,17 +129,15 @@
             </el-form-item>
           </el-col>
         </el-form-item>
-        <el-form-item label="Progress">
+        <el-form-item label="Progress" v-show="showForExistingTask">
           <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
         </el-form-item>
-        <el-form-item label="Assign Team">
-          <el-select v-model="form.formAssignTeam" :disabled="taskDisabledStaus">
-            <el-option v-for="(assignteam, index) in taskAssignTeamArray" :key="index" :label="assignteam.team_name" :value="assignteam.team_id"></el-option>
-          </el-select>
+        <el-form-item v-show="showForExistingTask">
+          <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-plus" @click="addNewSubTask">Create Sub Task</el-button>
         </el-form-item>
         <el-form-item label="Sub Tasks" v-if="form.formSubTasks.length > 0" v-show="showForExistingTask">
-          <el-card class="box-card" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-            <el-table :data="form.formSubTasks" fit :show-header="false">
+          <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
+            <el-table :data="form.formSubTasks" fit :show-header="false" max-height="300">
               <el-table-column prop="task_id" v-if="false"></el-table-column>
               <el-table-column>
                 <template slot-scope="scope">
@@ -218,6 +222,7 @@ export default {
       showForHistory: true,
       form: {
         formId: 0,
+        formParent: '',
         formNumber: '',
         formType: '',
         formDesc: '',
@@ -225,6 +230,7 @@ export default {
         formEffort: 0,
         formEstimation: 0,
         formPercentage: 0,
+        formTaskLevel: 1,
         formAssignTeam: '',
         formSubTasks: [
           {task_id: 10, task_number: 'CGM190001 - Analysis'},
@@ -362,6 +368,7 @@ export default {
     resetTaskForm () {
       this.$data.form.formId = 0
       this.$data.form.formNumber = ''
+      this.$data.form.formTaskLevel = 1
       this.$data.form.formParent = 'N/A'
       this.$data.form.formType = ''
       this.$data.form.formDesc = ''
@@ -542,6 +549,22 @@ export default {
       this.$data.showForNewTask = true
       this.$data.editTaskVisible = true
     },
+    addNewSubTask () {
+      this.$data.taskDialogTitle = 'Add New Sub Task'
+      this.$data.taskDisabledStaus = false
+      var parentTask = this.$data.form.formNumber
+      var taskLevel = this.$data.form.formTaskLevel
+      this.resetTaskForm()
+      this.$data.form.formParent = parentTask
+      this.$data.form.formTaskLevel = Number(taskLevel) + 1
+      this.getTaskType()
+      this.getTeamList()
+      this.$data.showForPmtTask = true
+      this.$data.showForDefaultTask = false
+      this.$data.showForExistingTask = false
+      this.$data.showForNewTask = true
+      this.$data.editTaskVisible = true
+    },
     async changeSearchTaskType () {
       this.searchTask()
     },
@@ -647,6 +670,10 @@ export default {
 }
 .tl-edit-form {
   text-align: left;
+}
+.tl-edit-form-parent-task {
+  font-size: 17px;
+  text-decoration: underline;
 }
 .tl-edit-form-progress {
   height: 100%;
