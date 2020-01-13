@@ -316,6 +316,7 @@ export default {
       this.$data.timesheetMonth = reqMonth
       this.$data.timesheetMemo = reqMonth
       var reqUserId = this.$store.getters.getUserId
+      console.log('dedededebug')
       const res = await http.post('/worklogs/getWorklogByUserAndMonthForWeb', {
         wUserId: reqUserId,
         wWorklogMonth: reqMonth
