@@ -27,13 +27,18 @@ router.beforeEach(async (to, from, next) => {
       if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
         var resUserEid = res.data.user.Name
         var resUserId = res.data.user.Id
+        var resUserLevel = res.data.user.Level
         var resUserRole = res.data.user.Role
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
+        store.dispatch('setNewUserLevel', resUserLevel)
+        store.dispatch('setNewUserRole', resUserRole)
         store.dispatch('setShowMainBar')
         next('/Timesheet')
       } else {
         alert('Your EID is not found or inactive! Please retry or contact administrator!')
+        localStorage.setItem('Flag', '')
+        localStorage.setItem('UserEid', '')
         next('/Login')
       }
     }
@@ -48,10 +53,13 @@ router.beforeEach(async (to, from, next) => {
       if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
         var resUserEid = res.data.user.Name
         var resUserId = res.data.user.Id
+        var resUserLevel = res.data.user.Level
         var resUserRole = res.data.user.Role
         var resUserThemeStyle = Number(res.data.user.ThemeStyle)
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
+        store.dispatch('setNewUserLevel', resUserLevel)
+        store.dispatch('setNewUserRole', resUserRole)
         store.dispatch('setNewThemeStyle', resUserThemeStyle)
         store.dispatch('setShowMainBar')
         if (needAdmin) {
@@ -66,6 +74,8 @@ router.beforeEach(async (to, from, next) => {
         }
       } else {
         alert('Your EID is not found or inactive! Please retry or contact administrator!')
+        localStorage.setItem('Flag', '')
+        localStorage.setItem('UserEid', '')
         next('/Login')
       }
     } else {

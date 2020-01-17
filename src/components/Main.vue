@@ -132,6 +132,7 @@ export default {
         localStorage.setItem('UserEid', '')
         this.$store.dispatch('setNewUserEid', '')
         this.$store.dispatch('setNewUserId', '')
+        this.$store.dispatch('setNewUserLevel', '')
         this.$store.dispatch('setNewThemeStyle', 0)
         this.$store.dispatch('setHideMainBar')
         this.$router.push({path: '/Login'})

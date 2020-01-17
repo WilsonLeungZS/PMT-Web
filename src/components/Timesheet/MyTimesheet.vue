@@ -153,8 +153,16 @@ export default {
       var mtDay = iDateVal.getDay()
       var resetArray = []
       var days = 31
-      if (mtMonth === '02' || mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11') {
+      if (mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11') {
         days = 30
+      }
+      if (mtMonth === '02') {
+        var leapYear = Number(mtYear) % 4
+        if (leapYear === 0) {
+          days = 29
+        } else {
+          days = 28
+        }
       }
       for (var i = 1; i <= days; i++) {
         var resetJson = {}

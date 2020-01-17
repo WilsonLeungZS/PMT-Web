@@ -5,6 +5,8 @@ const store = new Vuex.Store({
   state: {
     userEid: '',
     userId: 0,
+    userLevel: -1,
+    userRole: 'General',
     isLogin: false,
     isShowMainBar: true,
     themeStyle: 0
@@ -15,6 +17,12 @@ const store = new Vuex.Store({
     },
     getUserId: function (state) {
       return state.userId
+    },
+    getUserLevel: function (state) {
+      return state.userLevel
+    },
+    getUserRole: function (state) {
+      return state.userRole
     },
     getIsShowMainBar: function (state) {
       return state.isShowMainBar
@@ -33,8 +41,20 @@ const store = new Vuex.Store({
     newUserId: function (state, userId) {
       state.userId = userId
     },
-    clearuserId: function (state) {
+    clearUserId: function (state) {
       state.userId = ''
+    },
+    newUserLevel: function (state, userLevel) {
+      state.userLevel = userLevel
+    },
+    clearUserLevel: function (state) {
+      state.userLevel = ''
+    },
+    newUserRole: function (state, userRole) {
+      state.userRole = userRole
+    },
+    clearUserRole: function (state) {
+      state.userRole = ''
     },
     showMainBar: function (state) {
       state.isShowMainBar = true
@@ -60,7 +80,19 @@ const store = new Vuex.Store({
       context.commit('newUserId', userId)
     },
     setClearUserId: function (context) {
-      context.commit('clearuserId')
+      context.commit('clearUserId')
+    },
+    setNewUserLevel: function (context, userLevel) {
+      context.commit('newUserLevel', userLevel)
+    },
+    setClearUserLevel: function (context) {
+      context.commit('clearUserLevel')
+    },
+    setNewUserRole: function (context, userRole) {
+      context.commit('newUserRole', userRole)
+    },
+    setClearUserRole: function (context) {
+      context.commit('clearUserRole')
     },
     setShowMainBar: function (context) {
       context.commit('showMainBar')

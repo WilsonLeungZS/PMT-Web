@@ -74,22 +74,31 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="50%" style="min-width: 500px;" :close-on-click-modal="false">
+    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="50%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="form" label-width="120px" class="tl-edit-form" >
-        <el-form-item label="Parent Task" >
-          <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true">{{form.formParent}}</el-button>
+        <el-form-item label="Parent Task">
+          <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask">{{form.formParent}}</el-button>
         </el-form-item>
         <el-form-item label="Number">
-          <span style="font-size: 17px">{{form.formNumber}}</span>
+          <el-input v-model="form.formNumber" :disabled="showForExistingTask" v-show="showNumber"></el-input>
         </el-form-item>
-        <el-form-item label="Task Level">
-          <span style="font-size: 17px">{{form.formTaskLevel}}</span>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="Task Level">
+              <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Task Level">
+              <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="Type">
           <el-select v-model="form.formType" v-show="showForExistingTask" disabled>
             <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
           </el-select>
-          <el-select v-model="form.formType" v-show="showForNewTask" @change="changeNewTaskType">
+          <el-select v-model="form.formType" v-show="showForNewTask">
             <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
           </el-select>
         </el-form-item>
@@ -98,51 +107,55 @@
         </el-form-item>
         <el-form-item label="Status" v-show="showForPmtTask">
           <el-select v-model="form.formStatus">
-            <el-option label="Open" value="Open"></el-option>
-            <el-option label="In Progress" value="In Progress"></el-option>
-            <el-option label="Pending" value="Pending"></el-option>
-            <el-option label="Paused" value="Paused"></el-option>
-            <el-option label="Completed" value="Completed"></el-option>
-            <el-option label="Closed" value="Closed"></el-option>
+            <el-option label="Drafting" value="Drafting"></el-option>
+            <el-option label="Planning" value="Planning"></el-option>
+            <el-option label="Running" value="Running"></el-option>
+            <el-option label="Done" value="Done"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Status" v-show="showForDefaultTask">
            <el-input v-model="form.formStatus" disabled></el-input>
         </el-form-item>
-        <el-form-item label="Effort">
-          <el-col :span="10">
-            <el-col :span="19">
-              <el-input v-model="form.formEffort" disabled></el-input>
-            </el-col>
-            <el-col :span="5" style="text-align: center; font-size: 16px;">
-              <span>hrs</span>
-            </el-col>
-          </el-col>
-          <el-col :span="14">
-            <el-form-item label="Estimation">
-              <el-col :span="19">
-                <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="Effort">
+              <el-col :span="21">
+                <el-input v-model="form.formEffort" disabled></el-input>
               </el-col>
-              <el-col :span="5" style="text-align: center; font-size: 16px;">
-                <span>hrs</span>
+              <el-col :span="3">
+                <span class="span-format">hrs</span>
               </el-col>
             </el-form-item>
           </el-col>
-        </el-form-item>
+          <el-col :span="12">
+            <el-form-item label="Estimation">
+              <el-col :span="21">
+                <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
+              </el-col>
+              <el-col :span="3">
+                <span class="span-format">hrs</span>
+              </el-col>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="Progress" v-show="showForExistingTask">
           <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
         </el-form-item>
         <el-form-item v-show="showForExistingTask">
-          <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-plus" @click="addNewSubTask">Create Sub Task</el-button>
+          <el-button size="small" icon="el-icon-plus" @click="addNewSubTask" :disabled="disableCreateSubTask">Create Sub Task</el-button>
         </el-form-item>
         <el-form-item label="Sub Tasks" v-if="form.formSubTasks.length > 0" v-show="showForExistingTask">
           <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-            <el-table :data="form.formSubTasks" fit :show-header="false" max-height="300">
+            <el-table :data="form.formSubTasks" fit max-height="300" class="sub-task-table">
               <el-table-column prop="task_id" v-if="false"></el-table-column>
-              <el-table-column>
+              <el-table-column type="index" :index="modifyIndex" width="40"></el-table-column>
+              <el-table-column :show-overflow-tooltip="true">
                 <template slot-scope="scope">
-                  <el-row style="cursor: pointer;"  @click.native="editTask(scope.row)">
-                    <el-col :span="23"><span>{{scope.row.task_number}}</span></el-col>
+                  <el-row style="cursor: pointer;" :gutter="10"  @click.native="editTask(scope.row)">
+                    <el-col :span="23" class="single-line">
+                      <span style="font-weight: bold">{{scope.row.task_name}}</span>
+                      <span style="margin-left:5px"> {{scope.row.task_desc}}</span>
+                    </el-col>
                     <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
                   </el-row>
                 </template>
@@ -232,13 +245,7 @@ export default {
         formPercentage: 0,
         formTaskLevel: 1,
         formAssignTeam: '',
-        formSubTasks: [
-          {task_id: 10, task_number: 'CGM190001 - Analysis'},
-          {task_id: 12, task_number: 'CGM190001 - Design'},
-          {task_id: 13, task_number: 'CGM190001 - Build'},
-          {task_id: 14, task_number: 'CGM190001 - Test'},
-          {task_id: 15, task_number: 'CGM190001 - Deploy'}
-        ]
+        formSubTasks: []
       },
       taskTypeArray: [],
       taskTypeArrayForPMT: [],
@@ -256,7 +263,11 @@ export default {
       taskDialogTitle: 'Edit Task',
       taskDisabledStaus: true,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
-      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      showNumber: true,
+      disableCreateSubTask: false,
+      userLevel: this.$store.getters.getUserLevel,
+      userRole: this.$store.getters.getUserRole
     }
   },
   methods: {
@@ -305,7 +316,6 @@ export default {
       }
     },
     async editTask (taskRow) {
-      this.$data.taskDialogTitle = 'Edit Task'
       this.resetTaskForm()
       this.getTaskType()
       this.getTeamList()
@@ -329,8 +339,23 @@ export default {
         }
         this.$data.showForNewTask = false
         this.$data.showForExistingTask = true
+        this.$data.taskDialogTitle = 'Edit Task - ' + taskData.task_name
+        if (Number(taskData.task_level) === 4) {
+          this.$data.disableCreateSubTask = true
+        }
         this.$data.form.formId = taskData.task_id
         this.$data.form.formNumber = taskData.task_name
+        switch (taskData.task_level) {
+          case 1: this.$data.form.formTaskLevel = taskData.task_level + ' (Business Opportunity)'
+            break
+          case 2: this.$data.form.formTaskLevel = taskData.task_level + ' (Business Implementation)'
+            break
+          case 3: this.$data.form.formTaskLevel = taskData.task_level + ' (Excutive Task)'
+            break
+          case 4: this.$data.form.formTaskLevel = taskData.task_level + ' (Workable Task)'
+            break
+          default: this.$data.form.formTaskLevel = taskData.task_level
+        }
         this.$data.form.formParent = taskData.task_parenttaskname
         this.$data.form.formType = taskData.task_type_id
         this.$data.form.formDesc = taskData.task_desc
@@ -339,6 +364,70 @@ export default {
         this.$data.form.formEstimation = taskData.task_totaleffort
         this.$data.form.formAssignTeam = taskData.task_assign_team_id
         this.$data.form.formPercentage = Number(taskData.task_progress_nosymbol)
+        const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
+          tTaskName: taskData.task_name
+        })
+        if (res1.data.status === 0) {
+          this.$data.form.formSubTasks = res1.data.data
+        } else {
+          this.$data.form.formSubTasks = []
+        }
+      }
+    },
+    async editParentTask () {
+      var reqParentTask = this.$data.form.formParent
+      this.resetTaskForm()
+      this.getTaskType()
+      this.getTeamList()
+      this.$data.showForHistory = true
+      this.$data.editTaskVisible = true
+      const res = await http.post('/tasks/getTaskByParentTask', {
+        tParentTask: reqParentTask
+      })
+      if (res.data.status === 0) {
+        var taskData = res.data.data[0]
+        var taskCreator = taskData.task_creator
+        if (taskCreator === 'PMT') {
+          this.$data.showForPmtTask = true
+          this.$data.showForDefaultTask = false
+          this.$data.taskDisabledStaus = false
+        } else {
+          this.$data.showForPmtTask = false
+          this.$data.showForDefaultTask = true
+          this.$data.taskDisabledStaus = true
+        }
+        this.$data.showForNewTask = false
+        this.$data.showForExistingTask = true
+        this.$data.taskDialogTitle = 'Edit Task - ' + taskData.task_name
+        this.$data.form.formId = taskData.task_id
+        this.$data.form.formNumber = taskData.task_name
+        switch (taskData.task_level) {
+          case 1: this.$data.form.formTaskLevel = taskData.task_level + ' (Business Opportunity)'
+            break
+          case 2: this.$data.form.formTaskLevel = taskData.task_level + ' (Business Implementation)'
+            break
+          case 3: this.$data.form.formTaskLevel = taskData.task_level + ' (Excutive Task)'
+            break
+          case 4: this.$data.form.formTaskLevel = taskData.task_level + ' (Workable Task)'
+            break
+          default: this.$data.form.formTaskLevel = taskData.task_level
+        }
+        this.$data.form.formParent = taskData.task_parenttaskname
+        this.$data.form.formType = taskData.task_type_id
+        this.$data.form.formDesc = taskData.task_desc
+        this.$data.form.formStatus = taskData.task_status
+        this.$data.form.formEffort = taskData.task_currenteffort
+        this.$data.form.formEstimation = taskData.task_totaleffort
+        this.$data.form.formAssignTeam = taskData.task_assign_team_id
+        this.$data.form.formPercentage = Number(taskData.task_progress_nosymbol)
+        const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
+          tTaskName: taskData.task_name
+        })
+        if (res1.data.status === 0) {
+          this.$data.form.formSubTasks = res1.data.data
+        } else {
+          this.$data.form.formSubTasks = []
+        }
       }
     },
     editSubTask (row, column, event) {
@@ -372,12 +461,14 @@ export default {
       this.$data.form.formParent = 'N/A'
       this.$data.form.formType = ''
       this.$data.form.formDesc = ''
-      this.$data.form.formStatus = ''
+      this.$data.form.formStatus = 'Drafting'
       this.$data.form.formEffort = 0
       this.$data.form.formEstimation = 0
       this.$data.form.formAssignTeam = ''
       this.$data.form.formPercentage = 0
       this.$data.showHistory = false
+      this.$data.showNumber = true
+      this.$data.disableCreateSubTask = false
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = ''
       this.$data.wlForm.worklog_date = this.getCurrentDate()
@@ -408,7 +499,10 @@ export default {
       }
     },
     async submitTask () {
+      var reqFormParent = this.$data.form.formParent
+      console.log(reqFormParent)
       var reqFormName = this.$data.form.formNumber
+      var reqFormTaskLevel = this.$data.form.formTaskLevel
       var reqFormTypeId = this.$data.form.formType
       if (reqFormTypeId === null || reqFormTypeId === '') {
         this.showWarnMessage('Warning', 'Please select task type')
@@ -417,25 +511,35 @@ export default {
       var reqFormDesc = this.$data.form.formDesc
       var reqFormStatus = this.$data.form.formStatus
       if (reqFormStatus === null || reqFormStatus === '') {
-        this.showWarnMessage('Warning', 'Please select task status')
-        return
+        // this.showWarnMessage('Warning', 'Please select task status')
+        reqFormStatus = 'Drafting'
       }
       var reqFormEffort = this.$data.form.formEffort
       var reqFormEstimation = this.$data.form.formEstimation
-      var reqFormAssignTeamId = this.$data.form.formAssignTeam
-      if (reqFormAssignTeamId === null || reqFormAssignTeamId === '') {
-        this.showWarnMessage('Warning', 'Please select task assign team')
-        return
+      if (reqFormTaskLevel === 4) {
+        if (reqFormEstimation > 18) {
+          this.showWarnMessage('Warning', 'Level 4 task elstimation could not over 18 hrs!')
+          return
+        }
+      }
+      if (reqFormTaskLevel === 3) {
+        if (!this.$data.form.formSubTasks.length > 0) {
+          if (reqFormEstimation > 18) {
+            this.showWarnMessage('Warning', 'Level 3 (No Sub Task) task elstimation could not over 18 hrs!')
+            return
+          }
+        }
       }
       const res = await http.post('/tasks/addOrUpdateTask', {
+        tParent: reqFormParent,
         tName: reqFormName,
-        tParent: 'N/A',
+        tLevel: reqFormTaskLevel,
         tDescription: reqFormDesc,
         tTaskTypeId: reqFormTypeId,
         tStatus: reqFormStatus,
         tEffort: reqFormEffort,
         tEstimation: reqFormEstimation,
-        tAssignTeamId: reqFormAssignTeamId
+        tAssignTeamId: 1
       })
       if (res.data.status === 0) {
         this.$message({
@@ -538,6 +642,10 @@ export default {
       }
     },
     addNewTask () {
+      if (this.$data.userLevel > 8 || this.$data.userRole !== 'Admin') {
+        this.showWarnMessage('Warning', 'No right to create Level 1 task!')
+        return
+      }
       this.$data.taskDialogTitle = 'Add New Task'
       this.$data.taskDisabledStaus = false
       this.resetTaskForm()
@@ -548,33 +656,50 @@ export default {
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.editTaskVisible = true
+      this.$data.showNumber = true
     },
     addNewSubTask () {
+      var taskLevel = this.$data.form.formTaskLevel
+      var newTaskLevel = Number(taskLevel) + 1
+      if (newTaskLevel === '2') {
+        if (this.$data.userLevel > 10 || this.$data.userRole !== 'Admin') {
+          this.showWarnMessage('Warning', 'No right to create Level 2 task!')
+          return
+        }
+      }
       this.$data.taskDialogTitle = 'Add New Sub Task'
       this.$data.taskDisabledStaus = false
       var parentTask = this.$data.form.formNumber
-      var taskLevel = this.$data.form.formTaskLevel
+      // var taskNumber = this.$data.form.formNumber
+      var taskType = this.$data.form.formType
       this.resetTaskForm()
       this.$data.form.formParent = parentTask
-      this.$data.form.formTaskLevel = Number(taskLevel) + 1
+      this.$data.form.formTaskLevel = newTaskLevel
+      this.$data.form.formType = taskType
       this.getTaskType()
       this.getTeamList()
       this.$data.showForPmtTask = true
       this.$data.showForDefaultTask = false
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
+      this.$data.showNumber = false
       this.$data.editTaskVisible = true
     },
     async changeSearchTaskType () {
       this.searchTask()
     },
+    /* Base on requirement, no need to auto generate task number when select task type
     async changeNewTaskType () {
       const res = await http.post('/tasks/getNewTaskNumberByType', {
         tTaskTypeId: this.$data.form.formType
       })
       if (res.data.status === 0) {
-        this.$data.form.formNumber = res.data.data.task_number
+        this.$data.form.formNumber = res.data.data.task_name
       }
+    },
+    */
+    modifyIndex (index) {
+      return index + 1 + '.'
     }
   },
   created () {
@@ -706,6 +831,12 @@ export default {
 .view-hide {
   display: none;
 }
+.span-format {
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>
 <style>
 .el-dialog__body {
@@ -719,5 +850,12 @@ export default {
 }
 .el-dialog__header {
   padding-top: 15px;
+}
+/* In order to hide table header because "show-header" and "max-height" use together will throw error */
+.sub-task-table .el-table__header{
+  display:none
+}
+.tl-taskform .el-dialog__title{
+  font-size: 21px;
 }
 </style>
