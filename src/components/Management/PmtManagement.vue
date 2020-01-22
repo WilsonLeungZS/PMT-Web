@@ -27,7 +27,6 @@
                   <el-popover placement="bottom" width="900" trigger="click" v-model="showList">
                     <el-table :data="taskListData">
                       <el-table-column align="center" width="100" property="tl_task" label="Task"></el-table-column>
-                      <el-table-column align="center" width="100" property="tl_assignteam" label="Team"></el-table-column>
                       <el-table-column align="center" property="tl_status" label="Status"></el-table-column>
                       <el-table-column align="center" width="110" property="tl_estimation" label="Estimation"></el-table-column>
                       <el-table-column align="center" width="120" property="tl_effort" label="Actual Effort"></el-table-column>
@@ -116,11 +115,6 @@
                       <span>{{taskForm.taskType}}</span>
                     </el-col>
                   </el-form-item>
-                  <el-form-item label="Assign Team">
-                     <el-col :span="24" class="pt-task-box-content-item">
-                      <span>{{taskForm.taskAssignTeam}}</span>
-                    </el-col>
-                  </el-form-item>
                   <el-form-item label="Effort">
                      <el-col :span="24" class="pt-task-box-content-item">
                       <span>{{taskForm.taskEffort}} / {{taskForm.taskEstimation}} hrs</span>
@@ -187,7 +181,6 @@ export default {
         taskType: '',
         taskEffort: 0,
         taskEstimation: 0,
-        taskAssignTeam: '',
         taskMonthEffort: 0
       },
       taskListData: [],
@@ -350,7 +343,6 @@ export default {
       this.$data.taskForm.taskName = data[0].tl_task
       this.$data.taskForm.taskStatus = data[0].tl_status
       this.$data.taskForm.taskType = data[0].tl_task_type
-      this.$data.taskForm.taskAssignTeam = data[0].tl_assignteam
       this.$data.taskForm.taskEffort = data[0].tl_effort
       this.$data.taskForm.taskEstimation = data[0].tl_estimation
       this.$data.taskForm.taskDescription = data[0].tl_desc
@@ -363,7 +355,6 @@ export default {
       this.$data.taskForm.taskName = 'Task Number'
       this.$data.taskForm.taskStatus = ''
       this.$data.taskForm.taskType = ''
-      this.$data.taskForm.taskAssignTeam = ''
       this.$data.taskForm.taskEffort = 0
       this.$data.taskForm.taskEstimation = 0
       this.$data.taskForm.taskDescription = ''

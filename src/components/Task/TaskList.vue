@@ -75,33 +75,35 @@
       </el-main>
     </el-container>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="50%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
-      <el-form ref="form" :model="form" label-width="120px" class="tl-edit-form" >
+      <el-form ref="form" :model="form" label-width="130px" class="tl-edit-form" >
         <el-form-item label="Parent Task">
           <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask">{{form.formParent}}</el-button>
         </el-form-item>
         <el-form-item label="Number">
-          <el-input v-model="form.formNumber" :disabled="showForExistingTask" v-show="showNumber"></el-input>
+          <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{form.formNumber}}</span>
+          <el-input v-model="form.formNumber" v-show="showForNewTask&&showNumberInput"></el-input>
         </el-form-item>
         <el-row>
           <el-col :span="12">
             <el-form-item label="Task Level">
-              <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+              <el-col :span="24">
+                <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+              </el-col>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="Task Level">
-              <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+            <el-form-item label="Type">
+              <el-col :span="24">
+                <el-select v-model="form.formType" v-show="showForExistingTask" disabled>
+                  <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                </el-select>
+                <el-select v-model="form.formType" v-show="showForNewTask">
+                  <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                </el-select>
+              </el-col>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="Type">
-          <el-select v-model="form.formType" v-show="showForExistingTask" disabled>
-            <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-          </el-select>
-          <el-select v-model="form.formType" v-show="showForNewTask">
-            <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="Description">
           <el-input type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
         </el-form-item>
@@ -141,6 +143,27 @@
         <el-form-item label="Progress" v-show="showForExistingTask">
           <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
         </el-form-item>
+        <el-form-item label="Issue Date" >
+          <el-col :span="24">
+            <el-date-picker v-model="form.formIssueDate" type="datetime"></el-date-picker>
+          </el-col>
+        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="Target Complete">
+              <el-col :span="24">
+                <el-date-picker v-model="form.formTargetComplete" type="datetime"></el-date-picker>
+              </el-col>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Actual Complete">
+              <el-col :span="24">
+                <el-date-picker v-model="form.formActualComplete" type="datetime"></el-date-picker>
+              </el-col>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item v-show="showForExistingTask">
           <el-button size="small" icon="el-icon-plus" @click="addNewSubTask" :disabled="disableCreateSubTask">Create Sub Task</el-button>
         </el-form-item>
@@ -244,12 +267,13 @@ export default {
         formEstimation: 0,
         formPercentage: 0,
         formTaskLevel: 1,
-        formAssignTeam: '',
+        formIssueDate: '2020-01-22 15:00:00',
+        formTargetComplete: '2020-01-22 15:00:00',
+        formActualComplete: '2020-01-22 15:00:00',
         formSubTasks: []
       },
       taskTypeArray: [],
       taskTypeArrayForPMT: [],
-      taskAssignTeamArray: [],
       showHistory: false,
       histories: [],
       worklogFormVisible: false,
@@ -264,7 +288,7 @@ export default {
       taskDisabledStaus: true,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
-      showNumber: true,
+      showNumberInput: true,
       disableCreateSubTask: false,
       userLevel: this.$store.getters.getUserLevel,
       userRole: this.$store.getters.getUserRole
@@ -306,19 +330,9 @@ export default {
         }
       }
     },
-    async getTeamList () {
-      const res = await http.get('/users/getTeamList')
-      if (res.data.status === 0) {
-        res.data.data.splice(0, 1)
-        this.$data.taskAssignTeamArray = res.data.data
-      } else {
-        this.$data.taskAssignTeamArray = []
-      }
-    },
     async editTask (taskRow) {
       this.resetTaskForm()
       this.getTaskType()
-      this.getTeamList()
       var taskId = taskRow.task_id
       this.$data.showForHistory = true
       this.$data.editTaskVisible = true
@@ -339,7 +353,7 @@ export default {
         }
         this.$data.showForNewTask = false
         this.$data.showForExistingTask = true
-        this.$data.taskDialogTitle = 'Edit Task - ' + taskData.task_name
+        this.$data.taskDialogTitle = 'Edit Task'
         if (Number(taskData.task_level) === 4) {
           this.$data.disableCreateSubTask = true
         }
@@ -362,7 +376,6 @@ export default {
         this.$data.form.formStatus = taskData.task_status
         this.$data.form.formEffort = taskData.task_currenteffort
         this.$data.form.formEstimation = taskData.task_totaleffort
-        this.$data.form.formAssignTeam = taskData.task_assign_team_id
         this.$data.form.formPercentage = Number(taskData.task_progress_nosymbol)
         const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
           tTaskName: taskData.task_name
@@ -378,7 +391,6 @@ export default {
       var reqParentTask = this.$data.form.formParent
       this.resetTaskForm()
       this.getTaskType()
-      this.getTeamList()
       this.$data.showForHistory = true
       this.$data.editTaskVisible = true
       const res = await http.post('/tasks/getTaskByParentTask', {
@@ -398,7 +410,7 @@ export default {
         }
         this.$data.showForNewTask = false
         this.$data.showForExistingTask = true
-        this.$data.taskDialogTitle = 'Edit Task - ' + taskData.task_name
+        this.$data.taskDialogTitle = 'Edit Task'
         this.$data.form.formId = taskData.task_id
         this.$data.form.formNumber = taskData.task_name
         switch (taskData.task_level) {
@@ -418,7 +430,6 @@ export default {
         this.$data.form.formStatus = taskData.task_status
         this.$data.form.formEffort = taskData.task_currenteffort
         this.$data.form.formEstimation = taskData.task_totaleffort
-        this.$data.form.formAssignTeam = taskData.task_assign_team_id
         this.$data.form.formPercentage = Number(taskData.task_progress_nosymbol)
         const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
           tTaskName: taskData.task_name
@@ -464,10 +475,9 @@ export default {
       this.$data.form.formStatus = 'Drafting'
       this.$data.form.formEffort = 0
       this.$data.form.formEstimation = 0
-      this.$data.form.formAssignTeam = ''
       this.$data.form.formPercentage = 0
       this.$data.showHistory = false
-      this.$data.showNumber = true
+      this.$data.showNumberInput = true
       this.$data.disableCreateSubTask = false
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = ''
@@ -538,8 +548,7 @@ export default {
         tTaskTypeId: reqFormTypeId,
         tStatus: reqFormStatus,
         tEffort: reqFormEffort,
-        tEstimation: reqFormEstimation,
-        tAssignTeamId: 1
+        tEstimation: reqFormEstimation
       })
       if (res.data.status === 0) {
         this.$message({
@@ -642,7 +651,7 @@ export default {
       }
     },
     addNewTask () {
-      if (this.$data.userLevel > 8 || this.$data.userRole !== 'Admin') {
+      if (this.$data.userLevel > 8 && this.$data.userRole !== 'Admin') {
         this.showWarnMessage('Warning', 'No right to create Level 1 task!')
         return
       }
@@ -650,19 +659,20 @@ export default {
       this.$data.taskDisabledStaus = false
       this.resetTaskForm()
       this.getTaskType()
-      this.getTeamList()
       this.$data.showForPmtTask = true
       this.$data.showForDefaultTask = false
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.editTaskVisible = true
-      this.$data.showNumber = true
+      this.$data.showNumberInput = true
     },
     addNewSubTask () {
       var taskLevel = this.$data.form.formTaskLevel
-      var newTaskLevel = Number(taskLevel) + 1
+      console.log('Level 1 : ' + taskLevel)
+      var newTaskLevel = Number(taskLevel.substring(0, 1)) + 1
+      console.log('Level: ' + newTaskLevel)
       if (newTaskLevel === '2') {
-        if (this.$data.userLevel > 10 || this.$data.userRole !== 'Admin') {
+        if (this.$data.userLevel > 10 && this.$data.userRole !== 'Admin') {
           this.showWarnMessage('Warning', 'No right to create Level 2 task!')
           return
         }
@@ -671,18 +681,15 @@ export default {
       this.$data.taskDisabledStaus = false
       var parentTask = this.$data.form.formNumber
       // var taskNumber = this.$data.form.formNumber
-      var taskType = this.$data.form.formType
       this.resetTaskForm()
       this.$data.form.formParent = parentTask
       this.$data.form.formTaskLevel = newTaskLevel
-      this.$data.form.formType = taskType
       this.getTaskType()
-      this.getTeamList()
       this.$data.showForPmtTask = true
       this.$data.showForDefaultTask = false
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
-      this.$data.showNumber = false
+      this.$data.showNumberInput = false
       this.$data.editTaskVisible = true
     },
     async changeSearchTaskType () {
