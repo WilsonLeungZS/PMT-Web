@@ -28,10 +28,12 @@ router.beforeEach(async (to, from, next) => {
         var resUserEid = res.data.user.Name
         var resUserId = res.data.user.Id
         var resUserLevel = res.data.user.Level
+        var resUserEmployeeNumber = res.data.user.EmployeeNumber
         var resUserRole = res.data.user.Role
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
         store.dispatch('setNewUserLevel', resUserLevel)
+        store.dispatch('setNewUserEmployeeNumber', resUserEmployeeNumber)
         store.dispatch('setNewUserRole', resUserRole)
         store.dispatch('setShowMainBar')
         next('/Timesheet')
@@ -54,11 +56,13 @@ router.beforeEach(async (to, from, next) => {
         var resUserEid = res.data.user.Name
         var resUserId = res.data.user.Id
         var resUserLevel = res.data.user.Level
+        var resUserEmployeeNumber = res.data.user.EmployeeNumber
         var resUserRole = res.data.user.Role
         var resUserThemeStyle = Number(res.data.user.ThemeStyle)
         store.dispatch('setNewUserEid', resUserEid)
         store.dispatch('setNewUserId', resUserId)
         store.dispatch('setNewUserLevel', resUserLevel)
+        store.dispatch('setNewUserEmployeeNumber', resUserEmployeeNumber)
         store.dispatch('setNewUserRole', resUserRole)
         store.dispatch('setNewThemeStyle', resUserThemeStyle)
         store.dispatch('setShowMainBar')

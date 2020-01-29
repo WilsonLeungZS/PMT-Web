@@ -118,13 +118,19 @@
                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Name</span>
                         </el-col>
-                        <el-col :span="10" class="pm-table-expand-item">
+                        <el-col :span="6" class="pm-table-expand-item">
                           <el-input v-model="props.row.user_eid" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="2" class="pm-table-expand-label">
+                          <span>Employee Number</span>
+                        </el-col>
+                        <el-col :span="6" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_employee_number" size="small" style="width: 100%"></el-input>
                         </el-col>
                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Email</span>
                         </el-col>
-                        <el-col :span="10" class="pm-table-expand-item">
+                        <el-col :span="6" class="pm-table-expand-item">
                           <el-input v-model="props.row.user_email" size="small" style="width: 100%"></el-input>
                         </el-col>
                       </el-row>
@@ -150,6 +156,7 @@
                           <el-select v-model="props.row.user_role" size="small" style="width: 100%">
                             <el-option label="Admin" value="Admin"></el-option>
                             <el-option label="General" value="General"></el-option>
+                            <el-option label="Special" value="Special"></el-option>
                           </el-select>
                         </el-col>
                       </el-row>
@@ -179,6 +186,7 @@
                   </el-table-column>
                   <el-table-column label="Id" prop="user_id" v-if="false"></el-table-column>
                   <el-table-column label="Name" prop="user_eid" min-width="120" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Employee Number" prop="user_employee_number" min-width="120"></el-table-column>
                   <el-table-column label="Email" prop="user_email" min-width="210" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Level" prop="user_level" min-width="30" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Team" prop="user_team" align="center" min-width="70"
@@ -191,6 +199,7 @@
                     <template slot-scope="scope">
                       <el-tag v-if="scope.row.user_role === 'Admin'" size="small" effect="dark">{{scope.row.user_role}}</el-tag>
                       <el-tag v-if="scope.row.user_role === 'General'" size="small" type="info" effect="dark">{{scope.row.user_role}}</el-tag>
+                      <el-tag v-if="scope.row.user_role === 'Special'" size="small" type="success" effect="dark">{{scope.row.user_role}}</el-tag>
                     </template>
                   </el-table-column>
                   <el-table-column label="Active" align="center"
@@ -300,7 +309,8 @@ export default {
       ],
       roleFilter: [
         {text: 'Admin', value: 'Admin'},
-        {text: 'General', value: 'General'}
+        {text: 'General', value: 'General'},
+        {text: 'Special', value: 'Special'}
       ],
       teamFilter: [],
       tasktypeData: [],
@@ -378,6 +388,7 @@ export default {
       const res = await http.post('/users/addOrUpdateUser', {
         reqUserId: user.user_id,
         reqUserEid: user.user_eid,
+        reqUserEmployeeNumber: user.user_employee_number,
         userEmail: user.user_email,
         reqUserLevel: user.user_level,
         reqUserTeam: user.user_team,
@@ -399,6 +410,7 @@ export default {
       var index = props.$index
       if (props.row.user_id > 0) {
         props.row.user_eid = this.$data.userResetData[index].user_eid
+        props.row.user_employee_number = this.$data.userResetData[index].user_employee_number
         props.row.user_email = this.$data.userResetData[index].user_email
         props.row.user_level = this.$data.userResetData[index].user_level
         props.row.user_team = this.$data.userResetData[index].user_team
@@ -413,6 +425,7 @@ export default {
       var user = {
         user_id: 0,
         user_eid: 'N/A',
+        user_employee_number: '',
         user_email: 'N/A',
         user_level: '-1',
         user_team: 'TOS',

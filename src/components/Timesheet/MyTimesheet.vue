@@ -362,7 +362,10 @@ export default {
       if (res.data.status === 0) {
         var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
         var dateConvert = new Date(Date.parse(firstDate))
-        this.resetTimesheet(dateConvert)
+        let _this = this
+        setTimeout(function () {
+          _this.resetTimesheet(dateConvert)
+        }, 500)
         this.$data.worklogFormVisible = false
       } else {
         this.showWarnMessage('Warning', 'Fail to add/update worklog!')
@@ -384,7 +387,6 @@ export default {
       arr = reqWorklogDate.split('-')
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
-      // console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
       const res = await http.post('/worklogs/removeWorklog', {
         wUserId: reqUserId,
         wTaskId: reqTaskId,
@@ -394,7 +396,10 @@ export default {
       if (res.data.status === 0) {
         var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
         var dateConvert = new Date(Date.parse(firstDate))
-        this.resetTimesheet(dateConvert)
+        let _this = this
+        setTimeout(function () {
+          _this.resetTimesheet(dateConvert)
+        }, 500)
         this.$data.worklogFormVisible = false
       } else {
         this.showWarnMessage('Warning', 'Fail to delete worklog!')

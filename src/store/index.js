@@ -6,6 +6,7 @@ const store = new Vuex.Store({
     userEid: '',
     userId: 0,
     userLevel: -1,
+    userEmployeeNumber: '',
     userRole: 'General',
     isLogin: false,
     isShowMainBar: true,
@@ -20,6 +21,9 @@ const store = new Vuex.Store({
     },
     getUserLevel: function (state) {
       return state.userLevel
+    },
+    getUserEmployeeNumber: function (state) {
+      return state.userEmployeeNumber
     },
     getUserRole: function (state) {
       return state.userRole
@@ -49,6 +53,12 @@ const store = new Vuex.Store({
     },
     clearUserLevel: function (state) {
       state.userLevel = ''
+    },
+    newUserEmployeeNumber: function (state, userEmployeeNumber) {
+      state.userEmployeeNumber = userEmployeeNumber
+    },
+    clearUserEmployeeNumber: function (state) {
+      state.userEmployeeNumber = ''
     },
     newUserRole: function (state, userRole) {
       state.userRole = userRole
@@ -87,6 +97,12 @@ const store = new Vuex.Store({
     },
     setClearUserLevel: function (context) {
       context.commit('clearUserLevel')
+    },
+    setNewUserEmployeeNumber: function (context, userEmployeeNumber) {
+      context.commit('newUserEmployeeNumber', userEmployeeNumber)
+    },
+    setClearUserEmployeeNumber: function (context) {
+      context.commit('clearUserEmployeeNumber')
     },
     setNewUserRole: function (context, userRole) {
       context.commit('newUserRole', userRole)
