@@ -73,7 +73,7 @@
               <!--<el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="16"></el-table-column>-->
               <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="showForOthLevelTask" key="17"></el-table-column>
               <el-table-column prop="task_issue_date" label="Issue Date" width="180px" align="center" v-if="showForOthLevelTask" key="18"></el-table-column>
-              <el-table-column prop="task_target_complete" label="Target Completion Date" width="180px" align="center" v-if="showForOthLevelTask" key="19"></el-table-column>
+              <el-table-column prop="task_target_complete" label="Target Completion Date" width="190px" align="center" v-if="showForOthLevelTask" key="19"></el-table-column>
               <el-table-column fixed="right" label="Edit" width="100" align="center">
                 <template slot-scope="scope">
                   <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" @click="editTask(scope.row)" icon="el-icon-edit">Edit</el-button>
