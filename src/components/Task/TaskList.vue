@@ -59,15 +59,21 @@
                 </template>
               </el-table-column>
               <el-table-column prop="task_top_opp_name" label="Opportunity Name" align="center" v-if="showForLevel1Task" key="4"></el-table-column>
-              <el-table-column prop="task_top_customer" label="Customer" align="center" v-if="showForLevel1Task" key="5"></el-table-column>
-              <el-table-column prop="task_type" label="Type" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showCommonColumn" key="6"></el-table-column>
-              <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true" v-if="showForOthLevelTask" key="7"></el-table-column>
-              <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showCommonColumn" key="8"></el-table-column>
-              <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable" v-if="showForOthLevelTask" key="9"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation(hrs)" width="132px" align="center" v-if="showForOthLevelTask" key="10"></el-table-column>
-              <el-table-column prop="task_top_target_start" label="Target Start Time" width="150px" align="center" v-if="showForLevel1Task" key="11"></el-table-column>
-              <el-table-column prop="task_top_target_end" label="Target End Time" width="150px" align="center" v-if="showForLevel1Task" key="12"></el-table-column>
-              <el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showCommonColumn" key="13"></el-table-column>
+              <el-table-column prop="task_top_customer" label="Customer" align="center" width="180px" v-if="showForLevel1Task" key="5"></el-table-column>
+              <el-table-column prop="task_top_type_of_work" label="Type Of Work" align="center" width="180px" v-if="showForLevel1Task" key="6"></el-table-column>
+              <el-table-column prop="task_top_team_sizing" label="Team Sizing" align="center" width="180px"  v-if="showForLevel1Task" key="7"></el-table-column>
+              <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" align="center" width="180px" v-if="showForLevel1Task" key="8"></el-table-column>
+              <el-table-column prop="task_top_target_start" label="Target Start Time" width="150px" align="center" v-if="showForLevel1Task" key="9"></el-table-column>
+              <!--<el-table-column prop="task_type" label="Type" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="10"></el-table-column>-->
+              <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true" v-if="showForOthLevelTask" key="11"></el-table-column>
+              <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="12"></el-table-column>
+              <el-table-column prop="task_scope" label="Scope(Baseline)" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task" key="13"></el-table-column>
+              <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable" v-if="showForOthLevelTask" key="14"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation(hrs)" width="132px" align="center" v-if="showForOthLevelTask" key="15"></el-table-column>
+              <!--<el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="16"></el-table-column>-->
+              <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="showForOthLevelTask" key="17"></el-table-column>
+              <el-table-column prop="task_issue_date" label="Issue Date" width="180px" align="center" v-if="showForOthLevelTask" key="18"></el-table-column>
+              <el-table-column prop="task_target_complete" label="Target Completion Date" width="180px" align="center" v-if="showForOthLevelTask" key="19"></el-table-column>
               <el-table-column fixed="right" label="Edit" width="100" align="center">
                 <template slot-scope="scope">
                   <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" @click="editTask(scope.row)" icon="el-icon-edit">Edit</el-button>
@@ -93,164 +99,195 @@
     </el-container>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="form" label-width="140px" class="tl-edit-form" >
-        <el-form-item label="Parent Task">
-          <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask(null)">{{form.formParent}}</el-button>
-        </el-form-item>
-        <el-form-item label="Number">
-          <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{form.formNumber}}</span>
-          <el-input v-model="form.formNumber" v-show="showForNewTask&&showNumberInput"></el-input>
-        </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Task Level">
-              <el-col :span="24">
-                <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+        <el-tabs v-model="activeFormTab" type="card" @tab-click="handleFormClick">
+          <el-tab-pane label="Task Details" name="form_first">
+            <el-form-item label="Parent Task">
+              <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask(null)">{{form.formParent}}</el-button>
+            </el-form-item>
+            <el-form-item label="Number">
+              <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{form.formNumber}}</span>
+              <el-input v-model="form.formNumber" v-show="showForNewTask&&showNumberInput"></el-input>
+            </el-form-item>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Task Level">
+                  <el-col :span="24">
+                    <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+                  </el-col>
+                </el-form-item>
               </el-col>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="Description">
-          <el-input type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
-        </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Type">
-              <el-col :span="24">
-                <el-select v-model="form.formType" v-show="showForExistingTask" disabled style="width: 100%">
-                  <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-                </el-select>
-                <el-select v-model="form.formType" v-show="showForNewTask" style="width: 100%">
-                  <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-                </el-select>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Reference">
+                  <el-col :span="24">
+                    <el-autocomplete placeholder="Input reference task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%"
+                      v-model="form.formReference" :fetch-suggestions="queryTaskAsync" @select="handleTaskSelect">
+                      <template slot-scope="{ item }">
+                        <div class="form_list_task_name">{{ item.value }}</div>
+                        <span class="form_list_task_desc">{{ item.description }}</span>
+                      </template>
+                    </el-autocomplete>
+                  </el-col>
+                </el-form-item>
               </el-col>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Status" v-show="showForPmtTask">
-              <el-select v-model="form.formStatus" style="width: 100%">
-                <el-option label="Drafting" value="Drafting"></el-option>
-                <el-option label="Planning" value="Planning"></el-option>
-                <el-option label="Running" value="Running"></el-option>
-                <el-option label="Done" value="Done"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Status" v-show="showForExternalTask">
-              <el-input v-model="form.formStatus" disabled style="width: 100%"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Effort">
-              <el-col :span="21">
-                <el-input v-model="form.formEffort" disabled></el-input>
+              <el-col :span="12">
+                <el-form-item label="Scope(Baseline)" v-show="showForLevel2Form">
+                  <el-col :span="24">
+                    <el-input v-model="form.formScope" style="width: 100%"></el-input>
+                  </el-col>
+                </el-form-item>
               </el-col>
-              <el-col :span="3">
-                <span class="span-format">hrs</span>
-              </el-col>
+            </el-row>
+            <el-form-item label="Description">
+              <el-input type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-col :span="14">
-              <el-form-item label="Estimation">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Type">
+                  <el-col :span="24">
+                    <el-select v-model="form.formType" v-show="showForExistingTask" disabled style="width: 100%">
+                      <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                    </el-select>
+                    <el-select v-model="form.formType" v-show="showForNewTask" style="width: 100%">
+                      <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                    </el-select>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Status" v-show="showForPmtTask">
+                  <el-select v-model="form.formStatus" style="width: 100%">
+                    <el-option label="Drafting" value="Drafting"></el-option>
+                    <el-option label="Planning" value="Planning"></el-option>
+                    <el-option label="Running" value="Running"></el-option>
+                    <el-option label="Done" value="Done"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="Status" v-show="showForExternalTask">
+                  <el-input v-model="form.formStatus" disabled style="width: 100%"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Effort">
+                  <el-col :span="21">
+                    <el-input v-model="form.formEffort" disabled></el-input>
+                  </el-col>
+                  <el-col :span="3">
+                    <span class="span-format">hrs</span>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
                 <el-col :span="14">
-                  <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
-                </el-col>
-                <el-col :span="10">
-                  <span class="span-format">hrs</span>
-                </el-col>
-              </el-form-item>
-            </el-col>
-            <el-col :span="10">
-              <el-form-item label="(Actual Estimation)">
-                <el-col :span="14">
-                  <span class="span-format-center" style="text-decoration: underline;font-size:16px">{{form.formSubEstimation}}</span>
-                </el-col>
-                <el-col :span="10">
-                  <span class="span-format-center">hrs</span>
-                </el-col>
-              </el-form-item>
-            </el-col>
-          </el-col>
-        </el-row>
-        <el-form-item label="Progress" v-show="showForExistingTask">
-          <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
-        </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Issue Date">
-              <el-col :span="24">
-                <el-date-picker v-model="form.formIssueDate" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-              </el-col>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Target Complete">
-              <el-col :span="24">
-                <el-date-picker v-model="form.formTargetComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-              </el-col>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Actual Complete">
-              <el-date-picker v-model="form.formActualComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Responsible Leader">
-              <el-select v-model="form.formRespLeader" style="width: 100%" :disabled="disableLeader">
-                <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Assignee">
-              <el-select v-model="form.formAssignee" style="width: 100%">
-                <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item v-show="showForExistingTask">
-          <el-button size="small" icon="el-icon-plus" @click="addNewSubTask" :disabled="disableCreateSubTask">Create Sub Task</el-button>
-        </el-form-item>
-        <el-form-item label="Sub Tasks" v-show="form.formSubTasks.length > 0">
-          <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-            <el-table :data="form.formSubTasks" fit max-height="300" class="sub-task-table">
-              <el-table-column prop="task_id" v-if="false"></el-table-column>
-              <el-table-column type="index" :index="modifyIndex" width="60"></el-table-column>
-              <el-table-column :show-overflow-tooltip="true">
-                <template slot-scope="scope">
-                  <el-row style="cursor: pointer;" :gutter="10"  @click.native="editTask(scope.row)">
-                    <el-col :span="23" class="single-line">
-                      <span style="font-weight: bold">{{scope.row.task_name}}</span>
-                      <span style="margin-left:5px"> {{scope.row.task_desc}}</span>
+                  <el-form-item label="Estimation">
+                    <el-col :span="14">
+                      <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
                     </el-col>
-                    <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
-                  </el-row>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-        </el-form-item>
-        <el-form-item label="Worklog History" v-show="showForExistingTask">
+                    <el-col :span="10">
+                      <span class="span-format">hrs</span>
+                    </el-col>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="10">
+                  <el-form-item label="(Actual Estimation)">
+                    <el-col :span="14">
+                      <span class="span-format-center" style="text-decoration: underline;font-size:16px">{{form.formSubEstimation}}</span>
+                    </el-col>
+                    <el-col :span="10">
+                      <span class="span-format-center">hrs</span>
+                    </el-col>
+                  </el-form-item>
+                </el-col>
+              </el-col>
+            </el-row>
+            <el-form-item label="Progress" v-show="showForExistingTask">
+              <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
+            </el-form-item>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Issue Date">
+                  <el-col :span="24">
+                    <el-date-picker v-model="form.formIssueDate" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Target Complete">
+                  <el-col :span="24">
+                    <el-date-picker v-model="form.formTargetComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Actual Complete">
+                  <el-date-picker v-model="form.formActualComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Responsible Leader">
+                  <el-select v-model="form.formRespLeader" style="width: 100%" :disabled="disableLeader">
+                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Assignee">
+                  <el-select v-model="form.formAssignee" style="width: 100%">
+                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <!-- Second Tab -->
+          <el-tab-pane label="Sub-Tasks List" name="form_second" :disabled="disabledTab">
+            <el-form-item v-show="showForExistingTask">
+              <el-button size="medium" icon="el-icon-plus" @click="addNewSubTask" :disabled="disableCreateSubTask">Create Sub Task</el-button>
+            </el-form-item>
+            <el-form-item label="Sub Tasks" v-show="form.formSubTasks.length > 0">
+              <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
+                <el-table :data="form.formSubTasks" fit max-height="300" class="sub-task-table">
+                  <el-table-column prop="task_id" v-if="false"></el-table-column>
+                  <el-table-column type="index" :index="modifyIndex" width="60"></el-table-column>
+                  <el-table-column :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                      <el-row style="cursor: pointer;" :gutter="10"  @click.native="editTask(scope.row)">
+                        <el-col :span="23" class="single-line">
+                          <span style="font-weight: bold">{{scope.row.task_name}}</span>
+                          <span style="margin-left:5px"> {{scope.row.task_desc}}</span>
+                        </el-col>
+                        <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
+                      </el-row>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-card>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="Worklogs List" name="form_third" :disabled="disabledTab">
+            <el-card class="box-card tl-history-box-card" v-show="showHistory">
+              <el-timeline>
+                <el-timeline-item v-for="(history, index) in histories" :key="index" :timestamp="history.timestamp"
+                  icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
+                  {{history.content}}
+                </el-timeline-item>
+              </el-timeline>
+            </el-card>
+          </el-tab-pane>
+        </el-tabs>
+        <!--<el-form-item label="Worklog History" v-show="showForExistingTask">
           <el-button icon="el-icon-more" size="small" type="text" @click="showWorklogHistory" style="font-size: 18px"></el-button>
-        </el-form-item>
+        </el-form-item>-->
       </el-form>
-      <el-card class="box-card tl-history-box-card" v-show="showHistory">
-        <el-timeline>
-          <el-timeline-item v-for="(history, index) in histories" :key="index" :timestamp="history.timestamp"
-            icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
-            {{history.content}}
-          </el-timeline-item>
-        </el-timeline>
-      </el-card>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>
         <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium" @click="logWorkDone" v-show="showForExistingTask">Log Work Done</el-button>
@@ -260,145 +297,151 @@
     <!--------------------------------------------Only for Level 1 Task------------------------------------------------------------------>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" >
-        <el-form-item label="Number">
-          <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
-          <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
-        </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Task Level">
-              <el-col :span="24">
-                <span style="font-size: 17px">{{formTop.formTopTaskLevel}}</span>
+        <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick">
+          <el-tab-pane label="Task Details" name="form_first">
+            <el-form-item label="Number">
+              <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
+              <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
+            </el-form-item>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Task Level">
+                  <el-col :span="24">
+                    <span style="font-size: 17px">{{formTop.formTopTaskLevel}}</span>
+                  </el-col>
+                </el-form-item>
               </el-col>
+            </el-row>
+            <el-form-item label="Opportunity Name">
+              <el-input v-model="formTop.formTopOppName"></el-input>
             </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="Opportunity Name">
-          <el-input v-model="formTop.formTopOppName"></el-input>
-        </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Customer">
-              <el-input v-model="formTop.formTopCustomer"></el-input>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Customer">
+                  <el-input v-model="formTop.formTopCustomer"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Facing Client">
+                  <el-input v-model="formTop.formTopFacingClient"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Status">
+                  <el-select v-model="formTop.formTopStatus" style="width: 100%">
+                    <el-option label="Drafting" value="Drafting"></el-option>
+                    <el-option label="Planning" value="Planning"></el-option>
+                    <el-option label="Running" value="Running"></el-option>
+                    <el-option label="Done" value="Done"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Task Type">
+                  <el-select v-model="formTop.formTopType" style="width: 100%">
+                    <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="8">
+                <el-form-item label="Type Of Work">
+                  <el-input v-model="formTop.formTopTypeOfWork"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="Chance of Winning">
+                  <el-input v-model="formTop.formTopChanceWinning"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="SOW Confirmation">
+                  <el-date-picker v-model="formTop.formTopSowConfirmation" type="date" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd"></el-date-picker>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item label="BusinessValue">
+              <el-input type="textarea" v-model="formTop.formTopBusinessValue" :rows="4"></el-input>
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Facing Client">
-              <el-input v-model="formTop.formTopFacingClient"></el-input>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Target Start">
+                  <el-date-picker v-model="formTop.formTopTargetStart" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Target End">
+                  <el-date-picker v-model="formTop.formTopTargetEnd" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Paint Points">
+                  <el-input v-model="formTop.formTopPaintPoints"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Constraint">
+                  <el-input v-model="formTop.formTopConstraint"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Responsible Leader">
+                  <el-select v-model="formTop.formTopRespLeader" style="width: 100%">
+                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Team Sizing">
+                  <el-input v-model="formTop.formTopTeamSizing"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Skills / Specialization">
+                  <el-input v-model="formTop.formTopSkill"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Opps > Project">
+                  <el-input v-model="formTop.formTopOppsProject"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="Sub-Tasks List" name="form_second" :disabled="disabledTab">
+            <el-form-item v-show="showForExistingTask">
+              <el-button size="medium" icon="el-icon-plus" @click="addNewSubTaskTop" :disabled="disableCreateSubTask">Create Sub Task</el-button>
             </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-             <el-form-item label="Status">
-              <el-select v-model="formTop.formTopStatus" style="width: 100%">
-                <el-option label="Drafting" value="Drafting"></el-option>
-                <el-option label="Planning" value="Planning"></el-option>
-                <el-option label="Running" value="Running"></el-option>
-                <el-option label="Done" value="Done"></el-option>
-              </el-select>
+            <el-form-item label="Sub Tasks" v-show="formTop.formTopSubTasks.length > 0">
+              <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
+                <el-table :data="formTop.formTopSubTasks" fit max-height="300" class="sub-task-table">
+                  <el-table-column prop="task_id" v-if="false"></el-table-column>
+                  <el-table-column type="index" :index="modifyIndex" width="60"></el-table-column>
+                  <el-table-column :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                      <el-row style="cursor: pointer;" :gutter="10"  @click.native="editTask(scope.row)">
+                        <el-col :span="23" class="single-line">
+                          <span style="font-weight: bold">{{scope.row.task_name}}</span>
+                          <span style="margin-left:5px"> {{scope.row.task_desc}}</span>
+                        </el-col>
+                        <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
+                      </el-row>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-card>
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Task Type">
-              <el-select v-model="formTop.formTopType" style="width: 100%">
-                <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
-            <el-form-item label="Type Of Work">
-              <el-input v-model="formTop.formTopTypeOfWork"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="Chance of Winning">
-              <el-input v-model="formTop.formTopChanceWinning"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="SOW Confirmation">
-              <el-date-picker v-model="formTop.formTopSowConfirmation" type="date" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd"></el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="BusinessValue">
-          <el-input type="textarea" v-model="formTop.formTopBusinessValue" :rows="4"></el-input>
-        </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Target Start">
-              <el-date-picker v-model="formTop.formTopTargetStart" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Target End">
-              <el-date-picker v-model="formTop.formTopTargetEnd" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Paint Points">
-              <el-input v-model="formTop.formTopPaintPoints"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Constraint">
-              <el-input v-model="formTop.formTopConstraint"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Responsible Leader">
-              <el-select v-model="formTop.formTopRespLeader" style="width: 100%">
-                <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Team Sizing">
-              <el-input v-model="formTop.formTopTeamSizing"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="Skills / Specialization">
-              <el-input v-model="formTop.formTopSkill"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Opps > Project">
-              <el-input v-model="formTop.formTopOppsProject"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item v-show="showForExistingTask">
-          <el-button size="small" icon="el-icon-plus" @click="addNewSubTaskTop" :disabled="disableCreateSubTask">Create Sub Task</el-button>
-        </el-form-item>
-        <el-form-item label="Sub Tasks" v-show="formTop.formTopSubTasks.length > 0">
-          <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-            <el-table :data="formTop.formTopSubTasks" fit max-height="300" class="sub-task-table">
-              <el-table-column prop="task_id" v-if="false"></el-table-column>
-              <el-table-column type="index" :index="modifyIndex" width="60"></el-table-column>
-              <el-table-column :show-overflow-tooltip="true">
-                <template slot-scope="scope">
-                  <el-row style="cursor: pointer;" :gutter="10"  @click.native="editTask(scope.row)">
-                    <el-col :span="23" class="single-line">
-                      <span style="font-weight: bold">{{scope.row.task_name}}</span>
-                      <span style="margin-left:5px"> {{scope.row.task_desc}}</span>
-                    </el-col>
-                    <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
-                  </el-row>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-        </el-form-item>
+          </el-tab-pane>
+        </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="editTaskVisibleTop = false">Cancel</el-button>
@@ -462,6 +505,8 @@ export default {
         formId: 0,
         formParent: '',
         formNumber: '',
+        formReference: '',
+        formScope: '',
         formType: '',
         formDesc: '',
         formStatus: '',
@@ -524,9 +569,14 @@ export default {
         formTopSubTasks: []
       },
       showForLevel1Task: false,
+      showForLevel2Task: false,
       showForOthLevelTask: true,
       showCommonColumn: true,
-      requestListTaskLevel: 'Level 1'
+      requestListTaskLevel: 'Level 1',
+      activeFormTab: 'form_first',
+      activeFormTopTab: 'form_first',
+      disabledTab: false,
+      showForLevel2Form: false
     }
   },
   methods: {
@@ -577,6 +627,12 @@ export default {
       this.$data.editTaskVisibleTop = false
       this.$data.editTaskVisible = false
       this.$data.taskDialogTitle = null
+      this.$data.showForExistingTask = true
+      this.$data.showForNewTask = false
+      this.$data.activeFormTab = 'form_first'
+      this.$data.activeFormTopTab = 'form_first'
+      this.$data.disabledTab = false
+      this.$data.showForLevel2Form = false
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
@@ -609,6 +665,11 @@ export default {
         this.$data.showForLevel1Task = true
         this.$data.showForOthLevelTask = false
       } else {
+        if (iTaskLevel === 2) {
+          this.$data.showForLevel2Task = true
+        } else {
+          this.$data.showForLevel2Task = false
+        }
         this.$data.showCommonColumn = true
         this.$data.showForLevel1Task = false
         this.$data.showForOthLevelTask = true
@@ -657,6 +718,8 @@ export default {
         var taskLevel = taskData.task_level
         if (taskLevel === 1) {
           // Show Task for Level 1
+          this.$data.showForNewTask = false
+          this.$data.showForExistingTask = true
           this.$data.editTaskVisibleTop = true
           this.$data.formTop.formTopNumber = taskData.task_name
           this.$data.formTop.formTopOppName = taskData.task_top_opp_name
@@ -676,16 +739,14 @@ export default {
           this.$data.formTop.formTopTeamSizing = taskData.task_top_team_sizing
           this.$data.formTop.formTopSkill = taskData.task_top_skill
           this.$data.formTop.formTopOppsProject = taskData.task_top_opps_project
-          const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
-            tTaskName: taskData.task_name
-          })
-          if (res1.data.status === 0) {
-            this.$data.formTop.formTopSubTasks = res1.data.data
-          } else {
-            this.$data.formTop.formTopSubTasks = []
-          }
         } else {
           // Show Task for Level 2 ~ 4
+          console.log(taskData.task_level)
+          if (taskData.task_level === 2) {
+            this.$data.showForLevel2Form = true
+          } else {
+            this.$data.showForLevel2Form = false
+          }
           this.$data.editTaskVisible = true
           var taskCreator = taskData.task_creator
           if (taskCreator.startsWith('PMT')) {
@@ -731,14 +792,8 @@ export default {
           this.$data.form.formActualComplete = (taskData.task_actual_complete !== null && taskData.task_actual_complete !== '') ? new Date(taskData.task_actual_complete) : null
           this.$data.form.formRespLeader = taskData.task_responsible_leader
           this.$data.form.formAssignee = taskData.task_assignee
-          const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
-            tTaskName: taskData.task_name
-          })
-          if (res1.data.status === 0) {
-            this.$data.form.formSubTasks = res1.data.data
-          } else {
-            this.$data.form.formSubTasks = []
-          }
+          this.$data.form.formReference = taskData.task_reference
+          this.$data.form.formScope = taskData.task_scope
         }
       }
     },
@@ -762,6 +817,8 @@ export default {
         var taskLevel = taskData.task_level
         if (taskLevel === 1) {
           // Show Task for Level 1
+          this.$data.showForNewTask = false
+          this.$data.showForExistingTask = true
           this.$data.editTaskVisibleTop = true
           this.$data.formTop.formTopNumber = taskData.task_name
           this.$data.formTop.formTopOppName = taskData.task_top_opp_name
@@ -781,17 +838,13 @@ export default {
           this.$data.formTop.formTopTeamSizing = taskData.task_top_team_sizing
           this.$data.formTop.formTopSkill = taskData.task_top_skill
           this.$data.formTop.formTopOppsProject = taskData.task_top_opps_project
-          const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
-            tTaskName: taskData.task_name
-          })
-          console.log(res1.data)
-          if (res1.data.status === 0) {
-            this.$data.formTop.formTopSubTasks = res1.data.data
-          } else {
-            this.$data.formTop.formTopSubTasks = []
-          }
         } else {
           // Show Task for Level 2 ~ 4
+          if (taskData.task_level === 2) {
+            this.$data.showForLevel2Form = true
+          } else {
+            this.$data.showForLevel2Form = false
+          }
           this.$data.editTaskVisible = true
           var taskCreator = taskData.task_creator
           if (taskCreator.startsWith('PMT')) {
@@ -837,14 +890,35 @@ export default {
           this.$data.form.formActualComplete = (taskData.task_actual_complete !== null && taskData.task_actual_complete !== '') ? new Date(taskData.task_actual_complete) : null
           this.$data.form.formRespLeader = taskData.task_responsible_leader
           this.$data.form.formAssignee = taskData.task_assignee
-          const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
-            tTaskName: taskData.task_name
-          })
-          if (res1.data.status === 0) {
-            this.$data.form.formSubTasks = res1.data.data
-          } else {
-            this.$data.form.formSubTasks = []
-          }
+          this.$data.form.formReference = taskData.task_reference
+          this.$data.form.formScope = taskData.task_scope
+        }
+      }
+    },
+    async handleFormClick (tab, event) {
+      if (tab.name === 'form_second') {
+        const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
+          tTaskName: this.$data.form.formNumber
+        })
+        if (res1.data.status === 0) {
+          this.$data.form.formSubTasks = res1.data.data
+        } else {
+          this.$data.form.formSubTasks = []
+        }
+      }
+      if (tab.name === 'form_third') {
+        this.showWorklogHistory()
+      }
+    },
+    async handleFormTopClick (tab, event) {
+      if (tab.name === 'form_second') {
+        const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
+          tTaskName: this.$data.formTop.formTopNumber
+        })
+        if (res1.data.status === 0) {
+          this.$data.formTop.formTopSubTasks = res1.data.data
+        } else {
+          this.$data.formTop.formTopSubTasks = []
         }
       }
     },
@@ -868,6 +942,7 @@ export default {
       this.resetTaskForm()
       this.getTaskType()
       this.getActiveUser()
+      this.$data.disabledTab = true
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.editTaskVisibleTop = true
@@ -884,6 +959,12 @@ export default {
       this.$data.form.formTaskLevel = newTaskLevel
       this.getTaskType()
       this.getActiveUser()
+      if (newTaskLevel === 2) {
+        this.$data.showForLevel2Form = true
+      } else {
+        this.$data.showForLevel2Form = false
+      }
+      this.$data.disabledTab = true
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
@@ -908,6 +989,13 @@ export default {
       this.$data.form.formTaskLevel = newTaskLevel
       this.getTaskType()
       this.getActiveUser()
+      if (newTaskLevel === 2) {
+        this.$data.showForLevel2Form = true
+      } else {
+        this.$data.showForLevel2Form = false
+      }
+      this.$data.showSecondTab = false
+      this.$data.showThirdTab = false
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
@@ -948,6 +1036,10 @@ export default {
         }
       }
       var reqFormIssueDate = this.dateToString(this.$data.form.formIssueDate)
+      /* if (reqFormIssueDate === '' || reqFormIssueDate === null) {
+        this.showWarnMessage('Warning', 'Issue date could not be empty!')
+        return
+      } */
       var reqFormTargetComplete = this.dateToString(this.$data.form.formTargetComplete)
       var reqFormActualComplete = this.dateToString(this.$data.form.formActualComplete)
       if (reqFormTargetComplete < reqFormIssueDate) {
@@ -960,6 +1052,8 @@ export default {
       }
       var reqFormRespLeader = this.$data.form.formRespLeader
       var reqFormAssignee = this.$data.form.formAssignee
+      var reqFormReference = this.$data.form.formReference
+      var reqFormScope = this.$data.form.formScope
       const res = await http.post('/tasks/addOrUpdateTask', {
         tParent: reqFormParent,
         tName: reqFormName,
@@ -974,7 +1068,9 @@ export default {
         tActualComplete: reqFormActualComplete,
         tRespLeader: reqFormRespLeader,
         tAssignee: reqFormAssignee,
-        tCreator: 'PMT:' + this.$data.userEmployeeNumber
+        tCreator: 'PMT:' + this.$data.userEmployeeNumber,
+        tScope: reqFormScope,
+        tReference: reqFormReference
       })
       if (res.data.status === 0) {
         this.$message({
@@ -1191,6 +1287,28 @@ export default {
         this.$data.activeUserList = res.data.data
       }
     },
+    async queryTaskAsync (queryString, cb) {
+      console.log('Query String: ' + queryString)
+      var returnArr = []
+      const res = await http.post('/tasks/getTaskByName', {
+        tTaskName: queryString
+      })
+      if (res.data.status === 0) {
+        var queryResult = res.data.data
+        for (var i = 0; i < queryResult.length; i++) {
+          var returnJson = {}
+          returnJson.value = queryResult[i].task_name
+          returnJson.description = queryResult[i].task_desc
+          returnJson.id = queryResult[i].task_id
+          returnArr.push(returnJson)
+        }
+      }
+      cb(returnArr)
+    },
+    handleTaskSelect (item) {
+      console.log(item.value)
+      this.$data.form.formReference = item.value
+    },
     // Common Function
     showWarnMessage (iTitle, iMsg) {
       this.$notify.error({
@@ -1367,6 +1485,16 @@ export default {
 }
 .tl-worklog-form {
   text-align: left;
+}
+.form_list_task_name {
+  font-size: 16px;
+  color: #57606f;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.form_list_task_desc {
+  font-size: 14px;
+  color: #bdc3c7;
 }
 /*Common Style*/
 .bg-color {

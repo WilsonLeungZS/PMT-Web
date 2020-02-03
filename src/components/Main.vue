@@ -16,12 +16,22 @@
               </el-dropdown>
             </div>
           </el-col>
-          <el-col :span="10" :offset="6">
+          <el-col :span="5" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
+            <div class="main-grid-content" style="justify-content: flex-start;">
+              <el-tooltip class="item" effect="dark" content="Timesheet" placement="bottom">
+                <el-button icon="el-icon-date" circle @click="handleMenuCommand('timesheet')"></el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="Task List" placement="bottom">
+                <el-button icon="el-icon-tickets" circle @click="handleMenuCommand('task')"></el-button>
+              </el-tooltip>
+            </div>
+          </el-col>
+          <el-col :span="12">
             <div class="main-grid-content">
               <span class="main-logo">{{logo}}</span>
             </div>
           </el-col>
-          <el-col :span="6" :offset="1" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
+          <el-col :span="6" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
             <div class="main-grid-content" style="justify-content:flex-end;">
               <!-- <el-dropdown trigger="click">
                 <el-badge :value="msgValue" :max="10" class="main-user-msg">
@@ -46,7 +56,7 @@
                 <el-button :style="{'background-color': btnColor}" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
                   <el-dropdown-item command="theme">
-                    <div class="main-user-info-panel-item"><span>Theme Style</span><div class="main-user-info-panel-colorbox" :style="{'background': mainColor}"></div></div>
+                    <div class="main-user-info-panel-item"><span>Theme</span><div class="main-user-info-panel-colorbox" :style="{'background': mainColor}"></div></div>
                   </el-dropdown-item>
                   <el-dropdown-item command="logout" divided>
                     <div class="main-user-info-panel-item"><b>Logout</b></div>
