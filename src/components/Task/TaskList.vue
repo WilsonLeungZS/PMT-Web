@@ -989,6 +989,7 @@ export default {
       this.$data.form.formTaskLevel = newTaskLevel
       this.getTaskType()
       this.getActiveUser()
+      this.$data.disabledTab = true
       if (newTaskLevel === 2) {
         this.$data.showForLevel2Form = true
       } else {
