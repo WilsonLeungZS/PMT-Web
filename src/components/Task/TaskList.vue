@@ -98,14 +98,14 @@
       </el-main>
     </el-container>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
-      <el-form ref="form" :model="form" label-width="140px" class="tl-edit-form" >
+      <el-form ref="form" :model="form" label-width="180px" class="tl-edit-form" :rules="formRules">
         <el-tabs v-model="activeFormTab" type="card" @tab-click="handleFormClick">
-          <el-tab-pane label="Business Opps" name="form_first">
+          <el-tab-pane label="Basic Information" name="form_first">
             <el-form-item label="Parent Task">
               <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask(null)">{{form.formParent}}</el-button>
             </el-form-item>
             <el-form-item label="Number">
-              <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{form.formNumber}}</span>
+              <span v-show="showForExistingTask">{{form.formNumber}}</span>
               <el-input v-model="form.formNumber" v-show="showForNewTask&&showNumberInput"></el-input>
             </el-form-item>
             <el-row>
@@ -117,7 +117,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="Type">
+                <el-form-item label="Type" prop="formType">
                   <el-col :span="24">
                     <el-select v-model="form.formType" v-show="showForExistingTask" disabled style="width: 100%">
                       <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
@@ -152,7 +152,7 @@
               </el-col>
             </el-row>
             <el-form-item label="Description">
-              <el-input type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
+              <el-input class="span-format-text" type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="Status Tracing" name="form_fourth">
@@ -219,31 +219,31 @@
                   </el-col>
                 </el-form-item>
               </el-col>
+            </el-row>
+            <el-row>
               <el-col :span="12">
-                <el-col :span="14">
-                  <el-form-item label="Estimation">
-                    <el-col :span="14">
-                      <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
-                    </el-col>
-                    <el-col :span="10">
-                      <span class="span-format">hrs</span>
-                    </el-col>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="10">
-                  <el-form-item label="(Actual Estimation)">
-                    <el-col :span="14">
-                      <span class="span-format-center" style="text-decoration: underline;font-size:16px">{{form.formSubEstimation}}</span>
-                    </el-col>
-                    <el-col :span="10">
-                      <span class="span-format-center">hrs</span>
-                    </el-col>
-                  </el-form-item>
-                </el-col>
+                <el-form-item label="Estimation">
+                  <el-col :span="21">
+                    <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
+                  </el-col>
+                  <el-col :span="3">
+                    <span class="span-format">hrs</span>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Sub-Tasks Estimation">
+                  <el-col :span="21">
+                    <el-input v-model="form.formSubEstimation" disabled></el-input>
+                  </el-col>
+                  <el-col :span="3">
+                    <span class="span-format">hrs</span>
+                  </el-col>
+                </el-form-item>
               </el-col>
             </el-row>
             <el-form-item label="Progress" v-show="showForExistingTask">
-              <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
+              <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" :status="formProgressStatus"></el-progress>
             </el-form-item>
           </el-tab-pane>
           <!-- Second Tab -->
@@ -294,11 +294,11 @@
     </el-dialog>
     <!--------------------------------------------Only for Level 1 Task------------------------------------------------------------------>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
-      <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" >
+      <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" :rules="formTopRules">
         <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick">
-          <el-tab-pane label="Business Opps" name="form_first">
+          <el-tab-pane label="Basic Information" name="form_first">
             <el-form-item label="Number">
-              <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
+              <span v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
               <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
             </el-form-item>
             <el-row>
@@ -309,10 +309,19 @@
                   </el-col>
                 </el-form-item>
               </el-col>
+              <el-col :span="12">
+                <el-form-item label="Task Type" prop="formTopType">
+                  <el-select v-model="formTop.formTopType" style="width: 100%">
+                    <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
             </el-row>
             <el-form-item label="Opportunity Name">
-              <el-input v-model="formTop.formTopOppName"></el-input>
+              <el-input class="span-format-text" v-model="formTop.formTopOppName"></el-input>
             </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="Business Opps" name="form_third">
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Customer">
@@ -337,27 +346,20 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="Task Type">
-                  <el-select v-model="formTop.formTopType" style="width: 100%">
-                    <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-                  </el-select>
+                <el-form-item label="SOW Confirmation">
+                  <el-date-picker v-model="formTop.formTopSowConfirmation" type="date" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="8">
+              <el-col :span="12">
                 <el-form-item label="Type Of Work">
                   <el-input v-model="formTop.formTopTypeOfWork"></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="8">
+              <el-col :span="12">
                 <el-form-item label="Chance of Winning">
                   <el-input v-model="formTop.formTopChanceWinning"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="SOW Confirmation">
-                  <el-date-picker v-model="formTop.formTopSowConfirmation" type="date" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -520,6 +522,9 @@ export default {
         formAssignee: null,
         formSubTasks: []
       },
+      formRules: {
+        formType: [{required: true, message: 'Select Task Type', trigger: 'blur'}]
+      },
       taskTypeArray: [],
       taskTypeArrayForPMT: [],
       activeUserList: [],
@@ -566,6 +571,9 @@ export default {
         formTopOppsProject: '',
         formTopSubTasks: []
       },
+      formTopRules: {
+        formTopType: [{required: true, message: 'Select Task Type', trigger: 'blur'}]
+      },
       showForLevel1Task: false,
       showForLevel2Task: false,
       showForOthLevelTask: true,
@@ -574,7 +582,8 @@ export default {
       activeFormTab: 'form_first',
       activeFormTopTab: 'form_first',
       disabledTab: false,
-      showForLevel2Form: false
+      showForLevel2Form: false,
+      formProgressStatus: 'success'
     }
   },
   methods: {
@@ -785,6 +794,11 @@ export default {
           this.$data.form.formEstimation = taskData.task_totaleffort
           this.$data.form.formSubEstimation = taskData.task_subtasks_totaleffort
           this.$data.form.formPercentage = Number(taskData.task_progress_nosymbol)
+          if (Number(taskData.task_progress_nosymbol) < 100) {
+            this.$data.formProgressStatus = 'success'
+          } else {
+            this.$data.formProgressStatus = 'exception'
+          }
           this.$data.form.formIssueDate = (taskData.task_issue_date !== null && taskData.task_issue_date !== '') ? new Date(taskData.task_issue_date) : null
           this.$data.form.formTargetComplete = (taskData.task_target_complete !== null && taskData.task_target_complete !== '') ? new Date(taskData.task_target_complete) : null
           this.$data.form.formActualComplete = (taskData.task_actual_complete !== null && taskData.task_actual_complete !== '') ? new Date(taskData.task_actual_complete) : null
@@ -883,6 +897,11 @@ export default {
           this.$data.form.formEstimation = taskData.task_totaleffort
           this.$data.form.formSubEstimation = taskData.task_subtasks_totaleffort
           this.$data.form.formPercentage = Number(taskData.task_progress_nosymbol)
+          if (Number(taskData.task_progress_nosymbol) < 100) {
+            this.$data.formProgressStatus = 'success'
+          } else {
+            this.$data.formProgressStatus = 'exception'
+          }
           this.$data.form.formIssueDate = (taskData.task_issue_date !== null && taskData.task_issue_date !== '') ? new Date(taskData.task_issue_date) : null
           this.$data.form.formTargetComplete = (taskData.task_target_complete !== null && taskData.task_target_complete !== '') ? new Date(taskData.task_target_complete) : null
           this.$data.form.formActualComplete = (taskData.task_actual_complete !== null && taskData.task_actual_complete !== '') ? new Date(taskData.task_actual_complete) : null
@@ -1548,5 +1567,15 @@ export default {
 }
 .tl-taskform .el-dialog__title{
   font-size: 21px;
+}
+.span-format-text .el-textarea__inner{
+ font-family: "Microsoft" !important;
+ font-size: 20px !important;
+ font-weight: bold !important;
+}
+.span-format-text .el-input__inner{
+ font-family: "Microsoft" !important;
+ font-size: 20px !important;
+ font-weight: bold !important;
 }
 </style>
