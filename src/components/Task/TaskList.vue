@@ -100,7 +100,7 @@
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="form" label-width="140px" class="tl-edit-form" >
         <el-tabs v-model="activeFormTab" type="card" @tab-click="handleFormClick">
-          <el-tab-pane label="Task Details" name="form_first">
+          <el-tab-pane label="Business Opps" name="form_first">
             <el-form-item label="Parent Task">
               <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask(null)">{{form.formParent}}</el-button>
             </el-form-item>
@@ -113,6 +113,18 @@
                 <el-form-item label="Task Level">
                   <el-col :span="24">
                     <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Type">
+                  <el-col :span="24">
+                    <el-select v-model="form.formType" v-show="showForExistingTask" disabled style="width: 100%">
+                      <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                    </el-select>
+                    <el-select v-model="form.formType" v-show="showForNewTask" style="width: 100%">
+                      <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                    </el-select>
                   </el-col>
                 </el-form-item>
               </el-col>
@@ -142,21 +154,11 @@
             <el-form-item label="Description">
               <el-input type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
             </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="Status Tracing" name="form_fourth">
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Type">
-                  <el-col :span="24">
-                    <el-select v-model="form.formType" v-show="showForExistingTask" disabled style="width: 100%">
-                      <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-                    </el-select>
-                    <el-select v-model="form.formType" v-show="showForNewTask" style="width: 100%">
-                      <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-                    </el-select>
-                  </el-col>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="Status" v-show="showForPmtTask">
+                <el-form-item label="Task Status" v-show="showForPmtTask">
                   <el-select v-model="form.formStatus" style="width: 100%">
                     <el-option label="Drafting" value="Drafting"></el-option>
                     <el-option label="Planning" value="Planning"></el-option>
@@ -164,8 +166,45 @@
                     <el-option label="Done" value="Done"></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="Status" v-show="showForExternalTask">
+                <el-form-item label="Task Status" v-show="showForExternalTask">
                   <el-input v-model="form.formStatus" disabled style="width: 100%"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Issue Date">
+                  <el-col :span="24">
+                    <el-date-picker v-model="form.formIssueDate" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Target Complete">
+                  <el-col :span="24">
+                    <el-date-picker v-model="form.formTargetComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Actual Complete">
+                  <el-date-picker v-model="form.formActualComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Responsible Leader">
+                  <el-select v-model="form.formRespLeader" style="width: 100%" :disabled="disableLeader">
+                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Assignee">
+                  <el-select v-model="form.formAssignee" style="width: 100%">
+                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -206,47 +245,6 @@
             <el-form-item label="Progress" v-show="showForExistingTask">
               <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="form.formPercentage" status="success"></el-progress>
             </el-form-item>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Issue Date">
-                  <el-col :span="24">
-                    <el-date-picker v-model="form.formIssueDate" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-                  </el-col>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Target Complete">
-                  <el-col :span="24">
-                    <el-date-picker v-model="form.formTargetComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-                  </el-col>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="Actual Complete">
-                  <el-date-picker v-model="form.formActualComplete" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Responsible Leader">
-                  <el-select v-model="form.formRespLeader" style="width: 100%" :disabled="disableLeader">
-                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="Assignee">
-                  <el-select v-model="form.formAssignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
           </el-tab-pane>
           <!-- Second Tab -->
           <el-tab-pane label="Sub-Tasks List" name="form_second" :disabled="disabledTab">
@@ -298,7 +296,7 @@
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" >
         <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick">
-          <el-tab-pane label="Task Details" name="form_first">
+          <el-tab-pane label="Business Opps" name="form_first">
             <el-form-item label="Number">
               <span style="font-size: 20px;font-weight: bold" v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
               <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
@@ -909,6 +907,11 @@ export default {
       if (tab.name === 'form_third') {
         this.showWorklogHistory()
       }
+      /* if (tab.name === 'form_fourth' || tab.name === 'form_first') {
+        var req = {}
+        req.task_id = this.$data.form.formId
+        this.editTask(req)
+      } */
     },
     async handleFormTopClick (tab, event) {
       if (tab.name === 'form_second') {
