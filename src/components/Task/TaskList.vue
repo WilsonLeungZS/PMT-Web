@@ -22,12 +22,41 @@
               </el-input>
             </div>
           </el-col>
-          <el-col :span="1">
+          <el-col :span="2">
             <div class="tl-bar-item">
               <el-button-group>
                 <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
-                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
+                  <el-button :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
                 </el-tooltip>
+                <el-popover placement="bottom" :value="visibleTaskFilter" trigger="click" title="Task Filter">
+                  <el-form label-width="100px" :model="formFilter">
+                    <el-form-item label="Assign To">
+                      <el-select v-model="formFilter.formFilterAssignTo" style="width: 100%" >
+                        <el-option label="" value=""></el-option>
+                        <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="Status">
+                      <el-select v-model="formFilter.formFilterStatus" style="width: 100%">
+                        <el-option label="" value=""></el-option>
+                        <el-option label="Drafting" value="Drafting"></el-option>
+                        <el-option label="Planning" value="Planning"></el-option>
+                        <el-option label="Running" value="Running"></el-option>
+                        <el-option label="Done" value="Done"></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="Issue Date">
+                      <el-date-picker v-model="formFilter.formFilterIssueDateRange" type="daterange"
+                        start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd">
+                      </el-date-picker>
+                    </el-form-item>
+                  </el-form>
+                  <div style="text-align: right; margin: 0">
+                    <el-button size="mini" type="text" @click="clearTaskFilter">Clear All</el-button>
+                    <el-button type="primary" size="mini" @click="saveTaskFilter">Confirm</el-button>
+                  </div>
+                  <el-button slot="reference" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-s-flag" size="small" class="tl-bar-item-btn" @click="viewTaskFilter"></el-button>
+                </el-popover>
               </el-button-group>
             </div>
           </el-col>
@@ -101,9 +130,18 @@
       <el-form ref="form" :model="form" label-width="180px" class="tl-edit-form" :rules="formRules">
         <el-tabs v-model="activeFormTab" type="card" @tab-click="handleFormClick">
           <el-tab-pane label="Basic Information" name="form_first">
-            <el-form-item label="Parent Task">
-              <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask(null)">{{form.formParent}}</el-button>
-            </el-form-item>
+            <el-row>
+              <el-col :span="24">
+                <el-form-item label="Parent Task">
+                  <div class="tl-edit-form-div">
+                    <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask(null)">{{form.formParent}}</el-button>
+                    <el-tooltip class="item" effect="dark" :content="form.formParentDesc" placement="top">
+                      <div class="tl-edit-form-div-desc">{{form.formParentDesc}}</div>
+                    </el-tooltip>
+                  </div>
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-form-item label="Number">
               <span v-show="showForExistingTask">{{form.formNumber}}</span>
               <el-input v-model="form.formNumber" v-show="showForNewTask&&showNumberInput"></el-input>
@@ -130,27 +168,28 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-form-item label="Reference">
-                  <el-col :span="24">
+                  <el-col :span="10">
                     <el-autocomplete placeholder="Input reference task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%"
-                      v-model="form.formReference" :fetch-suggestions="queryTaskAsync" @select="handleTaskSelect">
+                      v-model="form.formReference" :fetch-suggestions="queryTaskAsyncForReference" @select="handleTaskSelect">
                       <template slot-scope="{ item }">
                         <div class="form_list_task_name">{{ item.value }}</div>
                         <span class="form_list_task_desc">{{ item.description }}</span>
                       </template>
                     </el-autocomplete>
                   </el-col>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="Scope(Baseline)" v-show="showForLevel2Form">
-                  <el-col :span="24">
-                    <el-input v-model="form.formScope" style="width: 100%"></el-input>
+                  <el-col :span="14">
+                      <el-tooltip class="item" effect="dark" :content="form.formReferenceDesc" placement="top">
+                        <div class="tl-edit-form-div-desc">{{form.formReferenceDesc}}</div>
+                      </el-tooltip>
                   </el-col>
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-form-item label="Scope(Baseline)" v-show="showForLevel2Form">
+                <el-input v-model="form.formScope" style="width: 100%"></el-input>
+            </el-form-item>
             <el-form-item label="Description">
               <el-input class="span-format-text" type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
             </el-form-item>
@@ -224,7 +263,7 @@
               <el-col :span="12">
                 <el-form-item label="Estimation">
                   <el-col :span="21">
-                    <el-input v-model="form.formEstimation" :disabled="taskDisabledStaus"></el-input>
+                    <el-input v-model="form.formEstimation" :disabled="taskEstimationDisabled == true ? true : (taskDisabledStaus == true ? true : false)"></el-input>
                   </el-col>
                   <el-col :span="3">
                     <span class="span-format">hrs</span>
@@ -504,8 +543,10 @@ export default {
       form: {
         formId: 0,
         formParent: '',
+        formParentDesc: '',
         formNumber: '',
         formReference: '',
+        formReferenceDesc: '',
         formScope: '',
         formType: '',
         formDesc: '',
@@ -583,7 +624,14 @@ export default {
       activeFormTopTab: 'form_first',
       disabledTab: false,
       showForLevel2Form: false,
-      formProgressStatus: 'success'
+      formProgressStatus: 'success',
+      visibleTaskFilter: false,
+      formFilter: {
+        formFilterAssignTo: '',
+        formFilterStatus: '',
+        formFilterIssueDateRange: []
+      },
+      taskEstimationDisabled: false
     }
   },
   methods: {
@@ -593,9 +641,13 @@ export default {
       this.$data.form.formNumber = null
       this.$data.form.formTaskLevel = 1
       this.$data.form.formParent = 'N/A'
+      this.$data.form.formParentDesc = null
       this.$data.form.formType = null
       this.$data.form.formDesc = null
       this.$data.form.formStatus = 'Drafting'
+      this.$data.form.formReference = null
+      this.$data.form.formReferenceDesc = null
+      this.$data.form.formScope = null
       this.$data.form.formEffort = 0
       this.$data.form.formEstimation = 0
       this.$data.form.formSubEstimation = 0
@@ -640,6 +692,7 @@ export default {
       this.$data.activeFormTopTab = 'form_first'
       this.$data.disabledTab = false
       this.$data.showForLevel2Form = false
+      this.$data.taskEstimationDisabled = false
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
@@ -648,7 +701,6 @@ export default {
       this.$data.wlForm.worklog_remark = null
     },
     async getTaskList (iPage, iSize) {
-      // console.log('Get task of page: ' + iPage + ', Size: ' + iSize + 'Loading: ' + this.$data.loading)
       this.$data.loading = true
       this.$data.showPagination = true
       this.$data.showSortable = false
@@ -681,16 +733,45 @@ export default {
         this.$data.showForLevel1Task = false
         this.$data.showForOthLevelTask = true
       }
-      const res = await http.get('/tasks/getTotalTaskSize', {
+      var sizeCriteria = {
         reqTaskLevel: iTaskLevel
-      })
+      }
+      var listCriteria = {
+        reqPage: iPage,
+        reqSize: iSize,
+        reqTaskLevel: iTaskLevel
+      }
+      // var reqFilterAssignee = localStorage.getItem('TaskFilterAssignee')
+      var reqFilterAssignee = this.$data.formFilter.formFilterAssignTo
+      if (reqFilterAssignee !== null && reqFilterAssignee !== '') {
+        sizeCriteria.reqFilterAssignee = reqFilterAssignee
+        listCriteria.reqFilterAssignee = reqFilterAssignee
+      }
+      // var reqFilterStatus = localStorage.getItem('TaskFilterStatus')
+      var reqFilterStatus = this.$data.formFilter.formFilterStatus
+      if (reqFilterStatus !== null && reqFilterStatus !== '') {
+        sizeCriteria.reqFilterStatus = reqFilterStatus
+        listCriteria.reqFilterStatus = reqFilterStatus
+      }
+      var reqFilterIssueDate = this.$data.formFilter.formFilterIssueDateRange
+      if (reqFilterIssueDate !== null && reqFilterIssueDate.length > 0) {
+        var reqFilterIssueDateStart = reqFilterIssueDate[0]
+        var reqFilterIssueDateEnd = reqFilterIssueDate[1]
+        // var reqFilterIssueDateStart = localStorage.getItem('TaskFilterIssueDateStart')
+        if (reqFilterIssueDateStart !== null && reqFilterIssueDateStart !== '') {
+          sizeCriteria.reqFilterIssueDateStart = reqFilterIssueDateStart
+          listCriteria.reqFilterIssueDateStart = reqFilterIssueDateStart
+        }
+        // var reqFilterIssueDateEnd = localStorage.getItem('TaskFilterIssueDateEnd')
+        if (reqFilterIssueDateEnd !== null && reqFilterIssueDateEnd !== '') {
+          sizeCriteria.reqFilterIssueDateEnd = reqFilterIssueDateEnd
+          listCriteria.reqFilterIssueDateEnd = reqFilterIssueDateEnd
+        }
+      }
+      const res = await http.get('/tasks/getTotalTaskSize', sizeCriteria)
       if (res.data.status === 0) {
         this.$data.totalSize = res.data.data[0].task_total_size
-        const res1 = await http.get('/tasks/getTaskList', {
-          reqPage: iPage,
-          reqSize: iSize,
-          reqTaskLevel: iTaskLevel
-        })
+        const res1 = await http.get('/tasks/getTaskList', listCriteria)
         if (res1.data.status === 0) {
           this.$data.tasklistData = res1.data.data
         }
@@ -748,7 +829,6 @@ export default {
           this.$data.formTop.formTopOppsProject = taskData.task_top_opps_project
         } else {
           // Show Task for Level 2 ~ 4
-          console.log(taskData.task_level)
           if (taskData.task_level === 2) {
             this.$data.showForLevel2Form = true
           } else {
@@ -787,9 +867,13 @@ export default {
             default: this.$data.form.formTaskLevel = taskData.task_level
           }
           this.$data.form.formParent = taskData.task_parenttaskname
+          this.$data.form.formParentDesc = taskData.task_parenttaskdesc
           this.$data.form.formType = taskData.task_type_id
           this.$data.form.formDesc = taskData.task_desc
           this.$data.form.formStatus = taskData.task_status
+          if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
+            this.$data.taskEstimationDisabled = true
+          }
           this.$data.form.formEffort = taskData.task_currenteffort
           this.$data.form.formEstimation = taskData.task_totaleffort
           this.$data.form.formSubEstimation = taskData.task_subtasks_totaleffort
@@ -805,6 +889,7 @@ export default {
           this.$data.form.formRespLeader = taskData.task_responsible_leader
           this.$data.form.formAssignee = taskData.task_assignee
           this.$data.form.formReference = taskData.task_reference
+          this.$data.form.formReferenceDesc = taskData.task_referencetaskdesc
           this.$data.form.formScope = taskData.task_scope
         }
       }
@@ -890,9 +975,13 @@ export default {
             default: this.$data.form.formTaskLevel = taskData.task_level
           }
           this.$data.form.formParent = taskData.task_parenttaskname
+          this.$data.form.formParentDesc = taskData.task_parenttaskdesc
           this.$data.form.formType = taskData.task_type_id
           this.$data.form.formDesc = taskData.task_desc
           this.$data.form.formStatus = taskData.task_status
+          if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
+            this.$data.taskEstimationDisabled = true
+          }
           this.$data.form.formEffort = taskData.task_currenteffort
           this.$data.form.formEstimation = taskData.task_totaleffort
           this.$data.form.formSubEstimation = taskData.task_subtasks_totaleffort
@@ -908,6 +997,7 @@ export default {
           this.$data.form.formRespLeader = taskData.task_responsible_leader
           this.$data.form.formAssignee = taskData.task_assignee
           this.$data.form.formReference = taskData.task_reference
+          this.$data.form.formReferenceDesc = taskData.task_referencetaskdesc
           this.$data.form.formScope = taskData.task_scope
         }
       }
@@ -1046,14 +1136,14 @@ export default {
       var reqFormEstimation = this.$data.form.formEstimation
       if (reqFormTaskLevel === 4) {
         if (reqFormEstimation > 18) {
-          this.showWarnMessage('Warning', 'Level 4 task elstimation could not over 18 hrs!')
+          this.showWarnMessage('Warning', 'Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
         }
       }
       if (reqFormTaskLevel === 3) {
         if (!this.$data.form.formSubTasks.length > 0) {
           if (reqFormEstimation > 18) {
-            this.showWarnMessage('Warning', 'Level 3 (No Sub Task) task elstimation could not over 18 hrs!')
+            this.showWarnMessage('Warning', 'The current task need to break down sub-tasks. Please create sub-task and input the estimation in the sub-task level!')
             return
           }
         }
@@ -1286,6 +1376,32 @@ export default {
         this.$data.loading = false
       }
     },
+    viewTaskFilter () {
+      this.$data.visibleTaskFilter = true
+      this.getActiveUser()
+    },
+    saveTaskFilter () {
+      /* var reqFilterAssignee = this.$data.formFilter.formFilterAssignTo
+      var reqFilterStatus = this.$data.formFilter.formFilterStatus
+      var reqFilterIssueDate = this.$data.formFilter.formFilterIssueDateRange
+      var reqFilterIssueDateStart = null
+      var reqFilterIssueDateEnd = null
+      if (reqFilterIssueDate !== null && reqFilterIssueDate !== '') {
+        reqFilterIssueDateStart = reqFilterIssueDate[0] + ' 00:00:00'
+        reqFilterIssueDateEnd = reqFilterIssueDate[1] + ' 00:00:00'
+      }
+      localStorage.setItem('TaskFilterAssignee', reqFilterAssignee)
+      localStorage.setItem('TaskFilterStatus', reqFilterStatus)
+      localStorage.setItem('TaskFilterIssueDateStart', reqFilterIssueDateStart)
+      localStorage.setItem('TaskFilterIssueDateEnd', reqFilterIssueDateEnd) */
+      this.$data.visibleTaskFilter = false
+      this.getTaskList(1, 20)
+    },
+    clearTaskFilter () {
+      this.$data.formFilter.formFilterAssignTo = ''
+      this.$data.formFilter.formFilterStatus = ''
+      this.$data.formFilter.formFilterIssueDateRange = []
+    },
     // Get List Data
     async getTaskType () {
       this.$data.taskTypeArray = []
@@ -1310,10 +1426,10 @@ export default {
         this.$data.activeUserList = res.data.data
       }
     },
-    async queryTaskAsync (queryString, cb) {
+    async queryTaskAsyncForReference (queryString, cb) {
       console.log('Query String: ' + queryString)
       var returnArr = []
-      const res = await http.post('/tasks/getTaskByName', {
+      const res = await http.post('/tasks/getTaskByNameForReference', {
         tTaskName: queryString
       })
       if (res.data.status === 0) {
@@ -1457,6 +1573,7 @@ export default {
 }
 .tl-bar-item-btn {
   font-size: 20px;
+  border: 1px solid white;
 }
 .tl-bar-item-input {
   width: 98%;
@@ -1494,6 +1611,20 @@ export default {
 .tl-edit-form-parent-task {
   font-size: 17px;
   text-decoration: underline;
+}
+.tl-edit-form-div {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.tl-edit-form-div-desc {
+  font-size: 15px;
+  margin-left: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .tl-edit-form-progress {
   height: 100%;
@@ -1577,5 +1708,8 @@ export default {
  font-family: "Microsoft" !important;
  font-size: 20px !important;
  font-weight: bold !important;
+}
+.el-popover__title{
+  text-align: center;
 }
 </style>
