@@ -197,7 +197,7 @@
                 <el-form-item label="Ref Pool">
                   <el-col :span="5">
                     <el-autocomplete placeholder="Input reference task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%"
-                      v-model="form.formReference" :fetch-suggestions="queryTaskAsyncForReference" @select="handleTaskSelect">
+                      v-model="form.formReference" :fetch-suggestions="queryTaskAsyncForReference" @select="handleTaskSelect" @clear="clearTaskSelect">
                       <template slot-scope="{ item }">
                         <div class="form_list_task_name">{{ item.value }}</div>
                         <span class="form_list_task_desc">{{ item.description }}</span>
@@ -361,7 +361,7 @@
       <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" :rules="formTopRules">
         <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick">
           <el-tab-pane label="Basic Information" name="form_first">
-            <el-form-item label="Number">
+            <el-form-item label="Number" prop="formTopNumber">
               <span v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
               <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
             </el-form-item>
@@ -589,7 +589,7 @@ export default {
         formSubTasks: []
       },
       formRules: {
-        formType: [{required: true, message: 'Select Task Type', trigger: 'blur'}]
+        formType: [{required: true, message: 'Please Select Task Type', trigger: 'blur'}]
       },
       taskTypeArray: [],
       taskTypeArrayForPMT: [],
@@ -638,7 +638,8 @@ export default {
         formTopSubTasks: []
       },
       formTopRules: {
-        formTopType: [{required: true, message: 'Select Task Type', trigger: 'blur'}]
+        formTopNumber: [{required: true, message: 'Please Input Task Number', trigger: 'blur'}],
+        formTopType: [{required: true, message: 'Please Select Task Type', trigger: 'blur'}]
       },
       showForLevel1Task: false,
       showForLevel2Task: false,
@@ -1199,11 +1200,11 @@ export default {
       var reqFormTargetComplete = this.dateToString(this.$data.form.formTargetComplete)
       var reqFormActualComplete = this.dateToString(this.$data.form.formActualComplete)
       if (reqFormTargetComplete < reqFormIssueDate) {
-        this.showWarnMessage('Warning', 'Target Complete date could not smaller than issue date!')
+        this.showWarnMessage('Warning', 'Target Complete date can not earlier than issue date!')
         return
       }
       if (reqFormActualComplete < reqFormIssueDate) {
-        this.showWarnMessage('Warning', 'Actual Complete date could not smaller than issue date!')
+        this.showWarnMessage('Warning', 'Actual Complete date could not earlier than issue date!')
         return
       }
       var reqFormRespLeader = this.$data.form.formRespLeader
@@ -1253,6 +1254,10 @@ export default {
     },
     async submitTaskTop () {
       var reqFormTopName = this.$data.formTop.formTopNumber
+      if (reqFormTopName === null || reqFormTopName === '') {
+        this.showWarnMessage('Warning', 'Please input task number')
+        return
+      }
       var reqFormTopTaskLevel = Number(this.$data.formTop.formTopTaskLevel.substring(0, 1))
       var reqFormTopTypeId = this.$data.formTop.formTopType
       if (reqFormTopTypeId === null || reqFormTopTypeId === '') {
@@ -1497,6 +1502,10 @@ export default {
       console.log(item.value)
       this.$data.form.formReference = item.value
       this.$data.form.formReferenceDesc = item.description
+    },
+    clearTaskSelect () {
+      this.$data.form.formReference = null
+      this.$data.form.formReferenceDesc = null
     },
     // Common Function
     showWarnMessage (iTitle, iMsg) {
