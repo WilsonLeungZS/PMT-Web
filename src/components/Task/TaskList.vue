@@ -11,24 +11,24 @@
           </el-col>
         </el-row>
         <el-row class="tl-bar">
-          <el-col :span="14">
+          <el-col :span="9">
             <div class="tl-bar-item">
               <el-input placeholder="Search task..." v-model="inputTaskVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
-                <el-select v-model="selectTaskType" slot="prepend" placeholder="Select" class="tl-bar-item-input-select" @change="changeSearchTaskType">
+                <!--<el-select v-model="selectTaskType" slot="prepend" placeholder="Select" class="tl-bar-item-input-select" @change="changeSearchTaskType">
                   <el-option label="All Types" value="0"></el-option>
                   <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-                </el-select>
+                </el-select>-->
                 <el-button slot="append" icon="el-icon-search" @click="searchTask"></el-button>
               </el-input>
             </div>
           </el-col>
-          <el-col :span="2">
+          <el-col :span="1">
             <div class="tl-bar-item">
               <el-button-group>
                 <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
                   <el-button :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
                 </el-tooltip>
-                <el-popover placement="bottom" :value="visibleTaskFilter" trigger="click" title="Task Filter">
+                <!--<el-popover placement="bottom" :value="visibleTaskFilter" trigger="click" title="Task Filter">
                   <el-form label-width="100px" :model="formFilter">
                     <el-form-item label="Assign To">
                       <el-select v-model="formFilter.formFilterAssignTo" style="width: 100%" >
@@ -56,21 +56,46 @@
                     <el-button type="primary" size="mini" @click="saveTaskFilter">Confirm</el-button>
                   </div>
                   <el-button slot="reference" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-s-flag" size="small" class="tl-bar-item-btn" @click="viewTaskFilter"></el-button>
-                </el-popover>
+                </el-popover>-->
               </el-button-group>
             </div>
           </el-col>
-          <el-col :span="5">
-            <div class="tl-bar-item">
-              <el-tooltip class="item" effect="dark" content="Select task level.." placement="top-start">
-                <el-radio-group v-model="requestListTaskLevel" size="medium" @change="getTaskList(1, 20)">
-                  <el-radio-button label="Level 1"></el-radio-button>
-                  <el-radio-button label="Level 2"></el-radio-button>
-                  <el-radio-button label="Level 3"></el-radio-button>
-                  <el-radio-button label="Level 4"></el-radio-button>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="80px">
+              <el-form-item label="Task Level">
+                <el-radio-group v-model="requestListTaskLevel" @change="getTaskList(1, 20)" size="small">
+                  <el-radio-button label="1"></el-radio-button>
+                  <el-radio-button label="2"></el-radio-button>
+                  <el-radio-button label="3"></el-radio-button>
+                  <el-radio-button label="4"></el-radio-button>
                 </el-radio-group>
-              </el-tooltip>
-            </div>
+              </el-form-item>
+              <el-form-item label="Assign To">
+                <el-select v-model="formFilter.formFilterAssignTo" size="small" style="width:100%">
+                  <el-option label="" value=""></el-option>
+                  <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Status">
+                <el-select v-model="formFilter.formFilterStatus" size="small" style="width:auto">
+                  <el-option label="" value=""></el-option>
+                  <el-option label="Drafting" value="Drafting"></el-option>
+                  <el-option label="Planning" value="Planning"></el-option>
+                  <el-option label="Running" value="Running"></el-option>
+                  <el-option label="Done" value="Done"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Issue Date">
+                <el-date-picker v-model="formFilter.formFilterIssueDateRange" type="daterange"
+                  start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" size="small" style="width:auto">
+                </el-date-picker>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" size="mini" @click="saveTaskFilter">Confirm</el-button>
+              </el-form-item>
+            </el-form>
           </el-col>
         </el-row>
         <el-row class="tl-main">
@@ -135,7 +160,7 @@
                 <el-form-item label="Parent Task">
                   <div class="tl-edit-form-div">
                     <el-button type="text" class="tl-edit-form-parent-task" :disabled="form.formParent != 'N/A'?false:true" @click="editParentTask(null)">{{form.formParent}}</el-button>
-                    <el-tooltip class="item" effect="dark" :content="form.formParentDesc" placement="top">
+                    <el-tooltip class="item" effect="dark" :content="form.formParentDesc" placement="top-start">
                       <div class="tl-edit-form-div-desc">{{form.formParentDesc}}</div>
                     </el-tooltip>
                   </div>
@@ -169,8 +194,8 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <el-form-item label="Reference">
-                  <el-col :span="10">
+                <el-form-item label="Ref Pool">
+                  <el-col :span="5">
                     <el-autocomplete placeholder="Input reference task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%"
                       v-model="form.formReference" :fetch-suggestions="queryTaskAsyncForReference" @select="handleTaskSelect">
                       <template slot-scope="{ item }">
@@ -179,8 +204,8 @@
                       </template>
                     </el-autocomplete>
                   </el-col>
-                  <el-col :span="14">
-                      <el-tooltip class="item" effect="dark" :content="form.formReferenceDesc" placement="top">
+                  <el-col :span="19">
+                      <el-tooltip class="item" effect="dark" :content="form.formReferenceDesc" placement="top-start">
                         <div class="tl-edit-form-div-desc">{{form.formReferenceDesc}}</div>
                       </el-tooltip>
                   </el-col>
@@ -619,7 +644,7 @@ export default {
       showForLevel2Task: false,
       showForOthLevelTask: true,
       showCommonColumn: true,
-      requestListTaskLevel: 'Level 1',
+      requestListTaskLevel: '1',
       activeFormTab: 'form_first',
       activeFormTopTab: 'form_first',
       disabledTab: false,
@@ -709,13 +734,13 @@ export default {
       this.$data.showForOthLevelTask = false
       var iTaskLevel = 1
       switch (this.$data.requestListTaskLevel) {
-        case 'Level 1': iTaskLevel = 1
+        case '1': iTaskLevel = 1
           break
-        case 'Level 2': iTaskLevel = 2
+        case '2': iTaskLevel = 2
           break
-        case 'Level 3': iTaskLevel = 3
+        case '3': iTaskLevel = 3
           break
-        case 'Level 4': iTaskLevel = 4
+        case '4': iTaskLevel = 4
           break
         default: iTaskLevel = 1
       }
@@ -891,6 +916,17 @@ export default {
           this.$data.form.formReference = taskData.task_reference
           this.$data.form.formReferenceDesc = taskData.task_referencetaskdesc
           this.$data.form.formScope = taskData.task_scope
+          const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
+            tTaskName: this.$data.form.formNumber
+          })
+          if (res1.data.status === 0) {
+            this.$data.form.formSubTasks = res1.data.data
+          } else {
+            this.$data.form.formSubTasks = []
+          }
+          if (this.$data.form.formSubTasks.length > 0) {
+            this.$data.taskEstimationDisabled = true
+          }
         }
       }
     },
@@ -999,6 +1035,17 @@ export default {
           this.$data.form.formReference = taskData.task_reference
           this.$data.form.formReferenceDesc = taskData.task_referencetaskdesc
           this.$data.form.formScope = taskData.task_scope
+          const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
+            tTaskName: this.$data.form.formNumber
+          })
+          if (res1.data.status === 0) {
+            this.$data.form.formSubTasks = res1.data.data
+          } else {
+            this.$data.form.formSubTasks = []
+          }
+          if (this.$data.form.formSubTasks.length > 0) {
+            this.$data.taskEstimationDisabled = true
+          }
         }
       }
     },
@@ -1065,9 +1112,11 @@ export default {
       this.$data.taskDialogTitle = 'Add New Sub Task'
       this.$data.taskDisabledStaus = false
       var parentTask = this.$data.form.formNumber
+      var parentTaskDesc = this.$data.form.formDesc
       // var taskNumber = this.$data.form.formNumber
       this.resetTaskForm()
       this.$data.form.formParent = parentTask
+      this.$data.form.formParentDesc = parentTaskDesc
       this.$data.form.formTaskLevel = newTaskLevel
       this.getTaskType()
       this.getActiveUser()
@@ -1096,8 +1145,10 @@ export default {
       this.$data.taskDialogTitle = 'Add New Sub Task'
       this.$data.taskDisabledStaus = false
       var parentTask = this.$data.formTop.formTopNumber
+      var parentTaskDesc = this.$data.formTop.formTopOppName
       this.resetTaskForm()
       this.$data.form.formParent = parentTask
+      this.$data.form.formParentDesc = parentTaskDesc
       this.$data.form.formTaskLevel = newTaskLevel
       this.getTaskType()
       this.getActiveUser()
@@ -1134,18 +1185,10 @@ export default {
       }
       var reqFormEffort = this.$data.form.formEffort
       var reqFormEstimation = this.$data.form.formEstimation
-      if (reqFormTaskLevel === 4) {
+      if (reqFormTaskLevel === 4 || reqFormTaskLevel === 3) {
         if (reqFormEstimation > 18) {
           this.showWarnMessage('Warning', 'Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
-        }
-      }
-      if (reqFormTaskLevel === 3) {
-        if (!this.$data.form.formSubTasks.length > 0) {
-          if (reqFormEstimation > 18) {
-            this.showWarnMessage('Warning', 'The current task need to break down sub-tasks. Please create sub-task and input the estimation in the sub-task level!')
-            return
-          }
         }
       }
       var reqFormIssueDate = this.dateToString(this.$data.form.formIssueDate)
@@ -1166,6 +1209,12 @@ export default {
       var reqFormRespLeader = this.$data.form.formRespLeader
       var reqFormAssignee = this.$data.form.formAssignee
       var reqFormReference = this.$data.form.formReference
+      if (reqFormReference !== null && reqFormReference !== '') {
+        if (reqFormReference === reqFormName) {
+          this.showWarnMessage('Warning', 'Can not reference to same task!')
+          return
+        }
+      }
       var reqFormScope = this.$data.form.formScope
       const res = await http.post('/tasks/addOrUpdateTask', {
         tParent: reqFormParent,
@@ -1344,13 +1393,13 @@ export default {
         this.$data.showForOthLevelTask = false
         var iTaskLevel = 1
         switch (this.$data.requestListTaskLevel) {
-          case 'Level 1': iTaskLevel = 1
+          case '1': iTaskLevel = 1
             break
-          case 'Level 2': iTaskLevel = 2
+          case '2': iTaskLevel = 2
             break
-          case 'Level 3': iTaskLevel = 3
+          case '3': iTaskLevel = 3
             break
-          case 'Level 4': iTaskLevel = 4
+          case '4': iTaskLevel = 4
             break
           default: iTaskLevel = 1
         }
@@ -1447,6 +1496,7 @@ export default {
     handleTaskSelect (item) {
       console.log(item.value)
       this.$data.form.formReference = item.value
+      this.$data.form.formReferenceDesc = item.description
     },
     // Common Function
     showWarnMessage (iTitle, iMsg) {
@@ -1518,6 +1568,7 @@ export default {
     this.$data.currentPage = 1
     this.getTaskList(1, 20)
     this.getTaskType()
+    this.getActiveUser()
   }
 }
 </script>
@@ -1650,6 +1701,11 @@ export default {
   font-size: 14px;
   color: #bdc3c7;
 }
+.tl-form-filter {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
 /*Common Style*/
 .bg-color {
   background-color: #7bed9f;
@@ -1711,5 +1767,10 @@ export default {
 }
 .el-popover__title{
   text-align: center;
+}
+.tl-form-filter .el-form-item {
+  margin-right: 20px;
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 </style>
