@@ -53,7 +53,7 @@
           </el-autocomplete>
         </el-form-item>
         <el-form-item label="Date">
-          <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate"></el-date-picker>
+          <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate" style="width: 50%"></el-date-picker>
         </el-form-item>
         <el-form-item label="Effort" >
           <el-col :span="5">
@@ -307,7 +307,7 @@ export default {
     async queryTaskAsync (queryString, cb) {
       console.log('Query String: ' + queryString)
       var returnArr = []
-      const res = await http.post('/tasks/getTaskByName', {
+      const res = await http.post('/tasks/getTaskByNameForWorklogTask', {
         tTaskName: queryString
       })
       if (res.data.status === 0) {

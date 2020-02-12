@@ -1094,6 +1094,7 @@ export default {
         this.$data.histories = res.data.data
       }
     },
+    // Create Level 1 task
     addNewTask () {
       if (this.$data.userLevel > 8 && this.$data.userRole !== 'Admin') {
         this.showWarnMessage('Warning', 'No right to create Level 1 task!')
@@ -1108,33 +1109,7 @@ export default {
       this.$data.showForNewTask = true
       this.$data.editTaskVisibleTop = true
     },
-    addNewSubTask () {
-      var taskLevel = this.$data.form.formTaskLevel
-      var newTaskLevel = Number(taskLevel.substring(0, 1)) + 1
-      this.$data.taskDialogTitle = 'Add New Sub Task'
-      this.$data.taskDisabledStaus = false
-      var parentTask = this.$data.form.formNumber
-      var parentTaskDesc = this.$data.form.formDesc
-      // var taskNumber = this.$data.form.formNumber
-      this.resetTaskForm()
-      this.$data.form.formParent = parentTask
-      this.$data.form.formParentDesc = parentTaskDesc
-      this.$data.form.formTaskLevel = newTaskLevel
-      this.getTaskType()
-      this.getActiveUser()
-      if (newTaskLevel === 2) {
-        this.$data.showForLevel2Form = true
-      } else {
-        this.$data.showForLevel2Form = false
-      }
-      this.$data.disabledTab = true
-      this.$data.showForPmtTask = true
-      this.$data.showForExternalTask = false
-      this.$data.showForExistingTask = false
-      this.$data.showForNewTask = true
-      this.$data.showNumberInput = false
-      this.$data.editTaskVisible = true
-    },
+    // Create Level 2 task from Level 1 task
     addNewSubTaskTop () {
       var taskLevel = this.$data.formTop.formTopTaskLevel
       var newTaskLevel = Number(taskLevel.substring(0, 1)) + 1
@@ -1162,6 +1137,37 @@ export default {
       }
       this.$data.showSecondTab = false
       this.$data.showThirdTab = false
+      this.$data.showForPmtTask = true
+      this.$data.showForExternalTask = false
+      this.$data.showForExistingTask = false
+      this.$data.showForNewTask = true
+      this.$data.showNumberInput = false
+      this.$data.editTaskVisible = true
+    },
+    // Create Level 3/4 task
+    addNewSubTask () {
+      var taskLevel = this.$data.form.formTaskLevel
+      var newTaskLevel = Number(taskLevel.substring(0, 1)) + 1
+      this.$data.taskDialogTitle = 'Add New Sub Task'
+      this.$data.taskDisabledStaus = false
+      var parentTask = this.$data.form.formNumber
+      var parentTaskDesc = this.$data.form.formDesc
+      var taskReference = this.$data.form.formReference
+      var taskReferenceDesc = this.$data.form.formReferenceDesc
+      this.resetTaskForm()
+      this.$data.form.formParent = parentTask
+      this.$data.form.formParentDesc = parentTaskDesc
+      this.$data.form.formTaskLevel = newTaskLevel
+      this.$data.form.formReference = taskReference
+      this.$data.form.formReferenceDesc = taskReferenceDesc
+      this.getTaskType()
+      this.getActiveUser()
+      if (newTaskLevel === 2) {
+        this.$data.showForLevel2Form = true
+      } else {
+        this.$data.showForLevel2Form = false
+      }
+      this.$data.disabledTab = true
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
