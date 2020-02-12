@@ -98,6 +98,7 @@
             </el-form>
           </el-col>
         </el-row>
+        <el-divider></el-divider>
         <el-row class="tl-main">
           <el-col :span="24">
             <el-table v-loading="loading" :data="tasklistData" class="tl-main-table" fit empty-text="No Data">
