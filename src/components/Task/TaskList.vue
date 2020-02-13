@@ -65,7 +65,7 @@
           <el-col :span="24">
             <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="80px">
               <el-form-item label="Task Level">
-                <el-radio-group v-model="requestListTaskLevel" @change="getTaskList(1, 20)" size="small">
+                <el-radio-group v-model="requestListTaskLevel" @change="formFilter.formFilterShowRefPool = false; getTaskList(1, 20)" size="small">
                   <el-radio-button label="1"></el-radio-button>
                   <el-radio-button label="2"></el-radio-button>
                   <el-radio-button label="3"></el-radio-button>
@@ -91,6 +91,9 @@
                 <el-date-picker v-model="formFilter.formFilterIssueDateRange" type="daterange"
                   start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" size="small" style="width:auto">
                 </el-date-picker>
+              </el-form-item>
+              <el-form-item v-show="requestListTaskLevel == '3'? true : false">
+                <el-checkbox v-model="formFilter.formFilterShowRefPool">Show Reference Pool</el-checkbox>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" size="mini" @click="saveTaskFilter">Confirm</el-button>
@@ -123,6 +126,11 @@
               <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true" v-if="showForOthLevelTask" key="11"></el-table-column>
               <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="12"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task" key="13"></el-table-column>
+              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task == true ? false: (showForOthLevelTask == true ? true : false)" key="13">
+                <template slot-scope="scope">
+                   <el-button type="text" @click="editParentTask(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
+                </template>
+              </el-table-column>
               <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable" v-if="showForOthLevelTask" key="14"></el-table-column>
               <el-table-column prop="task_estimation" label="Estimation(hrs)" width="132px" align="center" v-if="showForOthLevelTask" key="15"></el-table-column>
               <!--<el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="16"></el-table-column>-->
@@ -154,7 +162,7 @@
     </el-container>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="form" label-width="180px" class="tl-edit-form" :rules="formRules">
-        <el-tabs v-model="activeFormTab" type="card" @tab-click="handleFormClick">
+        <el-tabs v-model="activeFormTab" type="card" @tab-click="handleFormClick" ref="formTabs">
           <el-tab-pane label="Basic Information" name="form_first">
             <el-row>
               <el-col :span="24">
@@ -168,16 +176,16 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Number">
-              <span v-show="showForExistingTask">{{form.formNumber}}</span>
-              <el-input v-model="form.formNumber" v-show="showForNewTask&&showNumberInput"></el-input>
+            <el-form-item label="Task Level" v-if="showTaskLevel">
+              <el-col :span="24">
+                <span style="font-size: 17px">{{form.formTaskLevel}}</span>
+              </el-col>
             </el-form-item>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Task Level">
-                  <el-col :span="24">
-                    <span style="font-size: 17px">{{form.formTaskLevel}}</span>
-                  </el-col>
+                <el-form-item label="Number">
+                  <span v-show="showForExistingTask">{{form.formNumber}}</span>
+                  <el-input v-model="form.formNumber" v-show="showForNewTask&&showNumberInput"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -186,7 +194,7 @@
                     <el-select v-model="form.formType" v-show="showForExistingTask" disabled style="width: 100%">
                       <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
                     </el-select>
-                    <el-select v-model="form.formType" v-show="showForNewTask" style="width: 100%">
+                    <el-select v-model="form.formType" v-show="showForNewTask" :disabled="taskTypeDisabled" style="width: 100%">
                       <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
                     </el-select>
                   </el-col>
@@ -353,30 +361,33 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>
-        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium" @click="logWorkDone" v-show="showForExistingTask">Log Work Done</el-button>
+        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium" @click="logWorkDone" v-show="showForExistingTask" v-if="!logWorklogDisabled">Log Work Done</el-button>
         <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTask">Submit</el-button>
       </span>
     </el-dialog>
     <!--------------------------------------------Only for Level 1 Task------------------------------------------------------------------>
     <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" :rules="formTopRules">
-        <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick">
+        <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick" ref="formTopTabs">
           <el-tab-pane label="Basic Information" name="form_first">
-            <el-form-item label="Number" prop="formTopNumber">
-              <span v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
-              <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
+            <el-form-item label="Task Level" v-if="false">
+              <el-col :span="24">
+                <span style="font-size: 17px">{{formTop.formTopTaskLevel}}</span>
+              </el-col>
             </el-form-item>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Task Level">
-                  <el-col :span="24">
-                    <span style="font-size: 17px">{{formTop.formTopTaskLevel}}</span>
-                  </el-col>
+                <el-form-item label="Number" prop="formTopNumber">
+                  <span v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
+                  <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="Task Type" prop="formTopType">
-                  <el-select v-model="formTop.formTopType" style="width: 100%">
+                  <el-select v-model="formTop.formTopType" v-show="showForExistingTask" disabled style="width: 100%">
+                      <el-option v-for="(tasktype, index) in taskTypeArray" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
+                    </el-select>
+                  <el-select v-model="formTop.formTopType" v-show="showForNewTask" style="width: 100%">
                     <el-option v-for="(tasktype, index) in taskTypeArrayForPMT" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
                   </el-select>
                 </el-form-item>
@@ -566,6 +577,7 @@ export default {
       showPagination: true,
       showSortable: false,
       showForHistory: true,
+      showTaskLevel: false,
       form: {
         formId: 0,
         formParent: '',
@@ -656,9 +668,12 @@ export default {
       formFilter: {
         formFilterAssignTo: '',
         formFilterStatus: '',
-        formFilterIssueDateRange: []
+        formFilterIssueDateRange: [],
+        formFilterShowRefPool: false
       },
-      taskEstimationDisabled: false
+      taskEstimationDisabled: false,
+      taskTypeDisabled: false,
+      logWorklogDisabled: false
     }
   },
   methods: {
@@ -720,12 +735,25 @@ export default {
       this.$data.disabledTab = false
       this.$data.showForLevel2Form = false
       this.$data.taskEstimationDisabled = false
+      this.$data.showTaskLevel = false
+      this.$data.taskTypeDisabled = false
+      this.$data.logWorklogDisabled = false
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
       this.$data.wlForm.worklog_date = this.getCurrentDate()
       this.$data.wlForm.worklog_effort = 0
       this.$data.wlForm.worklog_remark = null
+      // Reset tab panel
+      this.$nextTick(() => {
+        if (this.$refs.formTopTabs !== undefined) {
+          this.$refs.formTopTabs.$children[0].$refs.tabs[2].style.display = ''
+        }
+        if (this.$refs.formTabs !== undefined) {
+          this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = ''
+          this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = ''
+        }
+      })
     },
     async getTaskList (iPage, iSize) {
       this.$data.loading = true
@@ -795,6 +823,11 @@ export default {
           listCriteria.reqFilterIssueDateEnd = reqFilterIssueDateEnd
         }
       }
+      var reqFilterShowRefPool = this.$data.formFilter.formFilterShowRefPool
+      if (reqFilterShowRefPool !== null && reqFilterShowRefPool !== '') {
+        sizeCriteria.reqFilterShowRefPool = reqFilterShowRefPool
+        listCriteria.reqFilterShowRefPool = reqFilterShowRefPool
+      }
       const res = await http.get('/tasks/getTotalTaskSize', sizeCriteria)
       if (res.data.status === 0) {
         this.$data.totalSize = res.data.data[0].task_total_size
@@ -820,17 +853,27 @@ export default {
     },
     async editTask (taskRow) {
       this.resetTaskForm()
-      this.getTaskType()
+      this.getTaskType(0, null)
       this.getActiveUser()
       var taskId = taskRow.task_id
       this.$data.showForHistory = true
-      this.$data.taskDialogTitle = 'Edit Task'
       const res = await http.post('/tasks/getTaskById', {
         tId: taskId
       })
       if (res.data.status === 0) {
         var taskData = res.data.data[0]
         var taskLevel = taskData.task_level
+        switch (taskData.task_level) {
+          case 1: this.$data.taskDialogTitle = '1 - Business Opportunity'
+            break
+          case 2: this.$data.taskDialogTitle = '2 - Business Implementation'
+            break
+          case 3: this.$data.taskDialogTitle = '3 - Excutive Task'
+            break
+          case 4: this.$data.taskDialogTitle = '4 - Workable Task'
+            break
+          default: this.$data.taskDialogTitle = 'Edit Task'
+        }
         if (taskLevel === 1) {
           // Show Task for Level 1
           this.$data.showForNewTask = false
@@ -858,6 +901,10 @@ export default {
           // Show Task for Level 2 ~ 4
           if (taskData.task_level === 2) {
             this.$data.showForLevel2Form = true
+            this.$nextTick(() => {
+              this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
+              this.$data.logWorklogDisabled = true
+            })
           } else {
             this.$data.showForLevel2Form = false
           }
@@ -879,6 +926,9 @@ export default {
           this.$data.showForExistingTask = true
           if (Number(taskData.task_level) === 4) {
             this.$data.disableCreateSubTask = true
+            this.$nextTick(() => {
+              this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
+            })
           }
           this.$data.form.formId = taskData.task_id
           this.$data.form.formNumber = taskData.task_name
@@ -896,6 +946,14 @@ export default {
           this.$data.form.formParent = taskData.task_parenttaskname
           this.$data.form.formParentDesc = taskData.task_parenttaskdesc
           this.$data.form.formType = taskData.task_type_id
+          var typeIndex = this.getIndexOfValueInArr(this.$data.taskTypeArray, 'type_id', taskData.task_type_id)
+          if (this.$data.taskTypeArray[typeIndex].type_name === 'Pool') {
+            this.$nextTick(() => {
+              this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
+              this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
+              this.$data.logWorklogDisabled = true
+            })
+          }
           this.$data.form.formDesc = taskData.task_desc
           this.$data.form.formStatus = taskData.task_status
           if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
@@ -928,6 +986,7 @@ export default {
           }
           if (this.$data.form.formSubTasks.length > 0) {
             this.$data.taskEstimationDisabled = true
+            this.$data.logWorklogDisabled = true
           }
         }
       }
@@ -940,16 +999,26 @@ export default {
         reqParentTask = this.$data.form.formParent
       }
       this.resetTaskForm()
-      this.getTaskType()
+      this.getTaskType(0, null)
       this.getActiveUser()
       this.$data.showForHistory = true
-      this.$data.taskDialogTitle = 'Edit Task'
       const res = await http.post('/tasks/getTaskByParentTask', {
         tParentTask: reqParentTask
       })
       if (res.data.status === 0) {
         var taskData = res.data.data[0]
         var taskLevel = taskData.task_level
+        switch (taskData.task_level) {
+          case 1: this.$data.taskDialogTitle = '1 - Business Opportunity'
+            break
+          case 2: this.$data.taskDialogTitle = '2 - Business Implementation'
+            break
+          case 3: this.$data.taskDialogTitle = '3 - Excutive Task'
+            break
+          case 4: this.$data.taskDialogTitle = '4 - Workable Task'
+            break
+          default: this.$data.taskDialogTitle = 'Edit Task'
+        }
         if (taskLevel === 1) {
           // Show Task for Level 1
           this.$data.showForNewTask = false
@@ -977,6 +1046,10 @@ export default {
           // Show Task for Level 2 ~ 4
           if (taskData.task_level === 2) {
             this.$data.showForLevel2Form = true
+            this.$nextTick(() => {
+              this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
+              this.$data.logWorklogDisabled = true
+            })
           } else {
             this.$data.showForLevel2Form = false
           }
@@ -998,6 +1071,9 @@ export default {
           this.$data.showForExistingTask = true
           if (Number(taskData.task_level) === 4) {
             this.$data.disableCreateSubTask = true
+            this.$nextTick(() => {
+              this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
+            })
           }
           this.$data.form.formId = taskData.task_id
           this.$data.form.formNumber = taskData.task_name
@@ -1015,6 +1091,14 @@ export default {
           this.$data.form.formParent = taskData.task_parenttaskname
           this.$data.form.formParentDesc = taskData.task_parenttaskdesc
           this.$data.form.formType = taskData.task_type_id
+          var typeIndex = this.getIndexOfValueInArr(this.$data.taskTypeArray, 'type_id', taskData.task_type_id)
+          if (this.$data.taskTypeArray[typeIndex].type_name === 'Pool') {
+            this.$nextTick(() => {
+              this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
+              this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
+              this.$data.logWorklogDisabled = true
+            })
+          }
           this.$data.form.formDesc = taskData.task_desc
           this.$data.form.formStatus = taskData.task_status
           if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
@@ -1047,6 +1131,7 @@ export default {
           }
           if (this.$data.form.formSubTasks.length > 0) {
             this.$data.taskEstimationDisabled = true
+            this.$data.logWorklogDisabled = true
           }
         }
       }
@@ -1102,12 +1187,15 @@ export default {
       }
       this.$data.taskDialogTitle = 'Add New Task'
       this.resetTaskForm()
-      this.getTaskType()
+      this.getTaskType(1, null)
       this.getActiveUser()
-      this.$data.disabledTab = true
+      // this.$data.disabledTab = true
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.editTaskVisibleTop = true
+      this.$nextTick(() => {
+        this.$refs.formTopTabs.$children[0].$refs.tabs[2].style.display = 'none'
+      })
     },
     // Create Level 2 task from Level 1 task
     addNewSubTaskTop () {
@@ -1123,26 +1211,32 @@ export default {
       this.$data.taskDisabledStaus = false
       var parentTask = this.$data.formTop.formTopNumber
       var parentTaskDesc = this.$data.formTop.formTopOppName
+      var taskType = this.$data.formTop.formTopType
       this.resetTaskForm()
+      this.$data.showTaskLevel = true
       this.$data.form.formParent = parentTask
       this.$data.form.formParentDesc = parentTaskDesc
       this.$data.form.formTaskLevel = newTaskLevel
-      this.getTaskType()
+      var typeIndex = this.getIndexOfValueInArr(this.$data.taskTypeArray, 'type_id', taskType)
+      var typeName = this.$data.taskTypeArray[typeIndex].type_name
+      this.getTaskType(2, typeName)
       this.getActiveUser()
-      this.$data.disabledTab = true
       if (newTaskLevel === 2) {
         this.$data.showForLevel2Form = true
       } else {
         this.$data.showForLevel2Form = false
       }
-      this.$data.showSecondTab = false
-      this.$data.showThirdTab = false
+      // this.$data.disabledTab = true
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.showNumberInput = false
       this.$data.editTaskVisible = true
+      this.$nextTick(() => {
+        this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
+        this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
+      })
     },
     // Create Level 3/4 task
     addNewSubTask () {
@@ -1154,26 +1248,34 @@ export default {
       var parentTaskDesc = this.$data.form.formDesc
       var taskReference = this.$data.form.formReference
       var taskReferenceDesc = this.$data.form.formReferenceDesc
+      var taskType = this.$data.form.formType
       this.resetTaskForm()
+      this.$data.showTaskLevel = true
+      this.$data.taskTypeDisabled = true
       this.$data.form.formParent = parentTask
       this.$data.form.formParentDesc = parentTaskDesc
       this.$data.form.formTaskLevel = newTaskLevel
       this.$data.form.formReference = taskReference
       this.$data.form.formReferenceDesc = taskReferenceDesc
-      this.getTaskType()
+      this.$data.form.formType = taskType
+      this.getTaskType(2, null)
       this.getActiveUser()
       if (newTaskLevel === 2) {
         this.$data.showForLevel2Form = true
       } else {
         this.$data.showForLevel2Form = false
       }
-      this.$data.disabledTab = true
+      // this.$data.disabledTab = true
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.showNumberInput = false
       this.$data.editTaskVisible = true
+      this.$nextTick(() => {
+        this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
+        this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
+      })
     },
     async submitTask () {
       var reqFormParent = this.$data.form.formParent
@@ -1462,18 +1564,45 @@ export default {
       this.$data.formFilter.formFilterAssignTo = ''
       this.$data.formFilter.formFilterStatus = ''
       this.$data.formFilter.formFilterIssueDateRange = []
+      this.$data.formFilter.formFilterShowRefPool = false
     },
     // Get List Data
-    async getTaskType () {
+    async getTaskType (level, typeParent) {
       this.$data.taskTypeArray = []
       this.$data.taskTypeArrayForPMT = []
       const res = await http.get('/tasks/getAllTaskType')
       if (res.data.status === 0) {
+        // All task type
         this.$data.taskTypeArray = res.data.data
+        // Get task type for level 1
         var taskTypeList = res.data.data
-        for (var i = 0; i < taskTypeList.length; i++) {
-          if (taskTypeList[i].type_prefix !== '' && taskTypeList[i].type_prefix !== null) {
-            this.$data.taskTypeArrayForPMT.push(taskTypeList[i])
+        if (level === 1) {
+          for (var i = 0; i < taskTypeList.length; i++) {
+            if (taskTypeList[i].type_prefix !== '' && taskTypeList[i].type_prefix !== null) {
+              if (taskTypeList[i].type_parent === '' || taskTypeList[i].type_parent === null) {
+                this.$data.taskTypeArrayForPMT.push(taskTypeList[i])
+              }
+            }
+          }
+        } else if (level === 2) {
+          for (var a = 0; a < taskTypeList.length; a++) {
+            if (taskTypeList[a].type_prefix !== '' && taskTypeList[a].type_prefix !== null) {
+              if (taskTypeList[a].type_parent !== '' && taskTypeList[a].type_parent !== null) {
+                if (typeParent != null) {
+                  if (taskTypeList[a].type_parent === typeParent) {
+                    this.$data.taskTypeArrayForPMT.push(taskTypeList[a])
+                  }
+                } else {
+                  this.$data.taskTypeArrayForPMT.push(taskTypeList[a])
+                }
+              }
+            }
+          }
+        } else {
+          for (var b = 0; b < taskTypeList.length; b++) {
+            if (taskTypeList[b].type_prefix !== '' && taskTypeList[b].type_prefix !== null) {
+              this.$data.taskTypeArrayForPMT.push(taskTypeList[b])
+            }
           }
         }
       }
@@ -1577,13 +1706,29 @@ export default {
     */
     modifyIndex (index) {
       return index + 1 + '.'
+    },
+    getIndexOfValueInArr (iArray, iKey, iValue) {
+      for (var i = 0; i < iArray.length; i++) {
+        var item = iArray[i]
+        if (iKey !== null) {
+          if (item[iKey] === iValue) {
+            return i
+          }
+        }
+        if (iKey === null) {
+          if (item === iValue) {
+            return i
+          }
+        }
+      }
+      return -1
     }
   },
   created () {
     this.$data.pageSize = 20
     this.$data.currentPage = 1
     this.getTaskList(1, 20)
-    this.getTaskType()
+    this.getTaskType(0, null)
     this.getActiveUser()
   }
 }

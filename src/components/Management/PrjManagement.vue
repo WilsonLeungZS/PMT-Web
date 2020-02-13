@@ -233,9 +233,15 @@
                     <template slot-scope="props">
                       <el-row :gutter="15">
                         <el-col :span="4" class="pm-table-expand-label">
+                          <span>Parent Type</span>
+                        </el-col>
+                        <el-col :span="8" class="pm-table-expand-item">
+                          <el-input v-model="props.row.type_parent" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="4" class="pm-table-expand-label">
                           <span>Name</span>
                         </el-col>
-                        <el-col :span="20" class="pm-table-expand-item">
+                        <el-col :span="8" class="pm-table-expand-item">
                           <el-input v-model="props.row.type_name" size="small" style="width: 100%"></el-input>
                         </el-col>
                       </el-row>
@@ -275,6 +281,7 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="Id" prop="type_id" v-if="false"></el-table-column>
+                  <el-table-column label="Parent Type" prop="type_parent" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Name" prop="type_name" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Prefix" prop="type_prefix" align="center" min-width="45" ></el-table-column>
                   <el-table-column label="Category" prop="type_category" align="center" min-width="55"></el-table-column>
@@ -493,6 +500,7 @@ export default {
         return
       }
       const res = await http.post('/tasks/addTaskType', {
+        taskTypeParent: tasktype.type_parent,
         taskTypeId: tasktype.type_id,
         taskTypeName: tasktype.type_name,
         taskTypePrefix: tasktype.type_prefix,
@@ -512,6 +520,7 @@ export default {
     cancelTasktype (props) {
       var index = props.$index
       if (props.row.type_id > 0) {
+        props.row.type_parent = this.$data.tasktypeResetData[index].type_parent
         props.row.type_name = this.$data.tasktypeResetData[index].type_name
         props.row.type_prefix = this.$data.tasktypeResetData[index].type_prefix
         props.row.type_category = this.$data.tasktypeResetData[index].type_category
@@ -523,6 +532,7 @@ export default {
     addTasktype () {
       var tasktype = {
         type_id: 0,
+        type_parent: '',
         type_name: 'N/A',
         type_prefix: '',
         type_category: 'AD',
