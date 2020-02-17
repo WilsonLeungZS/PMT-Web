@@ -22,11 +22,14 @@
               </el-input>
             </div>
           </el-col>
-          <el-col :span="1">
+          <el-col :span="2">
             <div class="tl-bar-item">
               <el-button-group>
                 <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
                   <el-button :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="Task Group" placement="top-start">
+                  <el-button v-show="requestListTaskLevel == '2'? true : false" :style="{'background-color': btnColor2, 'color': 'white'}" icon="el-icon-collection" size="small" class="tl-bar-item-btn" @click="showTaskGroup"></el-button>
                 </el-tooltip>
                 <!--<el-popover placement="bottom" :value="visibleTaskFilter" trigger="click" title="Task Filter">
                   <el-form label-width="100px" :model="formFilter">
@@ -65,7 +68,7 @@
           <el-col :span="24">
             <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="80px">
               <el-form-item label="Task Level">
-                <el-radio-group v-model="requestListTaskLevel" @change="formFilter.formFilterShowRefPool = false; getTaskList(1, 20)" size="small">
+                <el-radio-group v-model="requestListTaskLevel" @change="formFilter.formFilterShowRefPool = false; reqTaskGroupId = null; getTaskList(1, 20)" size="small">
                   <el-radio-button label="1"></el-radio-button>
                   <el-radio-button label="2"></el-radio-button>
                   <el-radio-button label="3"></el-radio-button>
@@ -119,7 +122,7 @@
               <el-table-column prop="task_top_opp_name" label="Opportunity Name" align="center" v-if="showForLevel1Task" key="4"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" align="center" width="180px" v-if="showForLevel1Task" key="5"></el-table-column>
               <el-table-column prop="task_top_type_of_work" label="Type Of Work" align="center" width="180px" v-if="showForLevel1Task" key="6"></el-table-column>
-              <el-table-column prop="task_top_team_sizing" label="Team Sizing" align="center" width="180px"  v-if="showForLevel1Task" key="7"></el-table-column>
+              <el-table-column prop="task_top_team_sizing" label="Team Sizing" align="center" v-if="showForLevel1Task" key="7"></el-table-column>
               <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" align="center" width="180px" v-if="showForLevel1Task" key="8"></el-table-column>
               <el-table-column prop="task_top_target_start" label="Target Start Time" width="150px" align="center" v-if="showForLevel1Task" key="9"></el-table-column>
               <!--<el-table-column prop="task_type" label="Type" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="10"></el-table-column>-->
@@ -224,6 +227,15 @@
             <el-form-item label="Scope(Baseline)" v-show="showForLevel2Form">
                 <el-input v-model="form.formScope" style="width: 100%"></el-input>
             </el-form-item>
+            <el-row v-show="showForLevel2Form">
+              <el-col :span="24">
+                <el-form-item label="Task Group">
+                  <el-select v-model="form.formGroup" style="width: 100%">
+                    <el-option v-for="(taskgroup, index) in taskGroups" :key="index" :label="taskgroup.group_name + ' [ ' +  taskgroup.group_start_time + ' ~ ' + taskgroup.group_end_time + ' ]'" :value="taskgroup.group_id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-form-item label="Description">
               <el-input class="span-format-text" type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
             </el-form-item>
@@ -521,10 +533,55 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="editTaskVisibleTop = false">Cancel</el-button>
-        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTaskTop">Submit</el-button>
+        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTaskTop" :disabled="disabledSubmitBtn">Submit</el-button>
       </span>
     </el-dialog>
     <!--End of Level 1 Task Form-->
+    <!-- Task Gourp -->
+    <el-drawer title="Task Group" :visible.sync="groupDrawerVisible" :direction="groupDrawerDirection" size="16%">
+      <div class="tl-task-group">
+        <el-divider></el-divider>
+        <el-row :gutter="10" style="margin-bottom: 15px;">
+          <el-col :span="12">
+            <el-button type="primary" size="small" style="width: 100%" @click="addNewTaskGroup">Add New Group</el-button>
+          </el-col>
+          <el-col :span="12">
+            <el-button type="info" size="small" style="width: 100%" @click="reqTaskGroupId = null; getTaskList(1, 20); groupDrawerVisible = false">Show All Tasks</el-button>
+          </el-col>
+        </el-row>
+        <el-card class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index" @click.native="getTaskByTaskGroup(index)">
+          <div slot="header" class="clearfix">
+            <el-row>
+              <el-col :span="21">
+                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{taskGroup.group_name}}</div>
+              </el-col>
+              <el-col :span="3">
+                <el-button style="float: right; padding: 3px 0;" type="text" @click.stop="editTaskGroup(index)">Edit</el-button>
+              </el-col>
+            </el-row>
+          </div>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Task Count: {{taskGroup.group_task_count}}</span>
+        </el-card>
+      </div>
+    </el-drawer>
+    <el-dialog title="Task Group" :visible.sync="groupFormVisible" width="35%" :close-on-click-modal="false" top="15%">
+      <el-form :model="tgForm" label-width="100px" class="tl-edit-form">
+        <el-form-item label="Group Name" >
+          <el-input v-model="tgForm.formGroupName" style="width: 100%"></el-input>
+        </el-form-item>
+        <el-form-item label="Time Range">
+          <el-date-picker v-model="tgForm.formTimeRange" type="daterange"
+            start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width:100%">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="groupFormVisible = false">Cancel</el-button>
+        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitTaskGroup" :disabled="disabledGroupSubmit">Submit</el-button>
+      </div>
+    </el-dialog>
+    <!-- End ofTask Gourp -->
     <el-dialog title="Add Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
       <el-form :model="wlForm" label-width="70px" class="tl-worklog-form">
         <el-form-item label="Task" >
@@ -586,6 +643,7 @@ export default {
         formReference: '',
         formReferenceDesc: '',
         formScope: '',
+        formGroup: '',
         formType: '',
         formDesc: '',
         formStatus: '',
@@ -673,7 +731,19 @@ export default {
       },
       taskEstimationDisabled: false,
       taskTypeDisabled: false,
-      logWorklogDisabled: false
+      logWorklogDisabled: false,
+      disabledSubmitBtn: false,
+      groupDrawerVisible: false,
+      groupDrawerDirection: 'ltr',
+      taskGroups: [],
+      groupFormVisible: false,
+      disabledGroupSubmit: false,
+      tgForm: {
+        formGroupId: null,
+        formGroupName: '',
+        formTimeRange: null
+      },
+      reqTaskGroupId: null
     }
   },
   methods: {
@@ -690,6 +760,7 @@ export default {
       this.$data.form.formReference = null
       this.$data.form.formReferenceDesc = null
       this.$data.form.formScope = null
+      this.$data.form.formGroup = null
       this.$data.form.formEffort = 0
       this.$data.form.formEstimation = 0
       this.$data.form.formSubEstimation = 0
@@ -738,6 +809,7 @@ export default {
       this.$data.showTaskLevel = false
       this.$data.taskTypeDisabled = false
       this.$data.logWorklogDisabled = false
+      this.$data.disabledSubmitBtn = false
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
@@ -795,6 +867,11 @@ export default {
         reqPage: iPage,
         reqSize: iSize,
         reqTaskLevel: iTaskLevel
+      }
+      var reqTaskGroupId = this.$data.reqTaskGroupId
+      if (reqTaskGroupId !== null && reqTaskGroupId !== '') {
+        sizeCriteria.reqTaskGroupId = reqTaskGroupId
+        listCriteria.reqTaskGroupId = reqTaskGroupId
       }
       // var reqFilterAssignee = localStorage.getItem('TaskFilterAssignee')
       var reqFilterAssignee = this.$data.formFilter.formFilterAssignTo
@@ -855,6 +932,7 @@ export default {
       this.resetTaskForm()
       this.getTaskType(0, null)
       this.getActiveUser()
+      this.getTaskGroup(0)
       var taskId = taskRow.task_id
       this.$data.showForHistory = true
       const res = await http.post('/tasks/getTaskById', {
@@ -976,6 +1054,7 @@ export default {
           this.$data.form.formReference = taskData.task_reference
           this.$data.form.formReferenceDesc = taskData.task_referencetaskdesc
           this.$data.form.formScope = taskData.task_scope
+          this.$data.form.formGroup = taskData.task_group_id
           const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
             tTaskName: this.$data.form.formNumber
           })
@@ -1001,6 +1080,7 @@ export default {
       this.resetTaskForm()
       this.getTaskType(0, null)
       this.getActiveUser()
+      this.getTaskGroup(0)
       this.$data.showForHistory = true
       const res = await http.post('/tasks/getTaskByParentTask', {
         tParentTask: reqParentTask
@@ -1121,6 +1201,7 @@ export default {
           this.$data.form.formReference = taskData.task_reference
           this.$data.form.formReferenceDesc = taskData.task_referencetaskdesc
           this.$data.form.formScope = taskData.task_scope
+          this.$data.form.formGroup = taskData.task_group_id
           const res1 = await http.post('/tasks/getSubTaskByParentTaskName', {
             tTaskName: this.$data.form.formNumber
           })
@@ -1185,10 +1266,10 @@ export default {
         this.showWarnMessage('Warning', 'No right to create Level 1 task!')
         return
       }
-      this.$data.taskDialogTitle = 'Add New Task'
       this.resetTaskForm()
       this.getTaskType(1, null)
       this.getActiveUser()
+      this.$data.taskDialogTitle = '1 - New Business Opportunity'
       // this.$data.disabledTab = true
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
@@ -1207,20 +1288,22 @@ export default {
           return
         }
       }
-      this.$data.taskDialogTitle = 'Add New Sub Task'
       this.$data.taskDisabledStaus = false
       var parentTask = this.$data.formTop.formTopNumber
       var parentTaskDesc = this.$data.formTop.formTopOppName
       var taskType = this.$data.formTop.formTopType
       this.resetTaskForm()
-      this.$data.showTaskLevel = true
+      this.$data.taskDialogTitle = '2 - New Business Implementation'
+      this.$data.showTaskLevel = false
       this.$data.form.formParent = parentTask
       this.$data.form.formParentDesc = parentTaskDesc
       this.$data.form.formTaskLevel = newTaskLevel
+      this.$data.form.formIssueDate = new Date()
       var typeIndex = this.getIndexOfValueInArr(this.$data.taskTypeArray, 'type_id', taskType)
       var typeName = this.$data.taskTypeArray[typeIndex].type_name
       this.getTaskType(2, typeName)
       this.getActiveUser()
+      this.getTaskGroup(0)
       if (newTaskLevel === 2) {
         this.$data.showForLevel2Form = true
       } else {
@@ -1242,7 +1325,6 @@ export default {
     addNewSubTask () {
       var taskLevel = this.$data.form.formTaskLevel
       var newTaskLevel = Number(taskLevel.substring(0, 1)) + 1
-      this.$data.taskDialogTitle = 'Add New Sub Task'
       this.$data.taskDisabledStaus = false
       var parentTask = this.$data.form.formNumber
       var parentTaskDesc = this.$data.form.formDesc
@@ -1250,13 +1332,21 @@ export default {
       var taskReferenceDesc = this.$data.form.formReferenceDesc
       var taskType = this.$data.form.formType
       this.resetTaskForm()
-      this.$data.showTaskLevel = true
+      this.$data.taskDialogTitle = 'New Sub Task'
+      if (newTaskLevel === 3) {
+        this.$data.taskDialogTitle = '3 - New Excutive Task'
+      }
+      if (newTaskLevel === 4) {
+        this.$data.taskDialogTitle = '4 - New Workable Task'
+      }
+      this.$data.showTaskLevel = false
       this.$data.taskTypeDisabled = true
       this.$data.form.formParent = parentTask
       this.$data.form.formParentDesc = parentTaskDesc
       this.$data.form.formTaskLevel = newTaskLevel
       this.$data.form.formReference = taskReference
       this.$data.form.formReferenceDesc = taskReferenceDesc
+      this.$data.form.formIssueDate = new Date()
       this.$data.form.formType = taskType
       this.getTaskType(2, null)
       this.getActiveUser()
@@ -1326,6 +1416,8 @@ export default {
         }
       }
       var reqFormScope = this.$data.form.formScope
+      var reqFormGroup = this.$data.form.formGroup
+      this.$data.disabledSubmitBtn = true
       const res = await http.post('/tasks/addOrUpdateTask', {
         tParent: reqFormParent,
         tName: reqFormName,
@@ -1342,7 +1434,8 @@ export default {
         tAssignee: reqFormAssignee,
         tCreator: 'PMT:' + this.$data.userEmployeeNumber,
         tScope: reqFormScope,
-        tReference: reqFormReference
+        tReference: reqFormReference,
+        tGroupId: reqFormGroup
       })
       if (res.data.status === 0) {
         this.$message({
@@ -1396,6 +1489,7 @@ export default {
         this.showWarnMessage('Warning', 'Target end month could not smaller than target start month!')
         return
       }
+      this.$data.disabledSubmitBtn = true
       const res = await http.post('/tasks/addOrUpdateTaskTop', {
         tTopName: reqFormTopName,
         tTopLevel: reqFormTopTaskLevel,
@@ -1434,6 +1528,65 @@ export default {
       this.$data.pageSize = 20
       this.$data.currentPage = 1
       this.getTaskList(1, 20)
+    },
+    showTaskGroup () {
+      this.getTaskGroup(0)
+      this.$data.groupDrawerVisible = true
+    },
+    getTaskByTaskGroup (index) {
+      var group = this.$data.taskGroups[index]
+      this.$data.reqTaskGroupId = group.group_id
+      this.getTaskList(1, 20)
+      this.$data.groupDrawerVisible = false
+    },
+    editTaskGroup (index) {
+      this.resetTaskGroupForm()
+      this.$data.groupFormVisible = true
+      var group = this.$data.taskGroups[index]
+      this.getTaskGroup(group.group_id)
+    },
+    addNewTaskGroup () {
+      this.resetTaskGroupForm()
+      this.$data.groupFormVisible = true
+    },
+    async submitTaskGroup () {
+      var tGroupId = this.$data.tgForm.formGroupId
+      var tGroupName = this.$data.tgForm.formGroupName
+      var tGroupTimeRange = this.$data.tgForm.formTimeRange
+      if (tGroupName === '' || tGroupName === null) {
+        this.showWarnMessage('Warning', 'Task Group Could not be empty!')
+        return
+      }
+      if (tGroupTimeRange === null) {
+        this.showWarnMessage('Warning', 'Task Group Time Range Invalid!')
+        return
+      }
+      var tGroupStartTime = tGroupTimeRange[0]
+      var tGroupEndTime = tGroupTimeRange[1]
+      this.$data.disabledGroupSubmit = true
+      const res = await http.post('/tasks/addOrUpdateTaskGroup', {
+        tGroupId: tGroupId,
+        tGroupName: tGroupName,
+        tGroupStartTime: tGroupStartTime,
+        tGroupEndTime: tGroupEndTime
+      })
+      if (res.data.status === 0) {
+        this.$message({
+          message: 'Task group created/updated successfully!',
+          type: 'success'
+        })
+        this.getTaskGroup(0)
+        this.$data.groupFormVisible = false
+        this.$data.disabledGroupSubmit = false
+      } else {
+        this.$message.error('Task group created/updated fail!')
+      }
+    },
+    resetTaskGroupForm () {
+      this.$data.tgForm.formGroupId = 0
+      this.$data.tgForm.formGroupName = ''
+      this.$data.tgForm.formTimeRange = null
+      this.$data.disabledGroupSubmit = false
     },
     logWorkDone () {
       this.$data.editTaskVisible = false
@@ -1642,6 +1795,23 @@ export default {
     clearTaskSelect () {
       this.$data.form.formReference = null
       this.$data.form.formReferenceDesc = null
+    },
+    async getTaskGroup (iGroupId) {
+      const res = await http.get('/tasks/getTaskGroup', {
+        tGroupId: iGroupId
+      })
+      if (res.data.status === 0) {
+        if (iGroupId === 0) {
+          this.$data.taskGroups = res.data.data
+        } else {
+          this.$data.tgForm.formGroupId = res.data.data[0].group_id
+          this.$data.tgForm.formGroupName = res.data.data[0].group_name
+          this.$data.tgForm.formTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
+        }
+      } else {
+        this.$data.taskGroups = []
+        this.resetTaskGroup()
+      }
     },
     // Common Function
     showWarnMessage (iTitle, iMsg) {
@@ -1867,6 +2037,23 @@ export default {
   justify-content: flex-start;
   align-items: center;
 }
+/* Task Group Style */
+.tl-task-group {
+  width: 100%;
+  height: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+.tl-task-group-card {
+  width: 100%;
+  height: auto;
+  border-radius: 3%;
+  margin-bottom: 10px;
+  border: 2px solid #E4E7ED;
+}
 /*Common Style*/
 .bg-color {
   background-color: #7bed9f;
@@ -1933,5 +2120,22 @@ export default {
   margin-right: 20px;
   margin-top: 15px;
   margin-bottom: 10px;
+}
+.el-drawer.ltr {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.el-drawer__header {
+  margin-bottom: 0px;
+}
+.tl-task-group-card .el-card__header {
+  padding: 10px;
+}
+.tl-task-group-card .el-card__body {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
 }
 </style>
