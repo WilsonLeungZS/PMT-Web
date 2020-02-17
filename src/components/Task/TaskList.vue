@@ -1231,11 +1231,6 @@ export default {
       if (tab.name === 'form_third') {
         this.showWorklogHistory()
       }
-      /* if (tab.name === 'form_fourth' || tab.name === 'form_first') {
-        var req = {}
-        req.task_id = this.$data.form.formId
-        this.editTask(req)
-      } */
     },
     async handleFormTopClick (tab, event) {
       if (tab.name === 'form_second') {
