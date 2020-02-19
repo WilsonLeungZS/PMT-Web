@@ -29,7 +29,7 @@
                   <el-button :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="Task Group" placement="top-start">
-                  <el-button v-show="requestListTaskLevel == '2'? true : false" :style="{'background-color': btnColor2, 'color': 'white'}" icon="el-icon-collection" size="small" class="tl-bar-item-btn" @click="showTaskGroup"></el-button>
+                  <el-button v-show="requestListTaskLevel != '1'? true : false" :style="{'background-color': btnColor2, 'color': 'white'}" icon="el-icon-collection" size="small" class="tl-bar-item-btn" @click="showTaskGroup"></el-button>
                 </el-tooltip>
                 <!--<el-popover placement="bottom" :value="visibleTaskFilter" trigger="click" title="Task Filter">
                   <el-form label-width="100px" :model="formFilter">
@@ -63,12 +63,17 @@
               </el-button-group>
             </div>
           </el-col>
+          <el-col :span="13">
+              <div v-show="requestListTaskLevel != '1'? true : false" class="tl-bar-item" style="font-size: 20px">
+                Group: {{reqTaskGroup}}
+              </div>
+          </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
             <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="80px">
               <el-form-item label="Task Level">
-                <el-radio-group v-model="requestListTaskLevel" @change="formFilter.formFilterShowRefPool = false; reqTaskGroupId = null; getTaskList(1, 20)" size="small">
+                <el-radio-group v-model="requestListTaskLevel" @change="formFilter.formFilterShowRefPool = false; if(requestListTaskLevel == '1') {reqTaskGroupId = null; reqTaskGroup = ''}; getTaskList(1, 20)" size="small">
                   <el-radio-button label="1"></el-radio-button>
                   <el-radio-button label="2"></el-radio-button>
                   <el-radio-button label="3"></el-radio-button>
@@ -99,7 +104,7 @@
                 <el-checkbox v-model="formFilter.formFilterShowRefPool">Show Reference Pool</el-checkbox>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" size="mini" @click="saveTaskFilter">Confirm</el-button>
+                <el-button type="primary" size="mini" @click="saveTaskFilter">Filter</el-button>
               </el-form-item>
             </el-form>
           </el-col>
@@ -129,7 +134,7 @@
               <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true" v-if="showForOthLevelTask" key="11"></el-table-column>
               <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="12"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task" key="13"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task == true ? false: (showForOthLevelTask == true ? true : false)" key="13">
+              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task == true ? false: (showForOthLevelTask == true ? (showRefPool == true? true : false) : false)" key="13">
                 <template slot-scope="scope">
                    <el-button type="text" @click="editParentTask(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                 </template>
@@ -206,7 +211,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <el-form-item label="Ref Pool">
+                <el-form-item label="Ref Pool" v-show="showRefPool">
                   <el-col :span="5">
                     <el-autocomplete placeholder="Input reference task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%"
                       v-model="form.formReference" :fetch-suggestions="queryTaskAsyncForReference" @select="handleTaskSelect" @clear="clearTaskSelect">
@@ -227,10 +232,10 @@
             <el-form-item label="Scope(Baseline)" v-show="showForLevel2Form">
                 <el-input v-model="form.formScope" style="width: 100%"></el-input>
             </el-form-item>
-            <el-row v-show="showForLevel2Form">
+            <el-row>
               <el-col :span="24">
                 <el-form-item label="Task Group">
-                  <el-select v-model="form.formGroup" style="width: 100%">
+                  <el-select v-model="form.formGroup" style="width: 100%" :disabled="!showForLevel2Form" placeholder="Select Task Group...">
                     <el-option v-for="(taskgroup, index) in taskGroups" :key="index" :label="taskgroup.group_name + ' [ ' +  taskgroup.group_start_time + ' ~ ' + taskgroup.group_end_time + ' ]'" :value="taskgroup.group_id"></el-option>
                   </el-select>
                 </el-form-item>
@@ -317,7 +322,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="Sub-Tasks Estimation">
+                <el-form-item label="Sub-Tasks Estimation" v-show="!disableCreateSubTask">
                   <el-col :span="21">
                     <el-input v-model="form.formSubEstimation" disabled></el-input>
                   </el-col>
@@ -408,8 +413,9 @@
             <el-form-item label="Opportunity Name">
               <el-input class="span-format-text" v-model="formTop.formTopOppName"></el-input>
             </el-form-item>
-          </el-tab-pane>
-          <el-tab-pane label="Business Opps" name="form_third">
+            <el-form-item label="BusinessValue">
+              <el-input type="textarea" v-model="formTop.formTopBusinessValue" :rows="4"></el-input>
+            </el-form-item>
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Customer">
@@ -424,23 +430,6 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Status">
-                  <el-select v-model="formTop.formTopStatus" style="width: 100%">
-                    <el-option label="Drafting" value="Drafting"></el-option>
-                    <el-option label="Planning" value="Planning"></el-option>
-                    <el-option label="Running" value="Running"></el-option>
-                    <el-option label="Done" value="Done"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="SOW Confirmation">
-                  <el-date-picker v-model="formTop.formTopSowConfirmation" type="date" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd"></el-date-picker>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
                 <el-form-item label="Type Of Work">
                   <el-input v-model="formTop.formTopTypeOfWork"></el-input>
                 </el-form-item>
@@ -448,21 +437,6 @@
               <el-col :span="12">
                 <el-form-item label="Chance of Winning">
                   <el-input v-model="formTop.formTopChanceWinning"></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-form-item label="BusinessValue">
-              <el-input type="textarea" v-model="formTop.formTopBusinessValue" :rows="4"></el-input>
-            </el-form-item>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Target Start">
-                  <el-date-picker v-model="formTop.formTopTargetStart" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="Target End">
-                  <el-date-picker v-model="formTop.formTopTargetEnd" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -480,10 +454,8 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Responsible Leader">
-                  <el-select v-model="formTop.formTopRespLeader" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
-                  </el-select>
+                <el-form-item label="SOW Confirmation">
+                  <el-date-picker v-model="formTop.formTopSowConfirmation" type="date" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -501,6 +473,49 @@
               <el-col :span="12">
                 <el-form-item label="Opps > Project">
                   <el-input v-model="formTop.formTopOppsProject"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <!-- End of basic information -->
+          <el-tab-pane label="Status Tracing" name="form_third">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Status">
+                  <el-select v-model="formTop.formTopStatus" style="width: 100%">
+                    <el-option label="Drafting" value="Drafting"></el-option>
+                    <el-option label="Planning" value="Planning"></el-option>
+                    <el-option label="Running" value="Running"></el-option>
+                    <el-option label="Done" value="Done"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+               <el-col :span="12">
+                <el-form-item label="Issue Date">
+                  <el-col :span="24">
+                    <el-date-picker v-model="formTop.formTopIssueDate" type="datetime" style="width: 100%" placeholder="Select Date..." format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Target Start">
+                  <el-date-picker v-model="formTop.formTopTargetStart" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Target End">
+                  <el-date-picker v-model="formTop.formTopTargetEnd" type="month" style="width: 100%" placeholder="Select Month..." format="yyyy-MM"></el-date-picker>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Responsible Leader">
+                  <el-select v-model="formTop.formTopRespLeader" style="width: 100%">
+                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -546,7 +561,7 @@
             <el-button type="primary" size="small" style="width: 100%" @click="addNewTaskGroup">Add New Group</el-button>
           </el-col>
           <el-col :span="12">
-            <el-button type="info" size="small" style="width: 100%" @click="reqTaskGroupId = null; getTaskList(1, 20); groupDrawerVisible = false">Show All Tasks</el-button>
+            <el-button type="info" size="small" style="width: 100%" @click="reqTaskGroupId = null; reqTaskGroup = ''; getTaskList(1, 20); groupDrawerVisible = false">Show All Tasks</el-button>
           </el-col>
         </el-row>
         <el-card class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index" @click.native="getTaskByTaskGroup(index)">
@@ -561,7 +576,9 @@
             </el-row>
           </div>
           <span style="font-size: 13px;color: #909399; margin-top: 5px;">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
-          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Task Count: {{taskGroup.group_task_count}}</span>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Level 2 - [{{taskGroup.group_lv2_task_count}}]</span>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Level 3 - [{{taskGroup.group_lv3_task_count}}]</span>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Level 4 - [{{taskGroup.group_lv4_task_count}}]</span>
         </el-card>
       </div>
     </el-drawer>
@@ -698,6 +715,7 @@ export default {
         formTopChanceWinning: '',
         formTopSowConfirmation: '',
         formTopBusinessValue: '',
+        formTopIssueDate: '',
         formTopTargetStart: '',
         formTopTargetEnd: '',
         formTopPaintPoints: '',
@@ -743,7 +761,9 @@ export default {
         formGroupName: '',
         formTimeRange: null
       },
-      reqTaskGroupId: null
+      reqTaskGroupId: null,
+      reqTaskGroup: '',
+      showRefPool: true
     }
   },
   methods: {
@@ -782,6 +802,7 @@ export default {
       this.$data.formTop.formTopChanceWinning = null
       this.$data.formTop.formTopSowConfirmation = null
       this.$data.formTop.formTopBusinessValue = null
+      this.$data.formTop.formTopIssueDate = null
       this.$data.formTop.formTopTargetStart = null
       this.$data.formTop.formTopTargetEnd = null
       this.$data.formTop.formTopPaintPoints = null
@@ -810,6 +831,7 @@ export default {
       this.$data.taskTypeDisabled = false
       this.$data.logWorklogDisabled = false
       this.$data.disabledSubmitBtn = false
+      this.$data.showRefPool = true
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
@@ -904,6 +926,11 @@ export default {
       if (reqFilterShowRefPool !== null && reqFilterShowRefPool !== '') {
         sizeCriteria.reqFilterShowRefPool = reqFilterShowRefPool
         listCriteria.reqFilterShowRefPool = reqFilterShowRefPool
+        if (this.$data.formFilter.formFilterShowRefPool) {
+          this.$data.showRefPool = false
+        } else {
+          this.$data.showRefPool = true
+        }
       }
       const res = await http.get('/tasks/getTotalTaskSize', sizeCriteria)
       if (res.data.status === 0) {
@@ -967,6 +994,7 @@ export default {
           this.$data.formTop.formTopChanceWinning = taskData.task_top_chance_winning
           this.$data.formTop.formTopSowConfirmation = (taskData.task_top_sow_confirmation !== null && taskData.task_top_sow_confirmation !== '') ? new Date(taskData.task_top_sow_confirmation) : null
           this.$data.formTop.formTopBusinessValue = taskData.task_top_business_value
+          this.$data.formTop.formTopIssueDate = (taskData.task_issue_date !== null && taskData.task_issue_date !== '') ? new Date(taskData.task_issue_date) : null
           this.$data.formTop.formTopTargetStart = (taskData.task_top_target_start !== null && taskData.task_top_target_start !== '') ? new Date(taskData.task_top_target_start) : null
           this.$data.formTop.formTopTargetEnd = (taskData.task_top_target_end !== null && taskData.task_top_target_end !== '') ? new Date(taskData.task_top_target_end) : null
           this.$data.formTop.formTopPaintPoints = taskData.task_top_paint_points
@@ -1030,6 +1058,7 @@ export default {
               this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
               this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
               this.$data.logWorklogDisabled = true
+              this.$data.showRefPool = false
             })
           }
           this.$data.form.formDesc = taskData.task_desc
@@ -1114,6 +1143,7 @@ export default {
           this.$data.formTop.formTopChanceWinning = taskData.task_top_chance_winning
           this.$data.formTop.formTopSowConfirmation = (taskData.task_top_sow_confirmation !== null && taskData.task_top_sow_confirmation !== '') ? new Date(taskData.task_top_sow_confirmation) : null
           this.$data.formTop.formTopBusinessValue = taskData.task_top_business_value
+          this.$data.formTop.formTopIssueDate = (taskData.task_issue_date !== null && taskData.task_issue_date !== '') ? new Date(taskData.task_issue_date) : null
           this.$data.formTop.formTopTargetStart = (taskData.task_top_target_start !== null && taskData.task_top_target_start !== '') ? new Date(taskData.task_top_target_start) : null
           this.$data.formTop.formTopTargetEnd = (taskData.task_top_target_end !== null && taskData.task_top_target_end !== '') ? new Date(taskData.task_top_target_end) : null
           this.$data.formTop.formTopPaintPoints = taskData.task_top_paint_points
@@ -1177,6 +1207,7 @@ export default {
               this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
               this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
               this.$data.logWorklogDisabled = true
+              this.$data.showRefPool = false
             })
           }
           this.$data.form.formDesc = taskData.task_desc
@@ -1265,7 +1296,7 @@ export default {
       this.getTaskType(1, null)
       this.getActiveUser()
       this.$data.taskDialogTitle = '1 - New Business Opportunity'
-      // this.$data.disabledTab = true
+      this.$data.formTop.formTopIssueDate = new Date()
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
       this.$data.editTaskVisibleTop = true
@@ -1326,6 +1357,7 @@ export default {
       var taskReference = this.$data.form.formReference
       var taskReferenceDesc = this.$data.form.formReferenceDesc
       var taskType = this.$data.form.formType
+      var taskGroup = this.$data.form.formGroup
       this.resetTaskForm()
       this.$data.taskDialogTitle = 'New Sub Task'
       if (newTaskLevel === 3) {
@@ -1345,12 +1377,13 @@ export default {
       this.$data.form.formType = taskType
       this.getTaskType(2, null)
       this.getActiveUser()
+      this.getTaskGroup(0)
       if (newTaskLevel === 2) {
         this.$data.showForLevel2Form = true
       } else {
         this.$data.showForLevel2Form = false
       }
-      // this.$data.disabledTab = true
+      this.$data.form.formGroup = taskGroup
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
@@ -1387,10 +1420,6 @@ export default {
         }
       }
       var reqFormIssueDate = this.dateToString(this.$data.form.formIssueDate)
-      /* if (reqFormIssueDate === '' || reqFormIssueDate === null) {
-        this.showWarnMessage('Warning', 'Issue date could not be empty!')
-        return
-      } */
       var reqFormTargetComplete = this.dateToString(this.$data.form.formTargetComplete)
       var reqFormActualComplete = this.dateToString(this.$data.form.formActualComplete)
       if (reqFormTargetComplete < reqFormIssueDate) {
@@ -1478,6 +1507,7 @@ export default {
       var reqFormTopSkill = this.$data.formTop.formTopSkill
       var reqFormTopOppsProject = this.$data.formTop.formTopOppsProject
       var reqFormTopSowConfirmation = this.dateToString(this.$data.formTop.formTopSowConfirmation)
+      var reqFormTopIssueDate = this.dateToString(this.$data.formTop.formTopIssueDate)
       var reqFormTopTargetStart = this.dateToString(this.$data.formTop.formTopTargetStart)
       var reqFormTopTargetEnd = this.dateToString(this.$data.formTop.formTopTargetEnd)
       if (reqFormTopTargetEnd < reqFormTopTargetStart) {
@@ -1505,7 +1535,8 @@ export default {
         tTopSkill: reqFormTopSkill,
         tTopOppsProject: reqFormTopOppsProject,
         tTopRespLeader: reqFormTopRespLeader,
-        tCreator: 'PMT:' + this.$data.userEmployeeNumber
+        tCreator: 'PMT:' + this.$data.userEmployeeNumber,
+        tIssueDate: reqFormTopIssueDate
       })
       if (res.data.status === 0) {
         this.$message({
@@ -1531,6 +1562,7 @@ export default {
     getTaskByTaskGroup (index) {
       var group = this.$data.taskGroups[index]
       this.$data.reqTaskGroupId = group.group_id
+      this.$data.reqTaskGroup = group.group_name + ' [ ' + group.group_start_time + ' ~ ' + group.group_end_time + ']'
       this.getTaskList(1, 20)
       this.$data.groupDrawerVisible = false
     },
