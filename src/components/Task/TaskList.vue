@@ -142,10 +142,11 @@
               <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="showForOthLevelTask" key="17"></el-table-column>
               <el-table-column prop="task_issue_date" label="Issue Date" width="180px" align="center" v-if="showForOthLevelTask" key="18"></el-table-column>
               <el-table-column prop="task_target_complete" label="Target Completion Date" width="190px" align="center" v-if="showForOthLevelTask" key="19"></el-table-column>
-              <el-table-column fixed="right" label="Edit" width="100" align="center">
+              <el-table-column fixed="right" label="Edit" width="120" align="center">
                 <template slot-scope="scope">
-                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" @click="editTask(scope.row)" icon="el-icon-edit">Edit</el-button>
-                </template>
+                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" @click="editTask(scope.row)" icon="el-icon-edit"></el-button>
+                  <el-button slot="reference" :style="{'border': 'none', 'color': 'white'}" @click="removeTaskVisible = true; removeTaskId = scope.row.task_id; removeTaskName = scope.row.task_name; if(scope.row.task_level == 1) {removeTaskDesc = scope.row.task_top_opp_name} else {removeTaskDesc = scope.row.task_desc}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                  </template>
               </el-table-column>
             </el-table>
           </el-col>
@@ -652,6 +653,18 @@
         <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitWorklog">Submit</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="Remove Task" :visible.sync="removeTaskVisible" width="25%" top="15%">
+      <div class="tl-remove-task">
+        <span>Confirm to remove task {{removeTaskName}}?</span>
+        <el-card class="box-card" shadow="never" style="margin-top:10px;font-size: 15px;color:#909399">
+          {{removeTaskDesc}}
+        </el-card>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="text" size="small" @click="resetRemoveTask()">Cancel</el-button>
+        <el-button type="danger" size="small" @click="removeTask()">Confirm</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -794,7 +807,11 @@ export default {
       },
       reqTaskGroupId: null,
       reqTaskGroup: '',
-      showNonPoolCol: true
+      showNonPoolCol: true,
+      removeTaskVisible: false,
+      removeTaskId: 0,
+      removeTaskName: '',
+      removeTaskDesc: ''
     }
   },
   methods: {
@@ -985,6 +1002,33 @@ export default {
       var pageSize = this.$data.pageSize
       this.$data.currentPage = val
       this.getTaskList(val, pageSize)
+    },
+    async removeTask () {
+      var taskId = this.$data.removeTaskId
+      var taskName = this.$data.removeTaskName
+      console.log(taskId + ' ' + taskName)
+      var updatedDate = this.getDay(-3)
+      const res = await http.post('/tasks/removeTaskIfNoSubTaskAndWorklog', {
+        tTaskId: taskId,
+        tTaskName: taskName,
+        tUpdateDate: updatedDate
+      })
+      if (res.data.status === 0) {
+        this.$message({
+          message: 'Task remove successfully!',
+          type: 'success'
+        })
+        this.resetRemoveTask()
+        this.getTaskList(1, 20)
+      } else {
+        this.showWarnMessage('Warning', res.data.message)
+      }
+    },
+    resetRemoveTask () {
+      this.$data.removeTaskId = 0
+      this.$data.removeTaskName = ''
+      this.$data.removeTaskDesc = ''
+      this.$data.removeTaskVisible = false
     },
     async editTask (taskRow) {
       this.resetTaskForm()
@@ -1956,6 +2000,12 @@ export default {
         return '' + iValue
       }
     },
+    getDay (day) {
+      var today = new Date()
+      var targetDayMilliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day
+      today.setTime(targetDayMilliseconds)
+      return this.dateToString(today)
+    },
     /* Base on requirement, no need to auto generate task number when select task type
     async changeNewTaskType () {
       const res = await http.post('/tasks/getNewTaskNumberByType', {
@@ -2144,6 +2194,13 @@ export default {
   height: auto;
   display: flex;
   flex-direction: row;
+}
+.tl-remove-task {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 17px;
 }
 /*Common Style*/
 .bg-color {
