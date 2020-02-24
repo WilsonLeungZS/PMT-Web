@@ -164,8 +164,14 @@
                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Mapping</span>
                         </el-col>
-                        <el-col :span="22" class="pm-table-expand-item">
+                        <el-col :span="10" class="pm-table-expand-item">
                           <el-input v-model="props.row.user_namemapping" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="2" class="pm-table-expand-label">
+                          <span>Assignment</span>
+                        </el-col>
+                        <el-col :span="10" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_assignment" size="small" style="width: 100%"></el-input>
                         </el-col>
                       </el-row>
                       <el-row :gutter="15" style="margin-top: 10px">
@@ -185,14 +191,15 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="Id" prop="user_id" v-if="false"></el-table-column>
-                  <el-table-column label="Name" prop="user_eid" min-width="120" show-overflow-tooltip></el-table-column>
-                  <el-table-column label="Employee Number" prop="user_employee_number" min-width="120"></el-table-column>
-                  <el-table-column label="Email" prop="user_email" min-width="210" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Name" prop="user_eid" min-width="100" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Employee Number" prop="user_employee_number" min-width="100"></el-table-column>
+                  <el-table-column label="Email" prop="user_email" min-width="110" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Level" prop="user_level" min-width="30" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Team" prop="user_team" align="center" min-width="70"
                       :filters="teamFilter"
                       :filter-method="teamfilterHandler">
                   </el-table-column>
+                  <el-table-column label="Assignment" prop="user_assignment" min-width="100" align="center" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Role" align="center"
                       :filters="roleFilter"
                       :filter-method="rolefilterHandler">
@@ -401,6 +408,7 @@ export default {
         reqUserTeam: user.user_team,
         reqUserRole: user.user_role,
         reqUserNameMapping: user.user_namemapping,
+        reqUserAssignment: user.user_assignment,
         reqUserIsActive: user.user_isactive
       })
       if (res.data.status === 0) {
@@ -423,6 +431,7 @@ export default {
         props.row.user_team = this.$data.userResetData[index].user_team
         props.row.user_role = this.$data.userResetData[index].user_role
         props.row.user_namemapping = this.$data.userResetData[index].user_namemapping
+        props.row.user_assignment = this.$data.userResetData[index].user_assignment
         props.row.user_isactive = this.$data.userResetData[index].user_isactive
       } else {
         this.$data.userData.splice(index, 1)
@@ -438,6 +447,7 @@ export default {
         user_team: 'TOS',
         user_role: 'General',
         user_namemapping: '',
+        user_assignment: '',
         user_isactive: false
       }
       this.$data.userData.unshift(user)

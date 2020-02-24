@@ -28,9 +28,6 @@
                 <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
                   <el-button :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="Task Group" placement="top-start">
-                  <el-button v-show="requestListTaskLevel != '1'? true : false" :style="{'background-color': btnColor2, 'color': 'white'}" icon="el-icon-collection" size="small" class="tl-bar-item-btn" @click="showTaskGroup"></el-button>
-                </el-tooltip>
                 <!--<el-popover placement="bottom" :value="visibleTaskFilter" trigger="click" title="Task Filter">
                   <el-form label-width="100px" :model="formFilter">
                     <el-form-item label="Assign To">
@@ -64,8 +61,8 @@
             </div>
           </el-col>
           <el-col :span="13">
-              <div v-show="requestListTaskLevel != '1'? true : false" class="tl-bar-item" style="font-size: 20px">
-                Group: {{reqTaskGroup}}
+              <div class="tl-bar-item" style="font-size: 20px">
+                Task Group: {{reqTaskGroup}}
               </div>
           </el-col>
         </el-row>
@@ -134,7 +131,7 @@
               <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true" v-if="showForOthLevelTask" key="11"></el-table-column>
               <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="12"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task" key="13"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task == true ? false: (showForOthLevelTask == true ? (showRefPool == true? true : false) : false)" key="13">
+              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task == true ? false: (showForOthLevelTask == true ? (showNonPoolCol == true? true : false) : false)" key="13">
                 <template slot-scope="scope">
                    <el-button type="text" @click="editParentTask(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                 </template>
@@ -211,7 +208,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <el-form-item label="Ref Pool" v-show="showRefPool">
+                <el-form-item label="Ref Pool" v-show="showNonPoolCol">
                   <el-col :span="5">
                     <el-autocomplete placeholder="Input reference task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%"
                       v-model="form.formReference" :fetch-suggestions="queryTaskAsyncForReference" @select="handleTaskSelect" @clear="clearTaskSelect">
@@ -236,7 +233,8 @@
               <el-col :span="24">
                 <el-form-item label="Task Group">
                   <el-select v-model="form.formGroup" style="width: 100%" :disabled="!showForLevel2Form" placeholder="Select Task Group...">
-                    <el-option v-for="(taskgroup, index) in taskGroups" :key="index" :label="taskgroup.group_name + ' [ ' +  taskgroup.group_start_time + ' ~ ' + taskgroup.group_end_time + ' ]'" :value="taskgroup.group_id"></el-option>
+                    <el-option label="" value=""></el-option>
+                    <el-option v-for="(taskgroup, index) in taskGroupsAll" :key="index" :label="taskgroup.group_name + ' [ ' +  taskgroup.group_start_time + ' ~ ' + taskgroup.group_end_time + ' ]'" :value="taskgroup.group_id"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -284,9 +282,9 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Responsible Leader">
-                  <el-select v-model="form.formRespLeader" style="width: 100%" :disabled="disableLeader">
-                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                <el-form-item label="Responsible Leader" v-show="showNonPoolCol">
+                  <el-select v-model="form.formRespLeader" style="width: 100%" :disabled="!showForLevel2Form">
+                    <el-option v-for="(activeUser, index) in activeRespLeaderList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -383,7 +381,7 @@
       </span>
     </el-dialog>
     <!--------------------------------------------Only for Level 1 Task------------------------------------------------------------------>
-    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
+    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform abow_dialog">
       <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" :rules="formTopRules">
         <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick" ref="formTopTabs">
           <el-tab-pane label="Basic Information" name="form_first">
@@ -514,7 +512,7 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="formTop.formTopRespLeader" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option v-for="(activeUser, index) in activeRespLeaderList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -543,6 +541,36 @@
                 </el-table>
               </el-card>
             </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="Task Group" name="form_fourth">
+            <el-form-item>
+              <el-button size="medium" icon="el-icon-plus" @click="addNewTaskGroup">Create New Group</el-button>
+            </el-form-item>
+            <div class="tl-task-group-container">
+              <el-row v-for="(taskGroup, index) in taskGroups" :key="index" @click.native="getTaskByTaskGroup(index)">
+                <el-col :span="24">
+                  <div class="tl-task-group">
+                    <el-card class="box-card tl-task-group-card" shadow="hover">
+                      <div slot="header" class="clearfix">
+                        <el-row>
+                          <el-col :span="21">
+                            <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{taskGroup.group_name}} &nbsp;[{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}]</div>
+                          </el-col>
+                          <el-col :span="3">
+                            <el-button style="float: right; padding: 3px 0;" type="text" @click.stop="editTaskGroup(index)">Edit</el-button>
+                          </el-col>
+                        </el-row>
+                      </div>
+                      <div class="tl-task-group-card-body">
+                        <span style="font-size: 13px;color: #909399;">Level 2 - [{{taskGroup.group_lv2_task_count}}]</span>
+                        <span style="font-size: 13px;color: #909399; margin-left: 10px;">Level 3 - [{{taskGroup.group_lv3_task_count}}]</span>
+                        <span style="font-size: 13px;color: #909399; margin-left: 10px;">Level 4 - [{{taskGroup.group_lv4_task_count}}]</span>
+                      </div>
+                    </el-card>
+                  </div>
+                </el-col>
+              </el-row>
+            </div>
           </el-tab-pane>
         </el-tabs>
       </el-form>
@@ -588,7 +616,7 @@
           <el-input v-model="tgForm.formGroupName" style="width: 100%"></el-input>
         </el-form-item>
         <el-form-item label="Time Range">
-          <el-date-picker v-model="tgForm.formTimeRange" type="daterange"
+          <el-date-picker v-model="tgForm.formGroupTimeRange" type="daterange"
             start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width:100%">
           </el-date-picker>
         </el-form-item>
@@ -682,6 +710,7 @@ export default {
       taskTypeArray: [],
       taskTypeArrayForPMT: [],
       activeUserList: [],
+      activeRespLeaderList: [],
       showHistory: false,
       histories: [],
       worklogFormVisible: false,
@@ -754,16 +783,18 @@ export default {
       groupDrawerVisible: false,
       groupDrawerDirection: 'ltr',
       taskGroups: [],
+      taskGroupsAll: [],
       groupFormVisible: false,
       disabledGroupSubmit: false,
       tgForm: {
         formGroupId: null,
         formGroupName: '',
-        formTimeRange: null
+        formGroupTimeRange: null,
+        formGroupRelatedTask: null
       },
       reqTaskGroupId: null,
       reqTaskGroup: '',
-      showRefPool: true
+      showNonPoolCol: true
     }
   },
   methods: {
@@ -831,7 +862,7 @@ export default {
       this.$data.taskTypeDisabled = false
       this.$data.logWorklogDisabled = false
       this.$data.disabledSubmitBtn = false
-      this.$data.showRefPool = true
+      this.$data.showNonPoolCol = true
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
@@ -927,9 +958,9 @@ export default {
         sizeCriteria.reqFilterShowRefPool = reqFilterShowRefPool
         listCriteria.reqFilterShowRefPool = reqFilterShowRefPool
         if (this.$data.formFilter.formFilterShowRefPool) {
-          this.$data.showRefPool = false
+          this.$data.showNonPoolCol = false
         } else {
-          this.$data.showRefPool = true
+          this.$data.showNonPoolCol = true
         }
       }
       const res = await http.get('/tasks/getTotalTaskSize', sizeCriteria)
@@ -959,7 +990,6 @@ export default {
       this.resetTaskForm()
       this.getTaskType(0, null)
       this.getActiveUser()
-      this.getTaskGroup(0)
       var taskId = taskRow.task_id
       this.$data.showForHistory = true
       const res = await http.post('/tasks/getTaskById', {
@@ -1007,11 +1037,13 @@ export default {
           // Show Task for Level 2 ~ 4
           if (taskData.task_level === 2) {
             this.$data.showForLevel2Form = true
+            this.getTaskGroup(0, taskData.task_parenttaskname)
             this.$nextTick(() => {
               this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
               this.$data.logWorklogDisabled = true
             })
           } else {
+            this.getTaskGroupAll()
             this.$data.showForLevel2Form = false
           }
           this.$data.editTaskVisible = true
@@ -1058,7 +1090,7 @@ export default {
               this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
               this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
               this.$data.logWorklogDisabled = true
-              this.$data.showRefPool = false
+              this.$data.showNonPoolCol = false
             })
           }
           this.$data.form.formDesc = taskData.task_desc
@@ -1109,7 +1141,6 @@ export default {
       this.resetTaskForm()
       this.getTaskType(0, null)
       this.getActiveUser()
-      this.getTaskGroup(0)
       this.$data.showForHistory = true
       const res = await http.post('/tasks/getTaskByParentTask', {
         tParentTask: reqParentTask
@@ -1156,12 +1187,14 @@ export default {
           // Show Task for Level 2 ~ 4
           if (taskData.task_level === 2) {
             this.$data.showForLevel2Form = true
+            this.getTaskGroup(0, taskData.task_parenttaskname)
             this.$nextTick(() => {
               this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
               this.$data.logWorklogDisabled = true
             })
           } else {
             this.$data.showForLevel2Form = false
+            this.getTaskGroupAll()
           }
           this.$data.editTaskVisible = true
           var taskCreator = taskData.task_creator
@@ -1207,7 +1240,7 @@ export default {
               this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
               this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
               this.$data.logWorklogDisabled = true
-              this.$data.showRefPool = false
+              this.$data.showNonPoolCol = false
             })
           }
           this.$data.form.formDesc = taskData.task_desc
@@ -1274,6 +1307,9 @@ export default {
           this.$data.formTop.formTopSubTasks = []
         }
       }
+      if (tab.name === 'form_fourth') {
+        this.showTaskGroup()
+      }
     },
     async showWorklogHistory () {
       this.$data.histories = []
@@ -1329,7 +1365,7 @@ export default {
       var typeName = this.$data.taskTypeArray[typeIndex].type_name
       this.getTaskType(2, typeName)
       this.getActiveUser()
-      this.getTaskGroup(0)
+      this.getTaskGroup(0, parentTask)
       if (newTaskLevel === 2) {
         this.$data.showForLevel2Form = true
       } else {
@@ -1358,6 +1394,7 @@ export default {
       var taskReferenceDesc = this.$data.form.formReferenceDesc
       var taskType = this.$data.form.formType
       var taskGroup = this.$data.form.formGroup
+      var respLeader = this.$data.form.formRespLeader
       this.resetTaskForm()
       this.$data.taskDialogTitle = 'New Sub Task'
       if (newTaskLevel === 3) {
@@ -1377,13 +1414,14 @@ export default {
       this.$data.form.formType = taskType
       this.getTaskType(2, null)
       this.getActiveUser()
-      this.getTaskGroup(0)
+      this.getTaskGroupAll()
       if (newTaskLevel === 2) {
         this.$data.showForLevel2Form = true
       } else {
         this.$data.showForLevel2Form = false
       }
       this.$data.form.formGroup = taskGroup
+      this.$data.form.formRespLeader = respLeader
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
@@ -1556,30 +1594,34 @@ export default {
       this.getTaskList(1, 20)
     },
     showTaskGroup () {
-      this.getTaskGroup(0)
-      this.$data.groupDrawerVisible = true
+      this.$data.tgForm.formGroupRelatedTask = this.$data.formTop.formTopNumber
+      this.getTaskGroup(0, this.$data.tgForm.formGroupRelatedTask)
     },
     getTaskByTaskGroup (index) {
       var group = this.$data.taskGroups[index]
       this.$data.reqTaskGroupId = group.group_id
       this.$data.reqTaskGroup = group.group_name + ' [ ' + group.group_start_time + ' ~ ' + group.group_end_time + ']'
+      this.$data.requestListTaskLevel = '2'
+      this.$data.editTaskVisibleTop = false
       this.getTaskList(1, 20)
-      this.$data.groupDrawerVisible = false
     },
     editTaskGroup (index) {
       this.resetTaskGroupForm()
+      this.$data.tgForm.formGroupRelatedTask = this.$data.formTop.formTopNumber
       this.$data.groupFormVisible = true
       var group = this.$data.taskGroups[index]
-      this.getTaskGroup(group.group_id)
+      this.getTaskGroup(group.group_id, this.$data.tgForm.formGroupRelatedTask)
     },
     addNewTaskGroup () {
       this.resetTaskGroupForm()
+      this.$data.tgForm.formGroupRelatedTask = this.$data.formTop.formTopNumber
       this.$data.groupFormVisible = true
     },
     async submitTaskGroup () {
       var tGroupId = this.$data.tgForm.formGroupId
       var tGroupName = this.$data.tgForm.formGroupName
-      var tGroupTimeRange = this.$data.tgForm.formTimeRange
+      var tGroupTimeRange = this.$data.tgForm.formGroupTimeRange
+      var tGroupRelatedTask = this.$data.tgForm.formGroupRelatedTask
       if (tGroupName === '' || tGroupName === null) {
         this.showWarnMessage('Warning', 'Task Group Could not be empty!')
         return
@@ -1595,14 +1637,15 @@ export default {
         tGroupId: tGroupId,
         tGroupName: tGroupName,
         tGroupStartTime: tGroupStartTime,
-        tGroupEndTime: tGroupEndTime
+        tGroupEndTime: tGroupEndTime,
+        tGroupRelatedTask: tGroupRelatedTask
       })
       if (res.data.status === 0) {
         this.$message({
           message: 'Task group created/updated successfully!',
           type: 'success'
         })
-        this.getTaskGroup(0)
+        this.getTaskGroup(0, tGroupRelatedTask)
         this.$data.groupFormVisible = false
         this.$data.disabledGroupSubmit = false
       } else {
@@ -1612,7 +1655,8 @@ export default {
     resetTaskGroupForm () {
       this.$data.tgForm.formGroupId = 0
       this.$data.tgForm.formGroupName = ''
-      this.$data.tgForm.formTimeRange = null
+      this.$data.tgForm.formGroupTimeRange = null
+      this.$data.tgForm.formGroupRelatedTask = null
       this.$data.disabledGroupSubmit = false
     },
     logWorkDone () {
@@ -1789,11 +1833,18 @@ export default {
     },
     async getActiveUser () {
       this.$data.activeUserList = []
+      this.$data.activeRespLeaderList = []
       const res = await http.get('/users/getUserList', {
         IsActive: 1
       })
       if (res.data.status === 0) {
         this.$data.activeUserList = res.data.data
+        var userList = res.data.data
+        for (var i = 0; i < userList.length; i++) {
+          if (userList[i].user_level > 0 && userList[i].user_level <= 10) {
+            this.$data.activeRespLeaderList.push(userList[i])
+          }
+        }
       }
     },
     async queryTaskAsyncForReference (queryString, cb) {
@@ -1823,20 +1874,34 @@ export default {
       this.$data.form.formReference = null
       this.$data.form.formReferenceDesc = null
     },
-    async getTaskGroup (iGroupId) {
+    async getTaskGroup (iGroupId, iGroupRelatedTask) {
+      this.$data.taskGroups = []
+      this.$data.taskGroupsAll = []
       const res = await http.get('/tasks/getTaskGroup', {
-        tGroupId: iGroupId
+        tGroupId: iGroupId,
+        tGroupRelatedTask: iGroupRelatedTask
       })
       if (res.data.status === 0) {
         if (iGroupId === 0) {
           this.$data.taskGroups = res.data.data
+          this.$data.taskGroupsAll = res.data.data
         } else {
           this.$data.tgForm.formGroupId = res.data.data[0].group_id
           this.$data.tgForm.formGroupName = res.data.data[0].group_name
-          this.$data.tgForm.formTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
+          this.$data.tgForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
         }
       } else {
         this.$data.taskGroups = []
+        this.resetTaskGroup()
+      }
+    },
+    async getTaskGroupAll () {
+      this.$data.taskGroupsAll = []
+      const res = await http.get('/tasks/getTaskGroupAll')
+      if (res.data.status === 0) {
+        this.$data.taskGroupsAll = res.data.data
+      } else {
+        this.$data.taskGroupsAll = []
         this.resetTaskGroup()
       }
     },
@@ -2066,20 +2131,19 @@ export default {
 }
 /* Task Group Style */
 .tl-task-group {
-  width: 100%;
-  height: 100%;
-  padding-left: 10px;
-  padding-right: 10px;
+  height:50%;
   display: flex;
-  justify-content: flex-start;
   flex-direction: column;
 }
 .tl-task-group-card {
-  width: 100%;
   height: auto;
-  border-radius: 3%;
   margin-bottom: 10px;
   border: 2px solid #E4E7ED;
+}
+.tl-task-group-card-body {
+  height: auto;
+  display: flex;
+  flex-direction: row;
 }
 /*Common Style*/
 .bg-color {
@@ -2163,6 +2227,13 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  flex-direction: column;
+}
+.tl-task-group-container {
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
   flex-direction: column;
 }
 </style>
