@@ -131,13 +131,13 @@
               <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true" v-if="showForOthLevelTask" key="11"></el-table-column>
               <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="12"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task" key="13"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task == true ? false: (showForOthLevelTask == true ? (showNonPoolCol == true? true : false) : false)" key="13">
+              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="requestListTaskLevel == '3'? (showNonPoolCol == true? true : false) : false" key="14">
                 <template slot-scope="scope">
                    <el-button type="text" @click="editParentTask(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable" v-if="showForOthLevelTask" key="14"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation(hrs)" width="132px" align="center" v-if="showForOthLevelTask" key="15"></el-table-column>
+              <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable" v-if="showForOthLevelTask" key="15"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation(hrs)" width="132px" align="center" v-if="showForOthLevelTask" key="16"></el-table-column>
               <!--<el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="16"></el-table-column>-->
               <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="showForOthLevelTask" key="17"></el-table-column>
               <el-table-column prop="task_issue_date" label="Issue Date" width="180px" align="center" v-if="showForOthLevelTask" key="18"></el-table-column>
@@ -207,7 +207,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row>
+            <el-row v-show="showLevel3Col">
               <el-col :span="24">
                 <el-form-item label="Ref Pool" v-show="showNonPoolCol">
                   <el-col :span="5">
@@ -220,9 +220,9 @@
                     </el-autocomplete>
                   </el-col>
                   <el-col :span="19">
-                      <el-tooltip class="item" effect="dark" :content="form.formReferenceDesc" placement="top-start">
-                        <div class="tl-edit-form-div-desc">{{form.formReferenceDesc}}</div>
-                      </el-tooltip>
+                    <el-tooltip class="item" effect="dark" :content="form.formReferenceDesc" placement="top-start">
+                      <div class="tl-edit-form-div-desc">{{form.formReferenceDesc}}</div>
+                    </el-tooltip>
                   </el-col>
                 </el-form-item>
               </el-col>
@@ -409,7 +409,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Opportunity Name">
+            <el-form-item label="Opportunity Name" prop="formTopOppName">
               <el-input class="span-format-text" v-model="formTop.formTopOppName"></el-input>
             </el-form-item>
             <el-form-item label="BusinessValue">
@@ -417,7 +417,7 @@
             </el-form-item>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Customer">
+                <el-form-item label="Customer" prop="formTopCustomer">
                   <el-input v-model="formTop.formTopCustomer"></el-input>
                 </el-form-item>
               </el-col>
@@ -513,7 +513,7 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="formTop.formTopRespLeader" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeRespLeaderList" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option v-for="(activeUser, index) in activeRespLeaderListTop" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -724,6 +724,7 @@ export default {
       taskTypeArrayForPMT: [],
       activeUserList: [],
       activeRespLeaderList: [],
+      activeRespLeaderListTop: [],
       showHistory: false,
       histories: [],
       worklogFormVisible: false,
@@ -770,7 +771,9 @@ export default {
       },
       formTopRules: {
         formTopNumber: [{required: true, message: 'Please Input Task Number', trigger: 'blur'}],
-        formTopType: [{required: true, message: 'Please Select Task Type', trigger: 'blur'}]
+        formTopType: [{required: true, message: 'Please Select Task Type', trigger: 'blur'}],
+        formTopOppName: [{required: true, message: 'Please Input Opp Name', trigger: 'blur'}],
+        formTopCustomer: [{required: true, message: 'Please Input Customer', trigger: 'blur'}]
       },
       showForLevel1Task: false,
       showForLevel2Task: false,
@@ -808,6 +811,7 @@ export default {
       reqTaskGroupId: null,
       reqTaskGroup: '',
       showNonPoolCol: true,
+      showLevel3Col: true,
       removeTaskVisible: false,
       removeTaskId: 0,
       removeTaskName: '',
@@ -880,6 +884,7 @@ export default {
       this.$data.logWorklogDisabled = false
       this.$data.disabledSubmitBtn = false
       this.$data.showNonPoolCol = true
+      this.$data.showLevel3Col = true
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
@@ -1112,6 +1117,11 @@ export default {
               this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
             })
           }
+          if (Number(taskData.task_level) === 3) {
+            this.$data.showLevel3Col = true
+          } else {
+            this.$data.showLevel3Col = false
+          }
           this.$data.form.formId = taskData.task_id
           this.$data.form.formNumber = taskData.task_name
           switch (taskData.task_level) {
@@ -1261,6 +1271,11 @@ export default {
             this.$nextTick(() => {
               this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
             })
+          }
+          if (Number(taskData.task_level) === 3) {
+            this.$data.showLevel3Col = true
+          } else {
+            this.$data.showLevel3Col = false
           }
           this.$data.form.formId = taskData.task_id
           this.$data.form.formNumber = taskData.task_name
@@ -1415,7 +1430,7 @@ export default {
       } else {
         this.$data.showForLevel2Form = false
       }
-      // this.$data.disabledTab = true
+      this.$data.showLevel3Col = false
       this.$data.showForPmtTask = true
       this.$data.showForExternalTask = false
       this.$data.showForExistingTask = false
@@ -1443,9 +1458,11 @@ export default {
       this.$data.taskDialogTitle = 'New Sub Task'
       if (newTaskLevel === 3) {
         this.$data.taskDialogTitle = '3 - New Excutive Task'
+        this.$data.showLevel3Col = true
       }
       if (newTaskLevel === 4) {
         this.$data.taskDialogTitle = '4 - New Workable Task'
+        this.$data.showLevel3Col = false
       }
       this.$data.showTaskLevel = false
       this.$data.taskTypeDisabled = true
@@ -1577,7 +1594,15 @@ export default {
         reqFormTopStatus = 'Drafting'
       }
       var reqFormTopOppName = this.$data.formTop.formTopOppName
+      if (reqFormTopOppName === null || reqFormTopOppName === '') {
+        this.showWarnMessage('Warning', 'Please Input Opp Name')
+        return
+      }
       var reqFormTopCustomer = this.$data.formTop.formTopCustomer
+      if (reqFormTopCustomer === null || reqFormTopCustomer === '') {
+        this.showWarnMessage('Warning', 'Please Input Customer')
+        return
+      }
       var reqFormTopFacingClient = this.$data.formTop.formTopFacingClient
       var reqFormTopTypeOfWork = this.$data.formTop.formTopTypeOfWork
       var reqFormTopChanceWinning = this.$data.formTop.formTopChanceWinning
@@ -1878,6 +1903,7 @@ export default {
     async getActiveUser () {
       this.$data.activeUserList = []
       this.$data.activeRespLeaderList = []
+      this.$data.activeRespLeaderListTop = []
       const res = await http.get('/users/getUserList', {
         IsActive: 1
       })
@@ -1887,6 +1913,11 @@ export default {
         for (var i = 0; i < userList.length; i++) {
           if (userList[i].user_level > 0 && userList[i].user_level <= 10) {
             this.$data.activeRespLeaderList.push(userList[i])
+          }
+        }
+        for (var a = 0; a < userList.length; a++) {
+          if (userList[a].user_level > 0 && userList[a].user_level <= 8) {
+            this.$data.activeRespLeaderListTop.push(userList[a])
           }
         }
       }
@@ -1936,7 +1967,7 @@ export default {
         }
       } else {
         this.$data.taskGroups = []
-        this.resetTaskGroup()
+        this.resetTaskGroupForm()
       }
     },
     async getTaskGroupAll () {
@@ -1946,7 +1977,7 @@ export default {
         this.$data.taskGroupsAll = res.data.data
       } else {
         this.$data.taskGroupsAll = []
-        this.resetTaskGroup()
+        this.resetTaskGroupForm()
       }
     },
     // Common Function
