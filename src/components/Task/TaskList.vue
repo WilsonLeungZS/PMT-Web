@@ -672,22 +672,18 @@
       </span>
     </el-dialog>
     <!-- Plan Task -->
-    <el-dialog :title="planTaskTitle" :visible.sync="planTaskVisible" width="60%">
+    <el-dialog :title="planTaskTitle" :visible.sync="planTaskVisible" width="60%" :before-close="closePlanTask">
       <div class="tl-plan-task-container">
         <el-row>
           <el-col :span="24">
             <el-card class="box-card tl-plan-task-header">
-              <el-row>
-                <el-col :span="24">
-                  <span style="font-size: 17px; color: #303133">TaskGroup: {{planTaskGroup}}</span>
-                </el-col>
-              </el-row>
+              <span style="font-size: 17px; color: #303133">TaskGroup: {{planTaskGroup}}</span>
             </el-card>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-table :data="planTaskArray" style="width: 100%" max-height="500">
+            <el-table :data="planTaskArray" style="width: 100%" max-height="500" default-expand-all>
               <el-table-column type="expand">
                 <template slot-scope="props">
                   <el-row>
@@ -719,7 +715,7 @@
                 </template>
               </el-table-column>
               <el-table-column label="Description" prop="task_desc" show-overflow-tooltip></el-table-column>
-              <el-table-column label="Scope" prop="task_scope" width="150" align="center"></el-table-column>
+              <el-table-column label="Actual Effort" prop="task_currenteffort" width="150" align="center"></el-table-column>
               <el-table-column label="Estimation" prop="task_totaleffort" width="150" align="center"></el-table-column>
               <el-table-column label="Sub Tasks Estimation" prop="task_subtasks_totaleffort" width="170" align="center"></el-table-column>
               <el-table-column fixed="right" width="100">
@@ -732,8 +728,8 @@
         </el-row>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="text" size="small" @click="planTaskVisible = false">Cancel</el-button>
-        <el-button type="primary" size="small" @click="planTaskVisible = false">Done</el-button>
+        <el-button type="text" size="small" @click="planTaskVisible = false; planTaskName = ''; planTaskGroupId = null; planTaskFlag = false">Cancel</el-button>
+        <el-button type="primary" size="small" @click="planTaskVisible = false; planTaskName = ''; planTaskGroupId = null; planTaskFlag = false">Done</el-button>
       </span>
     </el-dialog>
   </div>
@@ -889,11 +885,12 @@ export default {
       removeTaskDesc: '',
       formErrorMsg: '',
       // plan task value
+      planTaskFlag: false,
       planTaskTitle: '',
       planTaskName: '',
       planTaskDesc: '',
       planTaskGroup: '',
-      planTaskGroupId: '',
+      planTaskGroupId: null,
       planTaskVisible: false,
       planTaskArray: []
     }
@@ -1104,7 +1101,7 @@ export default {
           message: 'Task remove successfully!',
           type: 'success'
         })
-        if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null) {
+        if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null && this.$data.planTaskFlag) {
           this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
         }
         this.resetRemoveTask()
@@ -1541,8 +1538,6 @@ export default {
       this.resetTaskForm()
       this.$data.taskDialogTitle = 'New Sub Task'
       if (newTaskLevel === 3) {
-        this.$data.planTaskName = ''
-        this.$data.planTaskGroupId = null
         this.$data.taskDialogTitle = '3 - New Excutive Task'
         this.$data.showLevel3Col = true
       }
@@ -1651,16 +1646,17 @@ export default {
           message: 'Task created successfully!',
           type: 'success'
         })
-        if (reqFormTaskLevel === 2 || reqFormTaskLevel === 3) {
-          if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null) {
-            this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
-          }
+        if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null && this.$data.planTaskFlag) {
+          this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
         }
       } else {
         this.$message({
           message: 'Task updated successfully!',
           type: 'success'
         })
+        if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null && this.$data.planTaskFlag) {
+          this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
+        }
       }
       this.$data.editTaskVisible = false
       this.resetTaskForm()
@@ -1823,6 +1819,9 @@ export default {
       this.$data.disabledGroupSubmit = false
     },
     async planTask (index, tGroupId, tTaskName, tTaskDesc) {
+      console.log('plan task start')
+      this.$data.editTaskVisibleTop = false
+      this.$data.planTaskFlag = true
       this.$data.planTaskVisible = true
       this.$data.planTaskTitle = 'Plan Task - ' + tTaskName
       this.$data.planTaskName = tTaskName
@@ -1831,7 +1830,8 @@ export default {
         this.$data.planTaskDesc = tTaskDesc
       }
       var group = null
-      if (index > 0) {
+      console.log(index)
+      if (index >= 0) {
         group = this.$data.taskGroups[index]
         this.$data.planTaskGroup = group.group_name + ' [ ' + group.group_start_time + ' ~ ' + group.group_end_time + ']'
       }
@@ -1882,6 +1882,13 @@ export default {
         this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
         this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
       })
+    },
+    closePlanTask (done) {
+      this.$data.planTaskName = ''
+      this.$data.planTaskGroupId = null
+      this.$data.planTaskFlag = false
+      console.log('Flag: ' + this.$data.planTaskFlag)
+      done()
     },
     logWorkDone () {
       this.$data.editTaskVisible = false
