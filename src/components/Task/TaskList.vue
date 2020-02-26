@@ -25,7 +25,7 @@
           <el-col :span="2">
             <div class="tl-bar-item">
               <el-button-group>
-                <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
+                <el-tooltip class="item" effect="dark" content="New Level 1 Task" placement="top-start">
                   <el-button :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn" @click="addNewTask"></el-button>
                 </el-tooltip>
                 <!--<el-popover placement="bottom" :value="visibleTaskFilter" trigger="click" title="Task Filter">
@@ -145,7 +145,7 @@
               <el-table-column fixed="right" label="Edit" width="120" align="center">
                 <template slot-scope="scope">
                   <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" @click="editTask(scope.row)" icon="el-icon-edit"></el-button>
-                  <el-button slot="reference" :style="{'border': 'none', 'color': 'white'}" @click="removeTaskVisible = true; removeTaskId = scope.row.task_id; removeTaskName = scope.row.task_name; if(scope.row.task_level == 1) {removeTaskDesc = scope.row.task_top_opp_name} else {removeTaskDesc = scope.row.task_desc}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                  <el-button :style="{'border': 'none', 'color': 'white'}" @click="removeTaskVisible = true; removeTaskId = scope.row.task_id; removeTaskName = scope.row.task_name; if(scope.row.task_level == 1) {removeTaskDesc = scope.row.task_top_opp_name} else {removeTaskDesc = scope.row.task_desc}" type="danger" size="small" icon="el-icon-delete"></el-button>
                   </template>
               </el-table-column>
             </el-table>
@@ -395,7 +395,7 @@
               <el-col :span="12">
                 <el-form-item label="Number" prop="formTopNumber">
                   <span v-show="showForExistingTask">{{formTop.formTopNumber}}</span>
-                  <el-input v-model="formTop.formTopNumber" v-show="showForNewTask"></el-input>
+                  <el-input v-model="formTop.formTopNumber" v-show="showForNewTask" :placeholder="formErrorMsg" class="validate-input"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -410,7 +410,7 @@
               </el-col>
             </el-row>
             <el-form-item label="Opportunity Name" prop="formTopOppName">
-              <el-input class="span-format-text" v-model="formTop.formTopOppName"></el-input>
+              <el-input class="span-format-text validate-input" v-model="formTop.formTopOppName" :placeholder="formErrorMsg"></el-input>
             </el-form-item>
             <el-form-item label="BusinessValue">
               <el-input type="textarea" v-model="formTop.formTopBusinessValue" :rows="4"></el-input>
@@ -418,7 +418,7 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Customer" prop="formTopCustomer">
-                  <el-input v-model="formTop.formTopCustomer"></el-input>
+                  <el-input v-model="formTop.formTopCustomer" :placeholder="formErrorMsg" class="validate-input"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -554,10 +554,13 @@
                     <el-card class="box-card tl-task-group-card" shadow="hover">
                       <div slot="header" class="clearfix">
                         <el-row>
-                          <el-col :span="21">
+                          <el-col :span="22">
                             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{taskGroup.group_name}} &nbsp;[{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}]</div>
                           </el-col>
-                          <el-col :span="3">
+                          <el-col :span="1">
+                            <el-button style="float: right; padding: 3px 0; text-decoration: underline" type="text" @click.stop="planTask(index, taskGroups[index].group_id, formTop.formTopNumber, formTop.formTopOppName)">Plan Task</el-button>
+                          </el-col>
+                          <el-col :span="1">
                             <el-button style="float: right; padding: 3px 0;" type="text" @click.stop="editTaskGroup(index)">Edit</el-button>
                           </el-col>
                         </el-row>
@@ -582,7 +585,7 @@
     </el-dialog>
     <!--End of Level 1 Task Form-->
     <!-- Task Gourp -->
-    <el-drawer title="Task Group" :visible.sync="groupDrawerVisible" :direction="groupDrawerDirection" size="16%">
+    <!--<el-drawer title="Task Group" :visible.sync="groupDrawerVisible" :direction="groupDrawerDirection" size="16%">
       <div class="tl-task-group">
         <el-divider></el-divider>
         <el-row :gutter="10" style="margin-bottom: 15px;">
@@ -596,10 +599,13 @@
         <el-card class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index" @click.native="getTaskByTaskGroup(index)">
           <div slot="header" class="clearfix">
             <el-row>
-              <el-col :span="21">
+              <el-col :span="20">
                 <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{taskGroup.group_name}}</div>
               </el-col>
-              <el-col :span="3">
+              <el-col :span="2">
+                <el-button style="float: right; padding: 3px 0;" type="text" @click.stop="planTask(index, )">Plan Task</el-button>
+              </el-col>
+              <el-col :span="2">
                 <el-button style="float: right; padding: 3px 0;" type="text" @click.stop="editTaskGroup(index)">Edit</el-button>
               </el-col>
             </el-row>
@@ -610,7 +616,7 @@
           <span style="font-size: 13px;color: #909399; margin-top: 5px;">Level 4 - [{{taskGroup.group_lv4_task_count}}]</span>
         </el-card>
       </div>
-    </el-drawer>
+    </el-drawer>-->
     <el-dialog title="Task Group" :visible.sync="groupFormVisible" width="35%" :close-on-click-modal="false" top="15%">
       <el-form :model="tgForm" label-width="100px" class="tl-edit-form">
         <el-form-item label="Group Name" >
@@ -663,6 +669,71 @@
       <span slot="footer" class="dialog-footer">
         <el-button type="text" size="small" @click="resetRemoveTask()">Cancel</el-button>
         <el-button type="danger" size="small" @click="removeTask()">Confirm</el-button>
+      </span>
+    </el-dialog>
+    <!-- Plan Task -->
+    <el-dialog :title="planTaskTitle" :visible.sync="planTaskVisible" width="60%">
+      <div class="tl-plan-task-container">
+        <el-row>
+          <el-col :span="24">
+            <el-card class="box-card tl-plan-task-header">
+              <el-row>
+                <el-col :span="24">
+                  <span style="font-size: 17px; color: #303133">TaskGroup: {{planTaskGroup}}</span>
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-table :data="planTaskArray" style="width: 100%" max-height="500">
+              <el-table-column type="expand">
+                <template slot-scope="props">
+                  <el-row>
+                    <el-col :span="22" :offset="1">
+                      <el-table :data="props.row.task_subtasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
+                        <el-table-column label="Id" prop="task_id" v-if="false" key="1"></el-table-column>
+                        <el-table-column type="index" :index="1" align="left" width="50"></el-table-column>
+                        <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
+                          <template slot-scope="scope">
+                            <el-button type="text" class="sub-tasks-name-btn" size="small" @click="editTask(scope.row)">{{scope.row.sub_task_name}}</el-button>
+                          </template>
+                        </el-table-column>
+                        <el-table-column label="Estimation" prop="sub_task_totaleffort" align="left" width="150"></el-table-column>
+                        <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>
+                        <el-table-column fixed="right" width="100">
+                          <template slot-scope="scope">
+                            <el-button :style="{'border': 'none', 'color': 'white'}" @click="removeTaskVisible = true; removeTaskId = scope.row.task_id; removeTaskName = scope.row.sub_task_name; removeTaskDesc = scope.row.sub_task_desc" type="danger" size="mini" icon="el-icon-delete"></el-button>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                    </el-col>
+                  </el-row>
+                </template>
+              </el-table-column>
+              <el-table-column label="Id" prop="task_id" v-if="false" key="1"></el-table-column>
+              <el-table-column label="Number" prop="task_name" width="150" key="2">
+                <template slot-scope="scope">
+                   <el-button type="text" @click="editTask(scope.row)">{{scope.row.task_name}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column label="Description" prop="task_desc" show-overflow-tooltip></el-table-column>
+              <el-table-column label="Scope" prop="task_scope" width="150" align="center"></el-table-column>
+              <el-table-column label="Estimation" prop="task_totaleffort" width="150" align="center"></el-table-column>
+              <el-table-column label="Sub Tasks Estimation" prop="task_subtasks_totaleffort" width="170" align="center"></el-table-column>
+              <el-table-column fixed="right" width="100">
+                <template slot-scope="scope">
+                  <el-button type="success" size="small" @click="addNewPlanSubTask(scope.row)">New Task</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="text" size="small" @click="planTaskVisible = false">Cancel</el-button>
+        <el-button type="primary" size="small" @click="planTaskVisible = false">Done</el-button>
       </span>
     </el-dialog>
   </div>
@@ -815,7 +886,16 @@ export default {
       removeTaskVisible: false,
       removeTaskId: 0,
       removeTaskName: '',
-      removeTaskDesc: ''
+      removeTaskDesc: '',
+      formErrorMsg: '',
+      // plan task value
+      planTaskTitle: '',
+      planTaskName: '',
+      planTaskDesc: '',
+      planTaskGroup: '',
+      planTaskGroupId: '',
+      planTaskVisible: false,
+      planTaskArray: []
     }
   },
   methods: {
@@ -885,6 +965,7 @@ export default {
       this.$data.disabledSubmitBtn = false
       this.$data.showNonPoolCol = true
       this.$data.showLevel3Col = true
+      this.$data.formErrorMsg = ''
       // Reset Worklog Form
       this.$data.wlForm.worklog_task_id = 0
       this.$data.wlForm.worklog_task = null
@@ -1023,6 +1104,9 @@ export default {
           message: 'Task remove successfully!',
           type: 'success'
         })
+        if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null) {
+          this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
+        }
         this.resetRemoveTask()
         this.getTaskList(1, 20)
       } else {
@@ -1457,6 +1541,8 @@ export default {
       this.resetTaskForm()
       this.$data.taskDialogTitle = 'New Sub Task'
       if (newTaskLevel === 3) {
+        this.$data.planTaskName = ''
+        this.$data.planTaskGroupId = null
         this.$data.taskDialogTitle = '3 - New Excutive Task'
         this.$data.showLevel3Col = true
       }
@@ -1565,6 +1651,11 @@ export default {
           message: 'Task created successfully!',
           type: 'success'
         })
+        if (reqFormTaskLevel === 3) {
+          if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null) {
+            this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
+          }
+        }
       } else {
         this.$message({
           message: 'Task updated successfully!',
@@ -1580,6 +1671,7 @@ export default {
     async submitTaskTop () {
       var reqFormTopName = this.$data.formTop.formTopNumber
       if (reqFormTopName === null || reqFormTopName === '') {
+        this.$data.formErrorMsg = 'Could not be empty'
         this.showWarnMessage('Warning', 'Please input task number')
         return
       }
@@ -1595,12 +1687,14 @@ export default {
       }
       var reqFormTopOppName = this.$data.formTop.formTopOppName
       if (reqFormTopOppName === null || reqFormTopOppName === '') {
-        this.showWarnMessage('Warning', 'Please Input Opp Name')
+        this.$data.formErrorMsg = 'Could not be empty'
+        this.showWarnMessage('Warning', 'Please input opp name')
         return
       }
       var reqFormTopCustomer = this.$data.formTop.formTopCustomer
       if (reqFormTopCustomer === null || reqFormTopCustomer === '') {
-        this.showWarnMessage('Warning', 'Please Input Customer')
+        this.$data.formErrorMsg = 'Could not be empty'
+        this.showWarnMessage('Warning', 'Please input customer')
         return
       }
       var reqFormTopFacingClient = this.$data.formTop.formTopFacingClient
@@ -1727,6 +1821,66 @@ export default {
       this.$data.tgForm.formGroupTimeRange = null
       this.$data.tgForm.formGroupRelatedTask = null
       this.$data.disabledGroupSubmit = false
+    },
+    async planTask (index, tGroupId, tTaskName, tTaskDesc) {
+      this.$data.planTaskVisible = true
+      this.$data.planTaskTitle = 'Plan Task - ' + tTaskName
+      this.$data.planTaskName = tTaskName
+      this.$data.planTaskGroupId = tGroupId
+      if (tTaskDesc !== '') {
+        this.$data.planTaskDesc = tTaskDesc
+      }
+      var group = null
+      if (index > 0) {
+        group = this.$data.taskGroups[index]
+        this.$data.planTaskGroup = group.group_name + ' [ ' + group.group_start_time + ' ~ ' + group.group_end_time + ']'
+      }
+      const res = await http.post('/tasks/getSubTaskByParentTaskAndGroup', {
+        tParentTaskName: tTaskName,
+        tGroupId: tGroupId
+      })
+      if (res.data.status === 0) {
+        this.$data.planTaskArray = []
+        this.$data.planTaskArray = res.data.data
+      } else {
+        this.$data.planTaskArray = []
+      }
+    },
+    addNewPlanSubTask (iTask) {
+      console.log(iTask)
+      var newTaskLevel = 3
+      var parentTask = iTask.task_name
+      var parentTaskDesc = iTask.task_desc
+      var taskType = iTask.task_type_id
+      console.log('TaskType: ' + taskType)
+      var taskGroup = iTask.task_group_id
+      var respLeader = iTask.task_resp_leader
+      this.resetTaskForm()
+      this.getTaskType(2, null)
+      this.getActiveUser()
+      this.getTaskGroupAll()
+      this.$data.taskDialogTitle = '3 - New Excutive Task'
+      this.$data.form.formParent = parentTask
+      this.$data.form.formParentDesc = parentTaskDesc
+      this.$data.form.formTaskLevel = newTaskLevel
+      this.$data.form.formIssueDate = new Date()
+      this.$data.form.formType = taskType
+      this.$data.form.formGroup = taskGroup
+      this.$data.form.formRespLeader = respLeader
+      this.$data.taskDisabledStaus = false
+      this.$data.showLevel3Col = true
+      this.$data.showTaskLevel = false
+      this.$data.taskTypeDisabled = true
+      this.$data.showForPmtTask = true
+      this.$data.showForExternalTask = false
+      this.$data.showForExistingTask = false
+      this.$data.showForNewTask = true
+      this.$data.showNumberInput = false
+      this.$data.editTaskVisible = true
+      this.$nextTick(() => {
+        this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
+        this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = 'none'
+      })
     },
     logWorkDone () {
       this.$data.editTaskVisible = false
@@ -1916,7 +2070,7 @@ export default {
           }
         }
         for (var a = 0; a < userList.length; a++) {
-          if (userList[a].user_level > 0 && userList[a].user_level <= 8) {
+          if (userList[a].user_level > 0 && userList[a].user_level <= 9) {
             this.$data.activeRespLeaderListTop.push(userList[a])
           }
         }
@@ -1950,14 +2104,14 @@ export default {
       this.$data.form.formReferenceDesc = null
     },
     async getTaskGroup (iGroupId, iGroupRelatedTask) {
-      this.$data.taskGroups = []
-      this.$data.taskGroupsAll = []
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
         tGroupRelatedTask: iGroupRelatedTask
       })
       if (res.data.status === 0) {
         if (iGroupId === 0) {
+          this.$data.taskGroups = []
+          this.$data.taskGroupsAll = []
           this.$data.taskGroups = res.data.data
           this.$data.taskGroupsAll = res.data.data
         } else {
@@ -1967,15 +2121,16 @@ export default {
         }
       } else {
         this.$data.taskGroups = []
+        this.$data.taskGroupsAll = []
         this.resetTaskGroupForm()
       }
     },
     async getTaskGroupAll () {
-      this.$data.taskGroupsAll = []
       const res = await http.get('/tasks/getTaskGroupAll')
       if (res.data.status === 0) {
         this.$data.taskGroupsAll = res.data.data
       } else {
+        this.$data.taskGroupsAll = []
         this.$data.taskGroupsAll = []
         this.resetTaskGroupForm()
       }
@@ -2233,6 +2388,14 @@ export default {
   flex-direction: column;
   font-size: 17px;
 }
+.tl-plan-task-container {
+  width: 100%;
+  height: auto;
+}
+.tl-plan-task-header {
+  width: 100%;
+  height: auto;
+}
 /*Common Style*/
 .bg-color {
   background-color: #7bed9f;
@@ -2260,6 +2423,18 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+::-webkit-input-placeholder { /* WebKit browsers */
+  color: red;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color: red;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+  color: red;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+  color: red;
 }
 </style>
 <style>
@@ -2323,5 +2498,19 @@ export default {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+}
+.el-form-item__error {
+  display: none;
+}
+.validate-input .el-input__inner::-webkit-input-placeholder {
+  font-weight: normal;
+  font-size: 13px;
+  color: red;
+}
+.el-table__expanded-cell {
+  padding: 10px 10px !important;
+}
+.tl-plan-task-header .el-card__body {
+  padding: 10px 10px;
 }
 </style>
