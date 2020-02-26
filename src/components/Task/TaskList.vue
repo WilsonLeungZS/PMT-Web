@@ -1651,7 +1651,7 @@ export default {
           message: 'Task created successfully!',
           type: 'success'
         })
-        if (reqFormTaskLevel === 3) {
+        if (reqFormTaskLevel === 2 || reqFormTaskLevel === 3) {
           if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null) {
             this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
           }
@@ -1854,7 +1854,8 @@ export default {
       var taskType = iTask.task_type_id
       console.log('TaskType: ' + taskType)
       var taskGroup = iTask.task_group_id
-      var respLeader = iTask.task_resp_leader
+      var respLeader = iTask.task_responsible_leader
+      console.log('Leader: ' + respLeader)
       this.resetTaskForm()
       this.getTaskType(2, null)
       this.getActiveUser()
