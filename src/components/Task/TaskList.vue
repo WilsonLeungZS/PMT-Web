@@ -382,7 +382,7 @@
       </span>
     </el-dialog>
     <!--------------------------------------------Only for Level 1 Task------------------------------------------------------------------>
-    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform abow_dialog" :before-close="closeFormTop">
+    <el-dialog :title="taskDialogTitleTop" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform abow_dialog" :before-close="closeFormTop">
       <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" :rules="formTopRules">
         <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick" ref="formTopTabs">
           <el-tab-pane label="Basic Information" name="form_first">
@@ -804,7 +804,8 @@ export default {
         worklog_effort: 0,
         worklog_remark: ''
       },
-      taskDialogTitle: 'Edit Task',
+      taskDialogTitle: '',
+      taskDialogTitleTop: '1 - Business Opportunity',
       taskDisabledStaus: true,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
@@ -929,7 +930,6 @@ export default {
       this.$data.disableCreateSubTask = false
       // this.$data.editTaskVisibleTop = false
       // this.$data.editTaskVisible = false
-      this.$data.taskDialogTitle = null
       this.$data.showForExistingTask = true
       this.$data.showForNewTask = false
       this.$data.activeFormTab = 'form_first'
@@ -990,7 +990,6 @@ export default {
       this.$data.disableCreateSubTask = false
       // this.$data.editTaskVisibleTop = false
       // this.$data.editTaskVisible = false
-      this.$data.taskDialogTitle = null
       this.$data.showForExistingTask = true
       this.$data.showForNewTask = false
       this.$data.activeFormTab = 'form_first'
@@ -1171,7 +1170,7 @@ export default {
         var taskData = res.data.data[0]
         var taskLevel = taskData.task_level
         switch (taskData.task_level) {
-          case 1: this.$data.taskDialogTitle = '1 - Business Opportunity'
+          case 1: this.$data.taskDialogTitleTop = '1 - Business Opportunity'
             break
           case 2: this.$data.taskDialogTitle = '2 - Business Implementation'
             break
@@ -1207,6 +1206,13 @@ export default {
           this.$data.formTop.formTopOppsProject = taskData.task_top_opps_project
         } else {
           // Show Task for Level 2 ~ 4
+          if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
+            this.$data.taskEstimationDisabled = true
+            this.$data.logWorklogDisabled = false
+          } else {
+            this.$data.taskEstimationDisabled = false
+            this.$data.logWorklogDisabled = true
+          }
           if (taskData.task_level === 2) {
             this.$data.showForLevel2Form = true
             this.getTaskGroup(0, taskData.task_parenttaskname)
@@ -1272,9 +1278,6 @@ export default {
           }
           this.$data.form.formDesc = taskData.task_desc
           this.$data.form.formStatus = taskData.task_status
-          if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
-            this.$data.taskEstimationDisabled = true
-          }
           this.$data.form.formEffort = taskData.task_currenteffort
           this.$data.form.formEstimation = taskData.task_totaleffort
           this.$data.form.formSubEstimation = taskData.task_subtasks_totaleffort
@@ -1325,7 +1328,7 @@ export default {
         var taskData = res.data.data[0]
         var taskLevel = taskData.task_level
         switch (taskData.task_level) {
-          case 1: this.$data.taskDialogTitle = '1 - Business Opportunity'
+          case 1: this.$data.taskDialogTitleTop = '1 - Business Opportunity'
             break
           case 2: this.$data.taskDialogTitle = '2 - Business Implementation'
             break
@@ -1361,6 +1364,13 @@ export default {
           this.$data.formTop.formTopOppsProject = taskData.task_top_opps_project
         } else {
           // Show Task for Level 2 ~ 4
+          if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
+            this.$data.taskEstimationDisabled = true
+            this.$data.logWorklogDisabled = false
+          } else {
+            this.$data.taskEstimationDisabled = false
+            this.$data.logWorklogDisabled = true
+          }
           if (taskData.task_level === 2) {
             this.$data.showForLevel2Form = true
             this.getTaskGroup(0, taskData.task_parenttaskname)
@@ -1426,9 +1436,6 @@ export default {
           }
           this.$data.form.formDesc = taskData.task_desc
           this.$data.form.formStatus = taskData.task_status
-          if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
-            this.$data.taskEstimationDisabled = true
-          }
           this.$data.form.formEffort = taskData.task_currenteffort
           this.$data.form.formEstimation = taskData.task_totaleffort
           this.$data.form.formSubEstimation = taskData.task_subtasks_totaleffort
@@ -1514,7 +1521,7 @@ export default {
       this.resetTaskFormTop()
       this.getTaskType(1, null)
       this.getActiveUser()
-      this.$data.taskDialogTitle = '1 - New Business Opportunity'
+      this.$data.taskDialogTitleTop = '1 - New Business Opportunity'
       this.$data.formTop.formTopIssueDate = new Date()
       this.$data.showForExistingTask = false
       this.$data.showForNewTask = true
@@ -2207,19 +2214,23 @@ export default {
     changeStatus (newValue) {
       if (newValue === 'Drafting' || newValue === 'Planning') {
         this.$data.taskEstimationDisabled = false
+        this.$data.logWorklogDisabled = true
       }
       if (newValue === 'Running' || newValue === 'Done') {
         this.$data.taskEstimationDisabled = true
+        this.$data.logWorklogDisabled = false
       }
     },
     closeForm (done) {
       this.resetTaskForm()
       this.$data.editTaskVisible = false
+      this.$data.taskDialogTitle = ''
       done()
     },
     closeFormTop (done) {
       this.resetTaskFormTop()
       this.$data.editTaskVisibleTop = false
+      this.$data.taskDialogTitleTop = ''
       done()
     },
     // Common Function
