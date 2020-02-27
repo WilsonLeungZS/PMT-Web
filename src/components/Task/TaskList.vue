@@ -759,7 +759,6 @@ export default {
       showForExistingTask: true,
       showPagination: true,
       showSortable: false,
-      showForHistory: true,
       showTaskLevel: false,
       form: {
         formId: 0,
@@ -1162,7 +1161,6 @@ export default {
       this.getActiveUser()
       console.log(taskRow)
       var taskId = taskRow.task_id
-      this.$data.showForHistory = true
       const res = await http.post('/tasks/getTaskById', {
         tId: taskId
       })
@@ -1185,6 +1183,7 @@ export default {
           this.$data.showForNewTask = false
           this.$data.showForExistingTask = true
           this.$data.editTaskVisibleTop = true
+          this.resetTaskFormTop()
           this.$data.formTop.formTopNumber = taskData.task_name
           this.$data.formTop.formTopOppName = taskData.task_top_opp_name
           this.$data.formTop.formTopCustomer = taskData.task_top_customer
@@ -1206,6 +1205,7 @@ export default {
           this.$data.formTop.formTopOppsProject = taskData.task_top_opps_project
         } else {
           // Show Task for Level 2 ~ 4
+          this.resetTaskForm()
           if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
             this.$data.taskEstimationDisabled = true
             this.$data.logWorklogDisabled = false
@@ -1320,7 +1320,6 @@ export default {
       }
       this.getTaskType(0, null)
       this.getActiveUser()
-      this.$data.showForHistory = true
       const res = await http.post('/tasks/getTaskByParentTask', {
         tParentTask: reqParentTask
       })
@@ -1339,6 +1338,7 @@ export default {
           default: this.$data.taskDialogTitle = 'Edit Task'
         }
         if (taskLevel === 1) {
+          this.resetTaskFormTop()
           // Show Task for Level 1
           this.$data.showForNewTask = false
           this.$data.showForExistingTask = true
@@ -1363,6 +1363,7 @@ export default {
           this.$data.formTop.formTopSkill = taskData.task_top_skill
           this.$data.formTop.formTopOppsProject = taskData.task_top_opps_project
         } else {
+          this.resetTaskForm()
           // Show Task for Level 2 ~ 4
           if (taskData.task_status === 'Running' || taskData.task_status === 'Done') {
             this.$data.taskEstimationDisabled = true
