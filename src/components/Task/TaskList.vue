@@ -60,11 +60,11 @@
               </el-button-group>
             </div>
           </el-col>
-          <el-col :span="13">
+          <!--<el-col :span="13">
               <div class="tl-bar-item" style="font-size: 20px">
                 Task Group: {{reqTaskGroup}}
               </div>
-          </el-col>
+          </el-col>-->
         </el-row>
         <el-row>
           <el-col :span="24">
@@ -166,7 +166,7 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
+    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform" :before-close="closeForm">
       <el-form ref="form" :model="form" label-width="180px" class="tl-edit-form" :rules="formRules">
         <el-tabs v-model="activeFormTab" type="card" @tab-click="handleFormClick" ref="formTabs">
           <el-tab-pane label="Basic Information" name="form_first">
@@ -240,15 +240,15 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Description">
-              <el-input class="span-format-text" type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus"></el-input>
+            <el-form-item label="Description" prop="formDesc">
+              <el-input class="span-format-text validate-input" type="textarea" v-model="form.formDesc" :rows="4" :disabled="taskDisabledStaus" :placeholder="formErrorMsg"></el-input>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="Status Tracing" name="form_fourth">
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Task Status" v-show="showForPmtTask">
-                  <el-select v-model="form.formStatus" style="width: 100%">
+                  <el-select v-model="form.formStatus" style="width: 100%" @change="changeStatus">
                     <el-option label="Drafting" value="Drafting"></el-option>
                     <el-option label="Planning" value="Planning"></el-option>
                     <el-option label="Running" value="Running"></el-option>
@@ -376,13 +376,13 @@
         </el-form-item>-->
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>
+        <!--<el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>-->
         <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium" @click="logWorkDone" v-show="showForExistingTask" v-if="!logWorklogDisabled">Log Work Done</el-button>
-        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTask">Submit</el-button>
+        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTask">Save</el-button>
       </span>
     </el-dialog>
     <!--------------------------------------------Only for Level 1 Task------------------------------------------------------------------>
-    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform abow_dialog">
+    <el-dialog :title="taskDialogTitle" :visible.sync="editTaskVisibleTop" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform abow_dialog" :before-close="closeFormTop">
       <el-form ref="form" :model="formTop" label-width="150px" class="tl-edit-form" :rules="formTopRules">
         <el-tabs v-model="activeFormTopTab" type="card" @tab-click="handleFormTopClick" ref="formTopTabs">
           <el-tab-pane label="Basic Information" name="form_first">
@@ -548,7 +548,8 @@
               <el-button size="medium" icon="el-icon-plus" @click="addNewTaskGroup">Create New Group</el-button>
             </el-form-item>
             <div class="tl-task-group-container">
-              <el-row v-for="(taskGroup, index) in taskGroups" :key="index" @click.native="getTaskByTaskGroup(index)">
+              <!--<el-row v-for="(taskGroup, index) in taskGroups" :key="index" @click.native="getTaskByTaskGroup(index)">-->
+              <el-row v-for="(taskGroup, index) in taskGroups" :key="index">
                 <el-col :span="24">
                   <div class="tl-task-group">
                     <el-card class="box-card tl-task-group-card" shadow="hover">
@@ -579,8 +580,8 @@
         </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="editTaskVisibleTop = false">Cancel</el-button>
-        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTaskTop" :disabled="disabledSubmitBtn">Submit</el-button>
+        <!--<el-button size="medium" @click="editTaskVisibleTop = false">Cancel</el-button>-->
+        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTaskTop" :disabled="disabledSubmitBtn">Save</el-button>
       </span>
     </el-dialog>
     <!--End of Level 1 Task Form-->
@@ -716,8 +717,8 @@
               </el-table-column>
               <el-table-column label="Description" prop="task_desc" show-overflow-tooltip></el-table-column>
               <el-table-column label="Actual Effort" prop="task_currenteffort" width="150" align="center"></el-table-column>
-              <el-table-column label="Estimation" prop="task_totaleffort" width="150" align="center"></el-table-column>
-              <el-table-column label="Sub Tasks Estimation" prop="task_subtasks_totaleffort" width="170" align="center"></el-table-column>
+              <el-table-column label="Est" prop="task_totaleffort" width="150" align="center"></el-table-column>
+              <el-table-column label="Sub Tasks Est" prop="task_subtasks_totaleffort" width="170" align="center"></el-table-column>
               <el-table-column fixed="right" width="100">
                 <template slot-scope="scope">
                   <el-button type="success" size="small" @click="addNewPlanSubTask(scope.row)">New Task</el-button>
@@ -728,7 +729,7 @@
         </el-row>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="text" size="small" @click="planTaskVisible = false; planTaskName = ''; planTaskGroupId = null; planTaskFlag = false">Cancel</el-button>
+        <!--<el-button type="text" size="small" @click="planTaskVisible = false; planTaskName = ''; planTaskGroupId = null; planTaskFlag = false">Cancel</el-button>-->
         <el-button type="primary" size="small" @click="planTaskVisible = false; planTaskName = ''; planTaskGroupId = null; planTaskFlag = false">Done</el-button>
       </span>
     </el-dialog>
@@ -785,7 +786,8 @@ export default {
         formSubTasks: []
       },
       formRules: {
-        formType: [{required: true, message: 'Please Select Task Type', trigger: 'blur'}]
+        formType: [{required: true, message: 'Please Select Task Type', trigger: 'blur'}],
+        formDesc: [{required: true, message: 'Please Input Description', trigger: 'blur'}]
       },
       taskTypeArray: [],
       taskTypeArrayForPMT: [],
@@ -920,6 +922,46 @@ export default {
       this.$data.form.formRespLeader = null
       this.$data.form.formAssignee = null
       this.$data.form.formSubTasks = []
+      // Reset related item
+      this.$data.showHistory = false
+      this.$data.showNumberInput = true
+      this.$data.disableLeader = false
+      this.$data.disableCreateSubTask = false
+      // this.$data.editTaskVisibleTop = false
+      // this.$data.editTaskVisible = false
+      this.$data.taskDialogTitle = null
+      this.$data.showForExistingTask = true
+      this.$data.showForNewTask = false
+      this.$data.activeFormTab = 'form_first'
+      this.$data.activeFormTopTab = 'form_first'
+      this.$data.disabledTab = false
+      this.$data.showForLevel2Form = false
+      this.$data.taskEstimationDisabled = false
+      this.$data.showTaskLevel = false
+      this.$data.taskTypeDisabled = false
+      this.$data.logWorklogDisabled = false
+      this.$data.disabledSubmitBtn = false
+      this.$data.showNonPoolCol = true
+      this.$data.showLevel3Col = true
+      this.$data.formErrorMsg = ''
+      // Reset Worklog Form
+      this.$data.wlForm.worklog_task_id = 0
+      this.$data.wlForm.worklog_task = null
+      this.$data.wlForm.worklog_date = this.getCurrentDate()
+      this.$data.wlForm.worklog_effort = 0
+      this.$data.wlForm.worklog_remark = null
+      // Reset tab panel
+      this.$nextTick(() => {
+        if (this.$refs.formTopTabs !== undefined) {
+          this.$refs.formTopTabs.$children[0].$refs.tabs[2].style.display = ''
+        }
+        if (this.$refs.formTabs !== undefined) {
+          this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = ''
+          this.$refs.formTabs.$children[0].$refs.tabs[3].style.display = ''
+        }
+      })
+    },
+    resetTaskFormTop () {
       // Reset Level 1(Top) Task Form
       this.$data.formTop.formTopNumber = null
       this.$data.formTop.formTopOppName = null
@@ -946,8 +988,8 @@ export default {
       this.$data.showNumberInput = true
       this.$data.disableLeader = false
       this.$data.disableCreateSubTask = false
-      this.$data.editTaskVisibleTop = false
-      this.$data.editTaskVisible = false
+      // this.$data.editTaskVisibleTop = false
+      // this.$data.editTaskVisible = false
       this.$data.taskDialogTitle = null
       this.$data.showForExistingTask = true
       this.$data.showForNewTask = false
@@ -1117,9 +1159,9 @@ export default {
       this.$data.removeTaskVisible = false
     },
     async editTask (taskRow) {
-      this.resetTaskForm()
       this.getTaskType(0, null)
       this.getActiveUser()
+      console.log(taskRow)
       var taskId = taskRow.task_id
       this.$data.showForHistory = true
       const res = await http.post('/tasks/getTaskById', {
@@ -1273,7 +1315,6 @@ export default {
       } else {
         reqParentTask = this.$data.form.formParent
       }
-      this.resetTaskForm()
       this.getTaskType(0, null)
       this.getActiveUser()
       this.$data.showForHistory = true
@@ -1468,7 +1509,9 @@ export default {
         this.showWarnMessage('Warning', 'No right to create Level 1 task!')
         return
       }
-      this.resetTaskForm()
+      this.$data.editTaskVisibleTop = false
+      this.$data.editTaskVisible = false
+      this.resetTaskFormTop()
       this.getTaskType(1, null)
       this.getActiveUser()
       this.$data.taskDialogTitle = '1 - New Business Opportunity'
@@ -1494,6 +1537,8 @@ export default {
       var parentTask = this.$data.formTop.formTopNumber
       var parentTaskDesc = this.$data.formTop.formTopOppName
       var taskType = this.$data.formTop.formTopType
+      // this.$data.editTaskVisibleTop = false
+      this.$data.editTaskVisible = false
       this.resetTaskForm()
       this.$data.taskDialogTitle = '2 - New Business Implementation'
       this.$data.showTaskLevel = false
@@ -1535,6 +1580,8 @@ export default {
       var taskType = this.$data.form.formType
       var taskGroup = this.$data.form.formGroup
       var respLeader = this.$data.form.formRespLeader
+      this.$data.editTaskVisibleTop = false
+      this.$data.editTaskVisible = false
       this.resetTaskForm()
       this.$data.taskDialogTitle = 'New Sub Task'
       if (newTaskLevel === 3) {
@@ -1586,6 +1633,11 @@ export default {
         return
       }
       var reqFormDesc = this.$data.form.formDesc
+      if (reqFormDesc === null || reqFormDesc === '') {
+        this.$data.formErrorMsg = 'Could not be empty'
+        this.showWarnMessage('Warning', 'Please input description')
+        return
+      }
       var reqFormStatus = this.$data.form.formStatus
       if (reqFormStatus === null || reqFormStatus === '') {
         // this.showWarnMessage('Warning', 'Please select task status')
@@ -1622,6 +1674,7 @@ export default {
       var reqFormScope = this.$data.form.formScope
       var reqFormGroup = this.$data.form.formGroup
       this.$data.disabledSubmitBtn = true
+      var resObject = {}
       const res = await http.post('/tasks/addOrUpdateTask', {
         tParent: reqFormParent,
         tName: reqFormName,
@@ -1646,6 +1699,8 @@ export default {
           message: 'Task created successfully!',
           type: 'success'
         })
+        resObject.task_id = res.data.data.Id
+        this.editTask(resObject)
         if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null && this.$data.planTaskFlag) {
           this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
         }
@@ -1654,12 +1709,14 @@ export default {
           message: 'Task updated successfully!',
           type: 'success'
         })
+        resObject.task_id = res.data.data.Id
+        this.editTask(resObject)
         if (this.$data.planTaskName !== '' && this.$data.planTaskGroupId !== null && this.$data.planTaskFlag) {
           this.planTask(-1, this.$data.planTaskGroupId, this.$data.planTaskName, '')
         }
       }
-      this.$data.editTaskVisible = false
-      this.resetTaskForm()
+      // this.$data.editTaskVisible = false
+      // this.resetTaskForm()
       this.$data.pageSize = 20
       this.$data.currentPage = 1
       this.getTaskList(1, 20)
@@ -1712,6 +1769,7 @@ export default {
         return
       }
       this.$data.disabledSubmitBtn = true
+      var resObject = {}
       const res = await http.post('/tasks/addOrUpdateTaskTop', {
         tTopName: reqFormTopName,
         tTopLevel: reqFormTopTaskLevel,
@@ -1740,14 +1798,18 @@ export default {
           message: 'Task created successfully!',
           type: 'success'
         })
+        resObject.task_id = res.data.data.Id
+        this.editTask(resObject)
       } else {
         this.$message({
           message: 'Task updated successfully!',
           type: 'success'
         })
+        resObject.task_id = res.data.data.Id
+        this.editTask(resObject)
       }
-      this.$data.editTaskVisibleTop = false
-      this.resetTaskForm()
+      // this.$data.editTaskVisibleTop = false
+      // this.resetTaskForm()
       this.$data.pageSize = 20
       this.$data.currentPage = 1
       this.getTaskList(1, 20)
@@ -1820,7 +1882,7 @@ export default {
     },
     async planTask (index, tGroupId, tTaskName, tTaskDesc) {
       console.log('plan task start')
-      this.$data.editTaskVisibleTop = false
+      // this.$data.editTaskVisibleTop = false
       this.$data.planTaskFlag = true
       this.$data.planTaskVisible = true
       this.$data.planTaskTitle = 'Plan Task - ' + tTaskName
@@ -1935,7 +1997,6 @@ export default {
           message: 'Worklog added successfully!',
           type: 'success'
         })
-        this.resetTaskForm()
         this.$data.pageSize = 20
         this.$data.currentPage = 1
         this.getTaskList(1, 20)
@@ -2142,6 +2203,24 @@ export default {
         this.$data.taskGroupsAll = []
         this.resetTaskGroupForm()
       }
+    },
+    changeStatus (newValue) {
+      if (newValue === 'Drafting' || newValue === 'Planning') {
+        this.$data.taskEstimationDisabled = false
+      }
+      if (newValue === 'Running' || newValue === 'Done') {
+        this.$data.taskEstimationDisabled = true
+      }
+    },
+    closeForm (done) {
+      this.resetTaskForm()
+      this.$data.editTaskVisible = false
+      done()
+    },
+    closeFormTop (done) {
+      this.resetTaskFormTop()
+      this.$data.editTaskVisibleTop = false
+      done()
     },
     // Common Function
     showWarnMessage (iTitle, iMsg) {
@@ -2511,6 +2590,11 @@ export default {
   display: none;
 }
 .validate-input .el-input__inner::-webkit-input-placeholder {
+  font-weight: normal;
+  font-size: 13px;
+  color: red;
+}
+.validate-input .el-textarea__inner::-webkit-input-placeholder {
   font-weight: normal;
   font-size: 13px;
   color: red;
