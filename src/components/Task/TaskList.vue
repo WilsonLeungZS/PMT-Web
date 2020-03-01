@@ -1289,6 +1289,8 @@ export default {
           this.$data.form.formParentDesc = taskData.task_parenttaskdesc
           this.$data.form.formType = taskData.task_type_id
           var typeIndex = this.getIndexOfValueInArr(this.$data.taskTypeArray, 'type_id', taskData.task_type_id)
+          console.log('Debug type name')
+          console.log(this.$data.taskTypeArray[typeIndex])
           if (this.$data.taskTypeArray[typeIndex].type_name === 'Pool') {
             this.$nextTick(() => {
               this.$refs.formTabs.$children[0].$refs.tabs[2].style.display = 'none'
@@ -1327,7 +1329,12 @@ export default {
             this.$data.form.formSubTasks = []
           }
           if (this.$data.form.formSubTasks.length > 0) {
-            this.$data.taskEstimationDisabled = true
+            if (Number(taskData.task_level) === 2) {
+              this.$data.taskEstimationDisabled = false
+            }
+            if (Number(taskData.task_level) === 3 || Number(taskData.task_level) === 4) {
+              this.$data.taskEstimationDisabled = true
+            }
             this.$data.logWorklogDisabled = true
           }
         }
@@ -1524,7 +1531,12 @@ export default {
             this.$data.form.formSubTasks = []
           }
           if (this.$data.form.formSubTasks.length > 0) {
-            this.$data.taskEstimationDisabled = true
+            if (Number(taskData.task_level) === 2) {
+              this.$data.taskEstimationDisabled = false
+            }
+            if (Number(taskData.task_level) === 3 || Number(taskData.task_level) === 4) {
+              this.$data.taskEstimationDisabled = true
+            }
             this.$data.logWorklogDisabled = true
           }
         }
