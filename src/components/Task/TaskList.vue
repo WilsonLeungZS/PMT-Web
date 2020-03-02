@@ -1166,7 +1166,7 @@ export default {
             break
           case 2: this.$data.taskDialogTitle = '2 - Business Implementation'
             break
-          case 3: this.$data.taskDialogTitle = '3 - Excutive Task'
+          case 3: this.$data.taskDialogTitle = '3 - Executive Task'
             break
           case 4: this.$data.taskDialogTitle = '4 - Workable Task'
             break
@@ -1364,7 +1364,7 @@ export default {
             break
           case 2: this.$data.taskDialogTitle = '2 - Business Implementation'
             break
-          case 3: this.$data.taskDialogTitle = '3 - Excutive Task'
+          case 3: this.$data.taskDialogTitle = '3 - Executive Task'
             break
           case 4: this.$data.taskDialogTitle = '4 - Workable Task'
             break
@@ -1671,7 +1671,7 @@ export default {
       this.resetTaskForm()
       this.$data.taskDialogTitle = 'New Sub Task'
       if (newTaskLevel === 3) {
-        this.$data.taskDialogTitle = '3 - New Excutive Task'
+        this.$data.taskDialogTitle = '3 - New Executive Task'
         this.$data.showLevel3Col = true
       }
       if (newTaskLevel === 4) {
@@ -2084,7 +2084,7 @@ export default {
       this.$data.statusPlanning = true
       this.$data.statusRunning = true
       this.$data.statusDone = true
-      this.$data.taskDialogTitle = '3 - New Excutive Task'
+      this.$data.taskDialogTitle = '3 - New Executive Task'
       this.$data.form.formParent = parentTask
       this.$data.form.formParentDesc = parentTaskDesc
       this.$data.form.formTaskLevel = newTaskLevel
