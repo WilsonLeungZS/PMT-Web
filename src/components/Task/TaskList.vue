@@ -378,7 +378,7 @@
       <span slot="footer" class="dialog-footer">
         <!--<el-button size="medium" @click="editTaskVisible = false">Cancel</el-button>-->
         <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium" @click="logWorkDone" v-show="showForExistingTask" v-if="!logWorklogDisabled">Log Work Done</el-button>
-        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTask">Save</el-button>
+        <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium" @click="submitTask" :disabled="disabledSubmitBtn">Save</el-button>
       </span>
     </el-dialog>
     <!--------------------------------------------Only for Level 1 Task------------------------------------------------------------------>
@@ -1820,6 +1820,7 @@ export default {
       }
       // this.$data.editTaskVisible = false
       // this.resetTaskForm()
+      this.$data.disabledSubmitBtn = false
       this.$data.pageSize = 20
       this.$data.currentPage = 1
       this.getTaskList(1, 20)
@@ -1913,6 +1914,7 @@ export default {
       }
       // this.$data.editTaskVisibleTop = false
       // this.resetTaskForm()
+      this.$data.disabledSubmitBtn = false
       this.$data.pageSize = 20
       this.$data.currentPage = 1
       this.getTaskList(1, 20)
