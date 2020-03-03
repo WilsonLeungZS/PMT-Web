@@ -116,29 +116,29 @@
                    <el-button type="text" @click="editParentTask(scope.row.task_parenttaskname)">{{scope.row.task_parenttaskname}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_name" label="Number" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showCommonColumn" key="3">
+              <el-table-column prop="task_name" label="Number" width="150px" show-overflow-tooltip :sortable="showSortable" v-if="showCommonColumn" key="3">
                 <template slot-scope="scope">
                    <el-button type="text" @click="editTask(scope.row)">{{scope.row.task_name}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_top_opp_name" label="Opportunity Name" align="center" v-if="showForLevel1Task" key="4"></el-table-column>
+              <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip min-width="250px" align="center" v-if="showForLevel1Task" key="4"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" align="center" width="180px" v-if="showForLevel1Task" key="5"></el-table-column>
               <el-table-column prop="task_top_type_of_work" label="Type Of Work" align="center" width="180px" v-if="showForLevel1Task" key="6"></el-table-column>
-              <el-table-column prop="task_top_team_sizing" label="Team Sizing" align="center" v-if="showForLevel1Task" key="7"></el-table-column>
+              <el-table-column prop="task_top_team_sizing" label="Team Sizing" align="center" min-width="180px" v-if="showForLevel1Task" key="7"></el-table-column>
               <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" align="center" width="180px" v-if="showForLevel1Task" key="8"></el-table-column>
               <el-table-column prop="task_top_target_start" label="Target Start Time" width="150px" align="center" v-if="showForLevel1Task" key="9"></el-table-column>
-              <!--<el-table-column prop="task_type" label="Type" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="10"></el-table-column>-->
-              <el-table-column prop="task_desc" label="Description"  :show-overflow-tooltip="true" v-if="showForOthLevelTask" key="11"></el-table-column>
-              <el-table-column prop="task_status" label="Status" width="233px" align="center" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="12"></el-table-column>
-              <el-table-column prop="task_scope" label="Scope(Baseline)" width="150px" :show-overflow-tooltip="true" v-if="showForLevel2Task" key="13"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" :show-overflow-tooltip="true" v-if="requestListTaskLevel == '3'? (showNonPoolCol == true? true : false) : false" key="14">
+              <!--<el-table-column prop="task_type" label="Type" width="150px" show-overflow-tooltip :sortable="showSortable" v-if="showForOthLevelTask" key="10"></el-table-column>-->
+              <el-table-column prop="task_desc" label="Description" show-overflow-tooltip min-width="250px" v-if="showForOthLevelTask" key="11"></el-table-column>
+              <el-table-column prop="task_status" label="Status" width="233px" align="center" show-overflow-tooltip :sortable="showSortable" v-if="showForOthLevelTask" key="12"></el-table-column>
+              <el-table-column prop="task_scope" label="Scope(Baseline)" width="150px" show-overflow-tooltip v-if="showForLevel2Task" key="13"></el-table-column>
+              <el-table-column prop="task_reference" label="Ref Pool" width="150px" show-overflow-tooltip v-if="requestListTaskLevel == '3'? (showNonPoolCol == true? true : false) : false" key="14">
                 <template slot-scope="scope">
                    <el-button type="text" @click="editParentTask(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                 </template>
               </el-table-column>
               <el-table-column prop="task_effort" label="Effort(hrs)" width="123px" align="center" :sortable="showSortable" v-if="showForOthLevelTask" key="15"></el-table-column>
               <el-table-column prop="task_estimation" label="Estimation(hrs)" width="132px" align="center" v-if="showForOthLevelTask" key="16"></el-table-column>
-              <!--<el-table-column prop="task_created" label="Created Time" align="center" width="150px" :show-overflow-tooltip="true" :sortable="showSortable" v-if="showForOthLevelTask" key="16"></el-table-column>-->
+              <!--<el-table-column prop="task_created" label="Created Time" align="center" width="150px" show-overflow-tooltip :sortable="showSortable" v-if="showForOthLevelTask" key="16"></el-table-column>-->
               <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="showForOthLevelTask" key="17"></el-table-column>
               <el-table-column prop="task_issue_date" label="Issue Date" width="180px" align="center" v-if="showForOthLevelTask" key="18"></el-table-column>
               <el-table-column prop="task_target_complete" label="Target Completion Date" width="190px" align="center" v-if="showForOthLevelTask" key="19"></el-table-column>
@@ -345,7 +345,7 @@
                 <el-table :data="form.formSubTasks" fit max-height="300" class="sub-task-table">
                   <el-table-column prop="task_id" v-if="false"></el-table-column>
                   <el-table-column type="index" :index="modifyIndex" width="60"></el-table-column>
-                  <el-table-column :show-overflow-tooltip="true">
+                  <el-table-column show-overflow-tooltip>
                     <template slot-scope="scope">
                       <el-row style="cursor: pointer;" :gutter="10"  @click.native="editTask(scope.row)">
                         <el-col :span="23" class="single-line">
@@ -528,7 +528,7 @@
                 <el-table :data="formTop.formTopSubTasks" fit max-height="300" class="sub-task-table">
                   <el-table-column prop="task_id" v-if="false"></el-table-column>
                   <el-table-column type="index" :index="modifyIndex" width="60"></el-table-column>
-                  <el-table-column :show-overflow-tooltip="true">
+                  <el-table-column show-overflow-tooltip>
                     <template slot-scope="scope">
                       <el-row style="cursor: pointer;" :gutter="10"  @click.native="editTask(scope.row)">
                         <el-col :span="23" class="single-line">
