@@ -21,29 +21,12 @@
               </el-input>
             </div>
           </el-col>
-          <el-col :span="2">
-            <div class="tl-bar-item">
-              <el-button-group>
-                <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
-                  <el-button @click="createNewTask(formFilter.filterTaskLevel)" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn"></el-button>
-                </el-tooltip>
-              </el-button-group>
-            </div>
-          </el-col>
         </el-row>
 <!------- 2. End of Search Bar -->
 <!------- 3. Filter Criteria -->
         <el-row>
           <el-col :span="24">
             <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="85px" label-position="left">
-              <el-form-item label="Task Level">
-                <el-radio-group v-model="formFilter.filterTaskLevel" @change="formFilter.filterShowRefPool = false; filterTask()" size="small">
-                  <el-radio-button label="1"></el-radio-button>
-                  <el-radio-button label="2"></el-radio-button>
-                  <el-radio-button label="3"></el-radio-button>
-                  <el-radio-button label="4"></el-radio-button>
-                </el-radio-group>
-              </el-form-item>
               <el-form-item label="Assign To">
                 <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
                   <el-option label="" value=""></el-option>
@@ -59,244 +42,72 @@
                   <el-option label="Done" value="Done"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="Issue Date">
-                <el-date-picker v-model="formFilter.filterIssueDateRange" type="daterange"
-                  start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd" size="small" style="width:auto">
-                </el-date-picker>
-              </el-form-item>
-              <el-form-item>
-                <el-checkbox v-model="formFilter.filterShowRefPool" v-if="formFilter.filterTaskLevel == 3">Show Reference Pool</el-checkbox>
-              </el-form-item>
               <el-form-item>
                 <el-button type="primary" size="mini" @click="filterTask">Filter</el-button>
               </el-form-item>
             </el-form>
           </el-col>
         </el-row>
-        <el-divider></el-divider>
 <!------- 3. End of Filter Criteria -->
 <!------- 4. Task List -->
-        <el-row class="tl-main">
+        <el-row class="tp-main">
           <el-col :span="24">
-            <el-table v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
-              <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-              <el-table-column prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
-                <template slot-scope="scope">
-                   <el-button type="text" @click="openTaskByName(scope.row.task_parent_name)">{{scope.row.task_parent_name}}</el-button>
+            <el-collapse v-model="activeItemNames" @change="handleItemChange">
+              <el-collapse-item :name="index" v-for="(taskTab, index) in taskTabArray" :key="index">
+                <template slot="title">
+                  <div class="tp-main-title">
+                    <el-row>
+                      <el-col :span="1">{{taskTab.task_name}}</el-col>
+                      <el-col :span="10">{{taskTab.task_desc}}</el-col>
+                      <el-col :span="1"><el-button type="success" size="mini" @click="filterTask">Create</el-button></el-col>
+                    </el-row>
+                  </div>
                 </template>
-              </el-table-column>
-              <el-table-column prop="task_name" label="Number" width="150px" key="3">
-                <template slot-scope="scope">
-                   <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="250px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
-              <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="150px" v-if="taskListRule.showColForLv1" key="5"></el-table-column>
-              <el-table-column prop="task_top_type_of_work" label="Type Of Work" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="6"></el-table-column>
-              <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
-              <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
-              <el-table-column prop="task_top_target_start" label="Target Start Time" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
-              <el-table-column prop="task_desc" label="Description" show-overflow-tooltip align="left" min-width="250px" v-if="!taskListRule.showColForLv1" key="11"></el-table-column>
-              <el-table-column prop="task_status" label="Status" align="center" width="235px" v-if="!taskListRule.showColForLv1" key="12"></el-table-column>
-              <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="13"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="14">
-                <template slot-scope="scope">
-                   <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column prop="task_effort" label="Effort(hrs)" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="15"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="16"></el-table-column>
-              <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column>
-              <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
-              <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="19"></el-table-column>
-              <el-table-column fixed="right" label="Edit" align="center" width="120">
-                <template slot-scope="scope">
-                  <el-button @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-edit"></el-button>
-                  <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
-                  </template>
-              </el-table-column>
-            </el-table>
-          </el-col>
-        </el-row>
-        <el-row class="tl-pagination">
-          <el-col :span="24" class="tl-pagination-col">
-            <el-pagination
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="currentPage"
-              :page-sizes="[20, 50, 100, 500]"
-              :page-size="pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="tasksTotalSize">
-            </el-pagination>
+                <div class="tp-main-body">
+                   <el-row>
+                      <el-col :span="24">
+                        <el-table v-loading="taskslistLoading" :data="taskslistData" class="tp-main-table" fit empty-text="No Data">
+                          <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
+                          <el-table-column prop="task_name" label="Number" width="150px" key="2">
+                            <template slot-scope="scope">
+                              <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
+                            </template>
+                          </el-table-column>
+                          <el-table-column prop="task_desc" label="Description" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
+                          <el-table-column prop="task_status" label="Status" align="center" width="235px" key="4"></el-table-column>
+                          <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
+                            <template slot-scope="scope">
+                              <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
+                            </template>
+                          </el-table-column>
+                          <el-table-column prop="task_effort" label="Effort(hrs)" align="center" width="125px" key="6"></el-table-column>
+                          <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" key="7"></el-table-column>
+                          <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" key="8"></el-table-column>
+                          <el-table-column prop="task_group" label="Task Group" align="center" min-width="180px" key="9">
+                            <template slot-scope="scope">
+                              <el-select v-model="scope.row.task_group" style="width: 100%" size="small">
+                                <el-option v-for="(group, index) in taskGroupArray" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                              </el-select>
+                            </template>
+                          </el-table-column>
+                          <el-table-column fixed="right" label="Edit" align="center" width="180">
+                            <template slot-scope="scope">
+                              <el-button :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
+                              <el-button @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-edit"></el-button>
+                              <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                              </template>
+                          </el-table-column>
+                        </el-table>
+                      </el-col>
+                    </el-row>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
           </el-col>
         </el-row>
 <!------- 4. End of Task List -->
       </el-main>
     </el-container>
-<!------- 5. Level 1 Task Details Dialog -->
-    <el-dialog :before-close="closeLv1TaskDialog" :title="taskLv1DialogTitle" :visible.sync="taskLv1DialogVisible" width="55%" style="min-width: 600px;" :close-on-click-modal="false" class="tl-taskform abow_dialog">
-      <el-form ref="form" :model="taskLv1Form" label-width="143px" label-position="left" class="tl-edit-form" :rules="taskLv1FormRules">
-        <el-tabs v-model="activeTabForLv1" type="card" ref="taskLv1Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv1Form', 'activeTabForLv1')})">
-          <el-tab-pane label="Basic Information" name="tab_basic_info">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Number" prop="task_name">
-                  <span v-if="!lv1TaskItemRule.showTaskNameInput">{{taskLv1Form.task_name}}</span>
-                  <el-input v-if="lv1TaskItemRule.showTaskNameInput" v-model="taskLv1Form.task_name"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item label="Task Type" prop="task_type_id">
-                  <el-select :disabled="lv1TaskItemRule.disableTaskType" v-model="taskLv1Form.task_type_id" style="width: 100%">
-                    <el-option v-for="(tasktype, index) in taskTypeArrayForLv1Task" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-form-item label="Opportunity Name" prop="task_top_opp_name">
-              <el-input class="span-format-text" v-model="taskLv1Form.task_top_opp_name"></el-input>
-            </el-form-item>
-            <el-form-item label="BusinessValue">
-              <el-input type="textarea" v-model="taskLv1Form.task_top_business_value" :rows="4"></el-input>
-            </el-form-item>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Customer" prop="task_top_customer">
-                  <el-input v-model="taskLv1Form.task_top_customer"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item label="Facing Client">
-                  <el-input v-model="taskLv1Form.task_top_facing_client"></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Type Of Work">
-                  <el-input v-model="taskLv1Form.task_top_type_of_work"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item label="Chance of Winning">
-                  <el-input v-model="taskLv1Form.task_top_chance_winning"></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Paint Points">
-                  <el-input v-model="taskLv1Form.task_top_paint_points"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item label="Constraint">
-                  <el-input v-model="taskLv1Form.task_top_constraint"></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="SOW Confirmation">
-                  <el-date-picker v-model="taskLv1Form.task_top_sow_confirmation" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
-                </el-form-item>
-              </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item label="Team Sizing">
-                  <el-input v-model="taskLv1Form.task_top_team_sizing"></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Skills / Specialization">
-                  <el-input v-model="taskLv1Form.task_top_skill"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item label="Opps > Project">
-                  <el-input v-model="taskLv1Form.task_top_opps_project"></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-tab-pane>
-          <!-- End of basic information -->
-          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Status">
-                  <el-select v-model="taskLv1Form.task_status" style="width: 100%">
-                    <el-option v-for="(status, index) in statusArray" :key="index" :label="status.status_name" :value="status.status_name"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-               <el-col :span="11" :offset="1">
-                <el-form-item label="Issue Date">
-                  <el-col :span="24">
-                    <el-date-picker v-model="taskLv1Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-                  </el-col>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Target Start">
-                  <el-date-picker v-model="taskLv1Form.task_top_target_start" type="month" style="width: 100%" placeholder="Select Month..." value-format="yyyy-MM"></el-date-picker>
-                </el-form-item>
-              </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item label="Target End">
-                  <el-date-picker v-model="taskLv1Form.task_top_target_end" type="month" style="width: 100%" placeholder="Select Month..." value-format="yyyy-MM"></el-date-picker>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Responsible Leader">
-                  <el-select v-model="taskLv1Form.task_responsible_leader" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForLv1RespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-tab-pane>
-          <!-- End of status tracing -->
-          <el-tab-pane label="Sub-Tasks List" name="tab_subtasks_list">
-            <el-row>
-              <el-col :span="24">
-                <el-button @click="createNewSubTask(2, 'taskLv1Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Sub-Task</el-button>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="24">
-                <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table :data="taskLv1FormSubTasks" fit max-height="500" class="sub-task-table">
-                    <el-table-column prop="task_id" v-if="false"></el-table-column>
-                    <el-table-column show-overflow-tooltip>
-                      <template slot-scope="scope">
-                        <el-row style="cursor: pointer;" :gutter="10" @click.native="openTaskById(scope.row.task_id)">
-                          <el-col :span="23" class="single-line">
-                            <span style="font-weight:bold">{{scope.row.task_name}}</span>
-                            <span style="margin-left:5px"> {{scope.row.task_desc}}</span>
-                          </el-col>
-                          <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
-                        </el-row>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </el-card>
-              </el-col>
-            </el-row>
-          </el-tab-pane>
-          <!-- End of sub task list -->
-        </el-tabs>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="saveLv1Task" :disabled="taskLv1SaveBtnDisabled" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
-      </span>
-    </el-dialog>
-<!------- 5. End of Level 1 Task Details Dialog -->
 <!------- 6. Level 2 Task Details Dialog -->
     <el-dialog :before-close="closeLv2TaskDialog" :title="taskLv2DialogTitle" :visible.sync="taskLv2DialogVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="taskLv2Form" label-width="137px" label-position="left" class="tl-edit-form" :rules="taskLv2FormRules">
@@ -845,14 +656,26 @@ export default {
   data () {
     return {
       // Header/Theme Value
-      header1: 'Task List New',
+      header1: 'Task Plan',
       isActive: true,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      // Tab Item Value
+      activeItemNames: [],
+      taskTabArray: [
+        {'task_name': 'FU20.1-1', 'task_desc': 'STP-Test Script and Training Manual for AP', 'task_plan_list': []},
+        {'task_name': 'FU20.1-2', 'task_desc': 'STP-Test Script and Training Manual for AP', 'task_plan_list': []},
+        {'task_name': 'FU20.1-3', 'task_desc': 'STP-Test Script and Training Manual for AP', 'task_plan_list': []}
+      ],
+      taskGroupArray: [
+        {'group_name': 'MTL Mar Sprint 1 2020-03-01 ~ 2020-03-15', 'group_id': 1},
+        {'group_name': 'MTL Mar Sprint 2 2020-03-01 ~ 2020-03-15', 'group_id': 2},
+        {'group_name': 'MTL Apr Sprint 1 2020-04-01 ~ 2020-04-15', 'group_id': 3}
+      ],
       // Task List Value
       searchVal: '',
       formFilter: {
-        filterTaskLevel: 1,
+        filterTaskLevel: 3,
         filterAssignTo: '',
         filterStatus: '',
         filterIssueDateRange: [],
@@ -990,6 +813,10 @@ export default {
     }
   },
   methods: {
+    // Tab Item Function
+    handleItemChange (val) {
+      console.log(val)
+    },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     filterTask () {
       this.getTaskList(1, 20)
@@ -2018,13 +1845,21 @@ export default {
   width: 150px;
 }
 /* Task list main style */
-.tl-main {
+.tp-main {
   height: auto;
   width: 100%;
   margin-top: 10px;
 }
-.tl-main-table {
+.tp-main-table {
   width:100%;
+  height: auto;
+}
+.tp-main-title {
+  width: 100%;
+  height: auto;
+}
+.tp-main-body {
+  width: 100%;
   height: auto;
 }
 /*Task list pagination style*/
