@@ -109,8 +109,9 @@
               <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column>
               <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="19"></el-table-column>
-              <el-table-column fixed="right" label="Edit" align="center" width="120">
+              <el-table-column fixed="right" label="Edit" align="center" min-width="120">
                 <template slot-scope="scope">
+                  <el-button v-if="taskListRule.showColForLv1" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
                   <el-button @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-edit"></el-button>
                   <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
                   </template>

@@ -14,11 +14,16 @@
 <!------- 1. End of Header -->
 <!------- 2. Search Bar -->
         <el-row class="tl-bar">
-          <el-col :span="9">
+          <el-col :span="8">
             <div class="tl-bar-item">
               <el-input placeholder="Search task..." v-model="searchVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
                 <el-button slot="append" icon="el-icon-search" @click="searchTask"></el-button>
               </el-input>
+            </div>
+          </el-col>
+          <el-col :span="2">
+            <div class="tl-bar-item">
+              <el-button @click="getTaskGroup" :style="{'background-color': btnColor, 'color': 'white'}" type="primary">Task Group</el-button>
             </div>
           </el-col>
         </el-row>
@@ -52,7 +57,7 @@
 <!------- 4. Task List -->
         <el-row class="tp-main">
           <el-col :span="24">
-            <el-collapse v-model="activeItemNames" @change="handleItemChange">
+            <el-collapse v-model="activeItemNames" @change="handleTabChange">
               <el-collapse-item :name="index" v-for="(taskTab, index) in taskTabArray" :key="index">
                 <template slot="title">
                   <div class="tp-main-title">
@@ -67,6 +72,31 @@
                    <el-row>
                       <el-col :span="24">
                         <el-table v-loading="taskslistLoading" :data="taskslistData" class="tp-main-table" fit empty-text="No Data">
+                          <el-table-column type="expand">
+                            <template slot-scope="props">
+                              <el-row>
+                                <el-col :span="22" :offset="1">
+                                  <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
+                                    <el-table-column type="index" :index="1" align="left" width="50"></el-table-column>
+                                    <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
+                                    <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
+                                      <template slot-scope="scope">
+                                        <el-button type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
+                                      </template>
+                                    </el-table-column>
+                                    <el-table-column label="Status" prop="sub_task_status" align="left" width="100"></el-table-column>
+                                    <el-table-column label="Estimation" prop="sub_task_estimation" align="left" width="150"></el-table-column>
+                                    <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>
+                                    <el-table-column fixed="right" width="100">
+                                      <template slot-scope="scope">
+                                        <el-button :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
+                                      </template>
+                                    </el-table-column>
+                                  </el-table>
+                                </el-col>
+                              </el-row>
+                            </template>
+                          </el-table-column>
                           <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
                           <el-table-column prop="task_name" label="Number" width="150px" key="2">
                             <template slot-scope="scope">
@@ -108,6 +138,34 @@
 <!------- 4. End of Task List -->
       </el-main>
     </el-container>
+<!------- 5. Task Group Drawer -->
+    <el-drawer title="Task Group" :visible.sync="groupDrawerVisible" :direction="groupDrawerDirection" size="16%">
+      <div class="tl-task-group">
+        <el-divider></el-divider>
+        <el-row :gutter="10" style="margin-bottom: 15px;">
+          <el-col :span="12">
+            <el-button type="primary" size="small" style="width: 100%">Add New Group</el-button>
+          </el-col>
+        </el-row>
+        <el-card class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index">
+          <div slot="header" class="clearfix">
+            <el-row>
+              <el-col :span="22">
+                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{taskGroup.group_name}}</div>
+              </el-col>
+              <el-col :span="2">
+                <el-button style="float: right; padding: 3px 0;" type="text" @click.stop="editTaskGroup(index)">Edit</el-button>
+              </el-col>
+            </el-row>
+          </div>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Level 2 - [{{taskGroup.group_lv2_task_count}}]</span>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Level 3 - [{{taskGroup.group_lv3_task_count}}]</span>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Level 4 - [{{taskGroup.group_lv4_task_count}}]</span>
+        </el-card>
+      </div>
+    </el-drawer>
+<!------- 5. End Task Group Drawer -->
 <!------- 6. Level 2 Task Details Dialog -->
     <el-dialog :before-close="closeLv2TaskDialog" :title="taskLv2DialogTitle" :visible.sync="taskLv2DialogVisible" width="55%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="taskLv2Form" label-width="137px" label-position="left" class="tl-edit-form" :rules="taskLv2FormRules">
@@ -672,6 +730,13 @@ export default {
         {'group_name': 'MTL Mar Sprint 2 2020-03-01 ~ 2020-03-15', 'group_id': 2},
         {'group_name': 'MTL Apr Sprint 1 2020-04-01 ~ 2020-04-15', 'group_id': 3}
       ],
+      // Task Group Value
+      groupDrawerVisible: false,
+      groupDrawerDirection: 'ltr',
+      taskGroups: [],
+      currentTaskGroup: 'MTL Mar Sprint 1 2020-03-01 ~ 2020-03-15',
+      selectedLv1TaskName: 'FU20.1',
+      selectedLv1TaskDesc: 'MTL TOS Opportunity',
       // Task List Value
       searchVal: '',
       formFilter: {
@@ -813,8 +878,11 @@ export default {
     }
   },
   methods: {
-    // Tab Item Function
-    handleItemChange (val) {
+    // Task Group Function
+    getTaskGroup () {
+      this.$data.groupDrawerVisible = true
+    },
+    handleTabChange (val) {
       console.log(val)
     },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
