@@ -5,7 +5,6 @@ import Login from '@/components/Login'
 import MyTimesheet from '@/components/Timesheet/MyTimesheet'
 import PrjTimesheet from '@/components/Timesheet/PrjTimesheet'
 import TaskList from '@/components/Task/TaskList'
-import TaskListNew from '@/components/Task/TaskListNew'
 import TaskPlan from '@/components/Task/TaskPlan'
 import PrjManagement from '@/components/Management/PrjManagement'
 import PmtManagement from '@/components/Management/PmtManagement'
@@ -59,15 +58,6 @@ export default new Router({
           path: 'Task/TaskList',
           name: 'TaskList',
           component: TaskList,
-          meta: {
-            needAdmin: false,
-            needLogin: true
-          }
-        },
-        {
-          path: 'Task/TaskListNew',
-          name: 'TaskListNew',
-          component: TaskListNew,
           meta: {
             needAdmin: false,
             needLogin: true
