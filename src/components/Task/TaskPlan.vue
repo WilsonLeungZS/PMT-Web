@@ -52,90 +52,105 @@
 <!------- 4. Task List -->
         <el-row class="tp-main">
           <el-col :span="24">
-            <el-collapse v-model="activeItemNames" @change="handleTabChange">
-              <el-collapse-item v-loading="lv2TaskListLoading" :name="index" v-for="(task, index) in lv2TaskList" :key="index" @click.native="openTaskTab(task.task_name, index)">
+            <el-collapse v-model="activeItemNames" @change="handleTabChange" v-loading="lv2TaskListLoading">
+              <el-collapse-item :name="index" v-for="(task, index) in lv2TaskList" :key="index" @click.native="openTaskTab(task.task_name, index, 1, 20)">
                 <template slot="title">
                   <div class="tp-main-title">
                     <el-row>
                       <el-col :span="2" class="tp-main-content-item">
-                        <el-button type="text" size="small" style="font-size:16px">{{task.task_name}}</el-button>
+                        <el-button @click.stop="openTaskById(task.task_id)" type="text" size="small" style="font-size:16px">{{task.task_name}}</el-button>
                       </el-col>
                       <el-col :span="1" class="tp-main-content-item">{{task.task_status}}</el-col>
                       <el-tooltip class="item" effect="dark" :content="task.task_desc" placement="top-start">
-                        <el-col :span="10" class="tp-main-content-item">{{task.task_desc}}</el-col>
+                        <el-col :span="9" class="tp-main-content-item">{{task.task_desc}}</el-col>
                       </el-tooltip>
                       <el-col :span="2" class="tp-main-content-item">Actual Effort: {{task.task_effort}}</el-col>
                       <el-col :span="2" class="tp-main-content-item">Estimation: {{task.task_estimation}}</el-col>
                       <el-col :span="2" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
                       <el-col :span="4" class="tp-main-content-item">Responsible: {{task.task_responsible_leader}}</el-col>
-                      <el-col :span="1" class="tp-main-content-item"><el-button type="success" size="mini">Create</el-button></el-col>
+                      <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="createTask" type="success" size="mini">Create</el-button></el-col>
                     </el-row>
                   </div>
                 </template>
                 <div class="tp-main-content">
-                   <el-row>
-                      <el-col :span="24">
-                        <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" class="tp-main-table" fit empty-text="No Data">
-                          <el-table-column type="expand">
-                            <template slot-scope="props">
-                              <el-row>
-                                <el-col :span="22" :offset="1">
-                                  <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
-                                    <el-table-column type="index" :index="1" align="left" width="50"></el-table-column>
-                                    <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
-                                    <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
-                                      <template slot-scope="scope">
-                                        <el-button type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
-                                      </template>
-                                    </el-table-column>
-                                    <el-table-column label="Status" prop="sub_task_status" align="left" width="100"></el-table-column>
-                                    <el-table-column label="Estimation" prop="sub_task_estimation" align="left" width="150"></el-table-column>
-                                    <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>
-                                    <el-table-column label="Assignee" prop="sub_task_assignee" align="left"></el-table-column>
-                                    <el-table-column fixed="right" width="100">
-                                      <template slot-scope="scope">
-                                        <el-button :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
-                                      </template>
-                                    </el-table-column>
-                                  </el-table>
-                                </el-col>
-                              </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" class="tp-main-table tp-table-border" fit empty-text="No Data">
+                        <el-table-column type="expand">
+                          <template slot-scope="props">
+                            <el-row>
+                              <el-col :span="23" :offset="1">
+                                <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
+                                  <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
+                                  <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
+                                    <template slot-scope="scope">
+                                      <el-button @click.stop="openTaskById(scope.row.sub_task_id)" type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
+                                    </template>
+                                  </el-table-column>
+                                  <el-table-column label="Status" prop="sub_task_status" align="left" width="100"></el-table-column>
+                                  <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>
+                                  <el-table-column label="Effort" prop="sub_task_effort" align="left" width="150"></el-table-column>
+                                  <el-table-column label="Estimation" prop="sub_task_estimation" align="left" width="150"></el-table-column>
+                                  <el-table-column label="Assignee" prop="sub_task_assignee" align="left"></el-table-column>
+                                  <el-table-column fixed="right" width="100">
+                                    <template slot-scope="scope">
+                                      <el-button :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
+                                    </template>
+                                  </el-table-column>
+                                </el-table>
+                              </el-col>
+                            </el-row>
+                          </template>
+                        </el-table-column>
+                        <el-table-column type="index" :index="1" align="left" width="50"></el-table-column>
+                        <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
+                        <el-table-column prop="task_name" label="Number" width="150px" key="2">
+                          <template slot-scope="scope">
+                            <el-button type="text" @click.stop="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
+                          </template>
+                        </el-table-column>
+                        <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4"></el-table-column>
+                        <el-table-column prop="task_desc" label="Description" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
+                        <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
+                          <template slot-scope="scope">
+                            <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
+                          </template>
+                        </el-table-column>
+                        <el-table-column prop="task_effort" label="Effort" align="center" width="100px" key="6"></el-table-column>
+                        <el-table-column prop="task_estimation" label="Est" align="center" width="100px" key="7"></el-table-column>
+                        <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="8"></el-table-column>
+                        <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" key="9"></el-table-column>
+                        <el-table-column prop="task_group" label="Task Group" align="center" min-width="180px" key="10">
+                          <template slot-scope="scope">
+                            <el-select v-model="scope.row.task_group" style="width: 100%" size="small">
+                              <el-option label=" " value="0"></el-option>
+                              <el-option v-for="(group, index) in taskGroupArray" :key="index" :label="group.group_long_name" :value="group.group_id"></el-option>
+                            </el-select>
+                          </template>
+                        </el-table-column>
+                        <el-table-column fixed="right" label="Edit" align="center" width="120">
+                          <template slot-scope="scope">
+                            <el-button :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
+                            <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
                             </template>
-                          </el-table-column>
-                          <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-                          <el-table-column prop="task_name" label="Number" width="150px" key="2">
-                            <template slot-scope="scope">
-                              <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
-                            </template>
-                          </el-table-column>
-                          <el-table-column prop="task_status" label="Status" align="center" width="235px" key="4"></el-table-column>
-                          <el-table-column prop="task_desc" label="Description" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
-                          <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
-                            <template slot-scope="scope">
-                              <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
-                            </template>
-                          </el-table-column>
-                          <el-table-column prop="task_effort" label="Effort" align="center" width="125px" key="6"></el-table-column>
-                          <el-table-column prop="task_estimation" label="Est" align="center" width="135px" key="7"></el-table-column>
-                          <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="135px" key="8"></el-table-column>
-                          <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" key="9"></el-table-column>
-                          <el-table-column prop="task_group" label="Task Group" align="center" min-width="180px" key="10">
-                            <template slot-scope="scope">
-                              <el-select v-model="scope.row.task_group" style="width: 100%" size="small">
-                                <el-option v-for="(group, index) in taskGroupArray" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
-                              </el-select>
-                            </template>
-                          </el-table-column>
-                          <el-table-column fixed="right" label="Edit" align="center" width="180">
-                            <template slot-scope="scope">
-                              <el-button :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
-                              <el-button @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-edit"></el-button>
-                              <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
-                              </template>
-                          </el-table-column>
-                        </el-table>
-                      </el-col>
-                    </el-row>
+                        </el-table-column>
+                      </el-table>
+                    </el-col>
+                  </el-row>
+                  <el-row class="tl-pagination">
+                    <el-col :span="24" class="tl-pagination-col">
+                      <el-pagination
+                        background
+                        @size-change="((size)=>{handleSizeChange(size, task.task_name, index)})"
+                        @current-change="((page)=>{handleCurrentChange(page, task.task_name, index)})"
+                        :current-page="currentPage"
+                        :page-sizes="[20, 50, 100, 500]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="tasksTotalSize">
+                      </el-pagination>
+                    </el-col>
+                  </el-row>
                 </div>
               </el-collapse-item>
             </el-collapse>
@@ -870,34 +885,68 @@ export default {
     handleTabChange (iActiveTabArray) {
       this.$data.activeTabArray = iActiveTabArray
     },
-    async openTaskTab (iTaskName, Index) {
+    async openTaskTab (iTaskName, Index, iPage, iSize) {
       console.log('Request Task: ' + iTaskName + ', Index: ' + Index)
       var needGetTask = this.$data.activeTabArray.indexOf(Index)
-      console.log(needGetTask)
       if (needGetTask !== -1) {
+        this.$data.pageSize = iSize
+        this.$data.currentPage = iPage
+        console.log(this.$data.pageSize)
+        console.log(this.$data.currentPage)
         this.$data.lv2TaskList[Index].task_plan_tasks_loading = true
         var reqTaskGroupId = this.$data.currentTaskId
-        const res = await http.post('/tasks/getPlanTaskListByParentTask', {
+        var sizeCriteria = {
           reqParentTaskName: iTaskName,
           reqTaskGroupId: reqTaskGroupId
-        })
+        }
+        var listCriteria = {
+          reqPage: iPage,
+          reqSize: iSize,
+          reqParentTaskName: iTaskName,
+          reqTaskGroupId: reqTaskGroupId
+        }
+        const res = await http.post('/tasks/getPlanTaskSizeByParentTask', sizeCriteria)
         if (res.data.status === 0) {
-          this.$data.lv2TaskList[Index].task_plan_tasks_list = []
-          this.$data.lv2TaskList[Index].task_plan_tasks_list = res.data.data
-        } else {
-          this.$data.lv2TaskList[Index].task_plan_tasks_list = []
+          this.$data.tasksTotalSize = res.data.data.task_list_total_size
+          const res1 = await http.post('/tasks/getPlanTaskListByParentTask', listCriteria)
+          if (res1.data.status === 0) {
+            this.$data.lv2TaskList[Index].task_plan_tasks_list = []
+            this.$data.lv2TaskList[Index].task_plan_tasks_list = res1.data.data
+          } else {
+            this.$data.lv2TaskList[Index].task_plan_tasks_list = []
+          }
         }
         this.$data.lv2TaskList[Index].task_plan_tasks_loading = false
       } else {
         this.$data.lv2TaskList[Index].task_plan_tasks_list = []
       }
     },
+    handleSizeChange (iSize, iTaskName, Index) {
+      this.$data.currentPage = 1
+      this.$data.pageSize = iSize
+      console.log('Task Name: ' + iTaskName)
+      console.log('Index: ' + Index)
+      this.openTaskTab(iTaskName, Index, 1, iSize)
+    },
+    handleCurrentChange (iPage, iTaskName, Index) {
+      var pageSize = this.$data.pageSize
+      this.$data.currentPage = iPage
+      console.log('Page: ' + iPage)
+      console.log('Size: ' + pageSize)
+      console.log('Task Name: ' + iTaskName)
+      console.log('Index: ' + Index)
+      this.openTaskTab(iTaskName, Index, iPage, pageSize)
+    },
+    createTask () {
+      console.log('Click')
+    },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     filterTask () {
       this.getTaskList()
     },
-    async getTaskList () {
+    async getTaskList (iPage, iSize) {
       console.log('Start to get level 2 task list')
+      this.$data.lv2TaskListLoading = true
       var reqParentTaskName = this.$data.selectedLv1TaskName
       const res = await http.post('/tasks/getLevel2TaskByParentTask', {
         reqParentTaskName: reqParentTaskName
@@ -908,6 +957,7 @@ export default {
       } else {
         this.$data.lv2TaskList = []
       }
+      this.$data.lv2TaskListLoading = false
     },
     // 2. Task info
     openTaskById (iTaskId) {
@@ -1538,8 +1588,17 @@ export default {
       if (res.data.status === 0) {
         if (iGroupId === 0) {
           this.$data.taskGroups = []
-          this.$data.taskGroups = res.data.data
-          console.log(res.data.data)
+          this.$data.taskGroupArray = []
+          var taskGroupArr = res.data.data
+          this.$data.taskGroups = taskGroupArr
+          var resResult = []
+          for (var i = 0; i < taskGroupArr.length; i++) {
+            var resJson = {}
+            resJson.group_long_name = taskGroupArr[i].group_name + ' ' + taskGroupArr[i].group_start_time + ' ~ ' + taskGroupArr[i].group_end_time
+            resJson.group_id = taskGroupArr[i].group_id
+            resResult.push(resJson)
+          }
+          this.$data.taskGroupArray = resResult
         }
       } else {
         this.$data.taskGroups = []
@@ -1957,5 +2016,8 @@ input::-webkit-inner-spin-button {
 }
 input[type="number"]{
   -moz-appearance: textfield;
+}
+.el-collapse {
+  min-height: 200px;
 }
 </style>
