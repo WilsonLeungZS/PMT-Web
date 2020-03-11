@@ -10,7 +10,9 @@ const store = new Vuex.Store({
     userRole: 'General',
     isLogin: false,
     isShowMainBar: true,
-    themeStyle: 0
+    themeStyle: 0,
+    planTaskName: '',
+    planTaskDesc: ''
   },
   getters: {
     getUserEid: function (state) {
@@ -33,6 +35,12 @@ const store = new Vuex.Store({
     },
     getThemeStyle: function (state) {
       return state.themeStyle
+    },
+    getPlanTaskName: function (state) {
+      return state.planTaskName
+    },
+    getPlanTaskDesc: function (state) {
+      return state.planTaskDesc
     }
   },
   mutations: {
@@ -77,6 +85,18 @@ const store = new Vuex.Store({
     },
     defaultThemeStyle: function (state) {
       state.themeStyle = 0
+    },
+    newPlanTaskName: function (state, planTaskName) {
+      state.planTaskName = planTaskName
+    },
+    clearPlanTaskName: function (state) {
+      state.planTaskName = ''
+    },
+    newPlanTaskDesc: function (state, planTaskDesc) {
+      state.planTaskDesc = planTaskDesc
+    },
+    clearPlanTaskDesc: function (state) {
+      state.planTaskDesc = ''
     }
   },
   actions: {
@@ -121,6 +141,18 @@ const store = new Vuex.Store({
     },
     setDefaultThemeStyle: function (context) {
       context.commit('defaultThemeStyle')
+    },
+    setNewPlanTaskName: function (context, planTaskName) {
+      context.commit('newPlanTaskName', planTaskName)
+    },
+    setClearPlanTaskName: function (context) {
+      context.commit('clearPlanTaskName')
+    },
+    setNewPlanTaskDesc: function (context, planTaskDesc) {
+      context.commit('newPlanTaskDesc', planTaskDesc)
+    },
+    setClearPlanTaskDesc: function (context) {
+      context.commit('clearPlanTaskDesc')
     }
   }
 })

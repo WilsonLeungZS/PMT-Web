@@ -90,7 +90,7 @@
                    <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="250px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
+              <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="270px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="150px" v-if="taskListRule.showColForLv1" key="5"></el-table-column>
               <el-table-column prop="task_top_type_of_work" label="Type Of Work" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="6"></el-table-column>
               <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
@@ -106,12 +106,16 @@
               </el-table-column>
               <el-table-column prop="task_effort" label="Effort(hrs)" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="15"></el-table-column>
               <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="16"></el-table-column>
-              <el-table-column prop="task_assignee" label="Executor/Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column>
+              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column>
               <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="19"></el-table-column>
-              <el-table-column fixed="right" label="Edit" align="center" min-width="180">
+              <el-table-column fixed="right" label="Plan Mode" align="center" width="95px" v-if="taskListRule.showColForLv1" >
                 <template slot-scope="scope">
-                  <el-button v-if="taskListRule.showColForLv1" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
+                  <el-button @click="startPlanTask(scope.row)" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
+                </template>
+              </el-table-column>
+              <el-table-column fixed="right" label="Edit" align="center" min-width="120px">
+                <template slot-scope="scope">
                   <el-button @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-edit"></el-button>
                   <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
                   </template>
@@ -1331,12 +1335,22 @@ export default {
         this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
         this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
         this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
+        this.$data.taskLv4Form.task_group_id = this[iParentObj].task_group_id
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
       }
     },
     // 3. Level 1 task dialog
+    startPlanTask (iObj) {
+      var taskName = iObj.task_name
+      var taskOppName = iObj.task_top_opp_name
+      this.$store.dispatch('setNewPlanTaskName', '')
+      this.$store.dispatch('setNewPlanTaskDesc', '')
+      this.$store.dispatch('setNewPlanTaskName', taskName)
+      this.$store.dispatch('setNewPlanTaskDesc', taskOppName)
+      this.$router.push({path: '/Task/TaskPlan'})
+    },
     async saveLv1Task () {
       if (this.$data.userLevel > 8 && this.$data.userRole !== 'Admin') {
         this.$message.error('No right to create Level 1 task!')
@@ -1471,6 +1485,10 @@ export default {
             this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
           return
         }
+        if (Number(reqTask.task_estimation) > 18) {
+          this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
+          return
+        }
         this.$data.taskLv3SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
@@ -1582,6 +1600,10 @@ export default {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
             this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
+          return
+        }
+        if (Number(reqTask.task_estimation) > 18) {
+          this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
         }
         this.$data.taskLv4SaveBtnDisabled = true
@@ -1866,6 +1888,9 @@ export default {
         this.getTaskType(null)
         this[iObj].task_type_id = item.type_id
         this[iObj].task_responsible_leader = item.responsible_leader
+        if (this[iObj].task_level === 4) {
+          this[iObj].task_group_id = item.task_group_id
+        }
       }
     },
     clearSelectForParentTask (iObj) {
@@ -1873,6 +1898,7 @@ export default {
       this[iObj].task_parent_desc = null
       this[iObj].task_type_id = null
       this[iObj].task_responsible_leader = null
+      this[iObj].task_group_id = null
       this.$data.taskTypeArrayForLv2Task = []
     },
     // Auto return parent task list
@@ -1958,6 +1984,12 @@ export default {
 </script>
 
 <style scoped>
+.breadcrumb-active {
+  font-weight: bold;
+}
+.breadcrumb-click {
+  cursor: pointer;
+}
 .tl-body {
   width: 100%;
   height: auto;
