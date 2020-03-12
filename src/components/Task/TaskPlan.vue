@@ -95,7 +95,7 @@
                                   <el-table-column label="Assignee" prop="sub_task_assignee" align="left"></el-table-column>
                                   <el-table-column fixed="right" width="100">
                                     <template slot-scope="scope">
-                                      <el-button :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
+                                      <el-button @click.stop="removeTask(scope.row.sub_task_id, scope.row.sub_task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
                                     </template>
                                   </el-table-column>
                                 </el-table>
@@ -131,7 +131,7 @@
                         <el-table-column fixed="right" label="Edit" align="center" width="120">
                           <template slot-scope="scope">
                             <el-button @click.stop="createTaskInPlanMode(4, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
-                            <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                            <el-button @click.stop="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
                             </template>
                         </el-table-column>
                       </el-table>
@@ -622,6 +622,16 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
+              <el-col :span="6">
+                <span>{{taskLv4Form.task_reference}}</span>
+              </el-col>
+              <el-col :span="18">
+                <el-tooltip class="item" effect="dark" :content="taskLv4Form.task_reference_desc" placement="top-start">
+                  <div class="tl-edit-form-div-desc">{{taskLv4Form.task_reference_desc}}</div>
+                </el-tooltip>
+              </el-col>
+            </el-form-item>
             <el-row>
               <el-col :span="24">
                 <el-form-item label="Time Group">
@@ -1033,6 +1043,8 @@ export default {
         this.$data.taskLv4Form.task_type_id = iTaskObj.task_type_id
         this.$data.taskLv4Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
         this.$data.taskLv4Form.task_group_id = iTaskObj.task_group_id
+        this.$data.taskLv4Form.task_reference = iTaskObj.task_reference
+        this.$data.taskLv4Form.task_reference_desc = iTaskObj.task_reference_desc
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
@@ -1285,47 +1297,6 @@ export default {
         this[iTaskHistory] = []
       }
     },
-    async createNewTask (iTaskLevel) {
-      console.log('Create new task: ' + iTaskLevel)
-      // Create lv 2 task by top button
-      if (Number(iTaskLevel) === 3) {
-        this.$data.taskLv3Form = {}
-        // Set dialog value
-        this.getActiveUserList()
-        this.getTaskStatus('Drafting')
-        this.$data.taskTypeArrayForLv2Task = []
-        // Set data default value
-        this.$data.taskLv3Form.task_status = 'Drafting'
-        this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
-        this.$data.taskLv3Form.task_level = 3
-        this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
-        this.$data.taskLv3Form.task_progress_nosymbol = 0
-        if (this.$data.currentTaskGroupId > 0) {
-          this.$data.taskLv3Form.task_group_id = this.$data.currentTaskGroupId
-        } else {
-          this.$data.taskLv3Form.task_group_id = null
-        }
-        // Show or hide column
-        this.ruleControlLv3TaskItem('Create', true)
-        this.$data.taskLv3DialogVisible = true
-      }
-      if (Number(iTaskLevel) === 4) {
-        this.$data.taskLv4Form = {}
-        // Set dialog value
-        this.getActiveUserList()
-        this.getTaskStatus('Drafting')
-        this.$data.taskTypeArrayForLv2Task = []
-        // Set data default value
-        this.$data.taskLv4Form.task_status = 'Drafting'
-        this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
-        this.$data.taskLv4Form.task_level = 4
-        this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
-        this.$data.taskLv4Form.task_progress_nosymbol = 0
-        // Show or hide column
-        this.ruleControlLv4TaskItem('Create', true)
-        this.$data.taskLv4DialogVisible = true
-      }
-    },
     async createNewSubTask (iSubTaskLevel, iParentObj) {
       console.log('Create new sub task: ' + iSubTaskLevel)
       if (Number(iSubTaskLevel) === 3) {
@@ -1365,6 +1336,8 @@ export default {
         this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
         this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
         this.$data.taskLv4Form.task_group_id = this[iParentObj].task_group_id
+        this.$data.taskLv4Form.task_reference = this[iParentObj].task_reference
+        this.$data.taskLv4Form.task_reference_desc = this[iParentObj].task_reference_desc
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
@@ -1719,7 +1692,7 @@ export default {
       if (iObj.task_level === 1) {
         this.$data.removeTaskDesc = iObj.task_top_opp_name
       } else {
-        this.$data.removeTaskDesc = iObj.task_desc
+        this.$data.removeTaskDesc = iObj.task_desc != null ? iObj.task_desc : iObj.sub_task_desc
       }
       this.$data.removeTaskDialogVisible = true
     },

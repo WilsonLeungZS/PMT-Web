@@ -702,6 +702,16 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
+              <el-col :span="6">
+                <span>{{taskLv4Form.task_reference}}</span>
+              </el-col>
+              <el-col :span="18">
+                <el-tooltip class="item" effect="dark" :content="taskLv4Form.task_reference_desc" placement="top-start">
+                  <div class="tl-edit-form-div-desc">{{taskLv4Form.task_reference_desc}}</div>
+                </el-tooltip>
+              </el-col>
+            </el-form-item>
             <el-form-item label="Description" prop="task_desc">
               <el-input :disabled="lv4TaskItemRule.disableDesc" class="span-format-text" type="textarea" v-model="taskLv4Form.task_desc" :rows="4"></el-input>
             </el-form-item>
@@ -1339,6 +1349,8 @@ export default {
         this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
         this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
         this.$data.taskLv4Form.task_group_id = this[iParentObj].task_group_id
+        this.$data.taskLv4Form.task_reference = this[iParentObj].task_reference
+        this.$data.taskLv4Form.task_reference_desc = this[iParentObj].task_reference_desc
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
@@ -1876,6 +1888,9 @@ export default {
           returnJson.type_id = queryResult[i].task_type_id
           returnJson.id = queryResult[i].task_id
           returnJson.responsible_leader = queryResult[i].task_responsible_leader
+          returnJson.group_id = queryResult[i].task_group_id
+          returnJson.reference = queryResult[i].task_reference
+          returnJson.reference_desc = queryResult[i].task_reference_desc
           returnArr.push(returnJson)
         }
       }
@@ -1892,7 +1907,9 @@ export default {
         this[iObj].task_type_id = item.type_id
         this[iObj].task_responsible_leader = item.responsible_leader
         if (this[iObj].task_level === 4) {
-          this[iObj].task_group_id = item.task_group_id
+          this[iObj].task_group_id = item.group_id
+          this[iObj].task_reference = item.reference
+          this[iObj].task_reference_desc = item.reference_desc
         }
       }
     },
@@ -1902,6 +1919,8 @@ export default {
       this[iObj].task_type_id = null
       this[iObj].task_responsible_leader = null
       this[iObj].task_group_id = null
+      this[iObj].task_reference = null
+      this[iObj].reference_desc = null
       this.$data.taskTypeArrayForLv2Task = []
     },
     // Auto return parent task list
