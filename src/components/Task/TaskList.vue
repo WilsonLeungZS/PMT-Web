@@ -1092,6 +1092,9 @@ export default {
     },
     openTaskByName (iTaskName) {
       var reqTaskName = iTaskName
+      if (reqTaskName === 'N/A') {
+        return
+      }
       var url = '/tasks/getTaskByName'
       var criteria = {
         reqTaskName: reqTaskName

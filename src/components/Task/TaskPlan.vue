@@ -182,9 +182,9 @@
               <el-col :span="22">
                 <div @click.stop="editTaskGroup(taskGroup.group_id)" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;text-decoration:underline;color:#409EFF;cursor:pointer">{{taskGroup.group_name}}</div>
               </el-col>
-              <el-col :span="2">
+              <!--<el-col :span="2">
                 <el-button @click.stop="selectTaskByNewTaskGroup(taskGroup)" style="float:right; padding:3px 0;" type="text">Plan Task</el-button>
-              </el-col>
+              </el-col>-->
             </el-row>
           </div>
           <span style="font-size: 13px;color: #909399; margin-top: 5px;">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
@@ -434,7 +434,7 @@
             </el-form-item>
             <el-row>
               <el-col :span="24">
-                <el-form-item label="Time Group">
+                <el-form-item label="Time Group" v-if="lv3TaskItemRule.showTaskGroup">
                   <el-select v-model="taskLv3Form.task_group_id" style="width: 100%" placeholder="Select Task Group...">
                     <el-option label="" value=""></el-option>
                     <el-option v-for="(taskgroup, index) in taskGroups" :key="index" :label="taskgroup.group_name" :value="taskgroup.group_id"></el-option>
@@ -873,7 +873,8 @@ export default {
         showProgress: true,
         showRefPoolInput: true,
         showRespLeader: true,
-        showSubTaskEst: true
+        showSubTaskEst: true,
+        showTaskGroup: true
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1006,6 +1007,11 @@ export default {
         this.$data.taskLv3Form.task_parent_desc = iTaskObj.task_desc
         this.$data.taskLv3Form.task_type_id = iTaskObj.task_type_id
         this.$data.taskLv3Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
+        if (this.$data.currentTaskGroupId > 0) {
+          this.$data.taskLv3Form.task_group_id = this.$data.currentTaskGroupId
+        } else {
+          this.$data.taskLv3Form.task_group_id = null
+        }
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', false)
         this.$data.taskLv3DialogVisible = true
@@ -1294,6 +1300,11 @@ export default {
         this.$data.taskLv3Form.task_level = 3
         this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv3Form.task_progress_nosymbol = 0
+        if (this.$data.currentTaskGroupId > 0) {
+          this.$data.taskLv3Form.task_group_id = this.$data.currentTaskGroupId
+        } else {
+          this.$data.taskLv3Form.task_group_id = null
+        }
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', true)
         this.$data.taskLv3DialogVisible = true
@@ -1479,6 +1490,7 @@ export default {
             this.$data.taskLv3WorklogShow = false
             this.$data.lv3TaskItemRule.showRespLeader = false
             this.$data.lv3TaskItemRule.showSubTaskEst = false
+            this.$data.lv3TaskItemRule.showTaskGroup = false
             this.$nextTick(() => {
               this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // For ref pool, hide "Sub Tasks List" Tab
               this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // For ref pool, hide "Worklog History" tab
@@ -1488,6 +1500,7 @@ export default {
             this.$data.taskLv3WorklogShow = true
             this.$data.lv3TaskItemRule.showRespLeader = true
             this.$data.lv3TaskItemRule.showSubTaskEst = true
+            this.$data.lv3TaskItemRule.showTaskGroup = true
           }
         } else {
           console.log('PMT Task')
@@ -1498,6 +1511,7 @@ export default {
           this.$data.lv3TaskItemRule.showRefPoolInput = true
           this.$data.lv3TaskItemRule.showRespLeader = true
           this.$data.lv3TaskItemRule.showSubTaskEst = true
+          this.$data.lv3TaskItemRule.showTaskGroup = true
           this.$data.taskLv3WorklogShow = true
         }
         // Common Rule for estimation and worklog button
@@ -1528,6 +1542,7 @@ export default {
         this.$data.lv3TaskItemRule.showRespLeader = true
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
+        this.$data.lv3TaskItemRule.showTaskGroup = true
         this.$data.taskLv3WorklogShow = false
       }
     },
