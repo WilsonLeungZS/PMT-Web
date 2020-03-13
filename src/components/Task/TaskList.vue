@@ -65,7 +65,7 @@
                 </el-date-picker>
               </el-form-item>
               <el-form-item>
-                <el-checkbox v-model="formFilter.filterShowRefPool" v-if="formFilter.filterTaskLevel == 3">Show Reference Pool</el-checkbox>
+                <el-checkbox v-model="formFilter.filterShowRefPool" v-if="formFilter.filterTaskLevel == 3">External System Tasks(Ref Pool)</el-checkbox>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" size="mini" @click="filterTask">Filter</el-button>
