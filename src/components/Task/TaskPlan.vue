@@ -20,7 +20,14 @@
                 <el-form-item label="Assign To">
                   <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
                     <el-option label="" value=""></el-option>
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Status">
@@ -69,7 +76,7 @@
                       <el-col :span="2" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
                       <el-col :span="4" class="tp-main-content-item">Responsible: {{task.task_responsible_leader}}</el-col>
                       <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="createTaskInPlanMode(3, task)" type="success" size="mini" icon="el-icon-plus"></el-button></el-col>
-                      <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshLv2TaskSubEst(task.task_id, index)" type="info" size="mini" icon="el-icon-refresh"></el-button></el-col>
+                      <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshLv2Task(task.task_id, task.task_name, index)" type="info" size="mini" icon="el-icon-refresh"></el-button></el-col>
                     </el-row>
                   </div>
                 </template>
@@ -292,14 +299,28 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv2Form.task_responsible_leader" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForOthRespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Assignee">
                   <el-select v-model="taskLv2Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -480,21 +501,42 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader" v-if="lv3TaskItemRule.showRespLeader">
                   <el-select v-model="taskLv3Form.task_responsible_leader" style="width: 100%" disabled>
-                    <el-option v-for="(activeUser, index) in activeUserListForOthRespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv3TaskItemRule.disableAssignee" v-model="taskLv3Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="12" v-if="!lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv3TaskItemRule.disableAssignee" v-model="taskLv3Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -680,14 +722,28 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv4Form.task_responsible_leader" style="width: 100%" disabled>
-                    <el-option v-for="(activeUser, index) in activeUserListForOthRespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv4TaskItemRule.disableAssignee" v-model="taskLv4Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left;">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -977,6 +1033,7 @@ export default {
         if (res.data.status === 0) {
           this.$data.tasksTotalSize = res.data.data.task_list_total_size
           const res1 = await http.post('/tasks/getPlanTaskListByParentTask', listCriteria)
+          console.log(res1.data)
           if (res1.data.status === 0) {
             this.$data.lv2TaskList[Index].task_plan_tasks_list = []
             this.$data.lv2TaskList[Index].task_plan_tasks_list = res1.data.data
@@ -1168,6 +1225,7 @@ export default {
         reqTaskGroupId: reqTaskGroupId,
         reqTaskGroupFlag: reqTaskGroupFlag
       })
+      console.log(res.data)
       if (res.data.status === 0) {
         this.$data.lv2TaskList = []
         this.$data.lv2TaskList = res.data.data
@@ -1176,8 +1234,9 @@ export default {
       }
       this.$data.lv2TaskListLoading = false
     },
-    async refreshLv2TaskSubEst (iTaskId, iTaskIndex) {
+    async refreshLv2Task (iTaskId, iTaskName, iTaskIndex) {
       console.log('Start to refresh level 2 task')
+      this.openTaskTab(iTaskName, iTaskIndex, 1, 20)
       var reqTaskGroupId = this.$data.currentTaskGroupId
       var reqTaskGroupFlag = this.$data.currentTaskGroupFlag
       const res = await http.post('/tasks/refreshLevel2TaskSubEstimation', {
@@ -1433,7 +1492,7 @@ export default {
         }
         this.$data.taskLv3SaveBtnDisabled = false
         this.openTaskById(res.data.data.Id)
-        this.getTaskList()
+        // this.getTaskList()
       }
     },
     ruleControlLv3TaskItem (iAction, iNeedInputParent) {
@@ -1554,7 +1613,7 @@ export default {
         }
         this.$data.taskLv4SaveBtnDisabled = false
         this.openTaskById(res.data.data.Id)
-        this.getTaskList()
+        // this.getTaskList()
       }
     },
     ruleControlLv4TaskItem (iAction, iNeedInputParent) {

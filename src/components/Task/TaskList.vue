@@ -47,7 +47,14 @@
               <el-form-item label="Assign To">
                 <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
                   <el-option label="" value=""></el-option>
-                  <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                  <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="Status">
@@ -260,7 +267,14 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv1Form.task_responsible_leader" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForLv1RespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForLv1RespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -382,14 +396,28 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv2Form.task_responsible_leader" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForOthRespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Assignee">
                   <el-select v-model="taskLv2Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -560,21 +588,42 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader" v-if="lv3TaskItemRule.showRespLeader">
                   <el-select v-model="taskLv3Form.task_responsible_leader" style="width: 100%" disabled>
-                    <el-option v-for="(activeUser, index) in activeUserListForOthRespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv3TaskItemRule.disableAssignee" v-model="taskLv3Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="12" v-if="!lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv3TaskItemRule.disableAssignee" v-model="taskLv3Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -750,14 +799,28 @@
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv4Form.task_responsible_leader" style="width: 100%" disabled>
-                    <el-option v-for="(activeUser, index) in activeUserListForOthRespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv4TaskItemRule.disableAssignee" v-model="taskLv4Form.task_assignee" style="width: 100%">
-                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id"></el-option>
+                    <el-option
+                      v-for="(activeUser, index) in activeUserListForAll"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
