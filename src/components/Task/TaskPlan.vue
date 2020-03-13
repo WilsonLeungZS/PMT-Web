@@ -807,8 +807,8 @@ export default {
       currentTaskGroupId: 0,
       currentTaskGroup: 'All Time Group',
       selectedLv1TaskId: null,
-      selectedLv1TaskName: this.$store.getters.getPlanTaskName,
-      selectedLv1TaskDesc: this.$store.getters.getPlanTaskDesc,
+      selectedLv1TaskName: (this.$store.getters.getPlanTaskName !== null && this.$store.getters.getPlanTaskName !== '') ? this.$store.getters.getPlanTaskName : this.$route.query.planTaskName,
+      selectedLv1TaskDesc: (this.$store.getters.getPlanTaskDesc !== null && this.$store.getters.getPlanTaskDesc !== '') ? this.$store.getters.getPlanTaskDesc : this.$route.query.planTaskDesc,
       groupDialogVisible: false,
       taskGroupForm: {
         formGroupId: 0,

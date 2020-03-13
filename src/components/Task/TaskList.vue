@@ -1364,7 +1364,8 @@ export default {
       this.$store.dispatch('setNewPlanTaskDesc', '')
       this.$store.dispatch('setNewPlanTaskName', taskName)
       this.$store.dispatch('setNewPlanTaskDesc', taskOppName)
-      this.$router.push({path: '/Task/TaskPlan'})
+      var url = '/Task/TaskPlan' + '?' + 'planTaskName=' + taskName + '&' + 'planTaskDesc=' + taskOppName
+      this.$router.push({path: url})
     },
     async saveLv1Task () {
       if (this.$data.userLevel > 8 && this.$data.userRole !== 'Admin') {
