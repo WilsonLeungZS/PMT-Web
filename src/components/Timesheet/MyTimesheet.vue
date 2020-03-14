@@ -57,7 +57,7 @@
         </el-form-item>
         <el-form-item label="Effort" >
           <el-col :span="5">
-            <el-input v-model="form.worklog_effort" @keyup.native="number"></el-input>
+            <el-input v-model="form.worklog_effort" type="number"></el-input>
           </el-col>
           <el-col :span="5">
             <span style="text-align:center; font-size:16px; margin-left:10px">Hrs</span>
@@ -347,7 +347,11 @@ export default {
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
-        this.showWarnMessage('Warning', 'Invalid effort!')
+        this.$message.error('Invalid Effort (Worklog effort could not less than 0 or over 24 hrs)!')
+        return
+      }
+      if (!this.checkEffortIsValid(reqWorklogEffort)) {
+        this.$message.error('Invalid Effort!')
         return
       }
       console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
@@ -421,6 +425,14 @@ export default {
         changeDateDay = '' + changeDateDay
       }
       this.$data.form.worklog_date = changeDateYear + '-' + changeDateMonth + '-' + changeDateDay
+    },
+    checkEffortIsValid (iEffort) {
+      var effort = Number(iEffort)
+      if (effort % 0.5 === 0) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   created () {
@@ -563,5 +575,12 @@ export default {
 }
 .el-autocomplete-suggestion li {
   line-height: 28px;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+input[type="number"]{
+  -moz-appearance: textfield;
 }
 </style>

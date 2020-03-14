@@ -118,7 +118,7 @@
               <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="19"></el-table-column>
               <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
                 <template slot-scope="scope">
-                  <el-button @click="startPlanTask(scope.row)" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
+                  <el-button @click="startPlanTask(scope.row)" :disabled="!scope.row.task_plan_mode_btn_enable" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
                 </template>
               </el-table-column>
               <el-table-column fixed="right" label="Edit" align="center" min-width="120px">
@@ -407,7 +407,7 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="11" :offset="1" v-if="false">
                 <el-form-item label="Assignee">
                   <el-select v-model="taskLv2Form.task_assignee" style="width: 100%">
                     <el-option
@@ -1443,6 +1443,11 @@ export default {
             this.isFieldEmpty(reqTask.task_top_customer, 'Customer could not be empty!')) {
           return
         }
+        if (reqTask.task_status === 'Planning' || reqTask.task_status === 'Running') {
+          if (this.isFieldEmpty(reqTask.task_top_target_start, 'Target start time could not be empty!')) {
+            return
+          }
+        }
         this.$data.taskLv1SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
@@ -1809,6 +1814,10 @@ export default {
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
+        this.$message.error('Invalid Effort (Worklog effort could not less than 0 or over 24 hrs)!')
+        return
+      }
+      if (!this.checkEffortIsValid(reqWorklogEffort)) {
         this.$message.error('Invalid Effort!')
         return
       }
@@ -2062,6 +2071,14 @@ export default {
         }
       }
       return -1
+    },
+    checkEffortIsValid (iEffort) {
+      var effort = Number(iEffort)
+      if (effort % 0.5 === 0) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   created () {

@@ -69,11 +69,11 @@
                       </el-col>
                       <el-col :span="1" class="tp-main-content-item">{{task.task_status}}</el-col>
                       <el-tooltip class="item" effect="dark" :content="task.task_desc" placement="top-start">
-                        <el-col :span="9" class="tp-main-content-item">{{task.task_desc}}</el-col>
+                        <el-col :span="8" class="tp-main-content-item">{{task.task_desc}}</el-col>
                       </el-tooltip>
-                      <el-col :span="2" class="tp-main-content-item">Actual Effort: {{task.task_effort}}</el-col>
-                      <el-col :span="2" class="tp-main-content-item">Estimation: {{task.task_estimation}}</el-col>
-                      <el-col :span="2" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
+                      <el-col :span="2" class="tp-main-content-item">Effort: {{task.task_effort}}</el-col>
+                      <el-col :span="2" class="tp-main-content-item">Est: {{task.task_estimation}}</el-col>
+                      <el-col :span="3" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
                       <el-col :span="4" class="tp-main-content-item">Responsible: {{task.task_responsible_leader}}</el-col>
                       <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="createTaskInPlanMode(3, task)" type="success" size="mini" icon="el-icon-plus"></el-button></el-col>
                       <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshLv2Task(task.task_id, task.task_name, index)" type="info" size="mini" icon="el-icon-refresh"></el-button></el-col>
@@ -83,7 +83,7 @@
                 <div class="tp-main-content">
                   <el-row>
                     <el-col :span="24">
-                      <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" class="tp-main-table tp-table-border" fit empty-text="No Data">
+                      <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
                         <el-table-column type="expand">
                           <template slot-scope="props">
                             <el-row>
@@ -95,12 +95,13 @@
                                       <el-button @click.stop="openTaskById(scope.row.sub_task_id)" type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
                                     </template>
                                   </el-table-column>
-                                  <el-table-column label="Status" prop="sub_task_status" align="left" width="100"></el-table-column>
+                                  <el-table-column label="Status" prop="sub_task_status" align="center" width="100"></el-table-column>
                                   <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>
-                                  <el-table-column label="Effort" prop="sub_task_effort" align="left" width="150"></el-table-column>
-                                  <el-table-column label="Estimation" prop="sub_task_estimation" align="left" width="150"></el-table-column>
-                                  <el-table-column label="Assignee" prop="sub_task_assignee" align="left"></el-table-column>
-                                  <el-table-column fixed="right" width="100">
+                                  <el-table-column label="Effort" prop="sub_task_effort" align="center" width="100px"></el-table-column>
+                                  <el-table-column label="Est" prop="sub_task_estimation" align="center" width="100px"></el-table-column>
+                                  <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px"></el-table-column>
+                                  <el-table-column label="Assignee" prop="sub_task_assignee" align="center" width="180px"></el-table-column>
+                                  <el-table-column fixed="right" align="center" width="110">
                                     <template slot-scope="scope">
                                       <el-button @click.stop="removeTask(scope.row.sub_task_id, scope.row.sub_task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
                                     </template>
@@ -123,11 +124,7 @@
                             <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                           </template>
                         </el-table-column>
-                        <el-table-column prop="task_effort" label="Effort" align="center" width="100px" key="6"></el-table-column>
-                        <el-table-column prop="task_estimation" label="Est" align="center" width="100px" key="7"></el-table-column>
-                        <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="8"></el-table-column>
-                        <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" key="9"></el-table-column>
-                        <el-table-column prop="task_group" label="Time Group" align="center" min-width="180px" key="10">
+                        <el-table-column prop="task_group" label="Time Group" align="center" min-width="180px" key="6">
                           <template slot-scope="scope">
                             <el-select @change="((val)=>{changeTaskGroup(val, scope.row.task_id, task.task_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
                               <el-option label=" " value="0"></el-option>
@@ -135,6 +132,10 @@
                             </el-select>
                           </template>
                         </el-table-column>
+                        <el-table-column prop="task_effort" label="Effort" align="center" width="100px" key="7"></el-table-column>
+                        <el-table-column prop="task_estimation" label="Est" align="center" width="100px" key="8"></el-table-column>
+                        <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
+                        <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" key="10"></el-table-column>
                         <el-table-column fixed="right" label="Edit" align="center" width="120">
                           <template slot-scope="scope">
                             <el-button @click.stop="createTaskInPlanMode(4, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
@@ -310,7 +311,7 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="11" :offset="1" v-if="false">
                 <el-form-item label="Assignee">
                   <el-select v-model="taskLv2Form.task_assignee" style="width: 100%">
                     <el-option
@@ -456,7 +457,7 @@
             <el-row>
               <el-col :span="24">
                 <el-form-item label="Time Group" v-if="lv3TaskItemRule.showTaskGroup">
-                  <el-select v-model="taskLv3Form.task_group_id" style="width: 100%" placeholder="Select Task Group...">
+                  <el-select v-model="taskLv3Form.task_group_id" @change="selectLv3TaskGroup" style="width: 100%" placeholder="Select Task Group...">
                     <el-option label="" value=""></el-option>
                     <el-option v-for="(taskgroup, index) in taskGroups" :key="index" :label="taskgroup.group_name" :value="taskgroup.group_id"></el-option>
                   </el-select>
@@ -1589,6 +1590,10 @@ export default {
       this.$data.activeTabForLv3 = 'tab_basic_info'
       done()
     },
+    selectLv3TaskGroup (val) {
+      this.$data.taskLv3Form.task_group_id = val
+      this.$forceUpdate()
+    },
     // 6. Level 4 task dialog
     async saveLv4Task () {
       var reqTask = this.$data.taskLv4Form
@@ -1726,6 +1731,10 @@ export default {
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
+        this.$message.error('Invalid Effort (Worklog effort could not less than 0 or over 24 hrs)!')
+        return
+      }
+      if (!this.checkEffortIsValid(reqWorklogEffort)) {
         this.$message.error('Invalid Effort!')
         return
       }
@@ -1995,6 +2004,14 @@ export default {
     },
     preventParentEventTrigger () {
       console.log('Stop')
+    },
+    checkEffortIsValid (iEffort) {
+      var effort = Number(iEffort)
+      if (effort % 0.5 === 0) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   created () {
