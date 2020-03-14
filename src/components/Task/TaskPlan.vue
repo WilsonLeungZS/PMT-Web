@@ -1792,8 +1792,13 @@ export default {
         IsActive: 1
       })
       if (res.data.status === 0) {
-        this.$data.activeUserListForAll = []
-        this.$data.activeUserListForAll = res.data.data
+        const res1 = await http.get('/users/getUserListOrderByLevelDesc', {
+          IsActive: 1
+        })
+        if (res1.data.status === 0) {
+          this.$data.activeUserListForAll = []
+          this.$data.activeUserListForAll = res1.data.data
+        }
         var userList = res.data.data
         this.$data.activeUserListForOthRespLeader = []
         for (var i = 0; i < userList.length; i++) {
