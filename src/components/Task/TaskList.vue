@@ -98,22 +98,23 @@
                 </template>
               </el-table-column>
               <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="270px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
-              <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="150px" v-if="taskListRule.showColForLv1" key="5"></el-table-column>
-              <el-table-column prop="task_top_type_of_work" label="Type Of Work" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="6"></el-table-column>
-              <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
-              <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
-              <el-table-column prop="task_top_target_start" label="Target Start Time" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
+              <el-table-column prop="task_status" label="Status" align="center" width="235px" key="5"></el-table-column>
+              <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="150px" v-if="taskListRule.showColForLv1" key="6"></el-table-column>
+              <el-table-column prop="task_top_type_of_work" label="Type Of Work" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
+              <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
+              <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
+              <el-table-column prop="task_top_target_start" label="Target Start Time" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
               <el-table-column prop="task_desc" label="Description" show-overflow-tooltip align="left" min-width="250px" v-if="!taskListRule.showColForLv1" key="11"></el-table-column>
-              <el-table-column prop="task_status" label="Status" align="center" width="235px" v-if="!taskListRule.showColForLv1" key="12"></el-table-column>
-              <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="13"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="14">
+              <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="12"></el-table-column>
+              <el-table-column prop="task_reference" label="Ref Pool" width="150px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="13">
                 <template slot-scope="scope">
                    <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_effort" label="Effort(hrs)" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="15"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="16"></el-table-column>
-              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column>
+              <el-table-column prop="task_effort" label="Effort(hrs)" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="15"></el-table-column>
+              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="16"></el-table-column>
+              <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv2" key="17"></el-table-column>
               <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="19"></el-table-column>
               <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
@@ -1448,6 +1449,11 @@ export default {
             return
           }
         }
+        if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
+          if (this.isFieldEmpty(reqTask.task_responsible_leader, 'Responsible leader could not be empty!')) {
+            return
+          }
+        }
         this.$data.taskLv1SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
@@ -1505,6 +1511,9 @@ export default {
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
+          if (this.isFieldEmpty(reqTask.task_responsible_leader, 'Responsible leader could not be empty!')) {
             return
           }
         }
@@ -1580,6 +1589,9 @@ export default {
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
+          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
             return
           }
         }
@@ -1702,6 +1714,9 @@ export default {
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
+          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
             return
           }
         }

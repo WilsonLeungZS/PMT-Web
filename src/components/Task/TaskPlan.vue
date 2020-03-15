@@ -1416,6 +1416,9 @@ export default {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
             return
           }
+          if (this.isFieldEmpty(reqTask.task_responsible_leader, 'Responsible leader could not be empty!')) {
+            return
+          }
         }
         this.$data.taskLv2SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
@@ -1489,6 +1492,9 @@ export default {
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
+          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
             return
           }
         }
@@ -1619,6 +1625,9 @@ export default {
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
+          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
             return
           }
         }
