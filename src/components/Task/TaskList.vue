@@ -1503,6 +1503,11 @@ export default {
             this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
           return
         }
+        if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
+          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
+        }
         this.$data.taskLv2SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
@@ -1572,6 +1577,11 @@ export default {
         if (Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
+        }
+        if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
+          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
         }
         this.$data.taskLv3SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
@@ -1689,6 +1699,11 @@ export default {
         if (Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
+        }
+        if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
+          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+            return
+          }
         }
         this.$data.taskLv4SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
