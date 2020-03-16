@@ -35,16 +35,42 @@
 <!------- 3. Filter Criteria -->
         <el-row>
           <el-col :span="24">
-            <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="85px" label-position="left">
+            <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="85px" label-position="Top">
               <el-form-item label="Task Level">
-                <el-radio-group v-model="formFilter.filterTaskLevel" @change="formFilter.filterShowRefPool = false; filterTask()" size="small">
+                <el-radio-group v-model="formFilter.filterTaskLevel" @change="formFilter.filterShowRefPool = false; formFilter.filterAssignTo = null; filterTask()" size="small">
                   <el-radio-button label="1"></el-radio-button>
                   <el-radio-button label="2"></el-radio-button>
                   <el-radio-button label="3"></el-radio-button>
                   <el-radio-button label="4"></el-radio-button>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="Assign To">
+              <el-form-item label="Assign To" v-if="taskListRule.showColForLv1">
+                <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
+                  <el-option label="" value=""></el-option>
+                  <el-option
+                      v-for="(activeUser, index) in activeUserListForLv1RespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Assign To" v-if="taskListRule.showColForLv2">
+                <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
+                  <el-option label="" value=""></el-option>
+                  <el-option
+                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                      :key="index"
+                      :label="activeUser.user_eid"
+                      :value="activeUser.user_id">
+                      <span style="float: left">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                    </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Assign To" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2">
                 <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
                   <el-option label="" value=""></el-option>
                   <el-option
