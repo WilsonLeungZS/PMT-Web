@@ -152,11 +152,11 @@
                           background
                           @size-change="((size)=>{handleSizeChange(size, task.task_name, index)})"
                           @current-change="((page)=>{handleCurrentChange(page, task.task_name, index)})"
-                          :current-page="currentPage"
+                          :current-page="task.task_page_number"
                           :page-sizes="[20, 50, 100, 500]"
-                          :page-size="pageSize"
+                          :page-size="task.task_page_size"
                           layout="total, sizes, prev, pager, next, jumper"
-                          :total="tasksTotalSize">
+                          :total="task.task_total_size">
                         </el-pagination>
                       </el-col>
                     </el-row>
@@ -1032,7 +1032,9 @@ export default {
         }
         const res = await http.post('/tasks/getPlanTaskSizeByParentTask', sizeCriteria)
         if (res.data.status === 0) {
-          this.$data.tasksTotalSize = res.data.data.task_list_total_size
+          this.$data.lv2TaskList[Index].task_total_size = res.data.data.task_list_total_size
+          this.$data.lv2TaskList[Index].task_page_number = iPage
+          this.$data.lv2TaskList[Index].task_page_size = iSize
           const res1 = await http.post('/tasks/getPlanTaskListByParentTask', listCriteria)
           console.log(res1.data)
           if (res1.data.status === 0) {
@@ -1049,12 +1051,12 @@ export default {
     },
     handleSizeChange (iSize, iTaskName, Index) {
       this.$data.currentPage = 1
-      this.$data.pageSize = iSize
+      this.$data.lv2TaskList[Index].task_page_size = iSize
       this.openTaskTab(iTaskName, Index, 1, iSize)
     },
     handleCurrentChange (iPage, iTaskName, Index) {
-      var pageSize = this.$data.pageSize
-      this.$data.currentPage = iPage
+      var pageSize = this.$data.lv2TaskList[Index].task_page_size
+      this.$data.lv2TaskList[Index].task_page_number = iPage
       this.openTaskTab(iTaskName, Index, iPage, pageSize)
     },
     createTaskInPlanMode (iSubTaskLevel, iTaskObj) {
