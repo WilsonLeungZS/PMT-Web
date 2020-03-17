@@ -441,7 +441,7 @@
             <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
-                  v-model="taskLv3Form.task_reference" :fetch-suggestions="queryTaskAsyncForRefPool" @select="((item)=>{handleSelectForRefPool(item, 'taskLv3Form')})" @clear="clearSelectForRefPool('taskLv3Form')">
+                  v-model="taskLv3Form.task_reference" :value-key="taskLv3Form.task_reference" :fetch-suggestions="queryTaskAsyncForRefPool" @select="((item)=>{handleSelectForRefPool(item, 'taskLv3Form')})" @clear="clearSelectForRefPool('taskLv3Form')">
                   <template slot-scope="{ item }">
                     <div class="form_list_task_name">{{ item.value }}</div>
                     <span class="form_list_task_desc">{{ item.description }}</span>
@@ -1977,8 +1977,14 @@ export default {
       cb(returnArr)
     },
     handleSelectForRefPool (item, iObj) {
-      this[iObj].task_reference = item.value
-      this[iObj].task_reference_desc = item.description
+      console.log(item)
+      console.log(iObj)
+      var taskName = item.value
+      var taskDesc = item.description
+      console.log(taskName)
+      console.log(taskDesc)
+      this[iObj].task_reference = taskName
+      this[iObj].task_reference_desc = taskDesc
     },
     clearSelectForRefPool (iObj) {
       this[iObj].task_reference = null
