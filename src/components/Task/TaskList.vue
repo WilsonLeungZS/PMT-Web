@@ -328,7 +328,12 @@
                         </el-row>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="task_status" align="left" width="100"></el-table-column>
+                    <el-table-column prop="task_status" align="left" width="100">
+                      <template slot-scope="scope">
+                        <el-tag type="info" style="font-weight:bold" v-if="scope.row.task_status == 'Done'">{{scope.row.task_status}}</el-tag>
+                        <el-tag type="success" style="font-weight:bold" v-if="scope.row.task_status != 'Done'">{{scope.row.task_status}}</el-tag>
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="task_responsible_leader" align="left" width="160"></el-table-column>
                     <el-table-column show-overflow-tooltip fixed="right" align="center" width="30">
                       <template slot-scope="scope">
@@ -417,12 +422,12 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Target Complete">
-                  <el-date-picker v-model="taskLv2Form.task_target_complete" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
+                  <el-date-picker v-model="taskLv2Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Actual Complete">
-                  <el-date-picker v-model="taskLv2Form.task_actual_complete" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
+                  <el-date-picker v-model="taskLv2Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -516,7 +521,12 @@
                         </el-row>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="task_status" align="left" width="100"></el-table-column>
+                    <el-table-column prop="task_status" align="left" width="100">
+                      <template slot-scope="scope">
+                        <el-tag type="info" style="font-weight:bold" v-if="scope.row.task_status == 'Done'">{{scope.row.task_status}}</el-tag>
+                        <el-tag type="success" style="font-weight:bold" v-if="scope.row.task_status != 'Done'">{{scope.row.task_status}}</el-tag>
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="task_assignee" align="left" width="160"></el-table-column>
                     <el-table-column show-overflow-tooltip fixed="right" align="center" width="30">
                       <template slot-scope="scope">
@@ -579,7 +589,7 @@
             <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
-                  v-model="taskLv3Form.task_reference" :fetch-suggestions="queryTaskAsyncForRefPool" @select="((item)=>{handleSelectForRefPool(item, 'taskLv3Form')})" @clear="clearSelectForRefPool('taskLv3Form')">
+                  v-model="taskLv3Form.task_reference" :value-key="taskLv3Form.task_reference" :fetch-suggestions="queryTaskAsyncForRefPool" @select="((item)=>{handleSelectForRefPool(item, 'taskLv3Form')})" @clear="clearSelectForRefPool('taskLv3Form')">
                   <template slot-scope="{ item }">
                     <div class="form_list_task_name">{{ item.value }}</div>
                     <span class="form_list_task_desc">{{ item.description }}</span>
@@ -617,12 +627,12 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Target Complete">
-                  <el-date-picker v-model="taskLv3Form.task_target_complete" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
+                  <el-date-picker v-model="taskLv3Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Actual Complete">
-                  <el-date-picker v-model="taskLv3Form.task_actual_complete" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
+                  <el-date-picker v-model="taskLv3Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -730,7 +740,12 @@
                         </el-row>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="task_status" align="left" width="100"></el-table-column>
+                    <el-table-column prop="task_status" align="left" width="100">
+                      <template slot-scope="scope">
+                        <el-tag type="info" style="font-weight:bold" v-if="scope.row.task_status == 'Done'">{{scope.row.task_status}}</el-tag>
+                        <el-tag type="success" style="font-weight:bold" v-if="scope.row.task_status != 'Done'">{{scope.row.task_status}}</el-tag>
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="task_assignee" align="left" width="160"></el-table-column>
                     <el-table-column show-overflow-tooltip fixed="right" align="center" width="30">
                       <template slot-scope="scope">
@@ -836,12 +851,12 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Target Complete">
-                  <el-date-picker v-model="taskLv4Form.task_target_complete" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
+                  <el-date-picker v-model="taskLv4Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Actual Complete">
-                  <el-date-picker v-model="taskLv4Form.task_actual_complete" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
+                  <el-date-picker v-model="taskLv4Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
