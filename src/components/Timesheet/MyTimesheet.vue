@@ -39,6 +39,7 @@
             </el-table>
           </el-col>
         </el-row>
+<<<<<<< HEAD
         <el-row>
           <el-col :span="24" class="content-task-col">
               <div class="datePicker">
@@ -73,6 +74,8 @@
                   
           </el-col>
         </el-row>
+=======
+>>>>>>> WilsonLeungZS/master
       </el-main>
     </el-container>
     <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
@@ -87,11 +90,11 @@
           </el-autocomplete>
         </el-form-item>
         <el-form-item label="Date">
-          <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate"></el-date-picker>
+          <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate" style="width: 50%"></el-date-picker>
         </el-form-item>
         <el-form-item label="Effort" >
           <el-col :span="5">
-            <el-input v-model="form.worklog_effort" @keyup.native="number"></el-input>
+            <el-input v-model="form.worklog_effort" type="number"></el-input>
           </el-col>
           <el-col :span="5">
             <span style="text-align:center; font-size:16px; margin-left:10px">Hrs</span>
@@ -287,8 +290,16 @@ export default {
       var mtDay = iDateVal.getDay()
       var resetArray = []
       var days = 31
-      if (mtMonth === '02' || mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11') {
+      if (mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11') {
         days = 30
+      }
+      if (mtMonth === '02') {
+        var leapYear = Number(mtYear) % 4
+        if (leapYear === 0) {
+          days = 29
+        } else {
+          days = 28
+        }
       }
       for (var i = 1; i <= days; i++) {
         var resetJson = {}
@@ -437,7 +448,7 @@ export default {
     async queryTaskAsync (queryString, cb) {
       console.log('Query String: ' + queryString)
       var returnArr = []
-      const res = await http.post('/tasks/getTaskByName', {
+      const res = await http.post('/tasks/getTaskByNameForWorklogTask', {
         tTaskName: queryString
       })
       if (res.data.status === 0) {
@@ -477,7 +488,11 @@ export default {
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2].slice(0,2)
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
-        this.showWarnMessage('Warning', 'Invalid effort!')
+        this.$message.error('Invalid Effort (Worklog effort could not less than 0 or over 24 hrs)!')
+        return
+      }
+      if (!this.checkEffortIsValid(reqWorklogEffort)) {
+        this.$message.error('Invalid Effort!')
         return
       }
       console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
@@ -493,7 +508,10 @@ export default {
       if (res.data.status === 0) {
         var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
         var dateConvert = new Date(Date.parse(firstDate))
-        this.resetTimesheet(dateConvert)
+        let _this = this
+        setTimeout(function () {
+          _this.resetTimesheet(dateConvert)
+        }, 500)
         this.$data.worklogFormVisible = false
       } else {
         this.showWarnMessage('Warning', 'Fail to add/update worklog!')
@@ -516,7 +534,6 @@ export default {
       arr = reqWorklogDate.split('-')
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
-      // console.log('Date: ' + reqWorklogMonth + '|' + reqWorklogDay)
       const res = await http.post('/worklogs/removeWorklog', {
         wUserId: reqUserId,
         wTaskId: reqTaskId,
@@ -526,7 +543,10 @@ export default {
       if (res.data.status === 0) {
         var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
         var dateConvert = new Date(Date.parse(firstDate))
-        this.resetTimesheet(dateConvert)
+        let _this = this
+        setTimeout(function () {
+          _this.resetTimesheet(dateConvert)
+        }, 500)
         this.$data.worklogFormVisible = false
       } else {
         this.showWarnMessage('Warning', 'Fail to delete worklog!')
@@ -549,6 +569,7 @@ export default {
       }
       this.$data.form.worklog_date = changeDateYear + '-' + changeDateMonth + '-' + changeDateDay
     },
+<<<<<<< HEAD
     async addToAssign (assignToTask) {
       console.log('click')
       var currentDate = new Date()
@@ -577,6 +598,16 @@ export default {
     // console.log('Height'+Height);
     // console.log('Width'+VWidth);
     // })
+=======
+    checkEffortIsValid (iEffort) {
+      var effort = Number(iEffort)
+      if (effort % 0.5 === 0) {
+        return true
+      } else {
+        return false
+      }
+    }
+>>>>>>> WilsonLeungZS/master
   },
   created () {
     console.log('Created My Timesheet')
@@ -772,5 +803,15 @@ export default {
 .el-autocomplete-suggestion li {
   line-height: 28px;
 }
+<<<<<<< HEAD
 
+=======
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+input[type="number"]{
+  -moz-appearance: textfield;
+}
+>>>>>>> WilsonLeungZS/master
 </style>

@@ -96,7 +96,7 @@
               </el-card>
             </div>
           </el-col><!-- Team list -->
-          <el-col :span="15">
+          <el-col :span="24">
             <div class="pm-content">
               <el-card class="box-card">
                 <div slot="header" class="clearfix">
@@ -118,21 +118,33 @@
                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Name</span>
                         </el-col>
-                        <el-col :span="10" class="pm-table-expand-item">
+                        <el-col :span="6" class="pm-table-expand-item">
                           <el-input v-model="props.row.user_eid" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="2" class="pm-table-expand-label">
+                          <span>Employee Number</span>
+                        </el-col>
+                        <el-col :span="6" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_employee_number" size="small" style="width: 100%"></el-input>
                         </el-col>
                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Email</span>
                         </el-col>
-                        <el-col :span="10" class="pm-table-expand-item">
+                        <el-col :span="6" class="pm-table-expand-item">
                           <el-input v-model="props.row.user_email" size="small" style="width: 100%"></el-input>
                         </el-col>
                       </el-row>
                       <el-row :gutter="15" style="margin-top: 10px">
                         <el-col :span="2" class="pm-table-expand-label">
+                          <span>Level</span>
+                        </el-col>
+                        <el-col :span="6" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_level" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="2" class="pm-table-expand-label">
                           <span>Team</span>
                         </el-col>
-                        <el-col :span="10" class="pm-table-expand-item">
+                        <el-col :span="6" class="pm-table-expand-item">
                           <el-select v-model="props.row.user_team" size="small" style="width: 100%">
                             <el-option v-for="(team, index) in teamFilter" :key="index" :label="team.text" :value="team.value"></el-option>
                           </el-select>
@@ -140,11 +152,26 @@
                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Role</span>
                         </el-col>
-                        <el-col :span="10" class="pm-table-expand-item">
+                        <el-col :span="6" class="pm-table-expand-item">
                           <el-select v-model="props.row.user_role" size="small" style="width: 100%">
                             <el-option label="Admin" value="Admin"></el-option>
                             <el-option label="General" value="General"></el-option>
+                            <el-option label="Special" value="Special"></el-option>
                           </el-select>
+                        </el-col>
+                      </el-row>
+                      <el-row :gutter="15" style="margin-top: 10px">
+                        <el-col :span="2" class="pm-table-expand-label">
+                          <span>Mapping</span>
+                        </el-col>
+                        <el-col :span="10" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_namemapping" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="2" class="pm-table-expand-label">
+                          <span>Assignment</span>
+                        </el-col>
+                        <el-col :span="10" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_assignment" size="small" style="width: 100%"></el-input>
                         </el-col>
                       </el-row>
                       <el-row :gutter="15" style="margin-top: 10px">
@@ -164,18 +191,22 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="Id" prop="user_id" v-if="false"></el-table-column>
-                  <el-table-column label="Name" prop="user_eid" min-width="120" show-overflow-tooltip></el-table-column>
-                  <el-table-column label="Email" prop="user_email" min-width="210" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Name" prop="user_eid" min-width="100" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Employee Number" prop="user_employee_number" min-width="100"></el-table-column>
+                  <el-table-column label="Email" prop="user_email" min-width="110" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Level" prop="user_level" min-width="30" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Team" prop="user_team" align="center" min-width="70"
                       :filters="teamFilter"
                       :filter-method="teamfilterHandler">
                   </el-table-column>
+                  <el-table-column label="Assignment" prop="user_assignment" min-width="100" align="center" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Role" align="center"
                       :filters="roleFilter"
                       :filter-method="rolefilterHandler">
                     <template slot-scope="scope">
                       <el-tag v-if="scope.row.user_role === 'Admin'" size="small" effect="dark">{{scope.row.user_role}}</el-tag>
                       <el-tag v-if="scope.row.user_role === 'General'" size="small" type="info" effect="dark">{{scope.row.user_role}}</el-tag>
+                      <el-tag v-if="scope.row.user_role === 'Special'" size="small" type="success" effect="dark">{{scope.row.user_role}}</el-tag>
                     </template>
                   </el-table-column>
                   <el-table-column label="Active" align="center"
@@ -209,9 +240,15 @@
                     <template slot-scope="props">
                       <el-row :gutter="15">
                         <el-col :span="4" class="pm-table-expand-label">
+                          <span>Parent Type</span>
+                        </el-col>
+                        <el-col :span="8" class="pm-table-expand-item">
+                          <el-input v-model="props.row.type_parent" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="4" class="pm-table-expand-label">
                           <span>Name</span>
                         </el-col>
-                        <el-col :span="20" class="pm-table-expand-item">
+                        <el-col :span="8" class="pm-table-expand-item">
                           <el-input v-model="props.row.type_name" size="small" style="width: 100%"></el-input>
                         </el-col>
                       </el-row>
@@ -251,6 +288,7 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="Id" prop="type_id" v-if="false"></el-table-column>
+                  <el-table-column label="Parent Type" prop="type_parent" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Name" prop="type_name" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Prefix" prop="type_prefix" align="center" min-width="45" ></el-table-column>
                   <el-table-column label="Category" prop="type_category" align="center" min-width="55"></el-table-column>
@@ -285,7 +323,8 @@ export default {
       ],
       roleFilter: [
         {text: 'Admin', value: 'Admin'},
-        {text: 'General', value: 'General'}
+        {text: 'General', value: 'General'},
+        {text: 'Special', value: 'Special'}
       ],
       teamFilter: [],
       tasktypeData: [],
@@ -363,9 +402,13 @@ export default {
       const res = await http.post('/users/addOrUpdateUser', {
         reqUserId: user.user_id,
         reqUserEid: user.user_eid,
+        reqUserEmployeeNumber: user.user_employee_number,
         userEmail: user.user_email,
+        reqUserLevel: user.user_level,
         reqUserTeam: user.user_team,
         reqUserRole: user.user_role,
+        reqUserNameMapping: user.user_namemapping,
+        reqUserAssignment: user.user_assignment,
         reqUserIsActive: user.user_isactive
       })
       if (res.data.status === 0) {
@@ -382,9 +425,13 @@ export default {
       var index = props.$index
       if (props.row.user_id > 0) {
         props.row.user_eid = this.$data.userResetData[index].user_eid
+        props.row.user_employee_number = this.$data.userResetData[index].user_employee_number
         props.row.user_email = this.$data.userResetData[index].user_email
+        props.row.user_level = this.$data.userResetData[index].user_level
         props.row.user_team = this.$data.userResetData[index].user_team
         props.row.user_role = this.$data.userResetData[index].user_role
+        props.row.user_namemapping = this.$data.userResetData[index].user_namemapping
+        props.row.user_assignment = this.$data.userResetData[index].user_assignment
         props.row.user_isactive = this.$data.userResetData[index].user_isactive
       } else {
         this.$data.userData.splice(index, 1)
@@ -394,9 +441,13 @@ export default {
       var user = {
         user_id: 0,
         user_eid: 'N/A',
+        user_employee_number: '',
         user_email: 'N/A',
+        user_level: '-1',
         user_team: 'TOS',
         user_role: 'General',
+        user_namemapping: '',
+        user_assignment: '',
         user_isactive: false
       }
       this.$data.userData.unshift(user)
@@ -459,6 +510,7 @@ export default {
         return
       }
       const res = await http.post('/tasks/addTaskType', {
+        taskTypeParent: tasktype.type_parent,
         taskTypeId: tasktype.type_id,
         taskTypeName: tasktype.type_name,
         taskTypePrefix: tasktype.type_prefix,
@@ -478,6 +530,7 @@ export default {
     cancelTasktype (props) {
       var index = props.$index
       if (props.row.type_id > 0) {
+        props.row.type_parent = this.$data.tasktypeResetData[index].type_parent
         props.row.type_name = this.$data.tasktypeResetData[index].type_name
         props.row.type_prefix = this.$data.tasktypeResetData[index].type_prefix
         props.row.type_category = this.$data.tasktypeResetData[index].type_category
@@ -489,6 +542,7 @@ export default {
     addTasktype () {
       var tasktype = {
         type_id: 0,
+        type_parent: '',
         type_name: 'N/A',
         type_prefix: '',
         type_category: 'AD',
