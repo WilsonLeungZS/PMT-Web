@@ -45,7 +45,7 @@
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="Assign To" v-if="taskListRule.showColForLv1">
-                <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
+                <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
                   <el-option label="" value=""></el-option>
                   <el-option
                       v-for="(activeUser, index) in activeUserListForLv1RespLeader"
@@ -58,7 +58,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="Assign To" v-if="taskListRule.showColForLv2">
-                <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
+                <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
                   <el-option label="" value=""></el-option>
                   <el-option
                       v-for="(activeUser, index) in activeUserListForOthRespLeader"
@@ -71,7 +71,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="Assign To" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2">
-                <el-select v-model="formFilter.filterAssignTo" size="small" style="width:100%">
+                <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
                   <el-option label="" value=""></el-option>
                   <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
@@ -174,7 +174,7 @@
     </el-container>
 <!------- 5. Level 1 Task Details Dialog -->
     <el-dialog :before-close="closeLv1TaskDialog" :title="taskLv1DialogTitle" :visible.sync="taskLv1DialogVisible" width="70%" style="min-width: 600px;" :close-on-click-modal="false" class="tl-taskform abow_dialog">
-      <el-form ref="form" :model="taskLv1Form" label-width="143px" label-position="left" class="tl-edit-form" :rules="taskLv1FormRules">
+      <el-form ref="form" :model="taskLv1Form" label-width="145px" label-position="left" class="tl-edit-form" :rules="taskLv1FormRules">
         <el-tabs v-model="activeTabForLv1" type="card" ref="taskLv1Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv1Form', 'activeTabForLv1')})">
           <el-tab-pane label="Basic Information" name="tab_basic_info">
             <el-row>
@@ -292,7 +292,7 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
-                  <el-select v-model="taskLv1Form.task_responsible_leader" style="width: 100%">
+                  <el-select v-model="taskLv1Form.task_responsible_leader" filterable style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForLv1RespLeader"
                       :key="index"
@@ -357,7 +357,7 @@
 <!------- 5. End of Level 1 Task Details Dialog -->
 <!------- 6. Level 2 Task Details Dialog -->
     <el-dialog :before-close="closeLv2TaskDialog" :title="taskLv2DialogTitle" :visible.sync="taskLv2DialogVisible" width="70%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
-      <el-form ref="form" :model="taskLv2Form" label-width="137px" label-position="left" class="tl-edit-form" :rules="taskLv2FormRules">
+      <el-form ref="form" :model="taskLv2Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv2FormRules">
         <el-tabs v-model="activeTabForLv2" type="card" ref="taskLv2Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv2Form', 'activeTabForLv2')})">
           <el-tab-pane label="Basic Information" name="tab_basic_info">
             <el-row>
@@ -434,7 +434,7 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Responsible Leader">
-                  <el-select v-model="taskLv2Form.task_responsible_leader" style="width: 100%">
+                  <el-select v-model="taskLv2Form.task_responsible_leader" filterable style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForOthRespLeader"
                       :key="index"
@@ -448,7 +448,7 @@
               </el-col>
               <el-col :span="11" :offset="1" v-if="false">
                 <el-form-item label="Assignee">
-                  <el-select v-model="taskLv2Form.task_assignee" style="width: 100%">
+                  <el-select v-model="taskLv2Form.task_assignee" filterable style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
                       :key="index"
@@ -549,7 +549,7 @@
 <!------- 6. End Level 2 Task Details Dialog -->
 <!------- 7. Level 3 Task Details Dialog -->
     <el-dialog :before-close="closeLv3TaskDialog" :title="taskLv3DialogTitle" :visible.sync="taskLv3DialogVisible" width="70%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
-      <el-form ref="form" :model="taskLv3Form" label-width="137px" label-position="left" class="tl-edit-form" :rules="taskLv3FormRules">
+      <el-form ref="form" :model="taskLv3Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv3FormRules">
         <el-tabs v-model="activeTabForLv3" type="card" ref="taskLv3Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv3Form', 'activeTabForLv3')})">
           <el-tab-pane label="Basic Information" name="tab_basic_info">
             <el-row>
@@ -653,7 +653,7 @@
               </el-col>
               <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
-                  <el-select :disabled="lv3TaskItemRule.disableAssignee" v-model="taskLv3Form.task_assignee" style="width: 100%">
+                  <el-select :disabled="lv3TaskItemRule.disableAssignee" filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
                       :key="index"
@@ -667,7 +667,7 @@
               </el-col>
               <el-col :span="12" v-if="!lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
-                  <el-select :disabled="lv3TaskItemRule.disableAssignee" v-model="taskLv3Form.task_assignee" style="width: 100%">
+                  <el-select :disabled="lv3TaskItemRule.disableAssignee" filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
                       :key="index"
@@ -779,7 +779,7 @@
 <!------- 7. End Level 3 Task Details Dialog -->
 <!------- 8. Level 4 Task Details Dialog -->
     <el-dialog :before-close="closeLv4TaskDialog" :title="taskLv4DialogTitle" :visible.sync="taskLv4DialogVisible" width="70%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
-      <el-form ref="form" :model="taskLv4Form" label-width="137px" label-position="left" class="tl-edit-form" :rules="taskLv4FormRules">
+      <el-form ref="form" :model="taskLv4Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv4FormRules">
         <el-tabs v-model="activeTabForLv4" type="card" ref="taskLv4Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv4Form', 'activeTabForLv4')})">
           <el-tab-pane label="Basic Information" name="tab_basic_info">
             <el-row>
@@ -877,7 +877,7 @@
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item label="Assignee">
-                  <el-select :disabled="lv4TaskItemRule.disableAssignee" v-model="taskLv4Form.task_assignee" style="width: 100%">
+                  <el-select :disabled="lv4TaskItemRule.disableAssignee" filterable v-model="taskLv4Form.task_assignee" style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
                       :key="index"
