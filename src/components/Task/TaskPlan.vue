@@ -83,7 +83,7 @@
                 <div class="tp-main-content" @click.stop="preventParentEventTrigger">
                   <el-row>
                     <el-col :span="24">
-                      <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
+                      <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" :row-class-name="getSubTaskRowClassName" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
                         <el-table-column type="expand">
                           <template slot-scope="props">
                             <el-row>
@@ -2070,6 +2070,11 @@ export default {
       } else {
         return false
       }
+    },
+    getSubTaskRowClassName ({row, rowIndex}) {
+      if (row.task_sub_tasks.length === 0) {
+        return 'row-expand-cover'
+      }
     }
   },
   created () {
@@ -2376,5 +2381,8 @@ input[type="number"]{
 }
 .tp-main .el-collapse-item__header {
   background-color: #F0FFFF !important;
+}
+.row-expand-cover .el-table__expand-icon {
+  visibility:hidden;
 }
 </style>
