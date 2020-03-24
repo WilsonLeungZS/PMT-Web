@@ -1124,10 +1124,10 @@ export default {
       userRole: this.$store.getters.getUserRole,
       // Status Value
       statusCollection: [
-        {'status_name': 'Drafting', 'status_sequence': 1, 'status_disable_est': false, 'status_allow_worklog': false},
-        {'status_name': 'Planning', 'status_sequence': 2, 'status_disable_est': false, 'status_allow_worklog': false},
-        {'status_name': 'Running', 'status_sequence': 3, 'status_disable_est': true, 'status_allow_worklog': true},
-        {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true}
+        {'status_name': 'Drafting', 'status_sequence': 1, 'status_disable_est': false, 'status_allow_worklog': false, 'status_disable_change_parent': false},
+        {'status_name': 'Planning', 'status_sequence': 2, 'status_disable_est': false, 'status_allow_worklog': false, 'status_disable_change_parent': false},
+        {'status_name': 'Running', 'status_sequence': 3, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true},
+        {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true}
       ],
       statusArray: []
     }
@@ -1683,11 +1683,12 @@ export default {
           this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
           this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = '' // Show worklog history tab
         })
-        this.$data.lv3TaskItemRule.disableParentNameInput = true
         this.$data.lv3TaskItemRule.showProgress = true
         // Default value
         this.$data.taskLv3WorklogShow = true
         this.$data.lv3TaskItemRule.disableTaskEst = false
+        // Common Rule for estimation and worklog button
+        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
           this.$data.lv3TaskItemRule.disableTaskEst = true
@@ -1695,6 +1696,7 @@ export default {
           this.$data.lv3TaskItemRule.disableAssignee = true
           this.$data.lv3TaskItemRule.disableStatus = true
           this.$data.lv3TaskItemRule.showRefPoolInput = false
+          this.$data.lv3TaskItemRule.disableParentNameInput = true
           if (this.$data.taskLv3Form.task_type === 'Pool') {
             console.log('Pool Task')
             this.$data.taskLv3WorklogShow = false
@@ -1720,9 +1722,8 @@ export default {
           this.$data.lv3TaskItemRule.showRespLeader = true
           this.$data.lv3TaskItemRule.showSubTaskEst = true
           this.$data.taskLv3WorklogShow = true
+          this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
         }
-        // Common Rule for estimation and worklog button
-        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Common Rule 1
         this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         // Common Rule 2
@@ -1806,7 +1807,6 @@ export default {
         this.$nextTick(() => {
           this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = '' // Show worklog history tab
         })
-        this.$data.lv4TaskItemRule.disableParentNameInput = true
         this.$data.lv4TaskItemRule.showProgress = true
         this.$data.taskLv4WorklogShow = true
         // Common Rule for estimation and worklog button
@@ -1815,6 +1815,7 @@ export default {
         this.$data.lv4TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         // Common Rule 2
         this.$data.taskLv4WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
+        this.$data.lv4TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
       }
       if (iAction === 'Create') {
         // Set Dialog Default Value
