@@ -39,43 +39,6 @@
             </el-table>
           </el-col>
         </el-row>
-<<<<<<< HEAD
-        <el-row>
-          <el-col :span="24" class="content-task-col">
-              <div class="datePicker">
-                <el-button size="small" round  icon="el-icon-arrow-left" @click="ChangePeriod(-1)"></el-button>
-                <el-date-picker v-model="timesheetMemo" type="month" size="small" format="yyyy-MM" :clearable="false"
-                  class="assin-month-picker" @change="changeMemoMonth"></el-date-picker>
-                <el-button size="small" round @click="ChangePeriod(1)"><i class="el-icon-arrow-right el-icon--right" ></i></el-button>
-              </div>
-                <div class="cards" v-for="(assignToTask,index) in assignToTasks" :key="index" >
-                    <el-col :span="span_card">    
-                    <el-card  class="box-card" @click.native="addToAssign(assignToTask)">
-                      <div slot="header" class="clearfix">
-                        <span class="title">{{assignToTask.taskName}}</span>
-                      </div>
-                      <div class="text item">
-                        <el-row>
-                          <el-col class="title" :span="8">Date</el-col>
-                          <el-col class="content"  :span="16">{{assignToTask.date}}</el-col>
-                        </el-row>
-                        <el-row >
-                          <el-col class="title"  :span="8">Progress</el-col>
-                          <el-col class="content" :span="16"><el-progress :percentage="assignToTask.progress"></el-progress></el-col>
-                        </el-row>                        
-                        <el-row >
-                          <el-col class="title"  :span="8">Description</el-col>
-                          <el-col class="content" :title="assignToTask.Description" :span="16"><div class="overflow">{{assignToTask.Description}}</div></el-col> 
-                        </el-row >
-                      </div>
-                    </el-card>  
-                    </el-col>
-                  </div>
-                  
-          </el-col>
-        </el-row>
-=======
->>>>>>> WilsonLeungZS/master
       </el-main>
     </el-container>
     <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
@@ -569,36 +532,6 @@ export default {
       }
       this.$data.form.worklog_date = changeDateYear + '-' + changeDateMonth + '-' + changeDateDay
     },
-<<<<<<< HEAD
-    async addToAssign (assignToTask) {
-      console.log('click')
-      var currentDate = new Date()
-      console.log(currentDate)
-      this.$data.worklogFormVisible = true
-      console.log(assignToTask)
-      this.$data.form.worklog_taskid = assignToTask.taskId
-      this.$data.form.worklog_task = assignToTask.taskName
-      this.$data.form.worklog_date = currentDate
-      this.$data.form.worklog_effort = 0
-      this.$data.form.worklog_remark = ''
-      // var reqWorklogMonth = assignToTask.date.slice(0,7)
-      // var reqWorklogDay = assignToTask.date.slice(8,10)
-      // const res = await http.post('/worklogs/getWorklogForWeb', {
-      //   wUserId: this.$store.getters.getUserId,
-      //   wTaskId: assignToTask.taskId,
-      //   wWorklogMonth: reqWorklogMonth,
-      //   wWorklogDay: reqWorklogDay
-      // })
-      // console.log(res)
-
-    },
-    // $(window).resize(function(){ 
-    // var Height = $(window).height();
-    // var Width = $(window).width();
-    // console.log('Height'+Height);
-    // console.log('Width'+VWidth);
-    // })
-=======
     checkEffortIsValid (iEffort) {
       var effort = Number(iEffort)
       if (effort % 0.5 === 0) {
@@ -607,7 +540,6 @@ export default {
         return false
       }
     }
->>>>>>> WilsonLeungZS/master
   },
   created () {
     console.log('Created My Timesheet')
@@ -803,9 +735,7 @@ export default {
 .el-autocomplete-suggestion li {
   line-height: 28px;
 }
-<<<<<<< HEAD
 
-=======
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -813,5 +743,5 @@ input::-webkit-inner-spin-button {
 input[type="number"]{
   -moz-appearance: textfield;
 }
->>>>>>> WilsonLeungZS/master
+
 </style>

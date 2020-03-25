@@ -59,7 +59,7 @@
                   </el-tooltip>
                 </el-col>
                 <el-col :span="1">
-                  <el-popover @hide="hidePopover" placement="bottom" v-model="reportFormVisible">
+                  <el-popover placement="bottom" v-model="reportFormVisible">
                     <el-form label-width="60px">
                       <el-form-item label="Range">
                         <el-date-picker
@@ -75,53 +75,19 @@
                           :picker-options="pickerOptions">
                         </el-date-picker>
                       </el-form-item>
-                      <el-form-item label="Format">
-                        <el-select :disabled="disableCustomize" @clear="customizeVisible=true" v-model="customize" @change="changeCustomize" clearable placeholder="Please Choose Your Customize">
-                          <el-option
-                            v-for="item in options4"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                          </el-option>
-                        </el-select>
-                        <el-button @click="creatFormat" type="text" size="mini">Creat new Format</el-button>
+                      <el-form-item label="Report">
+                        <el-radio-group v-model="reportType">
+                          <div><el-radio :label="1">Report 1(Only MTL) </el-radio></div>
+                          <div><el-radio :label="2">Report 2 </el-radio></div>
+                          <div><el-radio :label="3">Report 3（task list) </el-radio></div>
+                        </el-radio-group>
                       </el-form-item>
-                      <el-form-item :class="{isHide:customizeVisible}"  label="Report">
-                        <!-- <el-radio-group v-model="reportType">
-                          <el-radio :label="1">Report 1 (Default)</el-radio>
-                          <el-radio :label="2">Report 2 (SI Project)</el-radio>
-                        </el-radio-group> -->
-                          <el-select  v-model="reportValue" multiple placeholder="Please choose Report Type">
-                            <el-option
-                              v-for="item in options2"
-                              :key="item.value"
-                              :label="item.label"
-                              :value="item.value">
-                            </el-option>
-                          </el-select>
-                      </el-form-item>
-                      <el-form-item :class="{isHide:customizeVisible}" label="Column">
-                        <el-cascader 
-                          v-model="formatValue"
-                          :options="options"
-                          :props="props"
-                          clearable></el-cascader>
-                      </el-form-item>
-                      <!-- <el-form-item label="Status" v-show="showForCus">
-                        <el-input
-                          placeholder="请输入内容"
-                          v-model="customizeName"
-                          clearable>
-                        </el-input>
-                      </el-form-item>                       -->
                     </el-form>
                     <div style="text-align: right; margin: 0">
-                      <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="addCus" :class="{isHide:customizeVisible}" icon="el-icon-edit" size="mini" ></el-button>
-                      <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}"  :class="{isHide:customizeVisible}" icon="el-icon-delete" size="mini" ></el-button>
-                      <el-button size="mini" type="text" @click="customizeVisible = true;reportFormVisible = false; reportRangeValue = []; reportType = 1">Cancel</el-button>
+                      <el-button size="mini" type="text" @click="reportFormVisible = false; reportRangeValue = []; reportType = 1">Cancel</el-button>
                       <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="mini" @click="extractReport">Extract</el-button>
                     </div>
-                    <el-button @click="forFormat" slot="reference" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" icon="el-icon-download" circle></el-button>
+                    <el-button slot="reference" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" icon="el-icon-download" circle></el-button>
                   </el-popover>
                 </el-col>
                 <el-col :span="5" :offset="5" class="pt-effort-progress">
@@ -190,105 +156,16 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog title="Enter Customize Name" width="400px" :visible.sync="worklogFormVisible" :close-on-click-modal="false">
-      <el-input
-        v-model="customizeName"
-        clearable>
-      </el-input>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="worklogFormVisible = false;">Cancel</el-button>
-        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitCustomize">Submit</el-button>
-      </div>
-    </el-dialog>    
   </div>
 </template>
 
 <script>
 import http from '../../utils/http'
 import utils from '../../utils/utils'
-import { async } from 'q'
 export default {
   name: 'Charts',
   data () {
     return {
-      disableCustomize:false,
-      worklogFormVisible: false,
-      customizeName:'',
-      customize:'',
-      options3:[],
-      options4:[],
-      reportValue:[],
-      options2:[{
-        value: 'SI-Issue',
-        label: 'SI-Issue'
-      },{
-        value: 'SI-Task',
-        label: 'SI-Task'
-      },{
-        value: 'App Admin',
-        label: 'App Admin'
-      },{
-        value: 'Change',
-        label: 'Change'
-      },{
-        value: 'Sponsor Task',
-        label: 'Sponsor Task'
-      },{
-        value: 'Incident',
-        label: 'Incident'
-      },{
-        value: 'ITSR',
-        label: 'ITSR'
-      },{
-        value: 'Problem',
-        label: 'Problem'
-      },{
-        value: 'Service Request',
-        label: 'Service Request'
-      },{
-        value: 'Sponsor Task - BAU',
-        label: 'Sponsor Task - BAU'
-      },{
-        value: 'Knowledge Transfer',
-        label: 'Knowledge Transfer'
-      }
-      ],
-        props: { multiple: true },
-        formatValue:[],
-        options: [
-          {
-          value: 'User',
-          label: 'User',
-          children: [
-            { value: 'Name', label: 'UserName' }
-          ]
-        }, 
-        {
-          value: 'Task',
-          label: 'Task',
-          children: [
-            { value: 'TaskName', label: 'Task Number' },
-            { value: 'Description', label: 'Task Title' },
-            { value: 'BusinessArea', label: 'Change Business Area' },
-            { value: 'BizProject', label: 'BizProject' },
-          ]
-        },
-      {
-          value: 'TaskType',
-          label: 'TaskType',
-          children: [
-            { value: 'Name', label: 'TaskTypeName' },
-            { value: 'Category', label: 'AD Task Category' }
-          ]
-        }, 
-      {
-          value: 'Team',
-          label: 'Team',
-          children: [
-            { value: 'Name', label: 'TeamName' },
-          ]
-        }, 
-      ],
       header1: 'Project Management',
       header2: 'Timesheet Management',
       isActive: true,
@@ -297,7 +174,6 @@ export default {
       taskSelect: '',
       taskWorklogList: [],
       labelPosition: 'left',
-      customizeVisible:true,
       taskForm: {
         taskId: 0,
         taskName: 'Task Number',
@@ -341,7 +217,7 @@ export default {
       },
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
-    } 
+    }
   },
   methods: {
     switchToPM () {
@@ -507,283 +383,140 @@ export default {
         this.$message.error('Fail to adjust worklog!')
       }
     },
-    searchName(label){
-      var req = [];
-      var model ='';
-      var value = '';
-      if(label === 'UserName'){
-          model = 'User'
-          value = 'Name'
-      }else if(label === 'Task Number'){
-          model = 'Task'
-          value = 'TaskName'
-      }else if(label === 'Task Title'){
-          model = 'Task'
-          value = 'Description'
-      }else if(label === 'Change Business Area'){
-          model = 'Task'
-          value = 'BusinessArea'
-      }else if(label === 'BizProject'){
-        model = 'Task'
-        value = 'BizProject'
-      }else if(label === 'TaskTypeName'){
-        model = 'TaskType'
-        value = 'Name'
-      }else if(label === 'AD Task Category'){
-        model = 'TaskType'
-        value = 'Category'
-      }else if(label === 'TeamName'){
-        model = 'Team'
-        value = 'Name'
-      }
-      return req = {
-        model : model,
-        value : value,
-        label : label
-      }
-    },
-    //search label with value
-    searchLabel(model,value){
-      if(model==='User'){
-        if(value === 'Name'){
-          return 'UserName'
-        }
-      }else if(model === 'Task'){
-        if(value === 'TaskName'){
-          return 'Task Number'
-        }else if(value === 'Description'){
-          return 'Task Title'
-        }else if(value === 'BusinessArea'){
-          return 'Change Business Area'
-        }else if(value === 'BizProject'){
-          return 'BizProject'
-        }
-      }else if(model === 'TaskType'){
-        if(value === 'Name'){
-          return 'TaskTypeName'
-        }else if(value === 'Category'){
-          return 'AD Task Category'
-        }
-      }else if(model === 'Team'){
-        if(value === 'Name'){
-          return 'TeamName'
-        }
-      }
-    },
-    hidePopover(){
-      this.$data.reportFormVisible = false
-      this.$data.reportRangeValue = []
-      this.$data.customizeVisible = true;
-      this.$data.customize = '';
-      this.$data.options3 = [];
-      this.$data.options4 = [];
-      this.$data.customizeName = '';
-      this.$data.disableCustomize = false;
-    },
-    async forFormat(){
-      console.log(this.customize)
-      console.log('----forFormat-----')
-      var userId = this.$store.getters.getUserId
-      const res = await http.post('/formats/getCustomizeByUserId',{
-        wUserId : userId
-      })
-      var criteria1 = []
-      var criteria2 = []
-      console.log(res)
-      if(res.status === 200){
-        for(var i = 0 ; i<res.data.data.length;i++){
-          criteria1={
-            Id :res.data.data[i].Id,
-            userId: res.data.data[i].userId, 
-            customizeName: res.data.data[i].customizeName, 
-            report: res.data.data[i].customizeName, 
-            format: res.data.data[i].customizeName
-          }
-          this.options3.push(criteria1)
-        }
-        for(var i = 0; i <this.options3.length;i++){
-          criteria2 ={
-            value:this.options3[i].Id,
-            label:this.options3[i].customizeName
-          }
-          this.options4.push(criteria2)
-        }
-        console.log(this.options4)
-      }
-    },
-    async changeCustomize(){
-      var rv = [];
-      var fv = [];
-      var fv1 = [];
-      this.$data.formatValue = []
-      this.$data.reportValue = []
-      this.customizeVisible = false;
-      const res = await http.post('/formats/getCustomizeById',{
-        wId : this.customize
-      })
-      console.log(res)
-      console.log('res')
-      if(res.status === 200){
-        fv = res.data.data.format.split(',');
-        console.log(fv)
-        console.log('fv')
-        rv = res.data.data.report.split(',');
-        for(var i = 0 ;i<fv.length ; i++){
-          var jsonRest = [];
-          jsonRest = this.searchName(fv[i])
-          fv1.push(jsonRest)
-        }
-        this.reportValue = rv
-        for(var i =0;i<fv1.length ;i++){
-          var fv2 = [];
-          fv2.push(fv1[i].model)
-          fv2.push(fv1[i].value)
-            console.log(fv2)
-            this.$data.formatValue.push(fv2)
-        }
-        console.log(this.$data.formatValue)
-        console.log('this.$data.formatValue')        
-      }else{
-        console.log('bug')
-      }
-
-    },
-    async submitCustomize () {
-      var wreqUserId = this.$store.getters.getUserId;
-      var wcustomizeName = this.$data.customizeName ;
-      var wrq = this.$data.reportValue;
-      var wfv = this.$data.formatValue;
-      var formatOptions = ''
-      var reportHeader2 = []
-
-      for(var i =0;i<wfv.length;i++){
-        formatOptions = this.searchLabel(wfv[i][0],wfv[i][1])
-        reportHeader2.push(formatOptions)
-      }
-      wrq = '' + wrq;
-      reportHeader2 = '' + reportHeader2;
-      console.log('submit')
-      const res = await http.post('/formats/addCustomize',{
-        customizeName : wcustomizeName,
-        userId : wreqUserId,
-        report : wrq,
-        format : reportHeader2
-      })
-      console.log(res)
-      this.$data.worklogFormVisible = false
-    },
-    addCus(){
-      this.$data.worklogFormVisible =true
-    },
-    creatFormat(){
-      this.$data.disableCustomize = true;
-      this.$data.customizeVisible = false;
-      this.$data.reportValue = [];
-      this.$data.formatValue = [];
-    },
     // Export report to excel
     async extractReport () {
-      var reportValue = this.$data.reportValue
-      console.log(reportValue)
       var reportTimeRange = this.$data.reportRangeValue
-      var formatValue = this.$data.formatValue 
-      var formatOptions = ''
-      var reqModel = []
-      var reqVal = []
-      var reportType2 =[]
-      var reportHeader2 = []
-      var reportValue2 = []    
-      console.log(formatValue)
-      console.log('------formatValue-----')      
-      for(var i = 0 ; i < formatValue.length ;i++){
-        console.log(formatValue[i])
-          //console.log(formatValue[i])
-          reportType2.push(formatValue[i])
-      }
-      console.log(reportType2)
-      console.log('------reportType2-----')
-      // console.log(reportType2)
+      var reportType = this.$data.reportType
       if (reportTimeRange != null && reportTimeRange.length > 0) {
         var reportStartMonth = reportTimeRange[0]
         var reportEndMonth = reportTimeRange[1]
+      } else if(reportType === 3 ){
       } else {
         this.$message.error('Please select month!')
         return
       }
-      var reportTitle = 'PMT Report ' + reportStartMonth + '-' + reportEndMonth
-      for(var i = 0 ;i < formatValue.length ; i++){
-        reqModel.push(reportType2[i][0])
-        reqVal.push(reportType2[i][1])
-        formatOptions  = this.searchLabel(reportType2[i][0],reportType2[i][1])
-        reportHeader2.push(formatOptions)
-        console.log(formatOptions)
-        formatOptions=formatOptions.replace(/\s*/g,'')
-        console.log(formatOptions)
-        reportValue2.push('report_'+formatOptions)
+      var url = '/worklogs/extractReport1ForWeb'
+      var reportTitle = 'PMT Report1 ' + reportStartMonth + '-' + reportEndMonth
+      if (reportType === 2) {
+        url = '/worklogs/extractReport2ForWeb'
+        reportTitle = 'PMT Report2 ' + reportStartMonth + '-' + reportEndMonth
       }
-      reportValue2[formatValue.length] = 'report_worklogremark'
-      reportValue2[formatValue.length+1] = 'report_date'
-      reportValue2[formatValue.length+2] = 'report_month'
-      reportValue2[formatValue.length+3] = 'report_manhours'
-      reportValue2[formatValue.length+4] = 'report_mandays'
-      reportHeader2[formatValue.length] = 'Worklog Description'
-      reportHeader2[formatValue.length+1] = 'Date'
-      reportHeader2[formatValue.length+2] = 'Month'
-      reportHeader2[formatValue.length+3] = 'Man-hours'
-      reportHeader2[formatValue.length+4] = 'Man-days'
-      console.log(reportValue2)
-      console.log('-----------------------reportValue2--------------------------')
-      console.log(reportHeader2)
-      console.log('-----------------------reportHeader2--------------------------')
-      reqModel = '' + reqModel
-      reqVal = '' + reqVal
-      reportValue = '' + reportValue
-      const res2 = await http.post('/worklogs/cascaderForWeb', {
-        wReportStartMonth: reportStartMonth,
-        wReportEndMonth: reportEndMonth,
-        wReportValue : reportValue
+      var reportHeader = []
+      var reportValue = []
+      if(reportType === 1){
+      reportHeader = ['Name', 'Month','Date', 'Task Number','Ref Pool', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Business Project', 'AD Task Category']
+      reportValue = ['report_username', 'report_month','report_date',  'report_task','report_ref', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_bizproject', 'report_taskcategory']        
+      }else{
+      reportHeader = ['Name','Date', 'Task Number','Ref Pool' ,'Task Title','Worklog Description', 'Man-hours', 'Estimation', 'Issue date', 'Target Complete date','Actual Complete date','Business Project','Task Category']
+      reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory']   
+      }
+      var res = {}
+      if(reportType ===1 || reportType ===2 ){
+        res = await http.post(url, {
+          wReportStartMonth: reportStartMonth,
+          wReportEndMonth: reportEndMonth
+        })        
+      }else{
+        console.log("click report3")
+        url = '/tasks/extractReport3ForWeb'
+        reportTitle = 'PMT Report3 ' + reportStartMonth + '-' + reportEndMonth
+        res = await http.post(url, {
+        wUserId:this.$store.getters.getUserId
       })
-      console.log('------------------------res2-------------------------')
-      console.log(res2)
-      if(res2.data.status === 0){
+      var resp
+      var assi
+      if(res.data.data!=null && res.data.data.length>0){
+        for(var i = 0 ; i<res.data.data.length ;i++){
+          var respId = res.data.data[i].report_resp
+          if(respId != null){
+             resp = await http.post('/users/getUserLevelById', {
+              userId: respId
+            })
+            res.data.data[i].report_resp = resp.data.data.Name
+            res.data.data[i].report_resplevel=resp.data.data.Level
+                      
+          }
+          assi = await http.post('/users/getUserLevelById', {
+            userId: this.$store.getters.getUserId
+          })
+          res.data.data[i].report_assignee=assi.data.data.Name  
+          res.data.data[i].report_assigneelevel=assi.data.data.Level            
+       }
+      }
+      reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date']
+      reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', ]  
+      var arr = res.data.data
+      // for(var i = 0 ,dataLength = res.data.data.length;i<dataLength;i++){
+      //   if(res.data.data[i].report_parentTask!=null){
+      //      // arr = this.findParentTask(res.data.data,res.data.data[i].report_parentTask)
+          
+      //   }
+        
+      // }
+      for(var i = 0 ; i<res.data.data.length;i++){
+        if(res.data.data[i].report_parentTask!=null){
+        const gettaskbyname = await http.post('/tasks/getreport3bytaskname',{
+            taskName:res.data.data[i].report_parentTask
+        })        
+        //arr.push(gettaskbyname.data.data)
+        //console.log(gettaskbyname.data.data)
+        arr = arr.concat(gettaskbyname.data.data)
+        }
+      }
+      // console.log(arr2)
+      res.data.data = this.deteleObject(arr)
+      }
+      if (res.data.status === 0) {
         this.$message({
-          message : 'Start to extract report...',
-          type : 'success',
-          duration : 3000
+          message: 'Start to extract report...',
+          type: 'success',
+          duration: 3000
         })
-        if(res2.data.data != null){
-          utils.exportExcel(reportTitle,reportHeader2,reportValue2,res2.data.data)
-        }else{
+        if (res.data.data != null && res.data.data.length > 0) {
+          utils.exportExcel(reportTitle, reportHeader, reportValue, res.data.data)
+        } else {
           this.$message.error('No worklog to extract!')
         }
-      }else if(res2.data.status === 1 ){
+      } else if (res.data.status === 1) {
         this.$message.error('No worklog to extract!')
-      }else {
+      } else {
         this.$message.error('Error to extract!')
       }
-      
       this.$data.reportFormVisible = false
       this.$data.reportRangeValue = []
-      this.$data.customizeVisible = true;
-      this.$data.customize = '';
-      this.$data.options3 = [];
-      this.$data.options4 = [];
-      this.$data.reportValue = [];
-      this.$data.customizeName = '';
-      this.$data.formatValue = [];
-      this.$data.disableCustomize = false;
-    }
+      this.$data.reportType = 1
+     },
+     //Remove duplicate elements
+     deteleObject(obj) {
+      var uniques = [];
+      var stringify = {};
+      for (var i = 0; i < obj.length; i++) {
+          var keys = Object.keys(obj[i]);
+          keys.sort(function(a, b) {
+              return (Number(a) - Number(b));
+          });
+          var str = '';
+          for (var j = 0; j < keys.length; j++) {
+              str += JSON.stringify(keys[j]);
+              str += JSON.stringify(obj[i][keys[j]]);
+          }
+          if (!stringify.hasOwnProperty(str)) {
+              uniques.push(obj[i]);
+              stringify[str] = true;
+          }
+      }
+      uniques = uniques;
+      return uniques;
+      },
   },
   created () {
     console.log('Start')
   }
+
 }
 </script>
 
 <style scoped>
-.isHide {
-  display:none;
-}
 .charts-body {
   width: 100%;
   height: auto;
@@ -844,7 +577,6 @@ export default {
 .pt-task-box {
   margin-top: 10px;
 }
-
 .pt-task-box-content-item {
   width: auto;
   height: 100%;
@@ -892,6 +624,4 @@ input::-webkit-inner-spin-button{
 input[type="number"]{
   -moz-appearance: textfield;
 }
-
-
 </style>

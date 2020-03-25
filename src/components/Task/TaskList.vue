@@ -129,7 +129,7 @@
               <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="280px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
               <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
               <el-table-column prop="task_top_target_start" label="Target Start Time" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
-              <el-table-column prop="task_desc" label="Description" show-overflow-tooltip align="left" min-width="250px" v-if="!taskListRule.showColForLv1" key="10"></el-table-column>
+              <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="120px" v-if="!taskListRule.showColForLv1" key="10"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
               <el-table-column prop="task_reference" label="Ref Pool" width="150px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
                 <template slot-scope="scope">
@@ -140,7 +140,7 @@
               <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
               <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="15"></el-table-column>
               <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv2" key="16"></el-table-column>
-              <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column>
+              <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
               <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
                 <template slot-scope="scope">
@@ -826,7 +826,7 @@
                 </el-tooltip>
               </el-col>
             </el-form-item>
-            <el-form-item label="Description" prop="task_desc">
+            <el-form-item label="Title" prop="task_desc">
               <el-input :disabled="lv4TaskItemRule.disableDesc" class="span-format-text" type="textarea" v-model="taskLv4Form.task_desc" :rows="4"></el-input>
             </el-form-item>
           </el-tab-pane>
