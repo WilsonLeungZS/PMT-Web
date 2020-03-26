@@ -446,25 +446,16 @@ export default {
       reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date']
       reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', ]  
       var arr = res.data.data
-      // for(var i = 0 ,dataLength = res.data.data.length;i<dataLength;i++){
-      //   if(res.data.data[i].report_parentTask!=null){
-      //      // arr = this.findParentTask(res.data.data,res.data.data[i].report_parentTask)
-          
-      //   }
-        
-      // }
       for(var i = 0 ; i<res.data.data.length;i++){
         if(res.data.data[i].report_parentTask!=null){
         const gettaskbyname = await http.post('/tasks/getreport3bytaskname',{
             taskName:res.data.data[i].report_parentTask
         })        
-        //arr.push(gettaskbyname.data.data)
-        //console.log(gettaskbyname.data.data)
         arr = arr.concat(gettaskbyname.data.data)
         }
       }
-      // console.log(arr2)
       res.data.data = this.deteleObject(arr)
+      console.log(res.data.data)
       }
       if (res.data.status === 0) {
         this.$message({
@@ -492,9 +483,9 @@ export default {
       var stringify = {};
       for (var i = 0; i < obj.length; i++) {
           var keys = Object.keys(obj[i]);
-          keys.sort(function(a, b) {
-              return (Number(a) - Number(b));
-          });
+          // keys.sort(function(a, b) {
+          //     return (Number(a) - Number(b));
+          // });
           var str = '';
           for (var j = 0; j < keys.length; j++) {
               str += JSON.stringify(keys[j]);
