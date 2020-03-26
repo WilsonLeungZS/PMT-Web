@@ -11,16 +11,6 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {},
-    //proxyTable: {
-      // '/api':{
-      //   target :'https://pmt.gzatcc.com:3000/',
-      //   ws: true,
-      //   changeOrigin: true,
-      //   pathRewrite:{
-      //     '^/api':'https://pmt.gzatcc.com:3000/'
-      //   }
-      // }
-    //},
     // Various Dev Server settings
     host: 'pmt.gzatcc.com', // can be overwritten by process.env.HOST
     port: 8000, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined

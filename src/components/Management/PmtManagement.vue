@@ -77,9 +77,8 @@
                       </el-form-item>
                       <el-form-item label="Report">
                         <el-radio-group v-model="reportType">
-                          <div><el-radio :label="1">Report 1(Only MTL) </el-radio></div>
-                          <div><el-radio :label="2">Report 2 </el-radio></div>
-                          <div><el-radio :label="3">Report 3（task list) </el-radio></div>
+                          <el-radio :label="1">Report 1 (Default)</el-radio>
+                          <el-radio :label="2">Report 2 (SI Project)</el-radio>
                         </el-radio-group>
                       </el-form-item>
                     </el-form>
@@ -390,73 +389,22 @@ export default {
       if (reportTimeRange != null && reportTimeRange.length > 0) {
         var reportStartMonth = reportTimeRange[0]
         var reportEndMonth = reportTimeRange[1]
-      } else if(reportType === 3 ){
       } else {
         this.$message.error('Please select month!')
         return
       }
       var url = '/worklogs/extractReport1ForWeb'
-      var reportTitle = 'PMT Report1 ' + reportStartMonth + '-' + reportEndMonth
+      var reportTitle = 'PMT Report ' + reportStartMonth + '-' + reportEndMonth
       if (reportType === 2) {
         url = '/worklogs/extractReport2ForWeb'
-        reportTitle = 'PMT Report2 ' + reportStartMonth + '-' + reportEndMonth
+        reportTitle = 'PMT Report(SI Project) ' + reportStartMonth + '-' + reportEndMonth
       }
-      var reportHeader = []
-      var reportValue = []
-      if(reportType === 1){
-      reportHeader = ['Name', 'Month','Date', 'Task Number','Ref Pool', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Business Project', 'AD Task Category']
-      reportValue = ['report_username', 'report_month','report_date',  'report_task','report_ref', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_bizproject', 'report_taskcategory']        
-      }else{
-      reportHeader = ['Name','Date', 'Task Number','Ref Pool' ,'Task Title','Worklog Description', 'Man-hours', 'Estimation', 'Issue date', 'Target Complete date','Actual Complete date','Business Project','Task Category']
-      reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory']   
-      }
-      var res = {}
-      if(reportType ===1 || reportType ===2 ){
-        res = await http.post(url, {
-          wReportStartMonth: reportStartMonth,
-          wReportEndMonth: reportEndMonth
-        })        
-      }else{
-        console.log("click report3")
-        url = '/tasks/extractReport3ForWeb'
-        reportTitle = 'PMT Report3 ' + reportStartMonth + '-' + reportEndMonth
-        res = await http.post(url, {
-        wUserId:this.$store.getters.getUserId
+      const reportHeader = ['Name', 'Date', 'Month', 'Task Number', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Change Business Area', 'AD Task Category']
+      const reportValue = ['report_username', 'report_date', 'report_month', 'report_task', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_businessarea', 'report_taskcategory']
+      const res = await http.post(url, {
+        wReportStartMonth: reportStartMonth,
+        wReportEndMonth: reportEndMonth
       })
-      var resp
-      var assi
-      if(res.data.data!=null && res.data.data.length>0){
-        for(var i = 0 ; i<res.data.data.length ;i++){
-          var respId = res.data.data[i].report_resp
-          if(respId != null){
-             resp = await http.post('/users/getUserLevelById', {
-              userId: respId
-            })
-            res.data.data[i].report_resp = resp.data.data.Name
-            res.data.data[i].report_resplevel=resp.data.data.Level
-                      
-          }
-          assi = await http.post('/users/getUserLevelById', {
-            userId: this.$store.getters.getUserId
-          })
-          res.data.data[i].report_assignee=assi.data.data.Name  
-          res.data.data[i].report_assigneelevel=assi.data.data.Level            
-       }
-      }
-      reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date']
-      reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', ]  
-      var arr = res.data.data
-      for(var i = 0 ; i<res.data.data.length;i++){
-        if(res.data.data[i].report_parentTask!=null){
-        const gettaskbyname = await http.post('/tasks/getreport3bytaskname',{
-            taskName:res.data.data[i].report_parentTask
-        })        
-        arr = arr.concat(gettaskbyname.data.data)
-        }
-      }
-      res.data.data = this.deteleObject(arr)
-      console.log(res.data.data)
-      }
       if (res.data.status === 0) {
         this.$message({
           message: 'Start to extract report...',
@@ -476,34 +424,11 @@ export default {
       this.$data.reportFormVisible = false
       this.$data.reportRangeValue = []
       this.$data.reportType = 1
-     },
-     //Remove duplicate elements
-     deteleObject(obj) {
-      var uniques = [];
-      var stringify = {};
-      for (var i = 0; i < obj.length; i++) {
-          var keys = Object.keys(obj[i]);
-          // keys.sort(function(a, b) {
-          //     return (Number(a) - Number(b));
-          // });
-          var str = '';
-          for (var j = 0; j < keys.length; j++) {
-              str += JSON.stringify(keys[j]);
-              str += JSON.stringify(obj[i][keys[j]]);
-          }
-          if (!stringify.hasOwnProperty(str)) {
-              uniques.push(obj[i]);
-              stringify[str] = true;
-          }
-      }
-      uniques = uniques;
-      return uniques;
-      },
+    }
   },
   created () {
     console.log('Start')
   }
-
 }
 </script>
 
@@ -568,6 +493,7 @@ export default {
 .pt-task-box {
   margin-top: 10px;
 }
+
 .pt-task-box-content-item {
   width: auto;
   height: 100%;
