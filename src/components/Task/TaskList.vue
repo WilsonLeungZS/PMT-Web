@@ -316,7 +316,7 @@
             <el-row>
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table :data="taskLv1FormSubTasks" fit max-height="500" class="sub-task-table">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv1FormSubTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -509,7 +509,7 @@
             <el-row>
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table :data="taskLv2FormSubTasks" fit max-height="500" class="sub-task-table">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv2FormSubTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -728,7 +728,7 @@
             <el-row>
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table :data="taskLv3FormSubTasks" fit max-height="500" class="sub-task-table">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv3FormSubTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -761,7 +761,7 @@
           </el-tab-pane>
           <el-tab-pane label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
-              <el-timeline>
+              <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv3FormHistories" :key="index" :timestamp="history.timestamp"
                   icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
                   {{history.content}}
@@ -920,7 +920,7 @@
           </el-tab-pane>
           <el-tab-pane label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
-              <el-timeline>
+              <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv4FormHistories" :key="index" :timestamp="history.timestamp"
                   icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
                   {{history.content}}
@@ -1006,6 +1006,8 @@ export default {
       tasksTotalSize: 0,
       taskslistData: [],
       taskslistLoading: false,
+      tasksSubTaskLoading: false,
+      tasksWorklogHistoriesLoading: false,
       // Level 1 Task Dialog Value
       taskLv1DialogVisible: false,
       taskLv1DialogTitle: '1 - Business Opportunity',
@@ -1310,6 +1312,7 @@ export default {
       }
     },
     async getSubTaskList (iTaskName, iSubTaskListItem, iLevel) {
+      this.$data.tasksSubTaskLoading = true
       const res = await http.post('/tasks/getSubTaskByTaskName', {
         reqTaskName: iTaskName
       })
@@ -1327,8 +1330,10 @@ export default {
           this.$data.lv3TaskItemRule.disableTaskEst = true
         }
       }
+      this.$data.tasksSubTaskLoading = false
     },
     async getTaskWorklogHistory (iTaskId, iTaskHistory) {
+      this.$data.tasksWorklogHistoriesLoading = true
       const res = await http.post('/worklogs/getWorklogHistoryByTaskId', {
         wTaskId: iTaskId
       })
@@ -1338,6 +1343,7 @@ export default {
       } else {
         this[iTaskHistory] = []
       }
+      this.$data.tasksWorklogHistoriesLoading = false
     },
     async createNewTask (iTaskLevel) {
       console.log('Create new task: ' + iTaskLevel)
