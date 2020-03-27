@@ -399,11 +399,27 @@ export default {
         url = '/worklogs/extractReport2ForWeb'
         reportTitle = 'PMT Report(SI Project) ' + reportStartMonth + '-' + reportEndMonth
       }
-      const reportHeader = ['Name', 'Date', 'Month', 'Task Number', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Change Business Area', 'AD Task Category']
-      const reportValue = ['report_username', 'report_date', 'report_month', 'report_task', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_businessarea', 'report_taskcategory']
-      const res = await http.post(url, {
-        wReportStartMonth: reportStartMonth,
-        wReportEndMonth: reportEndMonth
+      var reportHeader = []
+      var reportValue = []
+      if(reportType === 1){
+      reportHeader = ['Name', 'Month','Date', 'Task Number','Ref Pool', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Business Project', 'AD Task Category']
+      reportValue = ['report_username', 'report_month','report_date',  'report_task','report_ref', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_bizproject', 'report_taskcategory']        
+      }else if(reportType === 2){
+      reportHeader = ['Name','Date', 'Task Number','Ref Pool' ,'Task Title','Worklog Description', 'Man-hours', 'Estimation', 'Issue date', 'Target Complete date','Actual Complete date','Business Project','Task Category','L1 Task_Number','L2 Task_Number']
+      reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory','report_l1TaskNumber','report_l2TaskNumber']   
+      }
+      var res = {}
+      if(reportType ===1 || reportType ===2 ){
+        res = await http.post(url, {
+          wReportStartMonth: reportStartMonth,
+          wReportEndMonth: reportEndMonth
+        })        
+      }else{
+        console.log("click report3")
+        url = '/tasks/extractReport3ForWeb'
+        reportTitle = 'PMT Report3 ' + reportStartMonth + '-' + reportEndMonth
+        res = await http.post(url, {
+        wUserId:this.$store.getters.getUserId
       })
       if (res.data.status === 0) {
         this.$message({

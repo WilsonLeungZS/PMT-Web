@@ -826,8 +826,11 @@
                 </el-tooltip>
               </el-col>
             </el-form-item>
-            <el-form-item label="Description" prop="task_desc">
-              <el-input :disabled="lv4TaskItemRule.disableDesc" class="span-format-text" type="textarea" v-model="taskLv4Form.task_desc" :rows="4"></el-input>
+            <el-form-item label="Title" prop="task_desc">
+              <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc" :rows="4"></el-input>
+            </el-form-item>            
+            <el-form-item label="Description" prop="task_detail">
+              <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
           </el-tab-pane>
           <!-- End first tab -->
@@ -1220,6 +1223,12 @@ export default {
         this.$data.taskListRule.showColRef = false
       }
     },
+    selectTypeTag(taskForm){
+      taskForm.task_TypeTag = this.$data.typeTag
+    },
+    selectDeliverable (taskForm){
+      taskForm.task_deliverableTag = this.$data.deliverableTag.toString()
+    },
     // 2. Task info
     openTaskById (iTaskId) {
       console.log('Click')
@@ -1283,6 +1292,11 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
+          if(this.$data.taskLv3Form.task_deliverableTag!=null){
+            this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
+          }
+          this.$data.typeTag = this.$data.taskLv3Form.task_TypeTag
+          this.$data.deliverableTag = this.$data.taskLv3Form.task_deliverableTag
           if (Number(res.data.data.task_progress_nosymbol) < 100) {
             this.$data.taskLv3FormProgressStatus = 'success'
           } else {
@@ -1390,6 +1404,8 @@ export default {
       }
       if (Number(iTaskLevel) === 3) {
         this.$data.taskLv3Form = {}
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1406,6 +1422,8 @@ export default {
       }
       if (Number(iTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
