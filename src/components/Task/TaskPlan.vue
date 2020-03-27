@@ -1062,6 +1062,7 @@ export default {
           this.$data.lv2TaskList[Index].task_page_number = iPage
           this.$data.lv2TaskList[Index].task_page_size = iSize
           const res1 = await http.post('/tasks/getPlanTaskListByParentTask', listCriteria)
+          console.log("~~~")
           console.log(res1.data)
           if (res1.data.status === 0) {
             this.$data.lv2TaskList[Index].task_plan_tasks_list = []
@@ -2381,8 +2382,5 @@ input[type="number"]{
 }
 .tp-main .el-collapse-item__header {
   background-color: #F0FFFF !important;
-}
-.row-expand-cover .el-table__expand-icon {
-  visibility:hidden;
 }
 </style>
