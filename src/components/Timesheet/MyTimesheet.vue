@@ -22,8 +22,8 @@
               :header-row-class-name="mtTableHeaderRowStyle" :header-cell-class-name="mtTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
               <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
-                <template slot="header" >
-                    <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM" :clearable="false"
+                <template slot="header" slot-scope="scope">
+                   <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM" :clearable="false"
                     class="mt-table-month-picker" @change="changeMTMonth"></el-date-picker>
                 </template>
               </el-table-column>
@@ -85,13 +85,10 @@ export default {
     return {
       header1: 'My Timesheet',
       header2: 'Project Timesheet',
-      span_card:4,
       isActive: true,
       timesheetData: [],
-      memoTimesheetDate:[],
       timesheetHeaders: [],
       timesheetMonth: '',
-      timesheetMemo: '',
       sumHoursArray: [],
       worklogFormVisible: false,
       taskList: [],
@@ -101,25 +98,12 @@ export default {
         worklog_task: '',
         worklog_date: '',
         worklog_effort: 0,
-        worklog_remark: '',
-        worklog_progress: 0
+        worklog_remark: ''
       },
-      assignToTasks:[],
       headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
   },
-  filters: {
-      ellipsis (value) {
-        if(!value){
-          return '';
-        }
-        if(value.length >32) {
-          return value.slice(0,32) + "...";
-        }
-        return value;
-      }
-    },
   methods: {
     switchToPT () {
       this.$data.isActive = false
@@ -153,93 +137,9 @@ export default {
         return 'mt-table-col-nonweekday'
       }
     },
-    changeMemoMonth(iDate){
-      console.log('Change MemoMonth: '+iDate)
-      this.resetMemoTimeSheet(iDate)
-    },
     changeMTMonth (iDate) {
       console.log('Change month: ' + iDate)
       this.resetTimesheet(iDate)
-    },
-    ChangePeriod (value){
-      console.log(value)
-      console.log("clicked ChangePeriod")
-      var month = Number(this.$data.timesheetMemo.slice(5,7))
-      var year = Number(this.$data.timesheetMemo.slice(0,4))
-      if(value == -1){
-        if(month == 1){
-          year--
-          month = 12
-        }else{
-          month -- 
-        }
-      }else if(value == 1){
-        if(month == 12){
-          year ++
-          month = 1
-        }else{
-          month++
-        }
-      }
-      year = String(year)
-      month = String(month)
-      this.$data.timesheetMemo = year + '-' + month ;
-      var PeriodDate = this.$data.timesheetMemo + '-01 00:00:00'
-      var dateConvert = new Date(Date.parse(PeriodDate))
-      this.resetMemoTimeSheet(dateConvert)
-    },
-    async resetMemoTimeSheet(iDateVal){
-      this.$data.memoTimesheetDate = []
-      console.log(iDateVal)
-      var mtYear = iDateVal.getFullYear()
-      var mtMonth = iDateVal.getMonth() + 1
-      console.log(mtYear + " " +mtMonth)
-      if(mtMonth < 10){
-        mtMonth = '0' + mtMonth
-      }else{
-        mtMonth = ''+ mtMonth
-      }
-      var mtDay = iDateVal.getDay()
-      /*var days = 31
-      var isLeap = false
-      if(mtYear % 4 ===0 && mtYear % 100 !=0 || mtYear % 400 ===0){
-        isLeap = true
-      }
-      if(mtMonth === '04' || mtMonth === '06' || mtMonth === '09' || mtMonth === '11'){
-        days = 30
-      }else if(mtMonth ==='02' && isLeap === false){
-        days = 28
-      }else if(mtMonth ==='02' && isLeap === true){
-        days = 29
-      }*/
-      var mtUpdatedAt = mtYear+'-'+mtMonth;
-      var mtEndUpdated 
-      if(mtMonth<12){
-        mtMonth = Number(mtMonth)
-        mtMonth++
-      }else if(mtMonth == 12){
-        mtYear = Number(mtYear)
-        mtMonth = Number(mtMonth)
-        mtYear++ 
-        mtMonth = 1
-      }
-      mtEndUpdated =  mtYear+'-'+mtMonth;
-      console.log('mtEndUpdated :'+mtEndUpdated)
-      console.log('mtUpdatedAt :'+mtUpdatedAt)
-      var AssignUserId = this.$store.getters.getUserId
-      console.log('Assign To: ' + AssignUserId)
-      const res = await http.post('/tasks/getTaskByAssignUserId', {
-        wUserId: AssignUserId,
-        wmtUpdatedAt: mtUpdatedAt,
-        wmtEndUpdated:mtEndUpdated
-      })
-      console.log(res.data)
-      if(res.data.status === 0){
-        this.$data.assignToTasks = res.data.data;
-        console.log(this.$data.assignToTasks)
-      }else{
-        this.$data.assignToTasks = [];
-      }
     },
     async resetTimesheet (iDateVal) {
       this.$data.timesheetData = []
@@ -288,9 +188,7 @@ export default {
       this.$data.timesheetHeaders = resetArray
       var reqMonth = mtYear + '-' + mtMonth
       this.$data.timesheetMonth = reqMonth
-      this.$data.timesheetMemo = reqMonth
       var reqUserId = this.$store.getters.getUserId
-      console.log('dedededebug')
       const res = await http.post('/worklogs/getWorklogByUserAndMonthForWeb', {
         wUserId: reqUserId,
         wWorklogMonth: reqMonth
@@ -341,7 +239,6 @@ export default {
     },
     // Edit worklog when click the date
     editTimesheetByDate (scope) {
-      console.log('editTimesheetByDate')
       this.$data.worklogFormVisible = true
       this.$data.showDeleteBtn = false
       this.$data.form.worklog_taskid = 0
@@ -352,7 +249,6 @@ export default {
     },
     // Edit worklog when click the day
     async editTimesheetByTask (scope) {
-      console.log('editTimesheetByTask')
       console.log(scope)
       this.$data.worklogFormVisible = true
       this.$data.showDeleteBtn = false
@@ -449,7 +345,7 @@ export default {
       var arr = []
       arr = reqWorklogDate.split('-')
       var reqWorklogMonth = arr[0] + '-' + arr[1]
-      var reqWorklogDay = arr[2].slice(0,2)
+      var reqWorklogDay = arr[2]
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
         this.$message.error('Invalid Effort (Worklog effort could not less than 0 or over 24 hrs)!')
         return
@@ -467,7 +363,6 @@ export default {
         wEffort: reqWorklogEffort,
         wRemark: reqRemark
       })
-      console.log(res.data)
       if (res.data.status === 0) {
         var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
         var dateConvert = new Date(Date.parse(firstDate))
@@ -479,7 +374,6 @@ export default {
       } else {
         this.showWarnMessage('Warning', 'Fail to add/update worklog!')
       }
-      this.$router.go(0)
     },
     async deleteWorklog () {
       var reqUserId = this.$store.getters.getUserId
@@ -545,9 +439,6 @@ export default {
     console.log('Created My Timesheet')
     var firstDate = this.getCurrentMonthFirst()
     this.resetTimesheet(firstDate)
-    this.resetMemoTimeSheet(firstDate)
-    var winWidth = document.body.clientWidth || document.documentElement.clientWidth;
-  
   }
 }
 </script>
@@ -616,7 +507,7 @@ export default {
   margin-top:40px;
   height:400px;
   width: 100%;
-  border-top: 1px solid rgb(168, 168, 168) ;
+  border: 1px solid black
 }
 /*Common Style*/
 .bg-color {
@@ -627,56 +518,6 @@ export default {
   border-bottom: 1px solid #ff6348;
   cursor: default;
 }
-/**assin功能 */
-
-.overflow{
-      overflow: hidden;
-    -webkit-line-clamp: 2;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-}
-.assin-month-picker{
-  height:40px;
-  padding-left: 5px;
-  padding-right: 5px;
-  line-height: 46px;
-  font-size: 16px;
-  margin: 10px 5px;
-  width: auto;
-}
-  .text {
-    font-size: 14px;
-    font-family: "Helvetica Neue";
-    text-align: left;
-  }
-  .title{
-    word-wrap: break-word;
-    font-weight: bold;
-  }
-
-  .item {
-    margin-bottom: 10px;
-  }
-  .content{
-    float: left;
-  }
-  .clearfix:before,
-  .clearfix:after {
-    display: table;
-    content: "";
-  }
-  .clearfix:after {
-    clear: both
-  }
-  .box-card{
-    margin:10px 20px;
-    cursor: pointer;
-    background-color: #d9e1eb;
-  }
-  .box-card:hover {
-    transform: scale(1.1);
-  }
 </style>
 <style>
 .mt-table {
@@ -735,7 +576,6 @@ export default {
 .el-autocomplete-suggestion li {
   line-height: 28px;
 }
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -743,5 +583,4 @@ input::-webkit-inner-spin-button {
 input[type="number"]{
   -moz-appearance: textfield;
 }
-
 </style>

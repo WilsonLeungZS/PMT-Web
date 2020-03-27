@@ -33,7 +33,7 @@ export default {
       baseURL: iBaseUrl,
       url,
       data: qs.stringify(data),
-      timeout: 10000,
+      timeout: 600000,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -55,7 +55,7 @@ export default {
       baseURL: iBaseUrl,
       url,
       params,
-      timeout: 10000,
+      timeout: 600000,
       headers: {
         'X-Requested-With': 'XMLHttpRequest'
       }

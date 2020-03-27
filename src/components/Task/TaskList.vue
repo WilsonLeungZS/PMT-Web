@@ -129,7 +129,7 @@
               <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="280px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
               <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
               <el-table-column prop="task_top_target_start" label="Target Start Time" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
-              <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="120px" v-if="!taskListRule.showColForLv1" key="10"></el-table-column>
+              <el-table-column prop="task_desc" label="Description" show-overflow-tooltip align="left" min-width="250px" v-if="!taskListRule.showColForLv1" key="10"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
               <el-table-column prop="task_reference" label="Ref Pool" width="150px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
                 <template slot-scope="scope">
@@ -140,7 +140,7 @@
               <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
               <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="15"></el-table-column>
               <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv2" key="16"></el-table-column>
-              <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
+              <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column>
               <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
                 <template slot-scope="scope">
@@ -316,7 +316,7 @@
             <el-row>
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table :data="taskLv1FormSubTasks" fit max-height="500" class="sub-task-table">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv1FormSubTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -397,11 +397,8 @@
             <el-form-item label="Scope(Baseline)">
                 <el-input v-model="taskLv2Form.task_scope" style="width: 100%"></el-input>
             </el-form-item>
-            <el-form-item label="Title" prop="task_desc">
-              <el-input class="span-format-text" type="text" v-model="taskLv2Form.task_desc" :rows="4"></el-input>
-            </el-form-item>            
-            <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
+            <el-form-item label="Description" prop="task_desc">
+              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_desc" :rows="4"></el-input>
             </el-form-item>
           </el-tab-pane>
           <!-- End first tab -->
@@ -512,7 +509,7 @@
             <el-row>
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table :data="taskLv2FormSubTasks" fit max-height="500" class="sub-task-table">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv2FormSubTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -589,42 +586,6 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Type Tag">
-                  <el-select v-model="typeTag" @change="selectTypeTag(taskLv3Form)">
-                    <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>                  
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12" >
-                <el-form-item label="Deliverable tag">
-                  <el-select
-                    v-model="deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    @change="selectDeliverable(taskLv3Form)"
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>            
-                </el-form-item>
-              </el-col>
-            </el-row>
             <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
@@ -641,11 +602,8 @@
                 </el-tooltip>
               </el-col>
             </el-form-item>
-            <el-form-item label="Title" prop="task_desc">
-              <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :rows="4"></el-input>
-            </el-form-item>            
-            <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4"></el-input>
+            <el-form-item label="Description" prop="task_desc">
+              <el-input :disabled="lv3TaskItemRule.disableDesc" class="span-format-text" type="textarea" v-model="taskLv3Form.task_desc" :rows="4"></el-input>
             </el-form-item>
           </el-tab-pane>
           <!-- End first tab -->
@@ -770,7 +728,7 @@
             <el-row>
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table :data="taskLv3FormSubTasks" fit max-height="500" class="sub-task-table">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv3FormSubTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -803,7 +761,7 @@
           </el-tab-pane>
           <el-tab-pane label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
-              <el-timeline>
+              <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv3FormHistories" :key="index" :timestamp="history.timestamp"
                   icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
                   {{history.content}}
@@ -855,42 +813,6 @@
                   <el-select disabled v-model="taskLv4Form.task_type_id" style="width: 100%">
                     <el-option v-for="(tasktype, index) in taskTypeArrayForLv2Task" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
                   </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="Type Tag">
-                  <el-select v-model="typeTag" @change="selectTypeTag(taskLv4Form)">
-                    <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>                  
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12" >
-                <el-form-item label="Deliverable tag">
-                  <el-select
-                    v-model="deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    @change="selectDeliverable(taskLv4Form)"
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>            
                 </el-form-item>
               </el-col>
             </el-row>
@@ -1001,7 +923,7 @@
           </el-tab-pane>
           <el-tab-pane label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
-              <el-timeline>
+              <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv4FormHistories" :key="index" :timestamp="history.timestamp"
                   icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
                   {{history.content}}
@@ -1068,37 +990,6 @@ export default {
   name: 'TaskList',
   data () {
     return {
-        typeTagOptions:[{
-          value: 'One-Off Task',
-          label: 'One-Off Task'
-        },{
-          value: 'Regular Task',
-          label: 'Regular Task'          
-        },{
-          value: 'Issue',
-          label: 'Issue'          
-        },{
-          value: 'Problem',
-          label: 'Problem'          
-        }],
-        typeTag:'',
-        DeliverOptions: [{
-          value: 'Document',
-          label: 'Document'
-        }, {
-          value: 'Program',
-          label: 'Program'
-        }, {
-          value: 'Ready to UAT',
-          label: 'Ready to UAT'
-        },{
-          value: 'Ready to PROD',
-          label: 'Ready to PROD'
-        },{
-          value: 'Clarify',
-          label: 'Clarify'
-        }],
-      deliverableTag: [],
       // Header/Theme Value
       header1: 'Task List',
       isActive: true,
@@ -1118,6 +1009,8 @@ export default {
       tasksTotalSize: 0,
       taskslistData: [],
       taskslistLoading: false,
+      tasksSubTaskLoading: false,
+      tasksWorklogHistoriesLoading: false,
       // Level 1 Task Dialog Value
       taskLv1DialogVisible: false,
       taskLv1DialogTitle: '1 - Business Opportunity',
@@ -1236,10 +1129,10 @@ export default {
       userRole: this.$store.getters.getUserRole,
       // Status Value
       statusCollection: [
-        {'status_name': 'Drafting', 'status_sequence': 1, 'status_disable_est': false, 'status_allow_worklog': false},
-        {'status_name': 'Planning', 'status_sequence': 2, 'status_disable_est': false, 'status_allow_worklog': false},
-        {'status_name': 'Running', 'status_sequence': 3, 'status_disable_est': true, 'status_allow_worklog': true},
-        {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true}
+        {'status_name': 'Drafting', 'status_sequence': 1, 'status_disable_est': false, 'status_allow_worklog': false, 'status_disable_change_parent': false},
+        {'status_name': 'Planning', 'status_sequence': 2, 'status_disable_est': false, 'status_allow_worklog': false, 'status_disable_change_parent': false},
+        {'status_name': 'Running', 'status_sequence': 3, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true},
+        {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true}
       ],
       statusArray: []
     }
@@ -1338,7 +1231,7 @@ export default {
     },
     // 2. Task info
     openTaskById (iTaskId) {
-      console.log('Click~')
+      console.log('Click')
       var reqTaskId = iTaskId
       var url = '/tasks/getTaskById'
       var criteria = {
@@ -1403,8 +1296,6 @@ export default {
             this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
           }
           this.$data.typeTag = this.$data.taskLv3Form.task_TypeTag
-          
-          
           this.$data.deliverableTag = this.$data.taskLv3Form.task_deliverableTag
           if (Number(res.data.data.task_progress_nosymbol) < 100) {
             this.$data.taskLv3FormProgressStatus = 'success'
@@ -1423,13 +1314,6 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
           this.$data.taskLv4Form = res.data.data
-          if(this.$data.taskLv4Form.task_deliverableTag!=null){
-            this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(",")            
-          }
-          this.$data.typeTag = this.$data.taskLv4Form.task_TypeTag
-          
-          
-          this.$data.deliverableTag = this.$data.taskLv4Form.task_deliverableTag
           if (Number(res.data.data.task_progress_nosymbol) < 100) {
             this.$data.taskLv4FormProgressStatus = 'success'
           } else {
@@ -1442,6 +1326,7 @@ export default {
       }
     },
     async getSubTaskList (iTaskName, iSubTaskListItem, iLevel) {
+      this.$data.tasksSubTaskLoading = true
       const res = await http.post('/tasks/getSubTaskByTaskName', {
         reqTaskName: iTaskName
       })
@@ -1459,8 +1344,10 @@ export default {
           this.$data.lv3TaskItemRule.disableTaskEst = true
         }
       }
+      this.$data.tasksSubTaskLoading = false
     },
     async getTaskWorklogHistory (iTaskId, iTaskHistory) {
+      this.$data.tasksWorklogHistoriesLoading = true
       const res = await http.post('/worklogs/getWorklogHistoryByTaskId', {
         wTaskId: iTaskId
       })
@@ -1470,6 +1357,7 @@ export default {
       } else {
         this[iTaskHistory] = []
       }
+      this.$data.tasksWorklogHistoriesLoading = false
     },
     async createNewTask (iTaskLevel) {
       console.log('Create new task: ' + iTaskLevel)
@@ -1777,11 +1665,6 @@ export default {
     // 5. Level 3 task dialog
     async saveLv3Task () {
       var reqTask = this.$data.taskLv3Form
-      console.log(reqTask)
-      if(reqTask.task_deliverableTag!=null){
-        reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();        
-      }
-
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
@@ -1801,7 +1684,6 @@ export default {
           }
         }
         this.$data.taskLv3SaveBtnDisabled = true
-        //console.log(reqTask)
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
@@ -1825,11 +1707,12 @@ export default {
           this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
           this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = '' // Show worklog history tab
         })
-        this.$data.lv3TaskItemRule.disableParentNameInput = true
         this.$data.lv3TaskItemRule.showProgress = true
         // Default value
         this.$data.taskLv3WorklogShow = true
         this.$data.lv3TaskItemRule.disableTaskEst = false
+        // Common Rule for estimation and worklog button
+        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
           this.$data.lv3TaskItemRule.disableTaskEst = true
@@ -1837,6 +1720,7 @@ export default {
           this.$data.lv3TaskItemRule.disableAssignee = true
           this.$data.lv3TaskItemRule.disableStatus = true
           this.$data.lv3TaskItemRule.showRefPoolInput = false
+          this.$data.lv3TaskItemRule.disableParentNameInput = true
           if (this.$data.taskLv3Form.task_type === 'Pool') {
             console.log('Pool Task')
             this.$data.taskLv3WorklogShow = false
@@ -1862,9 +1746,8 @@ export default {
           this.$data.lv3TaskItemRule.showRespLeader = true
           this.$data.lv3TaskItemRule.showSubTaskEst = true
           this.$data.taskLv3WorklogShow = true
+          this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
         }
-        // Common Rule for estimation and worklog button
-        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Common Rule 1
         this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         // Common Rule 2
@@ -1948,7 +1831,6 @@ export default {
         this.$nextTick(() => {
           this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = '' // Show worklog history tab
         })
-        this.$data.lv4TaskItemRule.disableParentNameInput = true
         this.$data.lv4TaskItemRule.showProgress = true
         this.$data.taskLv4WorklogShow = true
         // Common Rule for estimation and worklog button
@@ -1957,6 +1839,7 @@ export default {
         this.$data.lv4TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         // Common Rule 2
         this.$data.taskLv4WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
+        this.$data.lv4TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
       }
       if (iAction === 'Create') {
         // Set Dialog Default Value
