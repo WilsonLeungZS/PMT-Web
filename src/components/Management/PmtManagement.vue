@@ -406,9 +406,9 @@ export default {
       if(reportType === 1){
       reportHeader = ['Name', 'Month','Date', 'Task Number','Ref Pool', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Business Project', 'AD Task Category']
       reportValue = ['report_username', 'report_month','report_date',  'report_task','report_ref', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_bizproject', 'report_taskcategory']        
-      }else{
-      reportHeader = ['Name','Date', 'Task Number','Ref Pool' ,'Task Title','Worklog Description', 'Man-hours', 'Estimation', 'Issue date', 'Target Complete date','Actual Complete date','Business Project','Task Category']
-      reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory']   
+      }else if(reportType === 2){
+      reportHeader = ['Name','Date', 'Task Number','Ref Pool' ,'Task Title','Worklog Description', 'Man-hours', 'Estimation', 'Issue date', 'Target Complete date','Actual Complete date','Business Project','Task Category','L1 Task_Number','L2 Task_Number']
+      reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory','report_l1TaskNumber','report_l2TaskNumber']   
       }
       var res = {}
       if(reportType ===1 || reportType ===2 ){
