@@ -113,7 +113,7 @@
           <el-col :span="24">
             <el-table v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
               <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-              <el-table-column prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
+              <el-table-column prop="task_parent_name" label="Parent Task" width="120px" v-if="!taskListRule.showColForLv1" key="2">
                 <template slot-scope="scope">
                    <el-button type="text" @click="openTaskByName(scope.row.task_parent_name)">{{scope.row.task_parent_name}}</el-button>
                 </template>
@@ -123,15 +123,16 @@
                    <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="270px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
+              <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="150px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
+              <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="150px" v-if="!taskListRule.showColForLv1" key="10"></el-table-column>
               <el-table-column prop="task_status" label="Status" align="center" width="235px" key="5"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="150px" v-if="taskListRule.showColForLv1" key="6"></el-table-column>
               <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="280px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
-              <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
-              <el-table-column prop="task_top_target_start" label="Target Start Time" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
-              <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="120px" v-if="!taskListRule.showColForLv1" key="10"></el-table-column>
+              <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
+              <el-table-column prop="task_top_target_start" label="Target Start" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
+              
               <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
+              <el-table-column prop="task_reference" label="Ref Pool" width="100px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
                 <template slot-scope="scope">
                    <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                 </template>
@@ -139,15 +140,15 @@
               <el-table-column prop="task_effort" label="Effort(hrs)" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="13"></el-table-column>
               <el-table-column prop="task_estimation" label="Estimation(hrs)" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
               <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="15"></el-table-column>
-              <el-table-column prop="task_top_resp_leader" label="Proposed Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv2" key="16"></el-table-column>
+              <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv2" key="16"></el-table-column>
               <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
-              <el-table-column prop="task_target_complete" label="Target Completion Date" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
+              <el-table-column prop="task_target_complete" label="Target Completion" align="center" width="190px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
                 <template slot-scope="scope">
                   <el-button @click="startPlanTask(scope.row)" :disabled="!scope.row.task_plan_mode_btn_enable" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
                 </template>
               </el-table-column>
-              <el-table-column fixed="right" label="Edit" align="center" min-width="120px">
+              <el-table-column fixed="right" label="Edit" align="center" min-width="60px">
                 <template slot-scope="scope">
                   <el-button @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-edit"></el-button>
                   <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
@@ -602,10 +603,8 @@
                   </el-select>                  
                 </el-form-item>
               </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12" >
-                <el-form-item label="Deliverable tag">
+              <el-col :span="11" :offset="1" >
+                <el-form-item label="Deliverable Tag">
                   <el-select
                     v-model="deliverableTag"
                     multiple
@@ -871,10 +870,8 @@
                   </el-select>                  
                 </el-form-item>
               </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12" >
-                <el-form-item label="Deliverable tag">
+              <el-col :span="11" :offset="1" >
+                <el-form-item label="Deliverable Tag">
                   <el-select
                     v-model="deliverableTag"
                     multiple
@@ -1316,7 +1313,7 @@ export default {
         this.$data.taskListRule.showColRef = false
       } else if (iTaskLevel === 3) {
         this.$data.taskListRule.showColForLv1 = false
-        this.$data.taskListRule.showColForLv2 = false
+        this.$data.taskListRule.showColForLv2 = true
         this.$data.taskListRule.showColForLv3 = true
         if (this.$data.formFilter.filterShowRefPool) {
           this.$data.taskListRule.showColRef = false
@@ -1325,7 +1322,7 @@ export default {
         }
       } else {
         this.$data.taskListRule.showColForLv1 = false
-        this.$data.taskListRule.showColForLv2 = false
+        this.$data.taskListRule.showColForLv2 = true
         this.$data.taskListRule.showColForLv3 = false
         this.$data.taskListRule.showColRef = false
       }
