@@ -451,6 +451,40 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Type Tag">
+                  <el-select v-model="typeTag" @change="selectTypeTag(taskLv3Form)">
+                    <el-option
+                      v-for="item in typeTagOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>                  
+                </el-form-item>
+              </el-col>
+              <el-col :span="11" :offset="1" >
+                <el-form-item label="Deliverable Tag">
+                  <el-select
+                    v-model="deliverableTag"
+                    multiple
+                    filterable
+                    allow-create
+                    default-first-option
+                    @change="selectDeliverable(taskLv3Form)"
+                    style="width: 100%"
+                    >
+                    <el-option
+                      v-for="item in DeliverOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>            
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
@@ -477,8 +511,11 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Description" prop="task_desc">
-              <el-input :disabled="lv3TaskItemRule.disableDesc" class="span-format-text" type="textarea" v-model="taskLv3Form.task_desc" :rows="4"></el-input>
+            <el-form-item label="Title" prop="task_desc">
+              <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :rows="4"></el-input>
+            </el-form-item>            
+            <el-form-item label="Description" prop="task_detail">
+              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4"></el-input>
             </el-form-item>
           </el-tab-pane>
           <!-- End first tab -->
@@ -691,6 +728,40 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="Type Tag">
+                  <el-select v-model="typeTag" @change="selectTypeTag(taskLv4Form)">
+                    <el-option
+                      v-for="item in typeTagOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>                  
+                </el-form-item>
+              </el-col>
+              <el-col :span="11" :offset="1" >
+                <el-form-item label="Deliverable Tag">
+                  <el-select
+                    v-model="deliverableTag"
+                    multiple
+                    filterable
+                    allow-create
+                    default-first-option
+                    @change="selectDeliverable(taskLv4Form)"
+                    style="width: 100%"
+                    >
+                    <el-option
+                      v-for="item in DeliverOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>            
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
               <el-col :span="6">
                 <span>{{taskLv4Form.task_reference}}</span>
@@ -711,8 +782,11 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Description" prop="task_desc">
-              <el-input :disabled="lv4TaskItemRule.disableDesc" class="span-format-text" type="textarea" v-model="taskLv4Form.task_desc" :rows="4"></el-input>
+            <el-form-item label="Title" prop="task_desc">
+              <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc" :rows="4"></el-input>
+            </el-form-item>            
+            <el-form-item label="Description" prop="task_detail">
+              <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
           </el-tab-pane>
           <!-- End first tab -->
@@ -872,6 +946,37 @@ export default {
   name: 'TaskListNew',
   data () {
     return {
+        typeTagOptions:[{
+          value: 'One-Off Task',
+          label: 'One-Off Task'
+        },{
+          value: 'Regular Task',
+          label: 'Regular Task'          
+        },{
+          value: 'Issue',
+          label: 'Issue'          
+        },{
+          value: 'Problem',
+          label: 'Problem'          
+        }],
+        typeTag:'',
+        DeliverOptions: [{
+          value: 'Document',
+          label: 'Document'
+        }, {
+          value: 'Program',
+          label: 'Program'
+        }, {
+          value: 'Ready to UAT',
+          label: 'Ready to UAT'
+        },{
+          value: 'Ready to PROD',
+          label: 'Ready to PROD'
+        },{
+          value: 'Clarify',
+          label: 'Clarify'
+        }],
+      deliverableTag: [],
       // Header/Theme Value
       header1: 'Task Plan',
       isActive: true,
@@ -1328,6 +1433,11 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
+          if(this.$data.taskLv3Form.task_deliverableTag!=null){
+            this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
+          }
+          this.$data.typeTag = this.$data.taskLv3Form.task_TypeTag
+          this.$data.deliverableTag = this.$data.taskLv3Form.task_deliverableTag
           if (Number(res.data.data.task_progress_nosymbol) < 100) {
             this.$data.taskLv3FormProgressStatus = 'success'
           } else {
@@ -1345,6 +1455,13 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
           this.$data.taskLv4Form = res.data.data
+          if(this.$data.taskLv4Form.task_deliverableTag!=null){
+            this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(",")            
+          }
+          this.$data.typeTag = this.$data.taskLv4Form.task_TypeTag
+          
+          
+          this.$data.deliverableTag = this.$data.taskLv4Form.task_deliverableTag
           if (Number(res.data.data.task_progress_nosymbol) < 100) {
             this.$data.taskLv4FormProgressStatus = 'success'
           } else {
@@ -1390,6 +1507,8 @@ export default {
       console.log('Create new sub task: ' + iSubTaskLevel)
       if (Number(iSubTaskLevel) === 3) {
         this.$data.taskLv3Form = {}
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1410,6 +1529,8 @@ export default {
       }
       if (Number(iSubTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1506,9 +1627,18 @@ export default {
       this.$data.activeTabForLv2 = 'tab_basic_info'
       done()
     },
+    selectTypeTag(taskForm){
+      taskForm.task_TypeTag = this.$data.typeTag
+    },
+    selectDeliverable (taskForm){
+      taskForm.task_deliverableTag = this.$data.deliverableTag.toString()
+    },
     // 5. Level 3 task dialog
     async saveLv3Task () {
       var reqTask = this.$data.taskLv3Form
+      if(reqTask.task_deliverableTag!=null){
+        reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();        
+      }
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
@@ -1602,6 +1732,8 @@ export default {
       if (iAction === 'Create') {
         // Set Dialog Default Value
         this.$data.taskLv3DialogTitle = '3 - New Executive Task'
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         this.$data.activeTabForLv3 = 'tab_basic_info'
         this.$nextTick(() => {
           this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
@@ -1642,6 +1774,9 @@ export default {
     // 6. Level 4 task dialog
     async saveLv4Task () {
       var reqTask = this.$data.taskLv4Form
+      if(reqTask.task_deliverableTag!=null){
+        reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();        
+      }
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
@@ -1695,6 +1830,8 @@ export default {
       if (iAction === 'Create') {
         // Set Dialog Default Value
         this.$data.taskLv4DialogTitle = '4 - New Workable Task'
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         this.$data.activeTabForLv4 = 'tab_basic_info'
         this.$nextTick(() => {
           this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide worklog history tab

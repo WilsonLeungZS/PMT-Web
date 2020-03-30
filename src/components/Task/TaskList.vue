@@ -1580,6 +1580,8 @@ export default {
       }
       if (Number(iSubTaskLevel) === 3) {
         this.$data.taskLv3Form = {}
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1600,6 +1602,8 @@ export default {
       }
       if (Number(iSubTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1876,6 +1880,8 @@ export default {
       if (iAction === 'Create') {
         // Set Dialog Default Value
         this.$data.taskLv3DialogTitle = '3 - New Executive Task'
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []        
         this.$data.activeTabForLv3 = 'tab_basic_info'
         this.$nextTick(() => {
           this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
@@ -1911,6 +1917,9 @@ export default {
     // 6. Level 4 task dialog
     async saveLv4Task () {
       var reqTask = this.$data.taskLv4Form
+      if(reqTask.task_deliverableTag!=null){
+        reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();        
+      }
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
@@ -1964,6 +1973,8 @@ export default {
       if (iAction === 'Create') {
         // Set Dialog Default Value
         this.$data.taskLv4DialogTitle = '4 - New Workable Task'
+        this.$data.typeTag = ''
+        this.$data.deliverableTag = []
         this.$data.activeTabForLv4 = 'tab_basic_info'
         this.$nextTick(() => {
           this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide worklog history tab
