@@ -128,7 +128,7 @@
               <el-table-column prop="task_status" label="Status" align="center" width="130px" key="6"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
               <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="280px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
-              <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
+              <!--<el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>-->
               <el-table-column prop="task_top_target_start" label="Target Start" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
               <el-table-column prop="task_reference" label="Ref Pool" width="110px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
