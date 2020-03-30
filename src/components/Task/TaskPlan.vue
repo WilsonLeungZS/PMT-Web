@@ -2510,4 +2510,7 @@ input[type="number"]{
 .tp-main .el-collapse-item__header {
   background-color: #F0FFFF !important;
 }
+.row-expand-cover .el-table__expand-icon {
+  visibility:hidden;
+}
 </style>
