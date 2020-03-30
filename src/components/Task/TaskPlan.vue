@@ -118,7 +118,7 @@
                           </template>
                         </el-table-column>
                         <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4"></el-table-column>
-                        <el-table-column prop="TiTle" label="Description" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
+                        <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
                         <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
                           <template slot-scope="scope">
                             <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
