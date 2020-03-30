@@ -591,8 +591,8 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Type Tag">
-                  <el-select v-model="typeTag" @change="selectTypeTag(taskLv3Form)">
+                <el-form-item label="Type Tag" prop="task_TypeTag">
+                  <el-select v-model="taskLv3Form.task_TypeTag" >
                     <el-option
                       v-for="item in typeTagOptions"
                       :key="item.value"
@@ -605,12 +605,11 @@
               <el-col :span="11" :offset="1" >
                 <el-form-item label="Deliverable Tag">
                   <el-select
-                    v-model="deliverableTag"
+                    v-model="taskLv3Form.task_deliverableTag"
                     multiple
                     filterable
                     allow-create
                     default-first-option
-                    @change="selectDeliverable(taskLv3Form)"
                     style="width: 100%"
                     >
                     <el-option
@@ -858,8 +857,8 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="Type Tag">
-                  <el-select v-model="typeTag" @change="selectTypeTag(taskLv4Form)">
+                <el-form-item label="Type Tag" prop="task_TypeTag">
+                  <el-select v-model="taskLv4Form.task_TypeTag">
                     <el-option
                       v-for="item in typeTagOptions"
                       :key="item.value"
@@ -872,12 +871,11 @@
               <el-col :span="11" :offset="1" >
                 <el-form-item label="Deliverable Tag">
                   <el-select
-                    v-model="deliverableTag"
+                    v-model="taskLv4Form.task_deliverableTag"
                     multiple
                     filterable
                     allow-create
                     default-first-option
-                    @change="selectDeliverable(taskLv4Form)"
                     style="width: 100%"
                     >
                     <el-option
@@ -1077,7 +1075,6 @@ export default {
           value: 'Problem',
           label: 'Problem'          
         }],
-        typeTag:'',
         DeliverOptions: [{
           value: 'Document',
           label: 'Document'
@@ -1094,7 +1091,6 @@ export default {
           value: 'Clarify',
           label: 'Clarify'
         }],
-      deliverableTag: [],
       // Header/Theme Value
       header1: 'Task List',
       isActive: true,
@@ -1193,7 +1189,8 @@ export default {
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
         task_type_id: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
-        task_desc: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
+        task_desc: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_TypeTag: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
       },
       lv4TaskItemRule: {
         disableParentNameInput: true,
@@ -1203,7 +1200,8 @@ export default {
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
         task_type_id: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
-        task_desc: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
+        task_desc: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_TypeTag: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
       },
       // Worklog Dialog Value
       worklogDialogVisible: false,
@@ -1328,12 +1326,6 @@ export default {
         this.$data.taskListRule.showColRef = false
       }
     },
-    selectTypeTag(taskForm){
-      taskForm.task_TypeTag = this.$data.typeTag
-    },
-    selectDeliverable (taskForm){
-      taskForm.task_deliverableTag = this.$data.deliverableTag.toString()
-    },
     // 2. Task info
     openTaskById (iTaskId) {
       console.log('Click~')
@@ -1397,13 +1389,11 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
+          console.log("~~~~~~")
+          console.log(typeof(this.$data.taskLv3Form.task_deliverableTag))
           if(this.$data.taskLv3Form.task_deliverableTag!=null){
             this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
           }
-          this.$data.typeTag = this.$data.taskLv3Form.task_TypeTag
-          
-          
-          this.$data.deliverableTag = this.$data.taskLv3Form.task_deliverableTag
           if (Number(res.data.data.task_progress_nosymbol) < 100) {
             this.$data.taskLv3FormProgressStatus = 'success'
           } else {
@@ -1424,10 +1414,6 @@ export default {
           if(this.$data.taskLv4Form.task_deliverableTag!=null){
             this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(",")            
           }
-          this.$data.typeTag = this.$data.taskLv4Form.task_TypeTag
-          
-          
-          this.$data.deliverableTag = this.$data.taskLv4Form.task_deliverableTag
           if (Number(res.data.data.task_progress_nosymbol) < 100) {
             this.$data.taskLv4FormProgressStatus = 'success'
           } else {
@@ -1518,8 +1504,6 @@ export default {
       }
       if (Number(iTaskLevel) === 3) {
         this.$data.taskLv3Form = {}
-        this.$data.typeTag = ''
-        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1536,8 +1520,6 @@ export default {
       }
       if (Number(iTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
-        this.$data.typeTag = ''
-        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1580,8 +1562,6 @@ export default {
       }
       if (Number(iSubTaskLevel) === 3) {
         this.$data.taskLv3Form = {}
-        this.$data.typeTag = ''
-        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1602,8 +1582,6 @@ export default {
       }
       if (Number(iSubTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
-        this.$data.typeTag = ''
-        this.$data.deliverableTag = []
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
@@ -1783,15 +1761,18 @@ export default {
     // 5. Level 3 task dialog
     async saveLv3Task () {
       var reqTask = this.$data.taskLv3Form
-      console.log(reqTask)
-      if(reqTask.task_deliverableTag!=null){
-        reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();        
+      if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
+          reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
       }
-
+      if(reqTask.task_deliverableTag!=null&&typeof(reqTask.task_deliverableTag)==='string'){
+        this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(',')
+      }
+      console.log(reqTask)
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
+            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
+            this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
         if (Number(reqTask.task_estimation) > 18) {
@@ -1808,6 +1789,9 @@ export default {
         }
         this.$data.taskLv3SaveBtnDisabled = true
         //console.log(reqTask)
+        if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
+            reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
+        }
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
@@ -1879,9 +1863,7 @@ export default {
       }
       if (iAction === 'Create') {
         // Set Dialog Default Value
-        this.$data.taskLv3DialogTitle = '3 - New Executive Task'
-        this.$data.typeTag = ''
-        this.$data.deliverableTag = []        
+        this.$data.taskLv3DialogTitle = '3 - New Executive Task'      
         this.$data.activeTabForLv3 = 'tab_basic_info'
         this.$nextTick(() => {
           this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
@@ -1916,14 +1898,18 @@ export default {
     },
     // 6. Level 4 task dialog
     async saveLv4Task () {
-      var reqTask = this.$data.taskLv4Form
-      if(reqTask.task_deliverableTag!=null){
-        reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();        
+      var reqTask = this.$data.taskLv4Form       
+      if(this.$data.taskLv4Form.task_deliverableTag!=null&&typeof(this.$data.taskLv4Form.task_deliverableTag)==='object'){
+          reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
       }
+      if(reqTask.task_deliverableTag!=null&&typeof(reqTask.task_deliverableTag)==='string'){
+        this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(',')
+      }      
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
+            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
+            this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
         if (Number(reqTask.task_estimation) > 18) {
@@ -1939,6 +1925,9 @@ export default {
           }
         }
         this.$data.taskLv4SaveBtnDisabled = true
+        if(this.$data.taskLv4Form.task_deliverableTag!=null&&typeof(this.$data.taskLv4Form.task_deliverableTag)==='object'){
+            reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
+        }
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
@@ -1973,8 +1962,6 @@ export default {
       if (iAction === 'Create') {
         // Set Dialog Default Value
         this.$data.taskLv4DialogTitle = '4 - New Workable Task'
-        this.$data.typeTag = ''
-        this.$data.deliverableTag = []
         this.$data.activeTabForLv4 = 'tab_basic_info'
         this.$nextTick(() => {
           this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide worklog history tab
