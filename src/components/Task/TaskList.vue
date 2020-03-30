@@ -139,9 +139,9 @@
               <el-table-column prop="task_effort" label="Effort" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="13"></el-table-column>
               <el-table-column prop="task_estimation" label="Estimation" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
               <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="180px" key="15"></el-table-column>
-              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="taskListRule.showColForLv3||taskListRule.showColForLv4" key="16"></el-table-column>
+              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="16"></el-table-column>
               <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
-              <el-table-column prop="task_target_complete" label="Target Completion" align="center" width="145px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
+              <el-table-column prop="task_target_complete" label="Target Completion" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
                 <template slot-scope="scope">
                   <el-button @click="startPlanTask(scope.row)" :disabled="!scope.row.task_plan_mode_btn_enable" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
