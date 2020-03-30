@@ -131,15 +131,15 @@
               <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>
               <el-table-column prop="task_top_target_start" label="Target Start" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
               <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="100px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
+              <el-table-column prop="task_reference" label="Ref Pool" width="110px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
                 <template slot-scope="scope">
                    <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                 </template>
               </el-table-column>
               <el-table-column prop="task_effort" label="Effort" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="13"></el-table-column>
               <el-table-column prop="task_estimation" label="Estimation" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
-              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="taskListRule.showColForLv3&&taskListRule.showColForLv4" key="15"></el-table-column>
-              <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="180px" key="16"></el-table-column>
+              <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="180px" key="15"></el-table-column>
+              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="taskListRule.showColForLv3||taskListRule.showColForLv4" key="16"></el-table-column>
               <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
               <el-table-column prop="task_target_complete" label="Target Completion" align="center" width="145px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
               <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
