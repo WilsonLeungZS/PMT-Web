@@ -60,7 +60,7 @@
                 </el-col>
                 <el-col :span="1">
                   <el-popover placement="bottom" v-model="reportFormVisible">
-                    <el-form label-width="60px">
+                    <el-form label-width="70px" label-position="left">
                       <el-form-item label="Range">
                         <el-date-picker
                           v-model="reportRangeValue"
@@ -75,11 +75,11 @@
                           :picker-options="pickerOptions">
                         </el-date-picker>
                       </el-form-item>
-                      <el-form-item label="Report">
-                        <el-radio-group v-model="reportType">
-                          <div><el-radio :label="1">Report 1(Only MTL) </el-radio></div>
+                      <el-form-item label="Report" style="margin-top:15px">
+                        <el-radio-group v-model="reportType" class="pt-report-radio-group">
+                          <div><el-radio :label="1">Report 1 (Only MTL) </el-radio></div>
                           <div><el-radio :label="2">Report 2 </el-radio></div>
-                          <div><el-radio :label="3">Report 3（task list) </el-radio></div>
+                          <div><el-radio :label="3">Report 3 (Task List) </el-radio></div>
                         </el-radio-group>
                       </el-form-item>
                     </el-form>
@@ -412,21 +412,27 @@ export default {
       reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory','report_l1TaskNumber','report_l2TaskNumber']   
       }
       var res = {}
+      const loading = this.$loading({
+        lock: true,
+        text: 'Report Generating',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
       if(reportType ===1 || reportType ===2 ){
+        console.log("Select to generate report 1/2")
         res = await http.post(url, {
           wReportStartMonth: reportStartMonth,
           wReportEndMonth: reportEndMonth
         })        
       }else{
-        console.log("click report3")
-        console.log("debug")
+        console.log("Select to generate report 3")
         reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Opportunity Name','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date']
         reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_oppn' ,'report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', ]                  
         url = '/tasks/extractReport3ForWeb'
         reportTitle = 'PMT Report3 '
         res = await http.post(url)
       }
-
+      loading.close()
       if (res.data.status === 0) {
         this.$message({
           message: 'Start to extract report...',
@@ -528,6 +534,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.pt-report-radio-group div {
+  margin-bottom: 10px;
 }
 /*Common Style*/
 .bg-color {

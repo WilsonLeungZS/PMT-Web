@@ -590,9 +590,9 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="12" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv3Form.task_TypeTag" >
+                  <el-select v-model="taskLv3Form.task_TypeTag" style="width: 100%">
                     <el-option
                       v-for="item in typeTagOptions"
                       :key="item.value"
@@ -602,7 +602,7 @@
                   </el-select>                  
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1" >
+              <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Deliverable Tag">
                   <el-select
                     v-model="taskLv3Form.task_deliverableTag"
@@ -639,10 +639,10 @@
               </el-col>
             </el-form-item>
             <el-form-item label="Title" prop="task_desc">
-              <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :rows="4"></el-input>
+              <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4"></el-input>
+              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>
           </el-tab-pane>
           <!-- End first tab -->
@@ -858,7 +858,7 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv4Form.task_TypeTag">
+                  <el-select v-model="taskLv4Form.task_TypeTag" style="width: 100%">
                     <el-option
                       v-for="item in typeTagOptions"
                       :key="item.value"
@@ -899,7 +899,7 @@
               </el-col>
             </el-form-item>
             <el-form-item label="Title" prop="task_desc">
-              <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc" :rows="4"></el-input>
+              <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
               <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
@@ -1184,7 +1184,9 @@ export default {
         showProgress: true,
         showRefPoolInput: true,
         showRespLeader: true,
-        showSubTaskEst: true
+        showSubTaskEst: true,
+        showTypeTag: true,
+        showDeliverableTag: true
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1389,7 +1391,6 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
-          console.log("~~~~~~")
           console.log(typeof(this.$data.taskLv3Form.task_deliverableTag))
           if(this.$data.taskLv3Form.task_deliverableTag!=null){
             this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
@@ -1399,9 +1400,9 @@ export default {
           } else {
             this.$data.taskLv3FormProgressStatus = 'exception'
           }
-          this.ruleControlLv3TaskItem('Edit', null)
           this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)
           this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+          this.ruleControlLv3TaskItem('Edit', null)
           this.$data.taskLv3DialogVisible = true
         }
         if (rtnTask.task_level === 4) {
@@ -1821,6 +1822,10 @@ export default {
         this.$data.lv3TaskItemRule.disableTaskEst = false
         // Common Rule for estimation and worklog button
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
+        // Common Rule 1
+        this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
+        // Common Rule 2
+        this.$data.taskLv3WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
           this.$data.lv3TaskItemRule.disableTaskEst = true
@@ -1834,32 +1839,31 @@ export default {
             this.$data.taskLv3WorklogShow = false
             this.$data.lv3TaskItemRule.showRespLeader = false
             this.$data.lv3TaskItemRule.showSubTaskEst = false
+            this.$data.lv3TaskItemRule.showTypeTag = false
+            this.$data.lv3TaskItemRule.showDeliverableTag = false
             this.$nextTick(() => {
               this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // For ref pool, hide "Sub Tasks List" Tab
               this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // For ref pool, hide "Worklog History" tab
             })
           } else {
             console.log('Not Pool Task')
-            this.$data.taskLv3WorklogShow = true
             this.$data.lv3TaskItemRule.showRespLeader = true
             this.$data.lv3TaskItemRule.showSubTaskEst = true
+            this.$data.lv3TaskItemRule.showTypeTag = true
+            this.$data.lv3TaskItemRule.showDeliverableTag = true
           }
         } else {
           console.log('PMT Task')
-          this.$data.lv3TaskItemRule.disableTaskEst = false
           this.$data.lv3TaskItemRule.disableDesc = false
           this.$data.lv3TaskItemRule.disableAssignee = false
           this.$data.lv3TaskItemRule.disableStatus = false
           this.$data.lv3TaskItemRule.showRefPoolInput = true
           this.$data.lv3TaskItemRule.showRespLeader = true
           this.$data.lv3TaskItemRule.showSubTaskEst = true
-          this.$data.taskLv3WorklogShow = true
+          this.$data.lv3TaskItemRule.showTypeTag = true
+            this.$data.lv3TaskItemRule.showDeliverableTag = true
           this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
         }
-        // Common Rule 1
-        this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
-        // Common Rule 2
-        this.$data.taskLv3WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
       }
       if (iAction === 'Create') {
         // Set Dialog Default Value
@@ -2627,5 +2631,8 @@ input::-webkit-inner-spin-button {
 }
 input[type="number"]{
   -moz-appearance: textfield;
+}
+.el-textarea .el-textarea__inner {
+  resize: vertical !important;
 }
 </style>
