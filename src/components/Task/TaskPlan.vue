@@ -263,8 +263,11 @@
             <el-form-item label="Scope(Baseline)">
                 <el-input v-model="taskLv2Form.task_scope" style="width: 100%"></el-input>
             </el-form-item>
-            <el-form-item label="Description" prop="task_desc">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_desc" :rows="4"></el-input>
+            <el-form-item label="Title" prop="task_desc">
+              <el-input class="span-format-text" type="text" v-model="taskLv2Form.task_desc"></el-input>
+            </el-form-item>            
+            <el-form-item label="Description" prop="task_detail">
+              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
             </el-form-item>
           </el-tab-pane>
           <!-- End first tab -->
