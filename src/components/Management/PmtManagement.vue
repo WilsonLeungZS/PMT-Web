@@ -421,8 +421,8 @@ export default {
         console.log("Select to generate report 1/2")       
       }else{
         console.log("Select to generate report 3")
-        reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Opportunity Name','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date', 'Estimation', 'Effort']
-        reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_oppn' ,'report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', 'report_estimation', 'report_effort']                  
+        reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Opportunity Name','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date', 'Level 3 Estimation', 'Level 4 Estimation', 'Effort']
+        reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_oppn' ,'report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', 'report_estimation', 'report_subtasks_estimation', 'report_effort']                  
         url = '/tasks/extractReport3ForWeb'
         reportTitle = 'PMT Report3 '
       }
