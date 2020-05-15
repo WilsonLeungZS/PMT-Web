@@ -390,7 +390,6 @@ export default {
       if (reportTimeRange != null && reportTimeRange.length > 0) {
         var reportStartMonth = reportTimeRange[0]
         var reportEndMonth = reportTimeRange[1]
-      } else if(reportType === 3 ){
       } else {
         this.$message.error('Please select month!')
         return
@@ -405,11 +404,11 @@ export default {
       var reportValue = []
       console.log(reportType)
       if(reportType === 1){
-      reportHeader = ['Name', 'Month','Date', 'Task Number','Ref Pool', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Business Project', 'AD Task Category']
-      reportValue = ['report_username', 'report_month','report_date',  'report_task','report_ref', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_bizproject', 'report_taskcategory']        
+        reportHeader = ['Name', 'Month','Date', 'Task Number','Ref Pool', 'Task Title', 'Worklog Description', 'Man-hours', 'Man-days', 'Business Project', 'AD Task Category']
+        reportValue = ['report_username', 'report_month','report_date',  'report_task','report_ref', 'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_mandays', 'report_bizproject', 'report_taskcategory']        
       }else if(reportType === 2){
-      reportHeader = ['Name','Date', 'Task Number','Ref Pool' ,'Task Title','Worklog Description', 'Man-hours', 'Estimation', 'Issue date', 'Target Complete date','Actual Complete date','Business Project','Task Category','L1 Task_Number','L2 Task_Number']
-      reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory','report_l1TaskNumber','report_l2TaskNumber']   
+        reportHeader = ['Name','Date', 'Task Number','Ref Pool' ,'Task Title','Worklog Description', 'Man-hours', 'Estimation', 'Issue date', 'Target Complete date','Actual Complete date','Business Project','Task Category','L1 Task_Number','L2 Task_Number']
+        reportValue = ['report_username', 'report_date',  'report_task','report_ref' ,'report_taskdesc', 'report_worklogremark', 'report_manhours', 'report_Estimation', 'report_issuedate', 'report_targetCom','report_actCom','report_bizproject','report_taskcategory','report_l1TaskNumber','report_l2TaskNumber']   
       }
       var res = {}
       const loading = this.$loading({
@@ -419,19 +418,18 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       });
       if(reportType ===1 || reportType ===2 ){
-        console.log("Select to generate report 1/2")
-        res = await http.post(url, {
-          wReportStartMonth: reportStartMonth,
-          wReportEndMonth: reportEndMonth
-        })        
+        console.log("Select to generate report 1/2")       
       }else{
         console.log("Select to generate report 3")
-        reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Opportunity Name','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date']
-        reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_oppn' ,'report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', ]                  
+        reportHeader = ['Task Level','Task Number', 'Project/Customer','Status','Opportunity Name','Task Title','Ref Pool' ,'Responsible Lead','Level of Lead', 'Task asignee', 'Level of Assignee', 'Issue date', 'Level 3 Estimation', 'Level 4 Estimation', 'Effort']
+        reportValue = ['report_tasklevel', 'report_tasknumber','report_customer', 'report_status','report_oppn' ,'report_des' , 'report_refpool','report_resp','report_resplevel', 'report_assignee', 'report_assigneelevel','report_issue', 'report_estimation', 'report_subtasks_estimation', 'report_effort']                  
         url = '/tasks/extractReport3ForWeb'
         reportTitle = 'PMT Report3 '
-        res = await http.post(url)
       }
+      res = await http.post(url, {
+        wReportStartMonth: reportStartMonth,
+        wReportEndMonth: reportEndMonth
+      }) 
       loading.close()
       if (res.data.status === 0) {
         this.$message({
@@ -457,7 +455,6 @@ export default {
   created () {
     console.log('Start')
   }
-
 }
 </script>
 
