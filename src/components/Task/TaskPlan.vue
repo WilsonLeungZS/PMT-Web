@@ -1369,7 +1369,6 @@ export default {
         reqTaskGroupFlag: reqTaskGroupFlag
       })
       console.log(res.data)
-
       if (res.data.status === 0) {
         this.$data.lv2TaskList = []
         this.$data.lv2TaskList = res.data.data

@@ -10,8 +10,6 @@ import PrjManagement from '@/components/Management/PrjManagement'
 import PmtManagement from '@/components/Management/PmtManagement'
 import Charts from '@/components/Others/Charts'
 import Error from '@/components/Error'
-import AssignToMe from '@/components/MyView/AssignToMe'
-import PieCharts from '@/components/MyView/PieCharts'
 
 Vue.use(Router)
 
@@ -23,7 +21,6 @@ export default new Router({
     {path: '/Task', redirect: '/Task/TaskList'},
     {path: '/Management', redirect: '/Management/PrjManagement'},
     {path: '/Others', redirect: '/Others/Charts'},
-    {path: '/AssignToMe', redirect: '/MyView/AssignToMe'},
     {
       path: '/',
       name: 'Main',
@@ -100,24 +97,6 @@ export default new Router({
           meta: {
             needAdmin: true,
             needLogin: false
-          }
-        },
-        {
-          path: 'MyView/AssignToMe',
-          name: 'AssignToMe',
-          component: AssignToMe,
-          meta: {
-            needAdmin: false,
-            needLogin: true
-          }
-        },
-        {
-          path: 'MyView/PieCharts',
-          name: 'PieCharts',
-          component: PieCharts,
-          meta: {
-            needAdmin: false,
-            needLogin: true
           }
         }
       ]
