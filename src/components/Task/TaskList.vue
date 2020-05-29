@@ -1783,10 +1783,10 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
-            return
-          }
           if (reqTask.task_TypeTag !== 'Public Task') {
+            if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+              return
+            }
             if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
               return
             }
@@ -1938,6 +1938,9 @@ export default {
             return
           }
           if (reqTask.task_TypeTag !== 'Public Task') {
+            if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+              return
+            }
             if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
               return
             }
