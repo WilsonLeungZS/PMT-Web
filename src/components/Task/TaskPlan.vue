@@ -269,6 +269,13 @@
             <el-form-item label="Description" prop="task_detail">
               <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
             </el-form-item>
+            <el-row v-if="lv2TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv2Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
@@ -459,31 +466,14 @@
               <el-col :span="12" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
                   <el-select v-model="taskLv3Form.task_TypeTag" style="width: 100%">
-                    <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                    <el-option v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Deliverable Tag">
-                  <el-select
-                    v-model="taskLv3Form.task_deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                  <el-select v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                    <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
               </el-col>
@@ -520,6 +510,13 @@
             <el-form-item label="Description" prop="task_detail">
               <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>
+            <el-row v-if="lv3TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv3Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
@@ -735,31 +732,14 @@
               <el-col :span="12">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
                   <el-select v-model="taskLv4Form.task_TypeTag" style="width: 100%">
-                    <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                    <el-option v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" >
                 <el-form-item label="Deliverable Tag">
-                  <el-select
-                    v-model="taskLv4Form.task_deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                  <el-select v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                    <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
               </el-col>
@@ -790,6 +770,13 @@
             <el-form-item label="Description" prop="task_detail">
               <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
+            <el-row v-if="lv4TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv4Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
@@ -948,35 +935,19 @@ export default {
   name: 'TaskListNew',
   data () {
     return {
-        typeTagOptions:[{
-          value: 'One-Off Task',
-          label: 'One-Off Task'
-        },{
-          value: 'Regular Task',
-          label: 'Regular Task'          
-        },{
-          value: 'Issue',
-          label: 'Issue'          
-        },{
-          value: 'Problem',
-          label: 'Problem'          
-        }],
-        DeliverOptions: [{
-          value: 'Document',
-          label: 'Document'
-        }, {
-          value: 'Program',
-          label: 'Program'
-        }, {
-          value: 'Ready to UAT',
-          label: 'Ready to UAT'
-        },{
-          value: 'Ready to PROD',
-          label: 'Ready to PROD'
-        },{
-          value: 'Clarify',
-          label: 'Clarify'
-        }],
+      typeTagOptions:[
+        {value: 'Public Task', label: 'Public Task'},
+        {value: 'One-Off Task', label: 'One-Off Task'},
+        {value: 'Regular Task', label: 'Regular Task'}
+      ],
+      DeliverOptions: [
+        {value: 'Clarify Requirement', label: 'Clarify Requirement'},
+        {value: 'Document Scenarios', label: 'Document Scenarios'}, 
+        {value: 'Design Program', label: 'Design Program'},
+        {value: 'Ready to UAT', label: 'Ready to UAT'},
+        {value: 'UAT In Support', label: 'UAT In Support'},
+        {value: 'Ready to PROD', label: 'Ready to PROD'}
+      ],
       // Header/Theme Value
       header1: 'Task Plan',
       isActive: true,
@@ -1057,7 +1028,8 @@ export default {
         disableTaskType: false,
         disableTaskEst: false,
         showProgress: true,
-        showSubTaskEst: true
+        showSubTaskEst: true,
+        showCreator: true
       },
       taskLv2FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1076,7 +1048,8 @@ export default {
         showSubTaskEst: true,
         showTaskGroup: true,
         showTypeTag: true,
-        showDeliverableTag: true
+        showDeliverableTag: true,
+        showCreator: true
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1087,7 +1060,8 @@ export default {
       lv4TaskItemRule: {
         disableParentNameInput: true,
         disableTaskEst: false,
-        showProgress: true
+        showProgress: true,
+        showCreator: true
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1569,6 +1543,13 @@ export default {
             return
           }
         }
+        if (reqTask.task_status === 'Done') {
+          var result = await this.ifAllSubTasksDone(reqTask.task_name)
+          if (!result) {
+            this.$message.error('Exist sub task not Done!')
+            return
+          }
+        }
         this.$data.taskLv2SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
@@ -1594,6 +1575,7 @@ export default {
         this.$data.lv2TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         this.$data.lv2TaskItemRule.showProgress = true
         this.$data.lv2TaskItemRule.showSubTaskEst = true
+        this.$data.lv2TaskItemRule.showCreator = true
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
         })
@@ -1611,6 +1593,7 @@ export default {
         this.$data.lv2TaskItemRule.disableTaskEst = false
         this.$data.lv2TaskItemRule.showProgress = false
         this.$data.lv2TaskItemRule.showSubTaskEst = false
+        this.$data.lv2TaskItemRule.showCreator = false
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
         })
@@ -1650,7 +1633,16 @@ export default {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
             return
           }
-          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+          if (reqTask.task_TypeTag !== 'Public Task') {
+            if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+              return
+            }
+          }
+        }
+        if (reqTask.task_status === 'Done') {
+          var result = await this.ifAllSubTasksDone(reqTask.task_name)
+          if (!result) {
+            this.$message.error('Exist sub task not Done!')
             return
           }
         }
@@ -1685,6 +1677,7 @@ export default {
         // Default value
         this.$data.taskLv3WorklogShow = true
         this.$data.lv3TaskItemRule.disableTaskEst = false
+        this.$data.lv3TaskItemRule.showCreator = true
         // Common Rule for estimation and worklog button
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Common Rule 1
@@ -1755,6 +1748,7 @@ export default {
         this.$data.lv3TaskItemRule.showRespLeader = true
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
+        this.$data.lv3TaskItemRule.showCreator = false
         this.$data.taskLv3WorklogShow = false
       }
     },
@@ -1797,8 +1791,10 @@ export default {
           if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
             return
           }
-          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
-            return
+          if (reqTask.task_TypeTag !== 'Public Task') {
+            if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+              return
+            }
           }
         }
         this.$data.taskLv4SaveBtnDisabled = true
@@ -1827,6 +1823,7 @@ export default {
           this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = '' // Show worklog history tab
         })
         this.$data.lv4TaskItemRule.showProgress = true
+        this.$data.lv4TaskItemRule.showCreator = true
         this.$data.taskLv4WorklogShow = true
         // Common Rule for estimation and worklog button
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv4Form.task_status)
@@ -1850,6 +1847,7 @@ export default {
         }
         this.$data.lv4TaskItemRule.disableTaskEst = false
         this.$data.lv4TaskItemRule.showProgress = false
+        this.$data.lv4TaskItemRule.showCreator = false
         this.$data.taskLv4WorklogShow = false
       }
     },
@@ -1900,6 +1898,14 @@ export default {
     },
     // Worklog Dialog
     addWorklog (iObj) {
+      var taskTypeTag = this[iObj].task_TypeTag
+      var taskAssigneeId = this[iObj].task_assignee
+      if (taskTypeTag !== 'Public Task') {
+        if (!this.checkIfAssigneeSameWithUser(taskAssigneeId)) {
+          this.$message.error('You are not the task assignee, cannot record your effort on this task!')
+          return
+        }
+      }
       this.$data.worklogForm.worklog_task_id = this[iObj].task_id
       this.$data.worklogForm.worklog_task = this[iObj].task_name
       var currentDate = this.dateToString(new Date())
@@ -2177,6 +2183,28 @@ export default {
       } else {
         return false
       }
+    },
+    async ifAllSubTasksDone (iTaskName) {
+      if(iTaskName !== undefined && iTaskName !== null && iTaskName !== ''){
+        const res = await http.get('/tasks/checkSubTaskDone', {
+          reqTaskName: iTaskName
+        })
+        if (res.data.status === 0) {
+          return true
+        } else {
+          return false
+        }
+      }
+    },
+    checkIfAssigneeSameWithUser (iAssigneeId) {
+      var userId = Number(this.$store.getters.getUserId)
+      var assigneeId = Number(iAssigneeId)
+      if (userId !== null && userId > 0 && assigneeId !== null && assigneeId > 0) {
+        if (userId === assigneeId) {
+          return true
+        }
+      }
+      return false
     },
     dateToString (iDate) {
       if (iDate !== null && iDate !== '' && iDate !== 'Invalid Date') {
