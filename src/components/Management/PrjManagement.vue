@@ -122,17 +122,17 @@
                           <el-input v-model="props.row.user_eid" size="small" style="width: 100%"></el-input>
                         </el-col>
                         <el-col :span="2" class="pm-table-expand-label">
+                          <span>Nickname</span>
+                        </el-col>
+                        <el-col :span="6" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_nickname" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="2" class="pm-table-expand-label">
                           <span>Employee Number</span>
                         </el-col>
                         <el-col :span="6" class="pm-table-expand-item">
                           <el-input v-model="props.row.user_employee_number" size="small" style="width: 100%"></el-input>
-                        </el-col>
-                        <el-col :span="2" class="pm-table-expand-label">
-                          <span>Email</span>
-                        </el-col>
-                        <el-col :span="6" class="pm-table-expand-item">
-                          <el-input v-model="props.row.user_email" size="small" style="width: 100%"></el-input>
-                        </el-col>
+                        </el-col>                    
                       </el-row>
                       <el-row :gutter="15" style="margin-top: 10px">
                         <el-col :span="2" class="pm-table-expand-label">
@@ -178,8 +178,14 @@
                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Active</span>
                         </el-col>
-                        <el-col :span="12" class="pm-table-expand-item">
+                        <el-col :span="2" class="pm-table-expand-item">
                           <el-switch v-model="props.row.user_isactive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                        </el-col>
+                        <el-col :span="2" class="pm-table-expand-label">
+                          <span>Email</span>
+                        </el-col>
+                        <el-col :span="8" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_email" size="small" style="width: 100%"></el-input>
                         </el-col>
                         <el-col :span="10" class="pm-table-expand-item">
                           <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small"
@@ -192,6 +198,7 @@
                   </el-table-column>
                   <el-table-column label="Id" prop="user_id" v-if="false"></el-table-column>
                   <el-table-column label="Name" prop="user_eid" min-width="100" show-overflow-tooltip></el-table-column>
+                  <el-table-column label="Nickname" prop="user_nickname" min-width="92" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Employee Number" prop="user_employee_number" min-width="100"></el-table-column>
                   <el-table-column label="Email" prop="user_email" min-width="110" show-overflow-tooltip></el-table-column>
                   <el-table-column label="Level" prop="user_level" min-width="30" show-overflow-tooltip></el-table-column>
@@ -341,6 +348,7 @@ export default {
     async getUserList () {
       this.$data.userData = []
       const res = await http.get('/users/getUserList', {IsActive: 0})
+      console.log(res.data.data)
       if (res.data.status === 0) {
         this.$data.userData = res.data.data
         var jsonString1 = JSON.stringify(this.$data.userData)
@@ -399,10 +407,12 @@ export default {
         this.$message.error('Add/Update user Failed!')
         return
       }
+      console.log(user.user_id)
       const res = await http.post('/users/addOrUpdateUser', {
         reqUserId: user.user_id,
         reqUserEid: user.user_eid,
         reqUserEmployeeNumber: user.user_employee_number,
+        reqUserNickname : user.user_nickname,
         userEmail: user.user_email,
         reqUserLevel: user.user_level,
         reqUserTeam: user.user_team,
@@ -426,6 +436,7 @@ export default {
       if (props.row.user_id > 0) {
         props.row.user_eid = this.$data.userResetData[index].user_eid
         props.row.user_employee_number = this.$data.userResetData[index].user_employee_number
+        props.row.user_nickname = this.$data.userResetData[index].user_nickname
         props.row.user_email = this.$data.userResetData[index].user_email
         props.row.user_level = this.$data.userResetData[index].user_level
         props.row.user_team = this.$data.userResetData[index].user_team
@@ -442,6 +453,7 @@ export default {
         user_id: 0,
         user_eid: 'N/A',
         user_employee_number: '',
+        user_nickname : '',
         user_email: 'N/A',
         user_level: '-1',
         user_team: 'TOS',
