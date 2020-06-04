@@ -307,8 +307,10 @@ export default {
     async queryTaskAsync (queryString, cb) {
       console.log('Query String: ' + queryString)
       var returnArr = []
+      var reqTaskAssigneeId = this.$store.getters.getUserId
       const res = await http.post('/tasks/getTaskByNameForWorklogTask', {
-        tTaskName: queryString
+        tTaskName: queryString,
+        tTaskAssigneeId: reqTaskAssigneeId
       })
       if (res.data.status === 0) {
         var queryResult = res.data.data
