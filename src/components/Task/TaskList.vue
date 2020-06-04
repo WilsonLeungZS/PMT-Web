@@ -52,8 +52,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                 </el-select>
               </el-form-item>
@@ -65,8 +65,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                 </el-select>
               </el-form-item>
@@ -78,8 +78,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                 </el-select>
               </el-form-item>
@@ -305,8 +305,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -457,8 +457,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -471,8 +471,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -690,8 +690,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -704,8 +704,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -718,8 +718,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -940,8 +940,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -954,8 +954,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -2155,19 +2155,36 @@ export default {
           IsActive: 1
         })
         if (res1.data.status === 0) {
+          var userList1 = res1.data.data
           this.$data.activeUserListForAll = []
-          this.$data.activeUserListForAll = res1.data.data
+          for (var f = 0; f < userList1.length; f++) {
+            if (userList1[f].user_level > 0) {
+              if (userList1[f].user_nickname !== null && userList1[f].user_nickname !== '') {
+                userList1[f].user_eid = userList1[f].user_eid + ' (' + userList1[f].user_nickname + ')'
+              }
+              this.$data.activeUserListForAll.push(userList1[f])
+            }
+          }
         }
-        var userList = res.data.data
+        var userListString = JSON.stringify(res.data.data)
+        var userList = JSON.parse(userListString)
         this.$data.activeUserListForOthRespLeader = []
         for (var i = 0; i < userList.length; i++) {
           if (userList[i].user_level > 0 && userList[i].user_level <= 10) {
+            if (userList[i].user_nickname !== null && userList[i].user_nickname !== '') {
+              userList[i].user_eid = userList[i].user_eid + ' (' + userList[i].user_nickname + ')'
+            }
             this.$data.activeUserListForOthRespLeader.push(userList[i])
           }
         }
+        userList = []
+        userList = JSON.parse(userListString)
         this.$data.activeUserListForLv1RespLeader = []
         for (var a = 0; a < userList.length; a++) {
           if (userList[a].user_level > 0 && userList[a].user_level <= 9) {
+            if (userList[a].user_nickname !== null && userList[a].user_nickname !== '') {
+              userList[a].user_eid = userList[a].user_eid + ' (' + userList[a].user_nickname + ')'
+            }
             this.$data.activeUserListForLv1RespLeader.push(userList[a])
           }
         }
