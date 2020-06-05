@@ -26,8 +26,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -267,8 +267,15 @@
               <el-input class="span-format-text" type="text" v-model="taskLv2Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
+              <el-input type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
             </el-form-item>
+            <el-row v-if="lv2TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv2Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
@@ -309,8 +316,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -323,8 +330,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -459,31 +466,14 @@
               <el-col :span="12" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
                   <el-select v-model="taskLv3Form.task_TypeTag" style="width: 100%">
-                    <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                    <el-option v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Deliverable Tag">
-                  <el-select
-                    v-model="taskLv3Form.task_deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                  <el-select v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                    <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
               </el-col>
@@ -518,8 +508,15 @@
               <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
+              <el-input type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>
+            <el-row v-if="lv3TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv3Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
@@ -560,8 +557,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -574,8 +571,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -588,8 +585,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -735,31 +732,14 @@
               <el-col :span="12">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
                   <el-select v-model="taskLv4Form.task_TypeTag" style="width: 100%">
-                    <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                    <el-option v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" >
                 <el-form-item label="Deliverable Tag">
-                  <el-select
-                    v-model="taskLv4Form.task_deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                  <el-select v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                    <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
               </el-col>
@@ -788,8 +768,15 @@
               <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
+              <el-input type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
+            <el-row v-if="lv4TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv4Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
@@ -830,8 +817,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -844,8 +831,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left;">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -948,35 +935,19 @@ export default {
   name: 'TaskListNew',
   data () {
     return {
-        typeTagOptions:[{
-          value: 'One-Off Task',
-          label: 'One-Off Task'
-        },{
-          value: 'Regular Task',
-          label: 'Regular Task'          
-        },{
-          value: 'Issue',
-          label: 'Issue'          
-        },{
-          value: 'Problem',
-          label: 'Problem'          
-        }],
-        DeliverOptions: [{
-          value: 'Document',
-          label: 'Document'
-        }, {
-          value: 'Program',
-          label: 'Program'
-        }, {
-          value: 'Ready to UAT',
-          label: 'Ready to UAT'
-        },{
-          value: 'Ready to PROD',
-          label: 'Ready to PROD'
-        },{
-          value: 'Clarify',
-          label: 'Clarify'
-        }],
+      typeTagOptions:[
+        {value: 'Public Task', label: 'Public Task'},
+        {value: 'One-Off Task', label: 'One-Off Task'},
+        {value: 'Regular Task', label: 'Regular Task'}
+      ],
+      DeliverOptions: [
+        {value: 'Clarify Requirement', label: 'Clarify Requirement'},
+        {value: 'Document Scenarios', label: 'Document Scenarios'}, 
+        {value: 'Design Program', label: 'Design Program'},
+        {value: 'Ready to UAT', label: 'Ready to UAT'},
+        {value: 'UAT In Support', label: 'UAT In Support'},
+        {value: 'Ready to PROD', label: 'Ready to PROD'}
+      ],
       // Header/Theme Value
       header1: 'Task Plan',
       isActive: true,
@@ -1057,7 +1028,8 @@ export default {
         disableTaskType: false,
         disableTaskEst: false,
         showProgress: true,
-        showSubTaskEst: true
+        showSubTaskEst: true,
+        showCreator: true
       },
       taskLv2FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1076,7 +1048,8 @@ export default {
         showSubTaskEst: true,
         showTaskGroup: true,
         showTypeTag: true,
-        showDeliverableTag: true
+        showDeliverableTag: true,
+        showCreator: true
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1087,7 +1060,8 @@ export default {
       lv4TaskItemRule: {
         disableParentNameInput: true,
         disableTaskEst: false,
-        showProgress: true
+        showProgress: true,
+        showCreator: true
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1558,7 +1532,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
+            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')) {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
@@ -1566,6 +1540,13 @@ export default {
             return
           }
           if (this.isFieldEmpty(reqTask.task_responsible_leader, 'Responsible leader could not be empty!')) {
+            return
+          }
+        }
+        if (reqTask.task_status === 'Done') {
+          var result = await this.ifAllSubTasksDone(reqTask.task_name)
+          if (!result) {
+            this.$message.error('Exist sub task not Done!')
             return
           }
         }
@@ -1594,6 +1575,7 @@ export default {
         this.$data.lv2TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         this.$data.lv2TaskItemRule.showProgress = true
         this.$data.lv2TaskItemRule.showSubTaskEst = true
+        this.$data.lv2TaskItemRule.showCreator = true
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
         })
@@ -1611,6 +1593,7 @@ export default {
         this.$data.lv2TaskItemRule.disableTaskEst = false
         this.$data.lv2TaskItemRule.showProgress = false
         this.$data.lv2TaskItemRule.showSubTaskEst = false
+        this.$data.lv2TaskItemRule.showCreator = false
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
         })
@@ -1638,7 +1621,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
+            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')||
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
@@ -1647,10 +1630,19 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
-            return
+          if (reqTask.task_TypeTag !== 'Public Task') {
+            if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+              return
+            }
+            if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+              return
+            }
           }
-          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+        }
+        if (reqTask.task_status === 'Done') {
+          var result = await this.ifAllSubTasksDone(reqTask.task_name)
+          if (!result) {
+            this.$message.error('Exist sub task not Done!')
             return
           }
         }
@@ -1685,6 +1677,7 @@ export default {
         // Default value
         this.$data.taskLv3WorklogShow = true
         this.$data.lv3TaskItemRule.disableTaskEst = false
+        this.$data.lv3TaskItemRule.showCreator = true
         // Common Rule for estimation and worklog button
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Common Rule 1
@@ -1755,6 +1748,7 @@ export default {
         this.$data.lv3TaskItemRule.showRespLeader = true
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
+        this.$data.lv3TaskItemRule.showCreator = false
         this.$data.taskLv3WorklogShow = false
       }
     },
@@ -1785,7 +1779,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
+            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')||
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
@@ -1794,11 +1788,13 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
-            return
-          }
-          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
-            return
+          if (reqTask.task_TypeTag !== 'Public Task') {
+            if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+              return
+            }
+            if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+              return
+            }
           }
         }
         this.$data.taskLv4SaveBtnDisabled = true
@@ -1827,6 +1823,7 @@ export default {
           this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = '' // Show worklog history tab
         })
         this.$data.lv4TaskItemRule.showProgress = true
+        this.$data.lv4TaskItemRule.showCreator = true
         this.$data.taskLv4WorklogShow = true
         // Common Rule for estimation and worklog button
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv4Form.task_status)
@@ -1850,6 +1847,7 @@ export default {
         }
         this.$data.lv4TaskItemRule.disableTaskEst = false
         this.$data.lv4TaskItemRule.showProgress = false
+        this.$data.lv4TaskItemRule.showCreator = false
         this.$data.taskLv4WorklogShow = false
       }
     },
@@ -1900,6 +1898,14 @@ export default {
     },
     // Worklog Dialog
     addWorklog (iObj) {
+      var taskTypeTag = this[iObj].task_TypeTag
+      var taskAssigneeId = this[iObj].task_assignee
+      if (taskTypeTag !== 'Public Task') {
+        if (!this.checkIfAssigneeSameWithUser(taskAssigneeId)) {
+          this.$message.error('You are not the task assignee, cannot record your effort on this task!')
+          return
+        }
+      }
       this.$data.worklogForm.worklog_task_id = this[iObj].task_id
       this.$data.worklogForm.worklog_task = this[iObj].task_name
       var currentDate = this.dateToString(new Date())
@@ -2003,19 +2009,36 @@ export default {
           IsActive: 1
         })
         if (res1.data.status === 0) {
+          var userList1 = res1.data.data
           this.$data.activeUserListForAll = []
-          this.$data.activeUserListForAll = res1.data.data
+          for (var f = 0; f < userList1.length; f++) {
+            if (userList1[f].user_level > 0) {
+              if (userList1[f].user_nickname !== null && userList1[f].user_nickname !== '') {
+                userList1[f].user_eid = userList1[f].user_eid + ' (' + userList1[f].user_nickname + ')'
+              }
+              this.$data.activeUserListForAll.push(userList1[f])
+            }
+          }
         }
-        var userList = res.data.data
+        var userListString = JSON.stringify(res.data.data)
+        var userList = JSON.parse(userListString)
         this.$data.activeUserListForOthRespLeader = []
         for (var i = 0; i < userList.length; i++) {
           if (userList[i].user_level > 0 && userList[i].user_level <= 10) {
+            if (userList[i].user_nickname !== null && userList[i].user_nickname !== '') {
+              userList[i].user_eid = userList[i].user_eid + ' (' + userList[i].user_nickname + ')'
+            }
             this.$data.activeUserListForOthRespLeader.push(userList[i])
           }
         }
+        userList = []
+        userList = JSON.parse(userListString)
         this.$data.activeUserListForLv1RespLeader = []
         for (var a = 0; a < userList.length; a++) {
           if (userList[a].user_level > 0 && userList[a].user_level <= 9) {
+            if (userList[a].user_nickname !== null && userList[a].user_nickname !== '') {
+              userList[a].user_eid = userList[a].user_eid + ' (' + userList[a].user_nickname + ')'
+            }
             this.$data.activeUserListForLv1RespLeader.push(userList[a])
           }
         }
@@ -2177,6 +2200,28 @@ export default {
       } else {
         return false
       }
+    },
+    async ifAllSubTasksDone (iTaskName) {
+      if(iTaskName !== undefined && iTaskName !== null && iTaskName !== ''){
+        const res = await http.get('/tasks/checkSubTaskDone', {
+          reqTaskName: iTaskName
+        })
+        if (res.data.status === 0) {
+          return true
+        } else {
+          return false
+        }
+      }
+    },
+    checkIfAssigneeSameWithUser (iAssigneeId) {
+      var userId = Number(this.$store.getters.getUserId)
+      var assigneeId = Number(iAssigneeId)
+      if (userId !== null && userId > 0 && assigneeId !== null && assigneeId > 0) {
+        if (userId === assigneeId) {
+          return true
+        }
+      }
+      return false
     },
     dateToString (iDate) {
       if (iDate !== null && iDate !== '' && iDate !== 'Invalid Date') {
