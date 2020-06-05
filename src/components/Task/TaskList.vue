@@ -408,7 +408,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv2Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
+              <el-input type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
             </el-form-item>
             <el-row v-if="lv2TaskItemRule.showCreator">
               <el-col :span="11">
@@ -641,7 +641,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
+              <el-input type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>
             <el-row v-if="lv3TaskItemRule.showCreator">
               <el-col :span="11">
@@ -891,7 +891,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
+              <el-input type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
             <el-row v-if="lv4TaskItemRule.showCreator">
               <el-col :span="11">
@@ -1925,7 +1925,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
+            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')||
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
