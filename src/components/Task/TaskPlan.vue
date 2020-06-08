@@ -465,14 +465,14 @@
             <el-row>
               <el-col :span="12" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv3Form.task_TypeTag" style="width: 100%">
+                  <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%">
                     <el-option v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Deliverable Tag">
-                  <el-select v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                  <el-select :disabled="isRegular" v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
                     <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
@@ -497,7 +497,7 @@
             <el-row>
               <el-col :span="24" v-if="lv3TaskItemRule.showTaskGroup">
                 <el-form-item label="Time Group">
-                  <el-select v-model="taskLv3Form.task_group_id" @change="selectLv3TaskGroup" style="width: 100%" placeholder="Select Task Group...">
+                  <el-select :disabled="taskLv3TimeGroupDisabled" v-model="taskLv3Form.task_group_id" @change="selectLv3TaskGroup" style="width: 100%" placeholder="Select Task Group...">
                     <el-option label="" value=""></el-option>
                     <el-option v-for="(taskgroup, index) in taskGroups" :key="index" :label="taskgroup.group_name" :value="taskgroup.group_id"></el-option>
                   </el-select>
@@ -731,14 +731,14 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv4Form.task_TypeTag" style="width: 100%">
+                  <el-select @change="TypeTagChange" v-model="taskLv4Form.task_TypeTag" style="width: 100%">
                     <el-option v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1" >
                 <el-form-item label="Deliverable Tag">
-                  <el-select v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                  <el-select :disabled="isRegular" v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
                     <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
@@ -879,7 +879,7 @@
         </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="taskLv4WorklogShow" @click="addWorklog('taskLv4Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
+        <el-button :disabled="taskLv4WorklogDisabled"  v-if="taskLv4WorklogShow" @click="addWorklog('taskLv4Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
         <el-button :disabled="taskLv4SaveBtnDisabled" @click="saveLv4Task" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
@@ -1006,6 +1006,8 @@ export default {
       taskLv3FormSubTasks: [],
       taskLv3FormHistories: [],
       taskLv3WorklogShow: true,
+      taskLv3WorklogDisabled : false,
+      taskLv3TimeGroupDisabled : false,
       taskLv3SaveBtnDisabled: false,
       // Level 4 Task Dialog Value
       taskLv4DialogVisible: false,
@@ -1014,6 +1016,7 @@ export default {
       taskLv4Form: {},
       taskLv4FormProgressStatus: 'success',
       taskLv4FormHistories: [],
+      taskLv4WorklogDisabled : false,
       taskLv4WorklogShow: true,
       taskLv4SaveBtnDisabled: false,
       // Rules
@@ -1107,7 +1110,8 @@ export default {
       // Refresh Value
       refreshTaskId: null,
       refreshTaskName: null,
-      refreshTaskIndex: null
+      refreshTaskIndex: null,
+      isRegular: false
     }
   },
   methods: {
@@ -1118,6 +1122,28 @@ export default {
     },
     handleTabChange (iActiveTabArray) {
       this.$data.activeTabArray = iActiveTabArray
+    },
+    TypeTagChange () {
+      if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task' || this.$data.taskLv4Form.task_TypeTag === 'Regular Task' ){
+        console.log("TypeTagChange")
+        this.$data.isRegular = true
+        this.$data.lv3TaskItemRule.disableAssignee = true
+        this.$data.lv4TaskItemRule.disableAssignee = true
+        this.$data.taskLv3TimeGroupDisabled = true
+        if(this.$data.taskLv3Form.task_status === 'Running' || this.$data.taskLv3Form.task_status === 'Done'){
+          this.$data.taskLv3WorklogDisabled = true
+        }else if(this.$data.taskLv4Form.task_status === 'Running' || this.$data.taskLv4Form.task_status === 'Done'){
+          console.log("123")
+          this.$data.taskLv4WorklogDisabled = true
+        }
+      }else{
+        console.log("else")
+        this.$data.isRegular = false
+        this.$data.lv3TaskItemRule.disableAssignee = false
+        this.$data.taskLv3WorklogDisabled = false
+        this.$data.lv4TaskItemRule.disableAssignee = false
+        this.$data.taskLv4WorklogDisabled = false     
+      }
     },
     async openTaskTab (iTaskName, Index, iPage, iSize) {
       console.log('Request Task: ' + iTaskName + ', Index: ' + Index)
@@ -1416,6 +1442,7 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
+          this.TypeTagChange()
           if(this.$data.taskLv3Form.task_deliverableTag!=null){
             this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
           }
@@ -1436,6 +1463,7 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
           this.$data.taskLv4Form = res.data.data
+          this.TypeTagChange()
           if(this.$data.taskLv4Form.task_deliverableTag!=null){
             this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(",")            
           }
@@ -1630,7 +1658,8 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (reqTask.task_TypeTag !== 'Public Task') {
+          if(reqTask.task_TypeTag !== 'Regular Task') {
+          //if (reqTask.task_TypeTag !== 'Public Task') {
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
             }
@@ -1716,7 +1745,7 @@ export default {
           console.log('PMT Task')
           this.$data.lv3TaskItemRule.disableTaskEst = false
           this.$data.lv3TaskItemRule.disableDesc = false
-          this.$data.lv3TaskItemRule.disableAssignee = false
+          //this.$data.lv3TaskItemRule.disableAssignee = false
           this.$data.lv3TaskItemRule.disableStatus = false
           this.$data.lv3TaskItemRule.showRefPoolInput = true
           this.$data.lv3TaskItemRule.showRespLeader = true
@@ -1788,7 +1817,8 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (reqTask.task_TypeTag !== 'Public Task') {
+          if(reqTask.task_TypeTag !== 'Regular Task') {
+          //if (reqTask.task_TypeTag !== 'Public Task') {
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
             }
