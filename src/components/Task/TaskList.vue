@@ -2080,7 +2080,7 @@ export default {
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
-        this.$message.error('Invalid Effort (Worklog effort could not less than 0 or over 24 hrs)!')
+        this.$message.error('Invalid Effort (Worklog effort cannot less than 0 or over 24 hrs)!')
         return
       }
       if (!this.checkEffortIsValid(reqWorklogEffort)) {
