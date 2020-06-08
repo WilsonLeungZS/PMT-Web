@@ -606,7 +606,7 @@
             <el-row>
               <el-col :span="11" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv3Form.task_TypeTag" style="width: 100%">
+                  <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%">
                     <el-option
                       v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
@@ -615,7 +615,7 @@
               </el-col>
               <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Deliverable Tag">
-                  <el-select v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                  <el-select :disabled="isRegular" v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
                     <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
@@ -817,7 +817,7 @@
         </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="taskLv3WorklogShow" @click="addWorklog('taskLv3Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
+        <el-button :disabled="taskLv3WorklogDisabled" v-if="taskLv3WorklogShow" @click="addWorklog('taskLv3Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
         <el-button :disabled="taskLv3SaveBtnDisabled" @click="saveLv3Task" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
@@ -864,14 +864,14 @@
             <el-row>
               <el-col :span="11">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv4Form.task_TypeTag" style="width: 100%">
+                  <el-select @change="TypeTagChange" v-model="taskLv4Form.task_TypeTag" style="width: 100%">
                     <el-option v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
               <el-col :span="12" :offset="1" >
                 <el-form-item label="Deliverable Tag">
-                  <el-select v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                  <el-select :disabled="isRegular" v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
                     <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
@@ -1002,7 +1002,7 @@
         </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="taskLv4WorklogShow" @click="addWorklog('taskLv4Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
+        <el-button :disabled="taskLv4WorklogDisabled" v-if="taskLv4WorklogShow" @click="addWorklog('taskLv4Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
         <el-button :disabled="taskLv4SaveBtnDisabled" @click="saveLv4Task" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
@@ -1116,6 +1116,7 @@ export default {
       taskLv3FormSubTasks: [],
       taskLv3FormHistories: [],
       taskLv3WorklogShow: true,
+      taskLv3WorklogDisabled: false,
       taskLv3SaveBtnDisabled: false,
       // Level 4 Task Dialog Value
       taskLv4DialogVisible: false,
@@ -1123,6 +1124,7 @@ export default {
       activeTabForLv4: 'tab_basic_info',
       taskLv4Form: {},
       taskLv4FormProgressStatus: 'success',
+      taskLv4WorklogDisabled : false,
       taskLv4FormHistories: [],
       taskLv4WorklogShow: true,
       taskLv4SaveBtnDisabled: false,
@@ -1181,7 +1183,8 @@ export default {
         disableParentNameInput: true,
         disableTaskEst: false,
         showProgress: true,
-        showCreator: true
+        showCreator: true,
+        disableAssignee: false
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1223,7 +1226,9 @@ export default {
         {'status_name': 'Running', 'status_sequence': 3, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true},
         {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true}
       ],
-      statusArray: []
+      statusArray: [],
+      //Regular
+      isRegular: false
     }
   },
   methods: {
@@ -1333,6 +1338,30 @@ export default {
       }
       this.getTask(url, criteria)
     },
+    TypeTagChange () {
+      console.log("~~~~")
+      if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task' || this.$data.taskLv4Form.task_TypeTag === 'Regular Task' ){
+        console.log("TypeTagChange")
+        this.$data.isRegular = true
+        // LevelRule.disableAssignee = true
+        this.$data.lv3TaskItemRule.disableAssignee = true
+        this.$data.lv4TaskItemRule.disableAssignee = true
+        if(this.$data.taskLv3Form.task_status === 'Running' || this.$data.taskLv3Form.task_status === 'Done'){
+          this.$data.taskLv3WorklogDisabled = true
+        }else if(this.$data.taskLv4Form.task_status === 'Running' || this.$data.taskLv4Form.task_status === 'Done'){
+          console.log("123")
+          this.$data.taskLv4WorklogDisabled = true
+        }
+      }else{
+        console.log("else")
+        this.$data.isRegular = false
+        this.$data.lv3TaskItemRule.disableAssignee = false
+        this.$data.taskLv3WorklogDisabled = false
+        this.$data.lv4TaskItemRule.disableAssignee = false
+        this.$data.taskLv4WorklogDisabled = false
+        // this.$data.lv4TaskItemRule.disableAssignee = false       
+      }
+    },
     async getTask (iUrl, iCriteria) {
       const res = await http.post(iUrl, iCriteria)
       if (res.data.status === 0) {
@@ -1375,7 +1404,7 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
-          console.log(typeof(this.$data.taskLv3Form.task_deliverableTag))
+          this.TypeTagChange()
           if(this.$data.taskLv3Form.task_deliverableTag!=null){
             this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
           }
@@ -1396,6 +1425,7 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
           this.$data.taskLv4Form = res.data.data
+          this.TypeTagChange()
           if(this.$data.taskLv4Form.task_deliverableTag!=null){
             this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(",")            
           }
@@ -1783,7 +1813,12 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (reqTask.task_TypeTag !== 'Public Task') {
+          if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task'){
+            console.log("change")
+            this.$data.taskLv3WorklogShow = true
+          }
+          if(reqTask.task_TypeTag !== 'Regular Task') {
+          //if (reqTask.task_TypeTag !== 'Public Task') {
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
             }
@@ -1842,7 +1877,7 @@ export default {
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
           this.$data.lv3TaskItemRule.disableTaskEst = true
           this.$data.lv3TaskItemRule.disableDesc = true
-          this.$data.lv3TaskItemRule.disableAssignee = true
+          //this.$data.lv3TaskItemRule.disableAssignee = true
           this.$data.lv3TaskItemRule.disableStatus = true
           this.$data.lv3TaskItemRule.showRefPoolInput = false
           this.$data.lv3TaskItemRule.disableParentNameInput = true
@@ -1867,7 +1902,7 @@ export default {
         } else {
           console.log('PMT Task')
           this.$data.lv3TaskItemRule.disableDesc = false
-          this.$data.lv3TaskItemRule.disableAssignee = false
+          //this.$data.lv3TaskItemRule.disableAssignee = false
           this.$data.lv3TaskItemRule.disableStatus = false
           this.$data.lv3TaskItemRule.showRefPoolInput = true
           this.$data.lv3TaskItemRule.showRespLeader = true
@@ -1934,7 +1969,8 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (reqTask.task_TypeTag !== 'Public Task') {
+          if(reqTask.task_TypeTag !== 'Regular Task') {
+          //if (reqTask.task_TypeTag !== 'Public Task') {
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
             }
