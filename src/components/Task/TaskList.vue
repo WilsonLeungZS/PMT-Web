@@ -621,6 +621,57 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="12" >
+              <el-collapse value="array">
+                <el-collapse-item title="Regular Task Time" name="1">
+                  <el-form-item label="Regular Task Time">
+                    <el-select  v-model="taskLv3Form.task_RegularTaskTime"   style="width: 100%">
+                      <el-option v-for="item in RegularTaskTime" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>        
+                  </el-form-item>
+                  <div class="collapse-span" >
+                    <el-radio-group v-model="DailyOps" v-if="taskLv3Form.task_RegularTaskTime==='Daily'" >
+                      <el-radio :label="1">Every Weekday</el-radio>
+                      <el-radio :label="2">Every <el-input style="width:50px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> days</el-radio>
+                    </el-radio-group>
+                    <span  v-if="taskLv3Form.task_RegularTaskTime==='Weekly'">
+                      Every <el-input style="width:50px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> weeks
+                    </span>
+                    <span  v-if="taskLv3Form.task_RegularTaskTime==='Monthly'">
+                      Every <el-input style="width:50px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> months
+                    </span>
+                  </div>  
+                  <div>                  
+                    <el-date-picker v-if="taskLv3Form.task_RegularTaskTime!=null" v-model="taskLv3Form.RegularTime" type="daterange"
+                      start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd" style="width:100%;">
+                    </el-date-picker>                     
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+              </el-col>
+            </el-row>
+            <!-- <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="12">
+                <el-form-item >
+                  <el-radio-group v-model="DailyOps" v-if="taskLv3Form.task_RegularTaskTime==='Daily'" >
+                    <el-radio :label="1">Every Weekday</el-radio>
+                    <el-radio :label="2">Every <el-input style="width:50px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> days</el-radio>
+                  </el-radio-group>
+                  <span  v-if="taskLv3Form.task_RegularTaskTime==='Weekly'">
+                    Every <el-input style="width:50px;height:25px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> weeks
+                  </span>
+                  <span  v-if="taskLv3Form.task_RegularTaskTime==='Monthly'">
+                    Every <el-input style="width:50px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> months
+                  </span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" v-if="taskLv3Form.task_RegularTaskTime!=null">
+                <el-date-picker v-model="taskLv3Form.RegularTime" type="daterange"
+                  start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd" style="width:auto">
+                </el-date-picker>               
+              </el-col>
+            </el-row>    -->
             <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
@@ -877,6 +928,36 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="11" >
+                <el-form-item label="Regular Task Time">
+                  <el-select  v-model="taskLv4Form.task_RegularTaskTime"   style="width: 100%">
+                    <el-option v-for="item in RegularTaskTime" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                  </el-select>        
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="12">
+                <el-form-item >
+                  <el-radio-group v-model="DailyOps" v-if="taskLv4Form.task_RegularTaskTime==='Daily'" >
+                    <el-radio :label="1">Every Weekday</el-radio>
+                    <el-radio :label="2">Every <el-input style="width:50px" maxlength="2"  v-model="taskLv4Form.task_scheduletime" ></el-input> days</el-radio>
+                  </el-radio-group>
+                  <span  v-if="taskLv4Form.task_RegularTaskTime==='Weekly'">
+                    Every <el-input style="width:50px;height:25px" maxlength="2"  v-model="taskLv4Form.task_scheduletime" ></el-input> weeks
+                  </span>
+                  <span  v-if="taskLv4Form.task_RegularTaskTime==='Monthly'">
+                    Every <el-input style="width:50px" maxlength="2"  v-model="taskLv4Form.task_scheduletime" ></el-input> months
+                  </span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" v-if="taskLv4Form.task_RegularTaskTime!=null">
+                <el-date-picker v-model="taskLv4Form.RegularTime" type="daterange"
+                  start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd" style="width:auto">
+                </el-date-picker>               
+              </el-col>
+            </el-row>   
             <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
               <el-col :span="6">
                 <span>{{taskLv4Form.task_reference}}</span>
@@ -1227,8 +1308,16 @@ export default {
         {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true}
       ],
       statusArray: [],
-      //Regular
-      isRegular: false
+      //Regular Task
+      isRegular: false,
+      RegularTaskTimeVisible: false,
+      RegularTaskTime : [        
+        {value: 'Daily', label: 'Daily'},
+        {value: 'Weekly', label: 'Weekly'},
+        {value: 'Monthly', label: 'Monthly'}],
+      RegularTaskDialogVisible  : false,
+      DailyOps: '',
+      activeNames: ['1']
     }
   },
   methods: {
@@ -1346,6 +1435,7 @@ export default {
         // LevelRule.disableAssignee = true
         this.$data.lv3TaskItemRule.disableAssignee = true
         this.$data.lv4TaskItemRule.disableAssignee = true
+        this.$data.RegularTaskTimeVisible = true
         if(this.$data.taskLv3Form.task_status === 'Running' || this.$data.taskLv3Form.task_status === 'Done'){
           this.$data.taskLv3WorklogDisabled = true
         }else if(this.$data.taskLv4Form.task_status === 'Running' || this.$data.taskLv4Form.task_status === 'Done'){
@@ -1359,7 +1449,8 @@ export default {
         this.$data.taskLv3WorklogDisabled = false
         this.$data.lv4TaskItemRule.disableAssignee = false
         this.$data.taskLv4WorklogDisabled = false
-        // this.$data.lv4TaskItemRule.disableAssignee = false       
+        this.$data.RegularTaskTimeVisible = false  
+        this.$data.RegularTaskDialogVisible  = false
       }
     },
     async getTask (iUrl, iCriteria) {
@@ -1404,6 +1495,7 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
+          this.$data.RegularTaskDialogVisible = false
           this.TypeTagChange()
           if(this.$data.taskLv3Form.task_deliverableTag!=null){
             this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
@@ -1425,6 +1517,7 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
           this.$data.taskLv4Form = res.data.data
+          this.$data.RegularTaskDialogVisible = false
           this.TypeTagChange()
           if(this.$data.taskLv4Form.task_deliverableTag!=null){
             this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(",")            
@@ -1522,7 +1615,9 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
+        this.$data.isRegular = false
         this.$data.taskTypeArrayForLv2Task = []
+        this.$data.RegularTaskTimeVisible = false
         // Set data default value
         this.$data.taskLv3Form.task_status = 'Drafting'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
@@ -1538,7 +1633,9 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
+        this.$data.isRegular = false
         this.$data.taskTypeArrayForLv2Task = []
+        this.$data.RegularTaskTimeVisible = false
         // Set data default value
         this.$data.taskLv4Form.task_status = 'Drafting'
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
@@ -1794,6 +1891,7 @@ export default {
     // 5. Level 3 task dialog
     async saveLv3Task () {
       var reqTask = this.$data.taskLv3Form
+      console.log(reqTask)
       if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
           reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
       }
@@ -2734,5 +2832,9 @@ input[type="number"]{
 }
 .el-textarea .el-textarea__inner {
   resize: vertical !important;
+}
+
+.collapse-span {
+  margin-bottom: 5px;
 }
 </style>

@@ -70,12 +70,21 @@
                       </el-col>
                       <el-col :span="1" class="tp-main-content-item">{{task.task_status}}</el-col>
                       <el-tooltip class="item" effect="dark" :content="task.task_desc" placement="top-start">
-                        <el-col :span="8" class="tp-main-content-item">{{task.task_desc}}</el-col>
+                        <el-col :span="6" class="tp-main-content-item">{{task.task_desc}}</el-col>
                       </el-tooltip>
                       <el-col :span="2" class="tp-main-content-item">Effort: {{task.task_effort}}</el-col>
                       <el-col :span="2" class="tp-main-content-item">Est: {{task.task_estimation}}</el-col>
-                      <el-col :span="3" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
+                      <el-col :span="2" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
                       <el-col :span="4" class="tp-main-content-item">Responsible: {{task.task_responsible_leader}}</el-col>
+                      <el-col :span="3" class="tp-main-content-item">Regular: 
+                      <el-switch
+                        v-model="ShowRegular"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                        @change="ChangeRegularStatus(task)"
+                        @catchtap="switchcase">
+                      </el-switch> 
+                      </el-col>
                       <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(3, task)" type="success" size="mini" icon="el-icon-plus"></el-button></el-col>
                       <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshLv2Task(task.task_id, task.task_name, index)" type="info" size="mini" icon="el-icon-refresh"></el-button></el-col>
                     </el-row>
@@ -478,6 +487,36 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="12" >
+                <el-form-item label="Regular Task Time">
+                  <el-select  v-model="taskLv3Form.task_RegularTaskTime"   style="width: 100%">
+                    <el-option v-for="item in RegularTaskTime" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                  </el-select>        
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="12">
+                <el-form-item >
+                  <el-radio-group v-model="DailyOps" v-if="taskLv3Form.task_RegularTaskTime==='Daily'" >
+                    <el-radio :label="1">Every Weekday</el-radio>
+                    <el-radio :label="2">Every <el-input style="width:50px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> days</el-radio>
+                  </el-radio-group>
+                  <span  v-if="taskLv3Form.task_RegularTaskTime==='Weekly'">
+                    Every <el-input style="width:50px;height:25px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> weeks
+                  </span>
+                  <span  v-if="taskLv3Form.task_RegularTaskTime==='Monthly'">
+                    Every <el-input style="width:50px" maxlength="2"  v-model="taskLv3Form.task_scheduletime" ></el-input> months
+                  </span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" v-if="taskLv3Form.task_RegularTaskTime!=null">
+                <el-date-picker v-model="taskLv3Form.RegularTime" type="daterange"
+                  start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd" style="width:auto">
+                </el-date-picker>               
+              </el-col>
+            </el-row>          
             <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
@@ -493,7 +532,7 @@
                   <div class="tl-edit-form-div-desc">{{taskLv3Form.task_reference_desc}}</div>
                 </el-tooltip>
               </el-col>
-            </el-form-item>
+            </el-form-item>                  
             <el-row>
               <el-col :span="24" v-if="lv3TaskItemRule.showTaskGroup">
                 <el-form-item label="Time Group">
@@ -744,6 +783,36 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="12" >
+                <el-form-item label="Regular Task Time">
+                  <el-select  v-model="taskLv4Form.task_RegularTaskTime"   style="width: 100%">
+                    <el-option v-for="item in RegularTaskTime" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                  </el-select>        
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-if="RegularTaskTimeVisible">
+              <el-col :span="12">
+                <el-form-item >
+                  <el-radio-group v-model="DailyOps" v-if="taskLv4Form.task_RegularTaskTime==='Daily'" >
+                    <el-radio :label="1">Every Weekday</el-radio>
+                    <el-radio :label="2">Every <el-input style="width:50px" maxlength="2"  v-model="taskLv4Form.task_scheduletime" ></el-input> days</el-radio>
+                  </el-radio-group>
+                  <span  v-if="taskLv4Form.task_RegularTaskTime==='Weekly'">
+                    Every <el-input style="width:50px;height:25px" maxlength="2"  v-model="taskLv4Form.task_scheduletime" ></el-input> weeks
+                  </span>
+                  <span  v-if="taskLv4Form.task_RegularTaskTime==='Monthly'">
+                    Every <el-input style="width:50px" maxlength="2"  v-model="taskLv4Form.task_scheduletime" ></el-input> months
+                  </span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" v-if="taskLv4Form.task_RegularTaskTime!=null">
+                <el-date-picker v-model="taskLv4Form.RegularTime" type="daterange"
+                  start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd" style="width:auto">
+                </el-date-picker>               
+              </el-col>
+            </el-row>   
             <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
               <el-col :span="6">
                 <span>{{taskLv4Form.task_reference}}</span>
@@ -1052,7 +1121,8 @@ export default {
         showTaskGroup: true,
         showTypeTag: true,
         showDeliverableTag: true,
-        showCreator: true
+        showCreator: true,
+        disableAssignee: false
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1064,7 +1134,8 @@ export default {
         disableParentNameInput: true,
         disableTaskEst: false,
         showProgress: true,
-        showCreator: true
+        showCreator: true,
+        disableAssignee: false
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1111,7 +1182,16 @@ export default {
       refreshTaskId: null,
       refreshTaskName: null,
       refreshTaskIndex: null,
-      isRegular: false
+      //Regular Task
+      isRegular: false,
+      RegularTaskTimeVisible: false,
+      RegularTaskTime : [        
+        {value: 'Daily', label: 'Daily'},
+        {value: 'Weekly', label: 'Weekly'},
+        {value: 'Monthly', label: 'Monthly'}],
+      ShowRegular : false,
+      RegularTaskDialogVisible  : false,
+      DailyOps: '',
     }
   },
   methods: {
@@ -1123,6 +1203,12 @@ export default {
     handleTabChange (iActiveTabArray) {
       this.$data.activeTabArray = iActiveTabArray
     },
+    ChangeRegularStatus () {
+      console.log("switch值改变");
+    },
+    switchcase (){
+
+    },
     TypeTagChange () {
       if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task' || this.$data.taskLv4Form.task_TypeTag === 'Regular Task' ){
         console.log("TypeTagChange")
@@ -1130,6 +1216,7 @@ export default {
         this.$data.lv3TaskItemRule.disableAssignee = true
         this.$data.lv4TaskItemRule.disableAssignee = true
         this.$data.taskLv3TimeGroupDisabled = true
+        this.$data.RegularTaskTimeVisible = true
         if(this.$data.taskLv3Form.task_status === 'Running' || this.$data.taskLv3Form.task_status === 'Done'){
           this.$data.taskLv3WorklogDisabled = true
         }else if(this.$data.taskLv4Form.task_status === 'Running' || this.$data.taskLv4Form.task_status === 'Done'){
@@ -1142,7 +1229,10 @@ export default {
         this.$data.lv3TaskItemRule.disableAssignee = false
         this.$data.taskLv3WorklogDisabled = false
         this.$data.lv4TaskItemRule.disableAssignee = false
+        this.$data.taskLv3TimeGroupDisabled = false
         this.$data.taskLv4WorklogDisabled = false     
+        this.$data.RegularTaskTimeVisible = false
+        
       }
     },
     async openTaskTab (iTaskName, Index, iPage, iSize) {
@@ -1514,6 +1604,7 @@ export default {
         this.$data.taskLv3Form = {}
         // Set dialog value
         this.getActiveUserList()
+        this.$data.isRegular = false
         this.getTaskStatus('Drafting')
         // Set data default value
         this.$data.taskLv3Form.task_status = 'Drafting'
@@ -1535,6 +1626,7 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
+        this.$data.isRegular = false
         // Set data default value
         this.$data.taskLv4Form.task_status = 'Drafting'
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
@@ -1640,6 +1732,7 @@ export default {
     // 5. Level 3 task dialog
     async saveLv3Task () {
       var reqTask = this.$data.taskLv3Form
+      console.log(reqTask)
       if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
           reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
       }
