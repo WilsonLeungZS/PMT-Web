@@ -77,13 +77,12 @@
                       <el-col :span="2" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
                       <el-col :span="4" class="tp-main-content-item">Responsible: {{task.task_responsible_leader}}</el-col>
                       <el-col :span="3" class="tp-main-content-item">Regular: 
-                      <el-switch
-                        v-model="ShowRegular"
-                        active-color="#13ce66"
-                        inactive-color="#ff4949"
-                        @change="ChangeRegularStatus(task)"
-                        @catchtap="switchcase">
-                      </el-switch> 
+                        <el-switch
+                          v-model="task.ShowRegular"
+                          active-color="#13ce66"
+                          inactive-color="#ff4949"
+                          @change="ChangeRegularStatus(task.ShowRegular)">
+                        </el-switch>                        
                       </el-col>
                       <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(3, task)" type="success" size="mini" icon="el-icon-plus"></el-button></el-col>
                       <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshLv2Task(task.task_id, task.task_name, index)" type="info" size="mini" icon="el-icon-refresh"></el-button></el-col>
@@ -1203,11 +1202,8 @@ export default {
     handleTabChange (iActiveTabArray) {
       this.$data.activeTabArray = iActiveTabArray
     },
-    ChangeRegularStatus () {
-      console.log("switch值改变");
-    },
-    switchcase (){
-
+    ChangeRegularStatus (iShowRegular) {
+      console.log(iShowRegular);
     },
     TypeTagChange () {
       if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task' || this.$data.taskLv4Form.task_TypeTag === 'Regular Task' ){
