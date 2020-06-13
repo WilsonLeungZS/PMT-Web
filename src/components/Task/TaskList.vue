@@ -615,7 +615,7 @@
                 <el-form-item label="Parent Task" prop="task_parent_name">
                   <el-col :span="6">
                     <el-autocomplete :disabled="lv3TaskItemRule.disableParentNameInput" placeholder="Search Parent Task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
-                      @input="changeParentName('taskLv4Form')" v-model="taskLv3Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv3Form')})" @clear="clearSelectForParentTask('taskLv3Form')">
+                      v-model="taskLv3Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv3Form')})" @clear="clearSelectForParentTask('taskLv3Form')">
                       <template slot-scope="{ item }">
                         <div class="form_list_task_name">{{ item.value }}</div>
                         <span class="form_list_task_desc">{{ item.description }}</span>
@@ -887,7 +887,7 @@
             <el-row>
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
-                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv2FormRegularTasks" fit max-height="500" class="sub-task-table">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv3FormRegularTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -1004,7 +1004,7 @@
             <el-row v-if="RegularTaskTimeVisible">
               <el-col :span="16" v-if="taskLv4Form.task_RegularTaskTime!=null">
                 <el-form-item label="Start Time" prop="task_startTime">
-                  <span>{{taskLv4Form.task_RegularTaskTime}}</span>
+                  <span>{{taskLv4Form.task_startTime}}</span>
                 </el-form-item>
               </el-col>
             </el-row>   
@@ -1238,6 +1238,7 @@ export default {
       taskLv2FormProgressStatus: 'success',
       taskLv2FormSubTasks: [],
       taskLv2FormRegularTasks: [],
+      taskLv2FormRegularTasks: [],
       taskLv2SaveBtnDisabled: false,
       // Level 3 Task Dialog Value
       taskLv3DialogVisible: false,
@@ -1246,6 +1247,7 @@ export default {
       taskLv3Form: {},
       taskLv3FormProgressStatus: 'success',
       taskLv3FormSubTasks: [],
+      taskLv3FormRegularTasks: [],
       taskLv3FormHistories: [],
       taskLv3WorklogShow: true,
       taskLv3WorklogDisabled: false,
@@ -1524,6 +1526,7 @@ export default {
     },
     async getTask (iUrl, iCriteria) {
       const res = await http.post(iUrl, iCriteria)
+      this.$data.Scheduletime = ''
       if (res.data.status === 0) {
         var rtnTask = res.data.data
         if (rtnTask.task_level === 1) {
@@ -1554,6 +1557,7 @@ export default {
             this.$data.taskLv2FormProgressStatus = 'exception'
           }
           this.getSubTaskList(rtnTask.task_name, 'taskLv2FormSubTasks', 2)
+          this.getRegularTaskList(rtnTask.task_name, 'taskLv2FormRegularTasks', 2)
           this.ruleControlLv2TaskItem('Edit', null)
           this.$data.taskLv2DialogVisible = true
         }
@@ -1573,8 +1577,30 @@ export default {
           } else {
             this.$data.taskLv3FormProgressStatus = 'exception'
           }
-          this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)
-          this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+          if(res.data.data.task_TypeTag === 'Regular Task'){
+            const res1 = await http.post('/schedules/getSchedulesByTaskName',{
+              reqTaskName : rtnTask.task_name
+            })
+            console.log(res1)
+            if(res1.data.status === 0 ){
+              this.$data.taskLv3Form.task_RegularTaskTime = res1.data.data.task_RegularTaskTime
+              if(this.$data.taskLv3Form.task_RegularTaskTime === 'Daily'){
+                if(res1.data.data.task_scheduletime === 'Every Weekday'){
+                  this.$data.DailyOps = 1
+                }else{
+                  this.$data.DailyOps = 2          
+                }
+              }else{
+                this.$data.Scheduletime = res1.data.data.task_scheduletime.substring(6,8)    
+              }
+              this.$data.taskLv3Form.task_scheduletime = res1.data.data.task_scheduletime
+              this.$data.taskLv3Form.task_startTime = res1.data.data.task_startTime
+              this.getRegularTaskList(rtnTask.task_name,'taskLv3FormRegularTasks', 3)               
+            }      
+          }else{
+            this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)  
+            this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+          }
           this.ruleControlLv3TaskItem('Edit', null)
           this.$data.taskLv3DialogVisible = true
         }
@@ -1595,8 +1621,29 @@ export default {
           } else {
             this.$data.taskLv4FormProgressStatus = 'exception'
           }
+          if(res.data.data.task_TypeTag === 'Regular Task'){
+            const res1 = await http.post('/schedules/getSchedulesByTaskName',{
+              reqTaskName : rtnTask.task_name
+            })
+            console.log(res1)
+            if(res1.data.status === 0){
+              this.$data.taskLv4Form.task_RegularTaskTime = res1.data.data.task_RegularTaskTime
+              if(this.$data.taskLv4Form.task_RegularTaskTime === 'Daily'){
+                if(res1.data.data.task_scheduletime === 'Every Weekday'){
+                  this.$data.DailyOps = 1
+                }else{
+                  this.$data.DailyOps = 2          
+                }
+              }else{
+                this.$data.Scheduletime = res1.data.data.task_scheduletime.substring(6,8)    
+              }
+              this.$data.taskLv4Form.task_scheduletime = res1.data.data.task_scheduletime
+              this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime               
+            }  
+          }else{
+            this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
+          }
           this.ruleControlLv4TaskItem('Edit', null)
-          this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
           this.$data.taskLv4DialogVisible = true
         }
       }
@@ -1622,27 +1669,28 @@ export default {
       }
       this.$data.tasksSubTaskLoading = false
     },
-    // async getRegularTaskList (iTaskName, iSubTaskListItem, iLevel) {
-    //   this.$data.tasksSubTaskLoading = true
-    //   const res = await http.post('/tasks/getRegularTaskList', {
-    //     reqTaskName: iTaskName
-    //   })
-    //   if (res.data.status === 0) {
-    //     this[iSubTaskListItem] = []
-    //     this[iSubTaskListItem] = res.data.data
-    //     // console.log('Sub Task: ' + JSON.stringify(res.data.data))
-    //   } else {
-    //     this[iSubTaskListItem] = []
-    //   }
-    //   if (this[iSubTaskListItem].length > 0) {
-    //     if (iLevel === 3) {
-    //       console.log('Sub task > 0')
-    //       this.$data.taskLv3WorklogShow = false
-    //       this.$data.lv3TaskItemRule.disableTaskEst = true
-    //     }
-    //   }
-    //   this.$data.tasksSubTaskLoading = false
-    // },
+    async getRegularTaskList (iTaskName, iSubTaskListItem, iLevel) {
+      this.$data.tasksSubTaskLoading = true
+      const res = await http.post('/tasks/getRegularaskByTaskName', {
+        reqTaskName: iTaskName
+      })
+      console.log(res)
+      if (res.data.status === 0) {
+        this[iSubTaskListItem] = []
+        this[iSubTaskListItem] = res.data.data
+        // console.log('Sub Task: ' + JSON.stringify(res.data.data))
+      } else {
+        this[iSubTaskListItem] = []
+      }
+      if (this[iSubTaskListItem].length > 0) {
+        if (iLevel === 3) {
+          console.log('Sub task > 0')
+          this.$data.taskLv3WorklogShow = false
+          this.$data.lv3TaskItemRule.disableTaskEst = true
+        }
+      }
+      this.$data.tasksSubTaskLoading = false
+    },
     async getTaskWorklogHistory (iTaskId, iTaskHistory) {
       this.$data.tasksWorklogHistoriesLoading = true
       const res = await http.post('/worklogs/getWorklogHistoryByTaskId', {
@@ -1671,6 +1719,25 @@ export default {
         this.$data.lv4TaskItemRule.disableAssignee = true
         this.$data.lv3TaskItemRule.disableAssignee = true
         this.$data.RegularTaskTimeVisible = true
+        const res1 = await http.post('/schedules/getSchedulesByTaskName',{
+           reqTaskName :res.data.data.task_name
+        })
+        if(res1.data.status === 0){
+          this.$data.taskLv4Form.task_scheduletime = res1.data.data.task_scheduletime
+          this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime             
+          this.$data.taskLv4Form.task_RegularTaskTime = res1.data.data.task_RegularTaskTime
+          if(this.$data.taskLv4Form.task_RegularTaskTime === 'Daily'){
+            if(res1.data.data.task_scheduletime === 'Every Weekday'){
+              this.$data.DailyOps = 1
+            }else{
+              this.$data.DailyOps = 2          
+            }
+          }else{
+            this.$data.Scheduletime = res1.data.data.task_scheduletime.substring(6,8)    
+          }
+          this.$data.taskLv4Form.task_scheduletime = res1.data.data.task_scheduletime
+          this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime          
+        }       
         if(this[iObj].task_status === 'Running' || this[iObj].task_status === 'Done'){
           this.$data.taskLv4WorklogDisabled = true
           this.$data.taskLv3WorklogDisabled = true
@@ -1725,6 +1792,8 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
+        this.$data.DailyOps = ''
+        this.$data.Scheduletime = ''
         this.$data.lv3TaskItemRule.showDeliverableTag = true
         this.$data.taskTypeArrayForLv2Task = []
         this.$data.RegularTaskTimeVisible = false
@@ -1743,6 +1812,8 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
+        this.changeParentName('taskLv4Form')
+        this.$data.DailyOps = ''
         this.$data.lv4TaskItemRule.showDeliverableTag = true
         this.$data.taskTypeArrayForLv2Task = []
         this.$data.RegularTaskTimeVisible = false
@@ -1753,6 +1824,7 @@ export default {
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv4Form.task_progress_nosymbol = 0
         // Show or hide column
+
         this.ruleControlLv4TaskItem('Create', true)
         this.$data.taskLv4DialogVisible = true
       }
@@ -1811,6 +1883,12 @@ export default {
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
         // Set data default value
+        const res  = await http.post('/tasks/getTaskByName',{
+          reqTaskName : this[iParentObj].task_name
+        })
+        if(res.data.status ===0 && res.data.data != null ){
+          this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
+        }
         this.$data.taskLv4Form.task_status = 'Drafting'
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
@@ -1818,7 +1896,6 @@ export default {
         this.$data.taskLv4Form.task_progress_nosymbol = 0
         // Set parent data of sub task
         this.$data.taskLv4Form.task_parent_name = this[iParentObj].task_name
-        this.changeParentName(iParentObj)
         this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
         this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
         this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
@@ -1842,6 +1919,7 @@ export default {
         this.$data.taskLv3Form.task_status = 'Drafting'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv3Form.task_level = 3
+        this.$data.DailyOps = ''
         this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv3Form.task_progress_nosymbol = 0
         this.$data.taskLv3Form.task_TypeTag = 'Regular Task'
@@ -1866,12 +1944,13 @@ export default {
         this.$data.taskLv4Form.task_status = 'Drafting'
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
+        this.$data.DailyOps = ''
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv4Form.task_progress_nosymbol = 0
         this.$data.taskLv4Form.task_TypeTag = 'Regular Task'
-        this.$data.taskLv4Form.task_RegularTaskTime = '~~'
-        this.$data.taskLv4Form.task_startTime = '!!'
-        this.$data.taskLv4Form.task_scheduletime = '**'
+        this.$data.taskLv4Form.task_RegularTaskTime = this[iParentObj].task_RegularTaskTime
+        this.$data.taskLv4Form.task_startTime = this[iParentObj].task_startTime
+        this.$data.taskLv4Form.task_scheduletime = this[iParentObj].task_scheduletime
         // Set parent data of sub task
         this.$data.taskLv4Form.task_parent_name = this[iParentObj].task_name
         this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
@@ -2054,6 +2133,7 @@ export default {
       this.$data.taskLv2Form = {}
       this.$data.taskLv2Form.task_progress_nosymbol = 0
       this.$data.taskLv2FormSubTasks = []
+      this.$data.taskLv2FormRegularTasks = []
       this.$data.taskLv2DialogTitle = '2 - Business Implementation'
       this.$data.activeTabForLv2 = 'tab_basic_info'
       done()
@@ -2061,9 +2141,9 @@ export default {
     // 5. Level 3 task dialog
     async saveLv3Task () {
       if(this.$data.taskLv3Form.task_RegularTaskTime === 'Weekly'){
-        this.$data.taskLv3Form.task_scheduletion= "Every " +this.$data.Scheduletime +" weeks"
+        this.$data.taskLv3Form.task_scheduletime= "Every " +this.$data.Scheduletime +" weeks"
       }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'){
-        this.$data.taskLv3Form.task_scheduletion = "Every " +this.$data.Scheduletime +" months"         
+        this.$data.taskLv3Form.task_scheduletime = "Every " +this.$data.Scheduletime +" months"         
       }
       var reqTask = this.$data.taskLv3Form
       if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
@@ -2093,8 +2173,7 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task'){
-            console.log("change")
+          if(reqTask.task_TypeTag === 'Regular Task'){
             this.$data.taskLv3WorklogShow = true
           }
           if(reqTask.task_TypeTag !== 'Regular Task') {
@@ -2115,13 +2194,21 @@ export default {
           }
         }
         this.$data.taskLv3SaveBtnDisabled = true
-        //console.log(reqTask)
         if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
             reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
         }
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
+        if(reqTask.task_TypeTag === 'Regular Task'){
+          const res1 = await http.post('/schedules/saveRegularTask',{
+            reqRegularTaskTime : reqTask.task_RegularTaskTime,
+            reqStartTime : reqTask.task_startTime,
+            reqTaskId : res.data.data.TaskName,
+            reqSchedule : reqTask.task_scheduletime,
+          })  
+          console.log(res1)        
+        }
         if (res.data.status === 0) {
           this.$message({message: 'Task created successfully!', type: 'success'})
         } else {
@@ -2222,8 +2309,10 @@ export default {
       console.log('Close lv 3 dialog')
       this.$data.taskLv3DialogVisible = false
       this.$data.taskLv3Form = {}
+      this.$data.DailyOps = ''
       this.$data.taskLv3Form.task_progress_nosymbol = 0
       this.$data.taskLv3FormSubTasks = []
+      this.$data.taskLv3FormRegularTasks = []
       this.$data.taskLv3FormHistories = []
       //this.$data.lv3TaskItemRule.showDeliverableTag = true
       this.$data.taskLv3DialogTitle = '3 - Executive Task'
@@ -2233,9 +2322,9 @@ export default {
     // 6. Level 4 task dialog
     async saveLv4Task () {
       if(this.$data.taskLv4Form.task_RegularTaskTime === 'Weekly'){
-        this.$data.taskLv4Form.task_scheduletion= "Every " +this.$data.Scheduletime +" weeks"
+        this.$data.taskLv4Form.task_scheduletime= "Every " +this.$data.Scheduletime +" weeks"
       }else if(this.$data.taskLv4Form.task_RegularTaskTime === 'Monthly'){
-        this.$data.taskLv4Form.task_scheduletion = "Every " +this.$data.Scheduletime +" months"         
+        this.$data.taskLv4Form.task_scheduletime = "Every " +this.$data.Scheduletime +" months"         
       }
       var reqTask = this.$data.taskLv4Form       
       if(this.$data.taskLv4Form.task_deliverableTag!=null&&typeof(this.$data.taskLv4Form.task_deliverableTag)==='object'){
@@ -2281,6 +2370,12 @@ export default {
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
+        const res1 = await http.post('/schedules/saveRegularTask',{
+          reqRegularTaskTime : reqTask.task_RegularTaskTime,
+          reqStartTime : reqTask.task_startTime,
+          reqTaskId : res.data.data.TaskName,
+          reqSchedule : reqTask.task_scheduletime,
+        })  
         if (res.data.status === 0) {
           this.$message({message: 'Task created successfully!', type: 'success'})
         } else {
@@ -2331,6 +2426,7 @@ export default {
     closeLv4TaskDialog (done) {
       console.log('Close lv 4 dialog')
       this.$data.taskLv4DialogVisible = false
+      this.$data.DailyOps = ''
       this.$data.taskLv4Form = {}
       this.$data.taskLv4Form.task_progress_nosymbol = 0
       this.$data.taskLv4FormHistories = []
@@ -2343,19 +2439,24 @@ export default {
       var taskLevel = Number(this[iObj].task_level)
       if (tab.name === 'tab_subtasks_list') {
         var subTaskForm = ''
+        var regularTaskForm = ''
         if (taskLevel === 1) {
           subTaskForm = 'taskLv1FormSubTasks'
         }
         if (taskLevel === 2) {
           subTaskForm = 'taskLv2FormSubTasks'
+          regularTaskForm = 'taskLv2FormRegularTasks'
         }
         if (taskLevel === 3) {
           subTaskForm = 'taskLv3FormSubTasks'
+          regularTaskForm = 'taskLv3FormRegularTasks'
         }
         if (taskLevel === 4) {
           subTaskForm = 'taskLv4FormSubTasks'
+          regularTaskForm = 'taskLv4FormRegularTasks'
         }
         this.getSubTaskList(this[iObj].task_name, subTaskForm, taskLevel)
+        this.getRegularTaskList(this[iObj].task_name,regularTaskForm, taskLevel)
         this[iActiveTab] = 'tab_subtasks_list'
       }
       if (tab.name === 'tab_worklog_histories') {
