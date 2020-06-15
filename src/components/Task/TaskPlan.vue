@@ -61,7 +61,7 @@
         <el-row class="tp-main">
           <el-col :span="24">
             <el-collapse v-model="activeTabArray" @change="handleTabChange" v-loading="lv2TaskListLoading">
-              <el-collapse-item :name="index" v-for="(task, index) in lv2TaskList" :key="index" @click.native="openTaskTab(task.task_name, index, 1, 20)" class="tp-main-task-list">
+              <el-collapse-item :name="index" v-for="(task, index) in lv2TaskList" :key="index" @click.native="openTaskTab(task.task_name, index, 1, 20,task.ShowRegular)" class="tp-main-task-list">
                 <template slot="title">
                   <div class="tp-main-title">
                     <el-row>
@@ -1203,6 +1203,7 @@ export default {
       DailyOps: '',
       isDailyInputDisable: false,
       Scheduletime:''
+
     }
   },
   methods: {
@@ -1216,6 +1217,9 @@ export default {
     },
     ChangeRegularStatus (iShowRegular) {
       console.log(iShowRegular);
+      if(iShowRegular === 'true'){
+
+      }
     },
     changePattern () {
       this.$data.Scheduletime = ''
@@ -1258,10 +1262,12 @@ export default {
         
       }
     },
-    async openTaskTab (iTaskName, Index, iPage, iSize) {
+    async openTaskTab (iTaskName, Index, iPage, iSize,iShowRegular) {
       console.log('Request Task: ' + iTaskName + ', Index: ' + Index)
       var needGetTask = this.$data.activeTabArray.indexOf(Index)
       console.log('Need to get task[' + needGetTask + ']')
+      console.log(needGetTask)
+      console.log(iShowRegular)
       if (needGetTask !== -1) {
         this.$data.pageSize = iSize
         this.$data.currentPage = iPage
@@ -1289,7 +1295,12 @@ export default {
           this.$data.lv2TaskList[Index].task_total_size = res.data.data.task_list_total_size
           this.$data.lv2TaskList[Index].task_page_number = iPage
           this.$data.lv2TaskList[Index].task_page_size = iSize
-          const res1 = await http.post('/tasks/getPlanTaskListByParentTask', listCriteria)
+          var res1 
+          if(iShowRegular === true){
+            res1 = await http.post('/tasks/getPlanRegularTaskListByParentTask', listCriteria) 
+          }else{
+            res1 = await http.post('/tasks/getPlanTaskListByParentTask', listCriteria)            
+          }
           if (res1.data.status === 0) {
             this.$data.lv2TaskList[Index].task_plan_tasks_list = []
             this.$data.lv2TaskList[Index].task_plan_tasks_list = res1.data.data
@@ -1590,6 +1601,28 @@ export default {
           this.$data.taskLv4DialogVisible = true
         }
       }
+    },
+    async getRegularTaskList (iTaskName, iSubTaskListItem, iLevel) {
+      this.$data.tasksSubTaskLoading = true
+      const res = await http.post('/tasks/getRegularaskByTaskName', {
+        reqTaskName: iTaskName
+      })
+      console.log(res)
+      if (res.data.status === 0) {
+        this[iSubTaskListItem] = []
+        this[iSubTaskListItem] = res.data.data
+        // console.log('Sub Task: ' + JSON.stringify(res.data.data))
+      } else {
+        this[iSubTaskListItem] = []
+      }
+      if (this[iSubTaskListItem].length > 0) {
+        if (iLevel === 3) {
+          console.log('Sub task > 0')
+          this.$data.taskLv3WorklogShow = false
+          this.$data.lv3TaskItemRule.disableTaskEst = true
+        }
+      }
+      this.$data.tasksSubTaskLoading = false
     },
     async getSubTaskList (iTaskName, iSubTaskListItem, iLevel) {
       const res = await http.post('/tasks/getSubTaskByTaskName', {
