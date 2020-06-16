@@ -645,7 +645,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="11" v-if="lv3TaskItemRule.showTypeTag">
+              <el-col :span="12" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
                   <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%">
                     <el-option
@@ -654,7 +654,7 @@
                   </el-select>                  
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
+              <el-col :span="12" v-if="lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Deliverable Tag">
                   <el-select  v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
                     <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -849,14 +849,14 @@
           <el-tab-pane v-if="taskLv3Form.task_TypeTag==='Regular Task'" label="Recurrence" name="tab_Recurrence">
             <el-divider content-position="left">Recurrence pattern</el-divider>
               <el-row>
-                <el-col :span="6" prop="task_RegularTaskTime" >
-                    <div><el-radio-group @change="changePattern" v-model="RegularTaskTimeOps" >
-                      <el-radio style="margin:10px;" :label="1">Daily</el-radio>
-                      <el-radio style="margin:10px;" :label="2">Weekly</el-radio>
-                      <el-radio style="margin:10px;" :label="3">Monthly</el-radio>
+                <el-col style="width:20%;" :span="6" prop="task_RegularTaskTime" >
+                    <div style="display:flex;justify-content:center;align-items:center"><el-radio-group @change="changePattern" v-model="RegularTaskTimeOps" >
+                      <el-radio style="padding:10px 0" :label="1">Daily</el-radio><br>
+                      <el-radio style="padding:10px 0" :label="2">Weekly</el-radio><br>
+                      <el-radio style="padding:10px 0" :label="3">Monthly</el-radio><br>
                     </el-radio-group></div>
                 </el-col>
-                <el-col :span="1"><el-divider  direction="vertical"></el-divider></el-col>
+                <el-col :span="1"><div style="float:left;width: 1px;height: 110px; background: #DCDFE6;"></div></el-col>
                 <el-col :span="17" prop="task_scheduletime">
                   <div>
                     <el-radio-group @change="changeDaily" v-model="DailyOps" v-if="RegularTaskTimeOps===1" >
@@ -999,33 +999,14 @@
                   <span>{{taskLv4Form.task_TypeTag}}</span>                
                 </el-form-item>
               </el-col> -->
-              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag" >
+              <el-col :span="12"  v-if="lv3TaskItemRule.showDeliverableTag" >
                 <el-form-item label="Deliverable Tag">
-                  <el-select v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                  <el-select  v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
                     <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
               </el-col>
             </el-row>
-            <!-- <el-row v-if="RegularTaskTimeVisible">
-              <el-col :span="11" >
-                <el-form-item label="Currence pattern" prop="task_RegularTaskTime">
-                  <span>{{taskLv4Form.task_RegularTaskTime}}</span>     
-                </el-form-item>
-              </el-col>
-              <el-col :span="13">
-                <el-form-item style="margin-left: -120px;" prop="task_scheduletime" larbel="Sechedule Time">
-                  <span>{{taskLv4Form.task_scheduletime}}</span>
-                </el-form-item>
-              </el-col>              
-            </el-row>
-            <el-row v-if="RegularTaskTimeVisible">
-              <el-col :span="16" v-if="taskLv4Form.task_RegularTaskTime!=null">
-                <el-form-item label="Start Time" prop="task_startTime">
-                  <span>{{taskLv4Form.task_startTime}}</span>
-                </el-form-item>
-              </el-col>
-            </el-row>    -->
             <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
               <el-col :span="6">
                 <span>{{taskLv4Form.task_reference}}</span>
@@ -1339,7 +1320,8 @@ export default {
         disableTaskEst: false,
         showProgress: true,
         showCreator: true,
-        disableAssignee: false
+        disableAssignee: false,
+        showDeliverableTag:true
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1659,12 +1641,14 @@ export default {
             this.$data.taskLv3FormProgressStatus = 'exception'
           }
           if(res.data.data.task_TypeTag === 'Regular Task'){
+            this.$data.taskLv3Form.task_status = 'Planning'
             const res1 = await http.post('/schedules/getSchedulesByTaskName',{
               reqTaskName : rtnTask.task_name
             })
             console.log(res1)
             if(res1.data.status === 0 ){
-              this.$data.DailyOps = 
+              this.$data.DailyOps = ''
+              this.$data.RegularTaskTimeOps = ''
               this.$data.taskLv3Form.rangeRecurrence = []
               this.$data.taskLv3Form.rangeRecurrence.push(res1.data.data.task_startTime)
               this.$data.taskLv3Form.rangeRecurrence.push(res1.data.data.task_endTime)
@@ -1739,6 +1723,7 @@ export default {
             this.$data.taskLv4FormProgressStatus = 'exception'
           }
           if(res.data.data.task_TypeTag === 'Regular Task'){
+            this.$data.taskLv4Form.task_status = 'Planning'
             const res1 = await http.post('/schedules/getSchedulesByTaskName',{
               reqTaskName : rtnTask.task_name
             })
@@ -2467,16 +2452,12 @@ export default {
       this.$data.taskLv3FormSubTasks = []
       this.$data.taskLv3FormRegularTasks = []
       this.$data.taskLv3FormHistories = []
-      //this.$data.lv3TaskItemRule.showDeliverableTag = true
       this.$data.taskLv3DialogTitle = '3 - Executive Task'
       this.$data.activeTabForLv3 = 'tab_basic_info'
       done()
     },
     // 6. Level 4 task dialog
     async saveLv4Task () {
-      if(this.$data.taskLv4Form.task_RegularTaskTime === 'Weekly'){
-        this.$data.taskLv4Form.task_scheduletime= "Every " +this.$data.Scheduletime.ScheduletimeDay +" weeks"
-      }
       var reqTask = this.$data.taskLv4Form       
       if(this.$data.taskLv4Form.task_deliverableTag!=null&&typeof(this.$data.taskLv4Form.task_deliverableTag)==='object'){
           reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
@@ -2491,14 +2472,14 @@ export default {
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
-        if(reqTask.task_TypeTag === 'Regular Task'){
-          if( 
-            this.isFieldEmpty(reqTask.task_RegularTaskTime, 'Recurrence pattern could not be empty!')||
-            this.isFieldEmpty(reqTask.task_scheduletime, 'Scheduletime could not be empty!')||
-            this.isFieldEmpty(reqTask.task_StartTime, 'Range of recurrence could not be empty!')){
-              return
-            }
-        }
+        // if(reqTask.task_TypeTag === 'Regular Task'){
+        //   if( 
+        //     this.isFieldEmpty(reqTask.task_RegularTaskTime, 'Recurrence pattern could not be empty!')||
+        //     this.isFieldEmpty(reqTask.task_scheduletime, 'Scheduletime could not be empty!')||
+        //     this.isFieldEmpty(reqTask.task_StartTime, 'Range of recurrence could not be empty!')){
+        //       return
+        //     }
+        // }
         if (Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
@@ -3295,5 +3276,16 @@ input[type="number"]{
 
 .collapse-span {
   margin-bottom: 5px;
+}
+
+.center-vertical{
+  position: relative;
+  top:50%;
+  transform:translateY(-50%);
+}
+.center-horizontal{
+  position: relative;
+  left:50%;
+  transform:translateX(-50%); 
 }
 </style>
