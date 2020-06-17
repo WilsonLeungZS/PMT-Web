@@ -168,7 +168,6 @@ export default {
       const res = await http.get('/users/getEmailGroupsAndSkillType', {
         userEid: this.$store.getters.getUserEid,
       })
-      console.log(res)
       if(res.data.status === 0){
         this.$data.userInfo.user_team = res.data.data.user_team
         this.$data.userInfo.user_email_groups = res.data.data.user_email_groups
