@@ -2398,7 +2398,8 @@ export default {
             // })
           } else {
             console.log('Not Pool Task')
-            this.$data.lv3TaskItemRule.showRespLeader = tthis.$data.lv3TaskItemRule.disableAssignee = falserue
+            this.$data.lv3TaskItemRule.showRespLeader = true
+            this.$data.lv3TaskItemRule.disableAssignee = false
             this.$data.lv3TaskItemRule.showSubTaskEst = true
             this.$data.lv3TaskItemRule.showTypeTag = true
             this.$data.lv3TaskItemRule.showDeliverableTag = true
