@@ -176,16 +176,34 @@
                       </el-row>
                       <el-row :gutter="15" style="margin-top: 10px">
                         <el-col :span="2" class="pm-table-expand-label">
+                          <span>Email</span>
+                        </el-col>
+                        <el-col :span="7" class="pm-table-expand-item">
+                          <el-input v-model="props.row.user_email" size="small" style="width: 100%"></el-input>
+                        </el-col>
+                        <el-col :span="3" class="pm-table-expand-label">
+                          <span>Emial Groups</span>
+                        </el-col>
+                        <el-col :span="9" class="pm-table-expand-item">
+                          <el-select  v-model="props.row.user_email_groups" multiple filterable allow-create default-first-option style="width: 100%">
+                            <el-option v-for="item in EmailGroupsOps" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                          </el-select> 
+                        </el-col>
+                      </el-row>
+                      <el-row :gutter="15" style="margin-top: 10px">
+                         <el-col :span="2" class="pm-table-expand-label">
                           <span>Active</span>
                         </el-col>
                         <el-col :span="2" class="pm-table-expand-item">
                           <el-switch v-model="props.row.user_isactive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-                        </el-col>
+                        </el-col>                           
                         <el-col :span="2" class="pm-table-expand-label">
-                          <span>Email</span>
+                          <span>Skill Type</span>
                         </el-col>
                         <el-col :span="8" class="pm-table-expand-item">
-                          <el-input v-model="props.row.user_email" size="small" style="width: 100%"></el-input>
+                          <el-select  v-model="props.row.user_skill_type" multiple filterable allow-create default-first-option style="width: 100%">
+                            <el-option v-for="item in SkillTypeOps" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                          </el-select> 
                         </el-col>
                         <el-col :span="10" class="pm-table-expand-item">
                           <el-button :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small"
@@ -337,7 +355,14 @@ export default {
       tasktypeData: [],
       tasktypeResetData: [],
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
-      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      SkillTypeOps:  [
+        {value: 'SAP related', label: 'SAP related'},
+        {value: 'Java/.net related', label: 'Java/.net related'}, 
+        {value: 'Infra related', label: 'Infra related'},
+        {value: 'Others', label: 'Others'}
+      ],
+      EmailGroupsOps : []
     }
   },
   methods: {
@@ -403,11 +428,18 @@ export default {
     },
     async saveUser (props) {
       var user = props.row
+      var emailGroups = ''
+      var skillType = ''
       if (user.user_eid === 'N/A' || user.user_eid === '') {
         this.$message.error('Add/Update user Failed!')
         return
+      } 
+      if(user.user_skill_type!=null){
+        skillType = user.user_skill_type.toString()
       }
-      console.log(user.user_id)
+      if(user.user_email_groups!=null){
+        emailGroups = user.user_email_groups.toString()
+      }
       const res = await http.post('/users/addOrUpdateUser', {
         reqUserId: user.user_id,
         reqUserEid: user.user_eid,
@@ -419,7 +451,9 @@ export default {
         reqUserRole: user.user_role,
         reqUserNameMapping: user.user_namemapping,
         reqUserAssignment: user.user_assignment,
-        reqUserIsActive: user.user_isactive
+        reqUserIsActive: user.user_isactive,
+        reqUserSkillType:skillType,
+        reqUserEmailGroups:emailGroups
       })
       if (res.data.status === 0) {
         let _this = this
