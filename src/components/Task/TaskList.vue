@@ -558,7 +558,7 @@
             </el-row>
           </el-tab-pane>
           <!-- Regular Task List -->
-          <el-tab-pane label="Regular Tasks List" name="tab_regular_list">
+          <el-tab-pane label="Regular Tasks List"  name="tab_regular_list">
             <el-row>
               <el-col :span="24">
                 <el-button @click="createRegularTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Regular Task</el-button>
@@ -2192,6 +2192,7 @@ export default {
       }
     },
     ruleControlLv2TaskItem (iAction, iNeedInputParent) {
+      console.log(iAction)
       if (iAction === 'Edit') {
         // Set Dialog Default Value
         this.$data.taskLv2DialogTitle = '2 - Business Implementation'
@@ -2205,6 +2206,7 @@ export default {
         this.$data.lv2TaskItemRule.showCreator = true
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
+          this.$refs.taskLv2Tabs.$children[0].$refs.tabs[3].style.display = '' // Show "Sub Tasks List" Tab
         })
       }
       if (iAction === 'Create') {
@@ -2223,6 +2225,7 @@ export default {
         this.$data.lv2TaskItemRule.showCreator = false
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+          this.$refs.taskLv2Tabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Sub Tasks List" Tab
         })
       }
     },
@@ -2782,7 +2785,6 @@ export default {
       }
     },
     getTaskStatus (iStatus) {
-      console.log(iStatus)
       var statusCollection = this.$data.statusCollection
       var index = this.getIndexOfValueInArr(statusCollection, 'status_name', iStatus)
       if (index !== -1) {
