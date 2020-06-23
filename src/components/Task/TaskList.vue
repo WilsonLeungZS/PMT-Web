@@ -14,7 +14,7 @@
 <!------- 1. End of Header -->
 <!------- 2. Search Bar -->
         <el-row class="tl-bar">
-          <el-col :span="9">
+          <el-col :span="10">
             <div class="tl-bar-item">
               <el-input placeholder="Search task..." v-model="searchVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
                 <el-button slot="append" icon="el-icon-search" @click="searchTask"></el-button>
@@ -30,10 +30,149 @@
               </el-button-group>
             </div>
           </el-col>
+          <el-col :span="10">
+            <div class="tl-bar-item">
+              <span style="margin-right:10px">Task Level</span>
+              <el-radio-group v-model="formFilter.filterTaskLevel" @change="formFilter.filterShowRefPool = false; formFilter.filterAssignTo = null; filterTask()" >
+                <el-radio-button label="1"></el-radio-button>
+                <el-radio-button label="2"></el-radio-button>
+                <el-radio-button label="3"></el-radio-button>
+                <el-radio-button label="4"></el-radio-button>
+              </el-radio-group>              
+            </div>
+          </el-col>
+          <el-col :span="2">
+            <div class="tl-bar-item">
+              <el-popover
+                placement="bottom"
+                title="Filter"
+                width="300"
+                trigger="click">
+                  <el-row style="margin: 5px;">
+                    <el-col :span="8">Status</el-col>
+                    <el-col class="nameInfo" :span="16">
+                      <el-select v-model="formFilter.filterStatus" size="small" style="width:auto">
+                        <el-option label="" value=""></el-option>
+                        <el-option label="Drafting" value="Drafting"></el-option>
+                        <el-option label="Planning" value="Planning"></el-option>
+                        <el-option label="Running" value="Running"></el-option>
+                        <el-option label="Done" value="Done"></el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                  <el-row style="margin: 5px;">
+                    <el-col :span="8">Leading By</el-col>
+                    <el-col :span="16">
+                      <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
+                        <el-option label="" value=""></el-option>
+                        <el-option
+                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
+                            :key="index"
+                            :label="activeUser.user_eid"
+                            :value="activeUser.user_id">
+                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                          </el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                  <el-row  style="margin: 5px;">
+                    <el-col :span="8">Assignee To</el-col>
+                    <el-col :span="16">
+                      <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
+                        <el-option label="" value=""></el-option>
+                        <el-option
+                            v-for="(activeUser, index) in activeUserListForOthRespLeader"
+                            :key="index"
+                            :label="activeUser.user_eid"
+                            :value="activeUser.user_id">
+                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                          </el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                  <el-row style="margin: 5px;">
+                    <el-col :span="8">Assignee To</el-col>
+                    <el-col :span="16">
+                      <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
+                        <el-option label="" value=""></el-option>
+                        <el-option
+                            v-for="(activeUser, index) in activeUserListForAll"
+                            :key="index"
+                            :label="activeUser.user_eid"
+                            :value="activeUser.user_id">
+                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                          </el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                  <el-divider></el-divider>
+                  <el-row style="margin: 5px;">
+                    <el-col :span="8">Opportunity</el-col>
+                    <el-col :span="16">
+                      <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
+                        <el-option label="" value=""></el-option>
+                        <el-option
+                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
+                            :key="index"
+                            :label="activeUser.user_eid"
+                            :value="activeUser.user_id">
+                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                          </el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                  <el-row style="margin: 5px;">
+                    <el-col :span="8">Skill</el-col>
+                    <el-col :span="16">
+                      <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
+                        <el-option label="" value=""></el-option>
+                        <el-option
+                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
+                            :key="index"
+                            :label="activeUser.user_eid"
+                            :value="activeUser.user_id">
+                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                          </el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                  <el-row style="margin: 5px;">
+                    <el-col :span="8">Time Group</el-col>
+                    <el-col :span="16">
+                      <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
+                        <el-option label="" value=""></el-option>
+                        <el-option
+                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
+                            :key="index"
+                            :label="activeUser.user_eid"
+                            :value="activeUser.user_id">
+                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                          </el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="12">
+                      <el-button type="primary" size="mini" @click="filterTask">Confirm</el-button>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-button type="primary" size="mini" @click="filterTask">Clear All</el-button>
+                    </el-col>
+                  </el-row>
+                <el-button slot="reference" type="warning" icon="el-icon-edit-outline"></el-button>
+              </el-popover>
+            </div>
+          </el-col>
         </el-row>
 <!------- 2. End of Search Bar -->
 <!------- 3. Filter Criteria -->
-        <el-row>
+        <!-- <el-row>
           <el-col :span="24">
             <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="85px" label-position="Top">
               <el-form-item label="Task Level">
@@ -52,8 +191,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                 </el-select>
               </el-form-item>
@@ -65,8 +204,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                 </el-select>
               </el-form-item>
@@ -78,8 +217,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                 </el-select>
               </el-form-item>
@@ -105,15 +244,15 @@
               </el-form-item>
             </el-form>
           </el-col>
-        </el-row>
+        </el-row> -->
         <el-divider></el-divider>
 <!------- 3. End of Filter Criteria -->
 <!------- 4. Task List -->
-        <el-row class="tl-main">
+        <el-row class="tl-main" v-if="false">
           <el-col :span="24">
             <el-table v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
               <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-              <el-table-column prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
+              <el-table-column  prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
                 <template slot-scope="scope">
                    <el-button type="text" @click="openTaskByName(scope.row.task_parent_name)">{{scope.row.task_parent_name}}</el-button>
                 </template>
@@ -142,19 +281,171 @@
               <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="16"></el-table-column>
               <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
               <el-table-column prop="task_target_complete" label="Target Completion" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
-              <el-table-column fixed="right" label="Plan" align="center" min-width="60px" v-if="taskListRule.showColForLv1" >
-                <template slot-scope="scope">
-                  <el-button @click="startPlanTask(scope.row)" :disabled="!scope.row.task_plan_mode_btn_enable" :style="{'border': 'none', 'color': 'white'}" type="warning" size="small" icon="el-icon-s-flag"></el-button>
-                </template>
-              </el-table-column>
               <el-table-column fixed="right" label="Edit" align="center" width="120px">
                 <template slot-scope="scope">
-                  <el-button @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-edit"></el-button>
+                  <el-button v-if="scope.row.task_level===3" @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-plus"></el-button>
                   <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
                   </template>
               </el-table-column>
             </el-table>
           </el-col>
+        </el-row>
+        <el-row class="tp-main">
+          <div v-for="index of 5" :key="index">
+            <el-col :span="24">
+              <el-table v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
+                <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
+                <el-table-column  prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="openTaskByName(scope.row.task_parent_name)">{{scope.row.task_parent_name}}</el-button>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="task_name" label="Number" width="170px" key="3">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="230px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
+                <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="230px" v-if="!taskListRule.showColForLv1" key="5"></el-table-column>
+                <el-table-column prop="task_status" label="Status" align="center" width="130px" key="6"></el-table-column>
+                <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
+                <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="280px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
+                <!--<el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>-->
+                <el-table-column prop="task_top_target_start" label="Target Start" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
+                <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
+                <el-table-column prop="task_reference" label="Ref Pool" width="110px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="task_effort" label="Effort" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="13"></el-table-column>
+                <el-table-column prop="task_estimation" label="Estimation" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
+                <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="180px" key="15"></el-table-column>
+                <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="16"></el-table-column>
+                <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
+                <el-table-column prop="task_target_complete" label="Target Completion" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
+                <el-table-column fixed="right" label="Edit" align="center" width="120px">
+                  <template slot-scope="scope">
+                    <el-button v-if="scope.row.task_level===3" @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-plus"></el-button>
+                    <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                    </template>
+                </el-table-column>
+              </el-table>
+              <el-collapse v-model="activeTabArray" @change="handleTabChange" v-loading="lv2TaskListLoading">
+                <el-collapse-item :name="index" v-for="(task, index) in lv2TaskList" :key="index" @click.native="openTaskTab(task.task_name, index, 1, 20,task.ShowRegular)" class="tp-main-task-list">
+                  <template slot="title">
+                    <div class="tp-main-title">
+                      <el-row>
+                        <el-col :span="2" class="tp-main-content-item">
+                          <el-button @click.stop="openTaskById(task.task_id)" type="text" size="small" style="font-size:16px">{{task.task_name}}</el-button>
+                        </el-col>
+                        <el-col :span="1" class="tp-main-content-item">{{task.task_status}}</el-col>
+                        <el-tooltip class="item" effect="dark" :content="task.task_desc" placement="top-start">
+                          <el-col :span="6" class="tp-main-content-item">{{task.task_desc}}</el-col>
+                        </el-tooltip>
+                        <el-col :span="2" class="tp-main-content-item">Effort: {{task.task_effort}}</el-col>
+                        <el-col :span="2" class="tp-main-content-item">Est: {{task.task_estimation}}</el-col>
+                        <el-col :span="2" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
+                        <el-col :span="4" class="tp-main-content-item">Responsible: {{task.task_responsible_leader}}</el-col>
+                        <div @click.stop="openTaskTab(task.task_name, index, 1, 20,task.ShowRegular)"><el-col :span="3" class="tp-main-content-item">Regular: 
+                            <el-switch
+                            v-model="task.ShowRegular"
+                            active-color="#13ce66"
+                            inactive-color="#ff4949"
+                            @change="ChangeRegularStatus(task.ShowRegular)">
+                          </el-switch>              
+                        </el-col></div>
+                        <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(3, task)" type="success" size="mini" icon="el-icon-plus"></el-button></el-col>
+                        <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshLv2Task(task.task_id, task.task_name, index,task.ShowRegular)" type="info" size="mini" icon="el-icon-refresh"></el-button></el-col>
+                      </el-row>
+                    </div>
+                  </template>
+                  <div class="tp-main-content" @click.stop="preventParentEventTrigger">
+                    <el-row>
+                      <el-col :span="24">
+                        <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
+                          <el-table-column type="expand">
+                            <template slot-scope="props">
+                              <el-row>
+                                <el-col :span="23" :offset="1">
+                                  <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
+                                    <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
+                                    <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
+                                      <template slot-scope="scope">
+                                        <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.sub_task_id)" type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
+                                      </template>
+                                    </el-table-column>
+                                    <el-table-column label="Status" prop="sub_task_status" align="center" width="100"></el-table-column>
+                                    <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>
+                                    <el-table-column label="Effort" prop="sub_task_effort" align="center" width="100px"></el-table-column>
+                                    <el-table-column label="Est" prop="sub_task_estimation" align="center" width="100px"></el-table-column>
+                                    <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px"></el-table-column>
+                                    <el-table-column label="Assignee" prop="sub_task_assignee" align="center" width="180px"></el-table-column>
+                                    <el-table-column fixed="right" align="center" width="110">
+                                      <template slot-scope="scope">
+                                        <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.sub_task_id, scope.row.sub_task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
+                                      </template>
+                                    </el-table-column>
+                                  </el-table>
+                                </el-col>
+                              </el-row>
+                            </template>
+                          </el-table-column>
+                          <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
+                          <el-table-column prop="task_name" label="Number" width="150px" key="2">
+                            <template slot-scope="scope">
+                              <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
+                            </template>
+                          </el-table-column>
+                          <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4"></el-table-column>
+                          <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
+                          <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
+                            <template slot-scope="scope">
+                              <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
+                            </template>
+                          </el-table-column>
+                          <el-table-column prop="task_group" label="Time Group" align="center" min-width="180px" key="6">
+                            <template slot-scope="scope">
+                              <el-select @change="((val)=>{changeTaskGroup(val, scope.row.task_id, task.task_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
+                                <el-option label=" " value="0"></el-option>
+                                <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                              </el-select>
+                            </template>
+                          </el-table-column>
+                          <el-table-column prop="task_effort" label="Effort" align="center" width="100px" key="7"></el-table-column>
+                          <el-table-column prop="task_estimation" label="Est" align="center" width="100px" key="8"></el-table-column>
+                          <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
+                          <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" key="10"></el-table-column>
+                          <el-table-column fixed="right" label="Edit" align="center" width="120">
+                            <template slot-scope="scope">
+                              <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(4, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
+                              <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                              </template>
+                          </el-table-column>
+                        </el-table>
+                      </el-col>
+                    </el-row>
+                    <div @click.stop="preventParentEventTrigger">
+                      <el-row class="tl-pagination">
+                        <el-col :span="24" class="tl-pagination-col">
+                          <el-pagination
+                            background
+                            @size-change="((size)=>{handleSizeChange(size, task.task_name, index)})"
+                            @current-change="((page)=>{handleCurrentChange(page, task.task_name, index)})"
+                            :current-page="task.task_page_number"
+                            :page-sizes="[20, 50, 100, 500]"
+                            :page-size="task.task_page_size"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="task.task_total_size">
+                          </el-pagination>
+                        </el-col>
+                      </el-row>
+                    </div>
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+            </el-col>            
+          </div>
         </el-row>
         <el-row class="tl-pagination">
           <el-col :span="24" class="tl-pagination-col">
@@ -178,13 +469,13 @@
         <el-tabs v-model="activeTabForLv1" type="card" ref="taskLv1Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv1Form', 'activeTabForLv1')})">
           <el-tab-pane label="Basic Information" name="tab_basic_info">
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Number" prop="task_name">
                   <span v-if="!lv1TaskItemRule.showTaskNameInput">{{taskLv1Form.task_name}}</span>
                   <el-input v-if="lv1TaskItemRule.showTaskNameInput" v-model="taskLv1Form.task_name"></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Task Type" prop="task_type_id">
                   <el-select :disabled="lv1TaskItemRule.disableTaskType" v-model="taskLv1Form.task_type_id" style="width: 100%">
                     <el-option v-for="(tasktype, index) in taskTypeArrayForLv1Task" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
@@ -199,62 +490,69 @@
               <el-input type="textarea" v-model="taskLv1Form.task_top_business_value" :rows="4"></el-input>
             </el-form-item>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Customer" prop="task_top_customer">
                   <el-input v-model="taskLv1Form.task_top_customer"></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Facing Client">
                   <el-input v-model="taskLv1Form.task_top_facing_client"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Type Of Work">
                   <el-input v-model="taskLv1Form.task_top_type_of_work"></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Chance of Winning">
                   <el-input v-model="taskLv1Form.task_top_chance_winning"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Paint Points">
                   <el-input v-model="taskLv1Form.task_top_paint_points"></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Constraint">
                   <el-input v-model="taskLv1Form.task_top_constraint"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="SOW Confirmation">
                   <el-date-picker v-model="taskLv1Form.task_top_sow_confirmation" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Team Sizing">
                   <el-input v-model="taskLv1Form.task_top_team_sizing"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Skills / Specialization">
                   <el-input v-model="taskLv1Form.task_top_skill"></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Opps > Project">
                   <el-input v-model="taskLv1Form.task_top_opps_project"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-if="lv1TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv1Form.task_creator_name}}</span>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -262,14 +560,14 @@
           <!-- End of basic information -->
           <el-tab-pane label="Status Tracing" name="tab_status_tracing">
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Status">
                   <el-select v-model="taskLv1Form.task_status" style="width: 100%">
                     <el-option v-for="(status, index) in statusArray" :key="index" :label="status.status_name" :value="status.status_name"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-               <el-col :span="11" :offset="1">
+               <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
                     <el-date-picker v-model="taskLv1Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
@@ -278,19 +576,19 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Target Start">
                   <el-date-picker v-model="taskLv1Form.task_top_target_start" type="month" style="width: 100%" placeholder="Select Month..." value-format="yyyy-MM"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Target End">
                   <el-date-picker v-model="taskLv1Form.task_top_target_end" type="month" style="width: 100%" placeholder="Select Month..." value-format="yyyy-MM"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv1Form.task_responsible_leader" filterable style="width: 100%">
                     <el-option
@@ -298,8 +596,8 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -381,12 +679,12 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Number">
                   <span>{{taskLv2Form.task_name}}</span>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Task Type" prop="task_type_id">
                   <el-select :disabled="lv2TaskItemRule.disableTaskType" v-model="taskLv2Form.task_type_id" style="width: 100%">
                     <el-option v-for="(tasktype, index) in taskTypeArrayForLv2Task" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
@@ -403,18 +701,25 @@
             <el-form-item label="Description" prop="task_detail">
               <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
             </el-form-item>
+            <el-row v-if="lv2TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv2Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Status">
                   <el-select v-model="taskLv2Form.task_status" style="width: 100%">
                     <el-option v-for="(status, index) in statusArray" :key="index" :label="status.status_name" :value="status.status_name"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-               <el-col :span="11" :offset="1">
+               <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
                     <el-date-picker v-model="taskLv2Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
@@ -423,19 +728,19 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Target Complete">
                   <el-date-picker v-model="taskLv2Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Actual Complete">
                   <el-date-picker v-model="taskLv2Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv2Form.task_responsible_leader" filterable style="width: 100%">
                     <el-option
@@ -443,13 +748,13 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1" v-if="false">
+              <el-col :span="12" :offset="1" v-if="false">
                 <el-form-item label="Assignee">
                   <el-select v-model="taskLv2Form.task_assignee" filterable style="width: 100%">
                     <el-option
@@ -457,15 +762,15 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Effort">
                   <el-col :span="21">
                     <el-input v-model="taskLv2Form.task_effort" disabled></el-input>
@@ -477,7 +782,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Estimation">
                   <el-col :span="21">
                     <el-input :disabled="lv2TaskItemRule.disableTaskEst" v-model="taskLv2Form.task_estimation" type="number"></el-input>
@@ -487,7 +792,7 @@
                   </el-col>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Sub-Tasks Est" v-if="lv2TaskItemRule.showSubTaskEst">
                   <el-col :span="21">
                     <el-input v-model="taskLv2Form.task_subtasks_estimation" disabled></el-input>
@@ -513,6 +818,47 @@
               <el-col :span="24">
                 <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
                   <el-table v-loading="tasksSubTaskLoading" :data="taskLv2FormSubTasks" fit max-height="500" class="sub-task-table">
+                    <el-table-column prop="task_id" v-if="false"></el-table-column>
+                    <el-table-column show-overflow-tooltip>
+                      <template slot-scope="scope">
+                        <el-row style="cursor: pointer;" :gutter="10" @click.native="openTaskById(scope.row.task_id)">
+                          <el-col :span="24" class="single-line">
+                            <span style="font-weight:bold">{{scope.row.task_name}}</span>
+                            <span style="margin-left:10px"> {{scope.row.task_desc}}</span>
+                          </el-col>
+                        </el-row>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="task_status" align="left" width="100">
+                      <template slot-scope="scope">
+                        <el-tag type="info" style="font-weight:bold" v-if="scope.row.task_status == 'Done'">{{scope.row.task_status}}</el-tag>
+                        <el-tag type="success" style="font-weight:bold" v-if="scope.row.task_status != 'Done'">{{scope.row.task_status}}</el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="task_assignee" align="left" width="160"></el-table-column>
+                    <el-table-column show-overflow-tooltip fixed="right" align="center" width="30">
+                      <template slot-scope="scope">
+                        <el-row style="cursor: pointer;" @click.native="openTaskById(scope.row.task_id)">
+                          <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
+                        </el-row>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </el-card>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <!-- Regular Task List -->
+          <el-tab-pane label="Regular Tasks List"  name="tab_regular_list">
+            <el-row>
+              <el-col :span="24">
+                <el-button @click="createRegularTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Regular Task</el-button>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="24">
+                <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv2FormRegularTasks" fit max-height="500" class="sub-task-table">
                     <el-table-column prop="task_id" v-if="false"></el-table-column>
                     <el-table-column show-overflow-tooltip>
                       <template slot-scope="scope">
@@ -576,12 +922,12 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Number">
                   <span>{{taskLv3Form.task_name}}</span>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Task Type" prop="task_type_id">
                   <el-select disabled v-model="taskLv3Form.task_type_id" style="width: 100%">
                     <el-option v-for="(tasktype, index) in taskTypeArrayForLv2Task" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
@@ -590,38 +936,23 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12" v-if="lv3TaskItemRule.showTypeTag">
+              <el-col :span="11" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv3Form.task_TypeTag" style="width: 100%">
+                  <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%">
                     <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                      v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                   </el-select>                  
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
+              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Deliverable Tag">
-                  <el-select
-                    v-model="taskLv3Form.task_deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                  <el-select  v-model="taskLv3Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                    <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
               </el-col>
-            </el-row>
+            </el-row> 
             <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
@@ -644,18 +975,25 @@
             <el-form-item label="Description" prop="task_detail">
               <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>
+            <el-row v-if="lv3TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv3Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Status">
                   <el-select :disabled="lv3TaskItemRule.disableStatus" v-model="taskLv3Form.task_status" style="width: 100%">
                     <el-option v-for="(status, index) in statusArray" :key="index" :label="status.status_name" :value="status.status_name"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-               <el-col :span="11" :offset="1">
+               <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
                     <el-date-picker v-model="taskLv3Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
@@ -664,19 +1002,19 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Target Complete">
                   <el-date-picker v-model="taskLv3Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Actual Complete">
                   <el-date-picker v-model="taskLv3Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Responsible Leader" v-if="lv3TaskItemRule.showRespLeader">
                   <el-select v-model="taskLv3Form.task_responsible_leader" style="width: 100%" disabled>
                     <el-option
@@ -684,13 +1022,13 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1" v-if="lv3TaskItemRule.showRespLeader">
+              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showRespLeader&&lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv3TaskItemRule.disableAssignee" filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
                     <el-option
@@ -698,29 +1036,29 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" v-if="!lv3TaskItemRule.showRespLeader">
+              <el-col :span="12" v-if="!lv3TaskItemRule.showRespLeader&&lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Assignee">
-                  <el-select :disabled="lv3TaskItemRule.disableAssignee" filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
+                  <el-select  filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Effort">
                   <el-col :span="21">
                     <el-input v-model="taskLv3Form.task_effort" disabled></el-input>
@@ -732,7 +1070,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Estimation">
                   <el-col :span="21">
                     <el-input :disabled="lv3TaskItemRule.disableTaskEst" v-model="taskLv3Form.task_estimation" type="number"></el-input>
@@ -742,7 +1080,7 @@
                   </el-col>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Sub-Tasks Est" v-if="lv3TaskItemRule.showSubTaskEst">
                   <el-col :span="21">
                     <el-input v-model="taskLv3Form.task_subtasks_estimation" disabled></el-input>
@@ -758,7 +1096,7 @@
             </el-form-item>
           </el-tab-pane>
           <!-- Second Tab -->
-          <el-tab-pane label="Sub-Tasks List" name="tab_subtasks_list">
+          <el-tab-pane v-if="taskLv3Form.task_TypeTag!='Regular Task'&&lv3TaskItemRule.showSubTaskList" label="Sub-Tasks List" name="tab_subtasks_list">
             <el-row>
               <el-col :span="24">
                 <el-button @click="createNewSubTask(4, 'taskLv3Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Sub-Task</el-button>
@@ -798,7 +1136,98 @@
               </el-col>
             </el-row>
           </el-tab-pane>
-          <el-tab-pane label="Worklogs List" name="tab_worklog_histories">
+          <!-- Appointment Recurrence -->
+          <el-tab-pane v-if="taskLv3Form.task_TypeTag==='Regular Task'" label="Recurrence" name="tab_Recurrence">
+            <el-divider content-position="left">Recurrence pattern</el-divider>
+              <el-row>
+                <el-col style="width:20%;" :span="6" prop="task_RegularTaskTime" >
+                    <div style="display:flex;justify-content:center;align-items:center"><el-radio-group @change="changePattern" v-model="RegularTaskTimeOps" >
+                      <el-radio style="padding:10px 0" :label="1">Daily</el-radio><br>
+                      <el-radio style="padding:10px 0" :label="2">Weekly</el-radio><br>
+                      <el-radio style="padding:10px 0" :label="3">Monthly</el-radio><br>
+                    </el-radio-group></div>
+                </el-col>
+                <el-col :span="1"><div style="float:left;width: 1px;height: 110px; background: #DCDFE6;"></div></el-col>
+                <el-col :span="17" prop="task_scheduletime">
+                  <div>
+                    <el-radio-group @change="changeDaily" v-model="DailyOps" v-if="RegularTaskTimeOps===1" >
+                      <el-radio  :label="1">Every Weekday</el-radio>
+                      <el-radio  :label="2">Every <el-input :disabled="isDailyInputDisable" style="width:50px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> days</el-radio>
+                    </el-radio-group>                      
+                    <div  v-if="RegularTaskTimeOps===2">
+                      Recur every <el-input style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeWeek" ></el-input> week(s) on:
+                        <el-select style="width:23%;height:25px" v-model="week" placeholder="Monday">
+                          <el-option
+                            v-for="item in weeks"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+                    </div>
+                    <div  v-if="RegularTaskTimeOps===3">
+                      <el-radio-group  @change="changeMonthly" v-model="MonthlyOps" >
+                        <el-radio style="padding-bottom:20px" :label="1">Day <el-input @input="changeInput()" :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> of every <el-input :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth1" ></el-input> month(s)</el-radio><br>
+                        <el-radio  :label="2">The                         
+                          <el-select :disabled="ScheduletimeMonth2Disable" v-model="num" style="width:17%;height:20px" placeholder="Frist"><el-option v-for="item in nums" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select> 
+                          of <el-select :disabled="ScheduletimeMonth2Disable" v-model="week" style="width:23%;height:25px" placeholder="Monday"><el-option v-for="item in weeks" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select>
+                          every <el-input :disabled="ScheduletimeMonth2Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth2" ></el-input> month(s)</el-radio>
+                      </el-radio-group>     
+                    </div>                    
+                  </div>
+                </el-col>             
+              </el-row>
+              <el-divider content-position="left">Range of recurrence</el-divider>
+              <el-row>
+                <el-col :span="16" >
+                  <el-date-picker prop="task_startTime" v-model="taskLv3Form.rangeRecurrence" type="daterange"
+                    start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd"  style="width:auto">
+                  </el-date-picker>
+                </el-col>
+              </el-row>                    
+          </el-tab-pane>
+          <!-- Regular Task List -->
+          <el-tab-pane v-if="taskLv3Form.task_TypeTag==='Regular Task'&&lv3TaskItemRule.showRegularTaskList" label="Sub-Tasks List" name="tab_regular_list">
+            <el-row>
+              <el-col :span="24">
+                <el-button @click="createRegularTask(4, 'taskLv3Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Sub-Task</el-button>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="24">
+                <el-card class="box-card tl-box-card-subtask" :body-style="{padding: '0px'}" style="margin-top:4px" shadow="never">
+                  <el-table v-loading="tasksSubTaskLoading" :data="taskLv3FormRegularTasks" fit max-height="500" class="sub-task-table">
+                    <el-table-column prop="task_id" v-if="false"></el-table-column>
+                    <el-table-column show-overflow-tooltip>
+                      <template slot-scope="scope">
+                        <el-row style="cursor: pointer;" :gutter="10" @click.native="openTaskById(scope.row.task_id)">
+                          <el-col :span="24" class="single-line">
+                            <span style="font-weight:bold">{{scope.row.task_name}}</span>
+                            <span style="margin-left:10px"> {{scope.row.task_desc}}</span>
+                          </el-col>
+                        </el-row>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="task_status" align="left" width="100">
+                      <template slot-scope="scope">
+                        <el-tag type="info" style="font-weight:bold" v-if="scope.row.task_status == 'Done'">{{scope.row.task_status}}</el-tag>
+                        <el-tag type="success" style="font-weight:bold" v-if="scope.row.task_status != 'Done'">{{scope.row.task_status}}</el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="task_assignee" align="left" width="160"></el-table-column>
+                    <el-table-column show-overflow-tooltip fixed="right" align="center" width="30">
+                      <template slot-scope="scope">
+                        <el-row style="cursor: pointer;" @click.native="openTaskById(scope.row.task_id)">
+                          <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
+                        </el-row>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </el-card>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane v-if="!taskLv3Form.task_TypeTag==='Regular Task'" label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
               <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv3FormHistories" :key="index" :timestamp="history.timestamp"
@@ -811,7 +1240,7 @@
         </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="taskLv3WorklogShow" @click="addWorklog('taskLv3Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
+        <el-button :disabled="taskLv3WorklogDisabled" v-if="taskLv3WorklogShow" @click="addWorklog('taskLv3Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
         <el-button :disabled="taskLv3SaveBtnDisabled" @click="saveLv3Task" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
@@ -826,7 +1255,7 @@
                 <el-form-item label="Parent Task" prop="task_parent_name">
                   <el-col :span="6">
                     <el-autocomplete :disabled="lv4TaskItemRule.disableParentNameInput" placeholder="Search Parent Task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
-                      v-model="taskLv4Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv4Form')})" @clear="clearSelectForParentTask('taskLv4Form')">
+                      @input="changeParentName('taskLv4Form')" v-model="taskLv4Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv4Form')})" @clear="clearSelectForParentTask('taskLv4Form')">
                       <template slot-scope="{ item }">
                         <div class="form_list_task_name">{{ item.value }}</div>
                         <span class="form_list_task_desc">{{ item.description }}</span>
@@ -842,12 +1271,12 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Number">
                   <span>{{taskLv4Form.task_name}}</span>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Task Type" prop="task_type_id">
                   <el-select disabled v-model="taskLv4Form.task_type_id" style="width: 100%">
                     <el-option v-for="(tasktype, index) in taskTypeArrayForLv2Task" :key="index" :label="tasktype.type_name" :value="tasktype.type_id"></el-option>
@@ -856,34 +1285,15 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select v-model="taskLv4Form.task_TypeTag" style="width: 100%">
-                    <el-option
-                      v-for="item in typeTagOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>                  
+                  <span>{{taskLv4Form.task_TypeTag}}</span>                
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1" >
+              <el-col :span="12" :offset="1"  v-if="lv3TaskItemRule.showDeliverableTag" >
                 <el-form-item label="Deliverable Tag">
-                  <el-select
-                    v-model="taskLv4Form.task_deliverableTag"
-                    multiple
-                    filterable
-                    allow-create
-                    default-first-option
-                    style="width: 100%"
-                    >
-                    <el-option
-                      v-for="item in DeliverOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
+                  <el-select  v-model="taskLv4Form.task_deliverableTag" multiple filterable allow-create default-first-option style="width: 100%">
+                    <el-option v-for="item in DeliverOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                   </el-select>            
                 </el-form-item>
               </el-col>
@@ -904,18 +1314,25 @@
             <el-form-item label="Description" prop="task_detail">
               <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
+            <el-row v-if="lv4TaskItemRule.showCreator">
+              <el-col :span="11">
+                <el-form-item label="Created By">
+                  <span>{{taskLv4Form.task_creator_name}}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-tab-pane>
           <!-- End first tab -->
          <el-tab-pane label="Status Tracing" name="tab_status_tracing">
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Status">
                   <el-select :disabled="lv4TaskItemRule.disableStatus" v-model="taskLv4Form.task_status" style="width: 100%">
                     <el-option v-for="(status, index) in statusArray" :key="index" :label="status.status_name" :value="status.status_name"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-               <el-col :span="11" :offset="1">
+               <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
                     <el-date-picker v-model="taskLv4Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
@@ -924,19 +1341,19 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Target Complete">
                   <el-date-picker v-model="taskLv4Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1">
                 <el-form-item label="Actual Complete">
                   <el-date-picker v-model="taskLv4Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv4Form.task_responsible_leader" style="width: 100%" disabled>
                     <el-option
@@ -944,29 +1361,29 @@
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
+              <el-col :span="12" :offset="1" v-if="lv4TaskItemRule.showDeliverableTag">
                 <el-form-item label="Assignee">
-                  <el-select :disabled="lv4TaskItemRule.disableAssignee" filterable v-model="taskLv4Form.task_assignee" style="width: 100%">
+                  <el-select filterable v-model="taskLv4Form.task_assignee" style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
                       :key="index"
                       :label="activeUser.user_eid"
                       :value="activeUser.user_id">
-                      <span style="float: left">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px">Level - {{ activeUser.user_level }}</span>
+                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Effort">
                   <el-col :span="21">
                     <el-input v-model="taskLv4Form.task_effort" disabled></el-input>
@@ -978,7 +1395,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="Estimation">
                   <el-col :span="21">
                     <el-input :disabled="lv4TaskItemRule.disableTaskEst" v-model="taskLv4Form.task_estimation" type="number"></el-input>
@@ -993,7 +1410,7 @@
               <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="Number(taskLv4Form.task_progress_nosymbol)" :status="taskLv4FormProgressStatus"></el-progress>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="Worklogs List" name="tab_worklog_histories">
+          <el-tab-pane v-if="!taskLv4Form.task_TypeTag==='Regular Task'" label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
               <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv4FormHistories" :key="index" :timestamp="history.timestamp"
@@ -1006,7 +1423,7 @@
         </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="taskLv4WorklogShow" @click="addWorklog('taskLv4Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
+        <el-button :disabled="taskLv4WorklogDisabled" v-if="taskLv4WorklogShow" @click="addWorklog('taskLv4Form')" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="medium">Log Work Done</el-button>
         <el-button :disabled="taskLv4SaveBtnDisabled" @click="saveLv4Task" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
@@ -1062,35 +1479,19 @@ export default {
   name: 'TaskList',
   data () {
     return {
-        typeTagOptions:[{
-          value: 'One-Off Task',
-          label: 'One-Off Task'
-        },{
-          value: 'Regular Task',
-          label: 'Regular Task'          
-        },{
-          value: 'Issue',
-          label: 'Issue'          
-        },{
-          value: 'Problem',
-          label: 'Problem'          
-        }],
-        DeliverOptions: [{
-          value: 'Document',
-          label: 'Document'
-        }, {
-          value: 'Program',
-          label: 'Program'
-        }, {
-          value: 'Ready to UAT',
-          label: 'Ready to UAT'
-        },{
-          value: 'Ready to PROD',
-          label: 'Ready to PROD'
-        },{
-          value: 'Clarify',
-          label: 'Clarify'
-        }],
+      typeTagOptions:[
+        {value: 'Public Task', label: 'Public Task'},
+        {value: 'One-Off Task', label: 'One-Off Task'},
+        {value: 'Regular Task', label: 'Regular Task'}
+      ],
+      DeliverOptions: [
+        {value: 'Clarify Requirement', label: 'Clarify Requirement'},
+        {value: 'Document Scenarios', label: 'Document Scenarios'}, 
+        {value: 'Design Program', label: 'Design Program'},
+        {value: 'Ready to UAT', label: 'Ready to UAT'},
+        {value: 'UAT In Support', label: 'UAT In Support'},
+        {value: 'Ready to PROD', label: 'Ready to PROD'}
+      ],
       // Header/Theme Value
       header1: 'Task List',
       isActive: true,
@@ -1126,6 +1527,8 @@ export default {
       taskLv2Form: {},
       taskLv2FormProgressStatus: 'success',
       taskLv2FormSubTasks: [],
+      taskLv2FormRegularTasks: [],
+      taskLv2FormRegularTasks: [],
       taskLv2SaveBtnDisabled: false,
       // Level 3 Task Dialog Value
       taskLv3DialogVisible: false,
@@ -1134,8 +1537,10 @@ export default {
       taskLv3Form: {},
       taskLv3FormProgressStatus: 'success',
       taskLv3FormSubTasks: [],
+      taskLv3FormRegularTasks: [],
       taskLv3FormHistories: [],
       taskLv3WorklogShow: true,
+      taskLv3WorklogDisabled: false,
       taskLv3SaveBtnDisabled: false,
       // Level 4 Task Dialog Value
       taskLv4DialogVisible: false,
@@ -1143,6 +1548,7 @@ export default {
       activeTabForLv4: 'tab_basic_info',
       taskLv4Form: {},
       taskLv4FormProgressStatus: 'success',
+      taskLv4WorklogDisabled : false,
       taskLv4FormHistories: [],
       taskLv4WorklogShow: true,
       taskLv4SaveBtnDisabled: false,
@@ -1155,7 +1561,8 @@ export default {
       },
       lv1TaskItemRule: {
         showTaskNameInput: true,
-        disableTaskType: false
+        disableTaskType: false,
+        showCreator: true
       },
       taskLv1FormRules: {
         task_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1168,7 +1575,8 @@ export default {
         disableTaskType: false,
         disableTaskEst: false,
         showProgress: true,
-        showSubTaskEst: true
+        showSubTaskEst: true,
+        showCreator: true
       },
       taskLv2FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1179,31 +1587,41 @@ export default {
         disableParentNameInput: true,
         disableTaskEst: false,
         disableDesc: false,
-        disableAssignee: false,
         disableStatus: false,
         showProgress: true,
         showRefPoolInput: true,
         showRespLeader: true,
         showSubTaskEst: true,
         showTypeTag: true,
-        showDeliverableTag: true
+        showDeliverableTag: true,
+        showCreator: true,
+        showRegularTaskList: false,
+        showSubTaskList : false
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
         task_type_id: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
         task_desc: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
-        task_TypeTag: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
+        task_TypeTag: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_RegularTaskTime: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_scheduletime: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_startTime: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
       },
       lv4TaskItemRule: {
         disableParentNameInput: true,
         disableTaskEst: false,
-        showProgress: true
+        showProgress: true,
+        showCreator: true,
+        showDeliverableTag:true
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
         task_type_id: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
         task_desc: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
-        task_TypeTag: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
+        task_TypeTag: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_RegularTaskTime: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_scheduletime: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
+        task_startTime: [{required: true, message: 'Could not be empty', trigger: 'blur'}]
       },
       // Worklog Dialog Value
       worklogDialogVisible: false,
@@ -1239,16 +1657,85 @@ export default {
         {'status_name': 'Running', 'status_sequence': 3, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true},
         {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true}
       ],
-      statusArray: []
+      statusArray: [],
+      //Regular Task
+      RegularTaskTimeVisible: false,
+      RegularTaskTimeOps: '',
+      DailyOps: '',
+      MonthlyOps: '',
+      isDailyInputDisable: false,
+      ScheduletimeMonth1Disable: false,
+      ScheduletimeMonth2Disable: false,
+      Scheduletime:{
+        ScheduletimeDay:'',
+        ScheduletimeWeek:'',
+        ScheduletimeMonth1:'',   
+        ScheduletimeMonth2:'',       
+      },
+      weeks:[
+        {value: 'Monday',lable: 'Monday'},
+        {value: 'Thuesday',lable: 'Thuesday'},
+        {value: 'Wednessday',lable: 'Wednessday'},
+        {value: 'Thursday',lable: 'Thursday'},
+        {value: 'Friday',lable: 'Friday'},
+        {value: 'Saturday',lable: 'Saturday'},
+        {value: 'Sunday',lable: 'Sunday'}
+      ],
+      week:'',
+      num:'',
+      nums:[
+        {value: 'First',lable: 'First'},
+        {value: 'Second',lable: 'Second'},
+        {value: 'Third',lable: 'Third'},
+        {value: 'Fourth',lable: 'Fourth'}
+      ],
+      lv2TaskList: [],
+      lv2TaskListLoading: false,   
+      activeTabArray: [],
     }
   },
   methods: {
+    changeInput () {
+      this.$forceUpdate()
+    },
+    handleTabChange () {
+
+    },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     filterTask () {
       this.getTaskList(1, 20)
     },
     async searchTask () {
       this.getTaskList(1, 20)
+    },
+    changeDaily () {
+      if(this.$data.DailyOps === 1){
+        this.$data.isDailyInputDisable = true
+      }else{
+          this.$data.isDailyInputDisable = false              
+      }
+    },
+    changePattern () {      
+      if(this.$data.RegularTaskTimeOps === 1){
+        this.$data.taskLv3Form.task_RegularTaskTime = "Daily"
+      }else if(this.$data.RegularTaskTimeOps === 2){
+        this.$data.taskLv3Form.task_RegularTaskTime = "Weekly"
+      }else{
+        this.$data.taskLv3Form.task_RegularTaskTime = "Monthly"
+      }   
+    },
+    changeMonthly () {
+      console.log("~~~~")
+      this.$data.Scheduletime = {}
+      this.$data.num = ''      
+      this.$data.week = ''
+      if(this.$data.MonthlyOps === 1){
+        this.$data.ScheduletimeMonth1Disable = false 
+        this.$data.ScheduletimeMonth2Disable = true 
+      }else{
+        this.$data.ScheduletimeMonth1Disable = true 
+        this.$data.ScheduletimeMonth2Disable = false              
+      }
     },
     async getTaskList (iPage, iSize) {
       this.$data.taskslistLoading = true
@@ -1313,7 +1800,7 @@ export default {
         this.$data.taskListRule.showColForLv3 = false
         this.$data.taskListRule.showColRef = false
       } else if (iTaskLevel === 3) {
-        this.$data.taskListRule.showColForLv1 = false
+        this.$data.taskListRule.showColForLv1 = true
         this.$data.taskListRule.showColForLv2 = false
         this.$data.taskListRule.showColForLv3 = true
         if (this.$data.formFilter.filterShowRefPool) {
@@ -1339,6 +1826,7 @@ export default {
       this.getTask(url, criteria)
     },
     openTaskByName (iTaskName) {
+      console.log('openTaskByName')
       var reqTaskName = iTaskName
       if (reqTaskName === 'N/A') {
         return
@@ -1349,8 +1837,35 @@ export default {
       }
       this.getTask(url, criteria)
     },
-    async getTask (iUrl, iCriteria) {
+    TypeTagChange () {
+      if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task' || this.$data.taskLv4Form.task_TypeTag === 'Regular Task' ){
+        this.$data.lv3TaskItemRule.showDeliverableTag = false
+        this.$data.lv4TaskItemRule.showDeliverableTag = false
+        this.$data.RegularTaskTimeVisible = true
+        if(this.$data.taskLv3Form.task_status === 'Running' || this.$data.taskLv3Form.task_status === 'Done'){
+          // this.$data.taskLv3WorklogDisabled = true
+          this.$data.taskLv3WorklogShow = false
+        }else if(this.$data.taskLv4Form.task_status === 'Running' || this.$data.taskLv4Form.task_status === 'Done'){
+          // this.$data.taskLv4WorklogDisabled = true
+          this.$data.taskLv4WorklogShow = false
+        }else if(this.$data.taskLv3Form.task_status === 'Drafting' || this.$data.taskLv4Form.task_status === 'Drafting'){
+          this.$data.taskLv3Form.task_status = 'Planning'
+          this.$data.taskLv4Form.task_status = 'Planning'
+        }
+      }else{
+        this.$data.lv3TaskItemRule.showDeliverableTag = true
+        this.$data.lv4TaskItemRule.showDeliverableTag = true
+        // this.$data.taskLv3WorklogDisabled = false
+        // this.$data.taskLv4WorklogDisabled = false
+        this.$data.taskLv3WorklogShow = true
+        this.$data.taskLv4WorklogShow = true
+        this.$data.RegularTaskTimeVisible = false  
+      }
+    },
+     async getTask (iUrl, iCriteria) {
       const res = await http.post(iUrl, iCriteria)
+      console.log(res)
+      //this.$data.Scheduletime = {}
       if (res.data.status === 0) {
         var rtnTask = res.data.data
         if (rtnTask.task_level === 1) {
@@ -1381,6 +1896,7 @@ export default {
             this.$data.taskLv2FormProgressStatus = 'exception'
           }
           this.getSubTaskList(rtnTask.task_name, 'taskLv2FormSubTasks', 2)
+          this.getRegularTaskList(rtnTask.task_name, 'taskLv2FormRegularTasks', 2)
           this.ruleControlLv2TaskItem('Edit', null)
           this.$data.taskLv2DialogVisible = true
         }
@@ -1391,7 +1907,7 @@ export default {
           this.getTaskType(null)
           this.$data.taskLv3Form = {}
           this.$data.taskLv3Form = res.data.data
-          console.log(typeof(this.$data.taskLv3Form.task_deliverableTag))
+          this.TypeTagChange()
           if(this.$data.taskLv3Form.task_deliverableTag!=null){
             this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(",")            
           }
@@ -1400,18 +1916,84 @@ export default {
           } else {
             this.$data.taskLv3FormProgressStatus = 'exception'
           }
-          this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)
-          this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+          this.$data.lv3TaskItemRule.showSubTaskList = true
+          if(res.data.data.task_TypeTag === 'Regular Task'){
+            this.$data.lv3TaskItemRule.showRegularTaskList = true
+            this.$data.taskLv3WorklogShow = false
+            const res1 = await http.post('/schedules/getSchedulesByTaskName',{
+              reqTaskName : rtnTask.task_name
+            })
+            console.log(res1)
+            if(res1.data.status === 0 ){
+              this.$data.taskLv3Form.rangeRecurrence = []
+              this.$data.taskLv3Form.rangeRecurrence.push(res1.data.data.task_startTime)
+              this.$data.taskLv3Form.rangeRecurrence.push(res1.data.data.task_endTime)
+              this.$data.taskLv3Form.task_RegularTaskTime = res1.data.data.task_RegularTaskTime
+              this.changePattern()
+              var schedule = res1.data.data.task_scheduletime
+              if(res1.data.data.task_RegularTaskTime === 'Daily'){
+                this.$data.RegularTaskTimeOps = 1
+                if(schedule === 'Every Weekday'){
+                  this.$data.DailyOps = 1
+                  this.$data.isDailyInputDisable = true
+                }else{
+                  this.$data.DailyOps = 2
+                  var index = schedule.split(' ')     
+                  this.$data.Scheduletime.ScheduletimeDay = index[1]
+                }
+              }else if(res1.data.data.task_RegularTaskTime === 'Weekly'){
+                this.$data.RegularTaskTimeOps = 2
+                var index = schedule.split(' ')         
+                this.$data.Scheduletime.ScheduletimeWeek = index[2]
+                var index=schedule.lastIndexOf("\:");
+                this.$data.week = schedule.substring(index+1,schedule.length)
+              }else{
+                this.$data.RegularTaskTimeOps = 3
+                if(schedule.substring(0,3) === 'Day'){
+                  this.$data.MonthlyOps =1
+                  var index = schedule.split(' ')                 
+                  this.$data.Scheduletime.ScheduletimeDay = index[1]
+                  this.$data.Scheduletime.ScheduletimeMonth1 = index[4]
+                  this.$data.ScheduletimeMonth1Disable = false 
+                  this.$data.ScheduletimeMonth2Disable = true 
+                }else{
+                  this.$data.MonthlyOps = 2 
+                  var index = schedule.split(' ')
+                  this.$data.num = index[1]
+                  this.$data.week = index[2]
+                  this.$data.Scheduletime.ScheduletimeMonth2 = index[5]
+                  this.$data.ScheduletimeMonth1Disable = true 
+                  this.$data.ScheduletimeMonth2Disable = false   
+                }
+              }
+              this.$data.taskLv3Form.task_scheduletime = res1.data.data.task_scheduletime
+              this.$data.taskLv3Form.task_startTime = res1.data.data.task_startTime
+              this.$data.taskLv3Form.task_endTime = res1.data.data.task_endTime
+              this.getRegularTaskList(rtnTask.task_name,'taskLv3FormRegularTasks', 3)               
+            }else{
+              this.$data.Scheduletime = {}
+              this.$data.RegularTaskTimeOps = ''
+              this.$data.week = ''
+              this.$data.num = ''
+              this.$data.DailyOps = ''
+              this.$data.RegularTaskTimeOps = ''
+            }      
+          }else{
+            this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)  
+            this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+          }
           this.ruleControlLv3TaskItem('Edit', null)
           this.$data.taskLv3DialogVisible = true
         }
         if (rtnTask.task_level === 4) {
           // Clear existing data
           this.getActiveUserList()
-          this.getTaskStatus(rtnTask.task_status)
+          this.getTaskStatus(this.$data.taskLv3Form.task_status)
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
+          this.changeParentName('taskLv4Form')
           this.$data.taskLv4Form = res.data.data
+          this.TypeTagChange()
           if(this.$data.taskLv4Form.task_deliverableTag!=null){
             this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(",")            
           }
@@ -1420,12 +2002,34 @@ export default {
           } else {
             this.$data.taskLv4FormProgressStatus = 'exception'
           }
+          if(res.data.data.task_TypeTag === 'Regular Task'){
+            this.$data.taskLv4Form.task_status = this.$data.taskLv3Form.task_status
+            const res1 = await http.post('/schedules/getSchedulesByTaskName',{
+              reqTaskName : rtnTask.task_name
+            })
+            console.log(res1)
+            if(res1.data.status === 0){
+              this.$data.taskLv4Form.task_RegularTaskTime = res1.data.data.task_RegularTaskTime
+              if(this.$data.taskLv4Form.task_RegularTaskTime === 'Daily'){
+                if(res1.data.data.task_scheduletime === 'Every Weekday'){
+                  this.$data.DailyOps = 1
+                }else{
+                  this.$data.DailyOps = 2          
+                }
+              }else{
+                this.$data.Scheduletime = res1.data.data.task_scheduletime.substring(6,8)    
+              }
+              this.$data.taskLv4Form.task_scheduletime = res1.data.data.task_scheduletime
+              this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime  
+              this.$data.taskLv4Form.task_endTime = res1.data.data.task_endTime             
+            }  
+            this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
+          }
           this.ruleControlLv4TaskItem('Edit', null)
-          this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
           this.$data.taskLv4DialogVisible = true
         }
       }
-    },
+     },
     async getSubTaskList (iTaskName, iSubTaskListItem, iLevel) {
       this.$data.tasksSubTaskLoading = true
       const res = await http.post('/tasks/getSubTaskByTaskName', {
@@ -1447,6 +2051,29 @@ export default {
       }
       this.$data.tasksSubTaskLoading = false
     },
+    async getRegularTaskList (iTaskName, iSubTaskListItem, iLevel) {
+      this.$data.tasksSubTaskLoading = true
+      const res = await http.post('/tasks/getRegularTaskByTaskName', {
+        reqTaskName: iTaskName
+      })
+      if (res.data.status === 0) {
+        this[iSubTaskListItem] = []
+        this[iSubTaskListItem] = res.data.data
+      } else {
+        this[iSubTaskListItem] = []
+      }
+      if (this[iSubTaskListItem].length > 0) {
+        if (iLevel === 3) {
+          console.log('Sub task > 0')
+          for(var i = 0 ; i < this[iSubTaskListItem].length ; i++){
+            this[iSubTaskListItem][i].task_status = this.$data.taskLv3Form.task_status
+          }
+          this.$data.taskLv3WorklogShow = false
+          this.$data.lv3TaskItemRule.disableTaskEst = true
+        }
+      }
+      this.$data.tasksSubTaskLoading = false
+    },
     async getTaskWorklogHistory (iTaskId, iTaskHistory) {
       this.$data.tasksWorklogHistoriesLoading = true
       const res = await http.post('/worklogs/getWorklogHistoryByTaskId', {
@@ -1459,6 +2086,45 @@ export default {
         this[iTaskHistory] = []
       }
       this.$data.tasksWorklogHistoriesLoading = false
+    },
+    async changeParentName (iObj) {
+      console.log('changeParentName')
+      console.log(this[iObj].task_parent_name)
+      const res  = await http.post('/tasks/getTaskByName',{
+        reqTaskName : this[iObj].task_parent_name
+      })
+      console.log(res)
+      if(res.data.status ===0 && res.data.data != null ){
+        this[iObj].task_TypeTag = res.data.data.task_TypeTag
+      }
+      if(this[iObj].task_TypeTag === 'Regular Task' ){
+        this.$data.lv3TaskItemRule.showDeliverableTag = false
+        this.$data.lv4TaskItemRule.showDeliverableTag = false
+        this.$data.RegularTaskTimeVisible = true
+        const res1 = await http.post('/schedules/getSchedulesByTaskName',{
+           reqTaskName :res.data.data.task_name
+        })
+        console.log(res1.data.data)
+        if(res1.data.status === 0){
+          this.$data.taskLv4Form.task_scheduletime = res1.data.data.task_scheduletime
+          this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime    
+          this.$data.taskLv4Form.task_endTime = res1.data.data.task_endTime             
+          this.$data.taskLv4Form.task_RegularTaskTime = res1.data.data.task_RegularTaskTime
+          if(this.$data.taskLv4Form.task_RegularTaskTime === 'Daily'){
+            if(res1.data.data.task_scheduletime === 'Every Weekday'){
+              this.$data.DailyOps = 1
+            }else{
+              this.$data.DailyOps = 2          
+            }
+          }else{
+            this.$data.Scheduletime = res1.data.data.task_scheduletime.substring(6,8)    
+          }     
+        }       
+        if(this[iObj].task_status === 'Running' || this[iObj].task_status === 'Done'){
+          this.$data.taskLv4WorklogDisabled = true
+          this.$data.taskLv3WorklogDisabled = true
+        }
+      }
     },
     async createNewTask (iTaskLevel) {
       console.log('Create new task: ' + iTaskLevel)
@@ -1508,7 +2174,14 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
+        // this.$data.DailyOps = ''
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
+        this.$data.lv3TaskItemRule.showDeliverableTag = true
         this.$data.taskTypeArrayForLv2Task = []
+        this.$data.RegularTaskTimeVisible = false
         // Set data default value
         this.$data.taskLv3Form.task_status = 'Drafting'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
@@ -1524,7 +2197,15 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
+        this.changeParentName('taskLv4Form')
+        // this.$data.DailyOps = ''
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
+        this.$data.lv4TaskItemRule.showDeliverableTag = true
         this.$data.taskTypeArrayForLv2Task = []
+        this.$data.RegularTaskTimeVisible = false
         // Set data default value
         this.$data.taskLv4Form.task_status = 'Drafting'
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
@@ -1564,6 +2245,7 @@ export default {
       if (Number(iSubTaskLevel) === 3) {
         this.$data.taskLv3Form = {}
         // Set dialog value
+        this.$data.lv3TaskItemRule.showDeliverableTag = true
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
         // Set data default value
@@ -1582,12 +2264,20 @@ export default {
         this.$data.taskLv3DialogVisible = true
       }
       if (Number(iSubTaskLevel) === 4) {
+        console.log('Number(iSubTaskLevel) === 4')
         this.$data.taskLv4Form = {}
         // Set dialog value
         this.getActiveUserList()
-        this.getTaskStatus('Drafting')
+        this.getTaskStatus('Planning')
+        console.log(this[iParentObj].task_name)
         // Set data default value
-        this.$data.taskLv4Form.task_status = 'Drafting'
+        const res  = await http.post('/tasks/getTaskByName',{
+          reqTaskName : this[iParentObj].task_name
+        })
+        if(res.data.status ===0 && res.data.data != null ){
+          this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
+        }
+        this.$data.taskLv4Form.task_status = res.data.data.task_status
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
@@ -1603,6 +2293,72 @@ export default {
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
+      }
+    },
+    async createRegularTask (iSubTaskLevel, iParentObj) {
+      console.log('Create regular task' )
+      if (Number(iSubTaskLevel) === 3) {
+        this.$data.taskLv3Form = {}
+        // Set dialog value
+        this.getActiveUserList()
+        this.getTaskStatus('Planning')
+        // Set data default value
+        this.$data.taskLv3Form.task_status = 'Planning'
+        this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
+        this.$data.taskLv3Form.task_level = 3
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
+        this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv3Form.task_progress_nosymbol = 0
+        this.$data.taskLv3Form.task_TypeTag = 'Regular Task'
+        this.$data.lv3TaskItemRule.showDeliverableTag = false
+        this.$data.RegularTaskTimeVisible = true
+        // Set parent data of sub task
+        this.$data.taskLv3Form.task_parent_name = this[iParentObj].task_name
+        this.$data.taskLv3Form.task_parent_desc = this[iParentObj].task_desc
+        this.$data.taskLv3Form.task_type_id = this[iParentObj].task_type_id
+        this.$data.taskLv3Form.task_responsible_leader = this[iParentObj].task_responsible_leader
+        // Show or hide column
+        this.ruleControlLv3TaskItem('Create', false)
+        this.$data.taskLv3DialogVisible = true
+      }
+      if (Number(iSubTaskLevel) === 4) {
+        this.$data.taskLv4Form = {}
+        console.log(this[iParentObj])
+        console.log("Number(iSubTaskLevel) === 4")
+        // Set dialog value
+        this.getActiveUserList()
+        this.getTaskStatus(this[iParentObj].task_status)
+        // Set data default value
+        this.$data.taskLv4Form.task_status = this[iParentObj].task_status
+        this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
+        this.$data.taskLv4Form.task_level = 4
+        // this.$data.DailyOps = ''
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
+        this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv4Form.task_progress_nosymbol = 0
+        this.$data.taskLv4Form.task_TypeTag = 'Regular Task'
+        this.$data.taskLv4Form.task_RegularTaskTime = this[iParentObj].task_RegularTaskTime
+        this.$data.taskLv4Form.task_startTime = this[iParentObj].task_startTime
+        this.$data.taskLv4Form.task_endTime = this[iParentObj].task_endTime
+        this.$data.taskLv4Form.task_scheduletime = this[iParentObj].task_scheduletime
+        // Set parent data of sub task
+        this.$data.taskLv4Form.task_parent_name = this[iParentObj].task_name
+        this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
+        this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
+        this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
+        this.$data.taskLv4Form.task_group_id = this[iParentObj].task_group_id
+        this.$data.taskLv4Form.task_reference = this[iParentObj].task_reference
+        this.$data.taskLv4Form.task_reference_desc = this[iParentObj].task_reference_desc
+        // Show or hide column
+        this.ruleControlLv4TaskItem('Create', false)
+        this.$data.taskLv4DialogVisible = true
+        this.$data.lv4TaskItemRule.showDeliverableTag = false        
       }
     },
     // 3. Level 1 task dialog
@@ -1639,6 +2395,13 @@ export default {
             return
           }
         }
+        if (reqTask.task_status === 'Done') {
+          var result = await this.ifAllSubTasksDone(reqTask.task_name)
+          if (!result) {
+            this.$message.error('Exist sub task not Done!')
+            return
+          }
+        }
         this.$data.taskLv1SaveBtnDisabled = true
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
@@ -1660,6 +2423,7 @@ export default {
         this.$data.activeTabForLv1 = 'tab_basic_info'
         this.$data.lv1TaskItemRule.showTaskNameInput = false
         this.$data.lv1TaskItemRule.disableTaskType = true
+        this.$data.lv1TaskItemRule.showCreator = true
         this.$nextTick(() => {
           this.$refs.taskLv1Tabs.$children[0].$refs.tabs[2].style.display = ''
         })
@@ -1669,6 +2433,7 @@ export default {
         this.$data.activeTabForLv1 = 'tab_basic_info'
         this.$data.lv1TaskItemRule.showTaskNameInput = true
         this.$data.lv1TaskItemRule.disableTaskType = false
+        this.$data.lv1TaskItemRule.showCreator = false
         this.$nextTick(() => {
           if (this.$refs.taskLv1Tabs !== undefined) {
             this.$refs.taskLv1Tabs.$children[0].$refs.tabs[2].style.display = 'none'
@@ -1691,7 +2456,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
+            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')) {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
@@ -1699,6 +2464,13 @@ export default {
             return
           }
           if (this.isFieldEmpty(reqTask.task_responsible_leader, 'Responsible leader could not be empty!')) {
+            return
+          }
+        }
+        if (reqTask.task_status === 'Done') {
+          var result = await this.ifAllSubTasksDone(reqTask.task_name)
+          if (!result) {
+            this.$message.error('Exist sub task not Done!')
             return
           }
         }
@@ -1717,6 +2489,7 @@ export default {
       }
     },
     ruleControlLv2TaskItem (iAction, iNeedInputParent) {
+      console.log(iAction)
       if (iAction === 'Edit') {
         // Set Dialog Default Value
         this.$data.taskLv2DialogTitle = '2 - Business Implementation'
@@ -1727,8 +2500,10 @@ export default {
         this.$data.lv2TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         this.$data.lv2TaskItemRule.showProgress = true
         this.$data.lv2TaskItemRule.showSubTaskEst = true
+        this.$data.lv2TaskItemRule.showCreator = true
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
+          this.$refs.taskLv2Tabs.$children[0].$refs.tabs[3].style.display = '' // Show "Sub Tasks List" Tab
         })
       }
       if (iAction === 'Create') {
@@ -1744,8 +2519,10 @@ export default {
         this.$data.lv2TaskItemRule.disableTaskEst = false
         this.$data.lv2TaskItemRule.showProgress = false
         this.$data.lv2TaskItemRule.showSubTaskEst = false
+        this.$data.lv2TaskItemRule.showCreator = false
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+          this.$refs.taskLv2Tabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Sub Tasks List" Tab
         })
       }
     },
@@ -1755,82 +2532,140 @@ export default {
       this.$data.taskLv2Form = {}
       this.$data.taskLv2Form.task_progress_nosymbol = 0
       this.$data.taskLv2FormSubTasks = []
+      this.$data.taskLv2FormRegularTasks = []
       this.$data.taskLv2DialogTitle = '2 - Business Implementation'
       this.$data.activeTabForLv2 = 'tab_basic_info'
       done()
     },
     // 5. Level 3 task dialog
     async saveLv3Task () {
-      var reqTask = this.$data.taskLv3Form
+      console.log("debug")
+      console.log(this.$data.taskLv3Form)
+      var reqTask = this.$data.taskLv3Form 
       if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
           reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
       }
       if(reqTask.task_deliverableTag!=null&&typeof(reqTask.task_deliverableTag)==='string'){
         this.$data.taskLv3Form.task_deliverableTag = this.$data.taskLv3Form.task_deliverableTag.split(',')
       }
-      console.log(reqTask)
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
+            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')||
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
+        }
+        if(reqTask.task_TypeTag === 'Regular Task'){
+          if(this.$data.taskLv3Form.task_RegularTaskTime === 'Weekly'&&this.$data.Scheduletime.ScheduletimeWeek!=null&&this.$data.week!=null){
+            this.$data.taskLv3Form.task_scheduletime= "Recur every " +this.$data.Scheduletime.ScheduletimeWeek +" weeks(s) on:"+this.$data.week
+          }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'){
+            if(this.$data.MonthlyOps === 1&&this.$data.Scheduletime.ScheduletimeDay!=null&&this.$data.Scheduletime.ScheduletimeMonth1!=null){
+              this.$data.taskLv3Form.task_scheduletime = "Day "+this.$data.Scheduletime.ScheduletimeDay+" of every " +this.$data.Scheduletime.ScheduletimeMonth1 +" month(s)"   
+            }else if(this.$data.MonthlyOps === 2&&this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'&&this.$data.MonthlyOps === 2&&this.$data.num!=null&&this.$data.Scheduletime.ScheduletimeMonth2!=null&&this.$data.week!=null){
+              this.$data.taskLv3Form.task_scheduletime = "The " +this.$data.num+" "+this.$data.week+" of every "+this.$data.Scheduletime.ScheduletimeMonth2 +" month(s)"}
+          }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Daily'){
+              if(this.$data.DailyOps === 1){
+              this.$data.taskLv3Form.task_scheduletime = "Every Weekday"
+              this.$data.taskLv4Form.task_scheduletime = "Every Weekday"
+            }else{
+              if(this.$data.Scheduletime.ScheduletimeDay!=null){ 
+                this.$data.taskLv3Form.task_scheduletime = "Every "+this.$data.Scheduletime.ScheduletimeDay +" days"
+                this.$data.taskLv4Form.task_scheduletime = "Every "+this.$data.Scheduletime.ScheduletimeDay +" days"           
+              }
+            }
+          }
+          if( this.$data.taskLv3Form.rangeRecurrence!=null){
+            this.$data.taskLv3Form.task_startTime = this.$data.taskLv3Form.rangeRecurrence[0]
+            this.$data.taskLv3Form.task_endTime = this.$data.taskLv3Form.rangeRecurrence[1]      
+          }
+          this.$data.lv3TaskItemRule.showRegularTaskList = true
+          if( 
+            this.isFieldEmpty(reqTask.task_RegularTaskTime, 'Recurrence pattern could not be empty!')||
+            this.isFieldEmpty(reqTask.task_scheduletime, 'Scheduletime could not be empty!')||
+            this.isFieldEmpty(reqTask.task_startTime, 'Range of recurrence could not be empty!')){
+              return
+            }
         }
         if (Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
-            return
+          if(reqTask.task_TypeTag === 'Regular Task'){
+            console.log("reqTask.task_TypeTag === 'Regular Task'")
+            this.$data.taskLv3WorklogShow = false
+          }else{
+            this.$data.taskLv3WorklogShow = true
+            console.log("reqTask.task_TypeTag != 'Regular Task'")
+            if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+              return
+            }
+            if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+              return
+            }            
           }
-          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+        }
+        if (reqTask.task_status === 'Done') {
+          var result = await this.ifAllSubTasksDone(reqTask.task_name)
+          if (!result) {
+            this.$message.error('Exist sub task not Done!')
             return
           }
         }
         this.$data.taskLv3SaveBtnDisabled = true
-        //console.log(reqTask)
         if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
             reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
         }
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
+        if(reqTask.task_TypeTag === 'Regular Task'){
+          const res1 = await http.post('/schedules/saveRegularTask',{
+            reqRegularTaskTime : reqTask.task_RegularTaskTime,
+            reqStartTime : reqTask.task_startTime,
+            reqEndTime : reqTask.task_endTime,
+            reqTaskId : res.data.data.TaskName,
+            reqSchedule : reqTask.task_scheduletime,
+          })      
+        }
         if (res.data.status === 0) {
           this.$message({message: 'Task created successfully!', type: 'success'})
         } else {
           this.$message({message: 'Task updated successfully!', type: 'success'})
         }
+        this.$data.lv3TaskItemRule.showSubTaskList = true
         this.$data.taskLv3SaveBtnDisabled = false
         this.openTaskById(res.data.data.Id)
         this.getTaskList(1, 20)
       }
     },
     ruleControlLv3TaskItem (iAction, iNeedInputParent) {
+      console.log(iAction)
       if (iAction === 'Edit') {
         // Set Dialog Default Value
         this.$data.taskLv3DialogTitle = '3 - Executive Task'
         this.$data.activeTabForLv3 = 'tab_basic_info'
         this.$data.lv3TaskItemRule.showProgress = true
-        this.$nextTick(() => {
-          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
-          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = '' // Show worklog history tab
-        })
+        // this.$nextTick(() => {
+        //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
+        //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = '' // Show worklog history tab
+        // })
         this.$data.lv3TaskItemRule.showProgress = true
+        this.$data.lv3TaskItemRule.showCreator = true
         // Default value
-        this.$data.taskLv3WorklogShow = true
         this.$data.lv3TaskItemRule.disableTaskEst = false
         // Common Rule for estimation and worklog button
-        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Common Rule 1
-        this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
-        // Common Rule 2
+        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         this.$data.taskLv3WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
+        this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
+        if(this.$data.taskLv3Form.task_TypeTag ==='Regular Task'){
+          this.$data.taskLv3WorklogShow = false
+        }        
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
           this.$data.lv3TaskItemRule.disableTaskEst = true
           this.$data.lv3TaskItemRule.disableDesc = true
-          this.$data.lv3TaskItemRule.disableAssignee = true
           this.$data.lv3TaskItemRule.disableStatus = true
           this.$data.lv3TaskItemRule.showRefPoolInput = false
           this.$data.lv3TaskItemRule.disableParentNameInput = true
@@ -1841,10 +2676,10 @@ export default {
             this.$data.lv3TaskItemRule.showSubTaskEst = false
             this.$data.lv3TaskItemRule.showTypeTag = false
             this.$data.lv3TaskItemRule.showDeliverableTag = false
-            this.$nextTick(() => {
-              this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // For ref pool, hide "Sub Tasks List" Tab
-              this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // For ref pool, hide "Worklog History" tab
-            })
+            // this.$nextTick(() => {
+            //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // For ref pool, hide "Sub Tasks List" Tab
+            //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // For ref pool, hide "Worklog History" tab
+            // })
           } else {
             console.log('Not Pool Task')
             this.$data.lv3TaskItemRule.showRespLeader = true
@@ -1855,13 +2690,11 @@ export default {
         } else {
           console.log('PMT Task')
           this.$data.lv3TaskItemRule.disableDesc = false
-          this.$data.lv3TaskItemRule.disableAssignee = false
           this.$data.lv3TaskItemRule.disableStatus = false
           this.$data.lv3TaskItemRule.showRefPoolInput = true
           this.$data.lv3TaskItemRule.showRespLeader = true
           this.$data.lv3TaskItemRule.showSubTaskEst = true
           this.$data.lv3TaskItemRule.showTypeTag = true
-            this.$data.lv3TaskItemRule.showDeliverableTag = true
           this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
         }
       }
@@ -1869,32 +2702,46 @@ export default {
         // Set Dialog Default Value
         this.$data.taskLv3DialogTitle = '3 - New Executive Task'      
         this.$data.activeTabForLv3 = 'tab_basic_info'
-        this.$nextTick(() => {
-          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
-          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide worklog history tab
-        })
+        // this.$nextTick(() => {
+        //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+        //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide worklog history tab
+        // })
         if (iNeedInputParent) {
           this.$data.lv3TaskItemRule.disableParentNameInput = false
         } else {
           this.$data.lv3TaskItemRule.disableParentNameInput = true
         }
+        this.$data.RegularTaskTimeOps = ''
+        this.$data.DailyOps = ''
+        this.$data.MonthlyOps = ''
+        this.$data.Scheduletime = {}
+        this.$data.week = ''
+        this.$data.num =''               
         this.$data.lv3TaskItemRule.disableTaskEst = false
         this.$data.lv3TaskItemRule.disableDesc = false
-        this.$data.lv3TaskItemRule.disableAssignee = false
         this.$data.lv3TaskItemRule.disableStatus = false
         this.$data.lv3TaskItemRule.showRefPoolInput = true
         this.$data.lv3TaskItemRule.showRespLeader = true
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
         this.$data.taskLv3WorklogShow = false
+        this.$data.lv3TaskItemRule.showCreator = false
+        this.$data.lv3TaskItemRule.showRegularTaskList = false
+        this.$data.lv3TaskItemRule.showSubTaskList = false
       }
     },
     closeLv3TaskDialog (done) {
       console.log('Close lv 3 dialog')
       this.$data.taskLv3DialogVisible = false
       this.$data.taskLv3Form = {}
+      // this.$data.DailyOps = ''
+      // this.$data.MonthlyOps = ''
+      //this.$data.Scheduletime = {}
+      // this.$data.week = ''
+      // this.$data.num =''
       this.$data.taskLv3Form.task_progress_nosymbol = 0
       this.$data.taskLv3FormSubTasks = []
+      this.$data.taskLv3FormRegularTasks = []
       this.$data.taskLv3FormHistories = []
       this.$data.taskLv3DialogTitle = '3 - Executive Task'
       this.$data.activeTabForLv3 = 'tab_basic_info'
@@ -1921,11 +2768,17 @@ export default {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-          if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
-            return
-          }
-          if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
-            return
+          if(reqTask.task_TypeTag !== 'Regular Task') {
+            this.$data.taskLv3WorklogShow = true
+          //if (reqTask.task_TypeTag !== 'Public Task') {
+            if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
+              return
+            }
+            if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
+              return
+            }
+          }else{
+            this.$data.taskLv4WorklogShow = false
           }
         }
         this.$data.taskLv4SaveBtnDisabled = true
@@ -1935,6 +2788,13 @@ export default {
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
+        const res1 = await http.post('/schedules/saveRegularTask',{
+          reqRegularTaskTime : reqTask.task_RegularTaskTime,
+          reqStartTime : reqTask.task_startTime,
+          reqEndTime : reqTask.task_endTime,
+          reqTaskId : res.data.data.TaskName,
+          reqSchedule : reqTask.task_scheduletime,
+        })  
         if (res.data.status === 0) {
           this.$message({message: 'Task created successfully!', type: 'success'})
         } else {
@@ -1950,10 +2810,11 @@ export default {
         // Set Dialog Default Value
         this.$data.taskLv4DialogTitle = '4 - Workable Task'
         this.$data.activeTabForLv4 = 'tab_basic_info'
-        this.$nextTick(() => {
-          this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = '' // Show worklog history tab
-        })
+        // this.$nextTick(() => {
+        //   this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = '' // Show worklog history tab
+        // })
         this.$data.lv4TaskItemRule.showProgress = true
+        this.$data.lv4TaskItemRule.showCreator = true
         this.$data.taskLv4WorklogShow = true
         // Common Rule for estimation and worklog button
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv4Form.task_status)
@@ -1961,15 +2822,18 @@ export default {
         this.$data.lv4TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         // Common Rule 2
         this.$data.taskLv4WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
+        if(this.$data.taskLv4Form.task_TypeTag ==='Regular Task'){
+          this.$data.taskLv4WorklogShow = false
+        }
         this.$data.lv4TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
       }
       if (iAction === 'Create') {
         // Set Dialog Default Value
         this.$data.taskLv4DialogTitle = '4 - New Workable Task'
         this.$data.activeTabForLv4 = 'tab_basic_info'
-        this.$nextTick(() => {
-          this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide worklog history tab
-        })
+        // this.$nextTick(() => {
+        //   this.$refs.taskLv4Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide worklog history tab
+        // })
         if (iNeedInputParent) {
           this.$data.lv4TaskItemRule.disableParentNameInput = false
         } else {
@@ -1977,6 +2841,7 @@ export default {
         }
         this.$data.lv4TaskItemRule.disableTaskEst = false
         this.$data.lv4TaskItemRule.showProgress = false
+        this.$data.lv4TaskItemRule.showCreator = false
         this.$data.taskLv4WorklogShow = false
       }
     },
@@ -1995,6 +2860,7 @@ export default {
       var taskLevel = Number(this[iObj].task_level)
       if (tab.name === 'tab_subtasks_list') {
         var subTaskForm = ''
+        var regularTaskForm = ''
         if (taskLevel === 1) {
           subTaskForm = 'taskLv1FormSubTasks'
         }
@@ -2007,11 +2873,23 @@ export default {
         if (taskLevel === 4) {
           subTaskForm = 'taskLv4FormSubTasks'
         }
-        console.log(this[iObj].task_name)
-        console.log(subTaskForm)
-        console.log(taskLevel)
         this.getSubTaskList(this[iObj].task_name, subTaskForm, taskLevel)
         this[iActiveTab] = 'tab_subtasks_list'
+      }
+      if(tab.name === 'tab_regular_list'){
+        var subTaskForm = ''
+        var regularTaskForm = ''
+        if (taskLevel === 2) {
+          regularTaskForm = 'taskLv2FormRegularTasks'
+        }
+        if (taskLevel === 3) {
+          regularTaskForm = 'taskLv3FormRegularTasks'
+        }    
+        if (taskLevel === 4) {
+          regularTaskForm = 'taskLv4FormRegularTasks'
+        }
+        this.getRegularTaskList(this[iObj].task_name,regularTaskForm, taskLevel)
+        this[iActiveTab] = 'tab_regular_list'
       }
       if (tab.name === 'tab_worklog_histories') {
         var historiesForm = ''
@@ -2027,6 +2905,14 @@ export default {
     },
     // Worklog Dialog
     addWorklog (iObj) {
+      var taskTypeTag = this[iObj].task_TypeTag
+      var taskAssigneeId = this[iObj].task_assignee
+      if (taskTypeTag !== 'Public Task') {
+        if (!this.checkIfAssigneeSameWithUser(taskAssigneeId)) {
+          this.$message.error('You are not the task assignee, cannot record your effort on this task!')
+          return
+        }
+      }
       this.$data.worklogForm.worklog_task_id = this[iObj].task_id
       this.$data.worklogForm.worklog_task = this[iObj].task_name
       var currentDate = this.dateToString(new Date())
@@ -2130,19 +3016,36 @@ export default {
           IsActive: 1
         })
         if (res1.data.status === 0) {
+          var userList1 = res1.data.data
           this.$data.activeUserListForAll = []
-          this.$data.activeUserListForAll = res1.data.data
+          for (var f = 0; f < userList1.length; f++) {
+            if (userList1[f].user_level > 0) {
+              if (userList1[f].user_nickname !== null && userList1[f].user_nickname !== '') {
+                userList1[f].user_eid = userList1[f].user_eid + ' (' + userList1[f].user_nickname + ')'
+              }
+              this.$data.activeUserListForAll.push(userList1[f])
+            }
+          }
         }
-        var userList = res.data.data
+        var userListString = JSON.stringify(res.data.data)
+        var userList = JSON.parse(userListString)
         this.$data.activeUserListForOthRespLeader = []
         for (var i = 0; i < userList.length; i++) {
           if (userList[i].user_level > 0 && userList[i].user_level <= 10) {
+            if (userList[i].user_nickname !== null && userList[i].user_nickname !== '') {
+              userList[i].user_eid = userList[i].user_eid + ' (' + userList[i].user_nickname + ')'
+            }
             this.$data.activeUserListForOthRespLeader.push(userList[i])
           }
         }
+        userList = []
+        userList = JSON.parse(userListString)
         this.$data.activeUserListForLv1RespLeader = []
         for (var a = 0; a < userList.length; a++) {
           if (userList[a].user_level > 0 && userList[a].user_level <= 9) {
+            if (userList[a].user_nickname !== null && userList[a].user_nickname !== '') {
+              userList[a].user_eid = userList[a].user_eid + ' (' + userList[a].user_nickname + ')'
+            }
             this.$data.activeUserListForLv1RespLeader.push(userList[a])
           }
         }
@@ -2198,14 +3101,13 @@ export default {
         reqTaskLevel: reqTaskLevel
       })
       if (res.data.status === 0) {
-        var queryResult = res.data.data
+        var queryResult = res.data.data    
         for (var i = 0; i < queryResult.length; i++) {
           var returnJson = {}
           returnJson.value = queryResult[i].task_name
           returnJson.description = queryResult[i].task_desc
           returnJson.type_name = queryResult[i].task_type
           returnJson.type_id = queryResult[i].task_type_id
-          returnJson.id = queryResult[i].task_id
           returnJson.responsible_leader = queryResult[i].task_responsible_leader
           returnJson.group_id = queryResult[i].task_group_id
           returnJson.reference = queryResult[i].task_reference
@@ -2235,8 +3137,11 @@ export default {
     clearSelectForParentTask (iObj) {
       this[iObj].task_parent_name = null
       this[iObj].task_parent_desc = null
+      this[iObj].task_TypeTag = null
       this[iObj].task_type_id = null
       this[iObj].task_responsible_leader = null
+      this.$data.RegularTaskTimeVisible = false
+      this[iObj].showDeliverableTag = true
       this[iObj].task_group_id = null
       this[iObj].task_reference = null
       this[iObj].reference_desc = null
@@ -2276,6 +3181,28 @@ export default {
       } else {
         return false
       }
+    },
+    async ifAllSubTasksDone (iTaskName) {
+      if(iTaskName !== undefined && iTaskName !== null && iTaskName !== ''){
+        const res = await http.get('/tasks/checkSubTaskDone', {
+          reqTaskName: iTaskName
+        })
+        if (res.data.status === 0) {
+          return true
+        } else {
+          return false
+        }
+      }
+    },
+    checkIfAssigneeSameWithUser (iAssigneeId) {
+      var userId = Number(this.$store.getters.getUserId)
+      var assigneeId = Number(iAssigneeId)
+      if (userId !== null && userId > 0 && assigneeId !== null && assigneeId > 0) {
+        if (userId === assigneeId) {
+          return true
+        }
+      }
+      return false
     },
     dateToString (iDate) {
       if (iDate !== null && iDate !== '' && iDate !== 'Invalid Date') {
@@ -2323,6 +3250,11 @@ export default {
     }
   },
   created () {
+    // this.$data.RegularTaskTimeOps = ''
+    // this.$data.week = ''
+    // this.$data.num = ''
+    // this.$data.DailyOps = ''
+    // this.$data.RegularTaskTimeOps = ''
     this.$data.pageSize = 20
     this.$data.currentPage = 1
     this.getTaskList(1, 20)
@@ -2634,5 +3566,20 @@ input[type="number"]{
 }
 .el-textarea .el-textarea__inner {
   resize: vertical !important;
+}
+
+.collapse-span {
+  margin-bottom: 5px;
+}
+
+.center-vertical{
+  position: relative;
+  top:50%;
+  transform:translateY(-50%);
+}
+.center-horizontal{
+  position: relative;
+  left:50%;
+  transform:translateX(-50%); 
 }
 </style>
