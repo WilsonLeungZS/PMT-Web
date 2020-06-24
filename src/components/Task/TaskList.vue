@@ -245,10 +245,22 @@
             </el-form>
           </el-col>
         </el-row> -->
-        <el-divider></el-divider>
 <!------- 3. End of Filter Criteria -->
+<!---------->
+        <el-row v-if="showTaskPath">
+            <el-col :span="24">
+              <el-breadcrumb separator-class="el-icon-arrow-right">
+                <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+                <el-breadcrumb-item>活动管理</el-breadcrumb-item>
+                <el-breadcrumb-item>活动列表</el-breadcrumb-item>
+                <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+              </el-breadcrumb>                  
+            </el-col>
+        </el-row>
+        <el-divider></el-divider>        
+<!----------->
 <!------- 4. Task List -->
-        <el-row class="tl-main" v-if="false">
+        <el-row class="tl-main" >
           <el-col :span="24">
             <el-table v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
               <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
@@ -259,7 +271,7 @@
               </el-table-column>
               <el-table-column prop="task_name" label="Number" width="170px" key="3">
                 <template slot-scope="scope">
-                   <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
+                   <el-button type="text" @click="getTaskLv2(scope.row.task_name)">{{scope.row.task_name}}</el-button>
                 </template>
               </el-table-column>
               <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="230px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
@@ -289,163 +301,6 @@
               </el-table-column>
             </el-table>
           </el-col>
-        </el-row>
-        <el-row class="tp-main">
-          <div v-for="index of 5" :key="index">
-            <el-col :span="24">
-              <el-table v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
-                <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-                <el-table-column  prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
-                  <template slot-scope="scope">
-                    <el-button type="text" @click="openTaskByName(scope.row.task_parent_name)">{{scope.row.task_parent_name}}</el-button>
-                  </template>
-                </el-table-column>
-                <el-table-column prop="task_name" label="Number" width="170px" key="3">
-                  <template slot-scope="scope">
-                    <el-button type="text" @click="openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
-                  </template>
-                </el-table-column>
-                <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="230px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
-                <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="230px" v-if="!taskListRule.showColForLv1" key="5"></el-table-column>
-                <el-table-column prop="task_status" label="Status" align="center" width="130px" key="6"></el-table-column>
-                <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
-                <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="280px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
-                <!--<el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>-->
-                <el-table-column prop="task_top_target_start" label="Target Start" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
-                <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
-                <el-table-column prop="task_reference" label="Ref Pool" width="110px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
-                  <template slot-scope="scope">
-                    <el-button type="text" @click="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
-                  </template>
-                </el-table-column>
-                <el-table-column prop="task_effort" label="Effort" align="center" width="125px" v-if="!taskListRule.showColForLv1" key="13"></el-table-column>
-                <el-table-column prop="task_estimation" label="Estimation" align="center" width="135px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
-                <el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="180px" key="15"></el-table-column>
-                <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="16"></el-table-column>
-                <!-- <el-table-column prop="task_issue_date" label="Issue Date" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="17"></el-table-column> -->
-                <el-table-column prop="task_target_complete" label="Target Completion" align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
-                <el-table-column fixed="right" label="Edit" align="center" width="120px">
-                  <template slot-scope="scope">
-                    <el-button v-if="scope.row.task_level===3" @click="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-plus"></el-button>
-                    <el-button @click="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
-                    </template>
-                </el-table-column>
-              </el-table>
-              <el-collapse v-model="activeTabArray" @change="handleTabChange" v-loading="lv2TaskListLoading">
-                <el-collapse-item :name="index" v-for="(task, index) in lv2TaskList" :key="index" @click.native="openTaskTab(task.task_name, index, 1, 20,task.ShowRegular)" class="tp-main-task-list">
-                  <template slot="title">
-                    <div class="tp-main-title">
-                      <el-row>
-                        <el-col :span="2" class="tp-main-content-item">
-                          <el-button @click.stop="openTaskById(task.task_id)" type="text" size="small" style="font-size:16px">{{task.task_name}}</el-button>
-                        </el-col>
-                        <el-col :span="1" class="tp-main-content-item">{{task.task_status}}</el-col>
-                        <el-tooltip class="item" effect="dark" :content="task.task_desc" placement="top-start">
-                          <el-col :span="6" class="tp-main-content-item">{{task.task_desc}}</el-col>
-                        </el-tooltip>
-                        <el-col :span="2" class="tp-main-content-item">Effort: {{task.task_effort}}</el-col>
-                        <el-col :span="2" class="tp-main-content-item">Est: {{task.task_estimation}}</el-col>
-                        <el-col :span="2" class="tp-main-content-item">Sub-Tasks Est: {{task.task_subtasks_estimation}}</el-col>
-                        <el-col :span="4" class="tp-main-content-item">Responsible: {{task.task_responsible_leader}}</el-col>
-                        <div @click.stop="openTaskTab(task.task_name, index, 1, 20,task.ShowRegular)"><el-col :span="3" class="tp-main-content-item">Regular: 
-                            <el-switch
-                            v-model="task.ShowRegular"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            @change="ChangeRegularStatus(task.ShowRegular)">
-                          </el-switch>              
-                        </el-col></div>
-                        <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(3, task)" type="success" size="mini" icon="el-icon-plus"></el-button></el-col>
-                        <el-col :span="1" class="tp-main-content-item"><el-button @click.stop="refreshLv2Task(task.task_id, task.task_name, index,task.ShowRegular)" type="info" size="mini" icon="el-icon-refresh"></el-button></el-col>
-                      </el-row>
-                    </div>
-                  </template>
-                  <div class="tp-main-content" @click.stop="preventParentEventTrigger">
-                    <el-row>
-                      <el-col :span="24">
-                        <el-table v-loading="task.task_plan_tasks_loading" :data="task.task_plan_tasks_list" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
-                          <el-table-column type="expand">
-                            <template slot-scope="props">
-                              <el-row>
-                                <el-col :span="23" :offset="1">
-                                  <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
-                                    <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
-                                    <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
-                                      <template slot-scope="scope">
-                                        <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.sub_task_id)" type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
-                                      </template>
-                                    </el-table-column>
-                                    <el-table-column label="Status" prop="sub_task_status" align="center" width="100"></el-table-column>
-                                    <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>
-                                    <el-table-column label="Effort" prop="sub_task_effort" align="center" width="100px"></el-table-column>
-                                    <el-table-column label="Est" prop="sub_task_estimation" align="center" width="100px"></el-table-column>
-                                    <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px"></el-table-column>
-                                    <el-table-column label="Assignee" prop="sub_task_assignee" align="center" width="180px"></el-table-column>
-                                    <el-table-column fixed="right" align="center" width="110">
-                                      <template slot-scope="scope">
-                                        <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.sub_task_id, scope.row.sub_task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
-                                      </template>
-                                    </el-table-column>
-                                  </el-table>
-                                </el-col>
-                              </el-row>
-                            </template>
-                          </el-table-column>
-                          <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-                          <el-table-column prop="task_name" label="Number" width="150px" key="2">
-                            <template slot-scope="scope">
-                              <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
-                            </template>
-                          </el-table-column>
-                          <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4"></el-table-column>
-                          <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
-                          <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
-                            <template slot-scope="scope">
-                              <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
-                            </template>
-                          </el-table-column>
-                          <el-table-column prop="task_group" label="Time Group" align="center" min-width="180px" key="6">
-                            <template slot-scope="scope">
-                              <el-select @change="((val)=>{changeTaskGroup(val, scope.row.task_id, task.task_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
-                                <el-option label=" " value="0"></el-option>
-                                <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
-                              </el-select>
-                            </template>
-                          </el-table-column>
-                          <el-table-column prop="task_effort" label="Effort" align="center" width="100px" key="7"></el-table-column>
-                          <el-table-column prop="task_estimation" label="Est" align="center" width="100px" key="8"></el-table-column>
-                          <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
-                          <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" key="10"></el-table-column>
-                          <el-table-column fixed="right" label="Edit" align="center" width="120">
-                            <template slot-scope="scope">
-                              <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(4, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
-                              <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
-                              </template>
-                          </el-table-column>
-                        </el-table>
-                      </el-col>
-                    </el-row>
-                    <div @click.stop="preventParentEventTrigger">
-                      <el-row class="tl-pagination">
-                        <el-col :span="24" class="tl-pagination-col">
-                          <el-pagination
-                            background
-                            @size-change="((size)=>{handleSizeChange(size, task.task_name, index)})"
-                            @current-change="((page)=>{handleCurrentChange(page, task.task_name, index)})"
-                            :current-page="task.task_page_number"
-                            :page-sizes="[20, 50, 100, 500]"
-                            :page-size="task.task_page_size"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="task.task_total_size">
-                          </el-pagination>
-                        </el-col>
-                      </el-row>
-                    </div>
-                  </div>
-                </el-collapse-item>
-              </el-collapse>
-            </el-col>            
-          </div>
         </el-row>
         <el-row class="tl-pagination">
           <el-col :span="24" class="tl-pagination-col">
@@ -1689,12 +1544,24 @@ export default {
         {value: 'Third',lable: 'Third'},
         {value: 'Fourth',lable: 'Fourth'}
       ],
-      lv2TaskList: [],
       lv2TaskListLoading: false,   
       activeTabArray: [],
+      taskLv2List : [],
+      expandRowArray: [],
+      //Path 
+      showTaskPath : false
     }
   },
   methods: {
+    getSubTaskRowClassName ({row, rowIndex}) {
+      if (row.task_sub_tasks.length === 0) {
+        return 'row-expand-cover'
+      }
+    },
+    rowKey (row) {
+      // console.log(row)
+      return row.task_id
+    },
     changeInput () {
       this.$forceUpdate()
     },
@@ -1824,6 +1691,25 @@ export default {
         reqTaskId: reqTaskId
       }
       this.getTask(url, criteria)
+    },
+    async getTaskLv2 (iTaskName) {
+      console.log("getTaskLv2")
+      console.log(iTaskName)
+      this.$data.showTaskPath = true
+      var reqParentTaskName = iTaskName
+      if (reqParentTaskName === 'N/A') {
+        return
+      }
+      var url = '/tasks/getTasksByParentName'
+      var criteria = {
+        reqParentTaskName: reqParentTaskName
+      }
+      const res = await http.post(url,criteria)
+      console.log(res)
+      this.$data.taskslistData = res.data.data
+       this.ruleShowListColumn(2)
+      //this.getTaskList(url,criteria)
+
     },
     openTaskByName (iTaskName) {
       console.log('openTaskByName')
@@ -3250,11 +3136,6 @@ export default {
     }
   },
   created () {
-    // this.$data.RegularTaskTimeOps = ''
-    // this.$data.week = ''
-    // this.$data.num = ''
-    // this.$data.DailyOps = ''
-    // this.$data.RegularTaskTimeOps = ''
     this.$data.pageSize = 20
     this.$data.currentPage = 1
     this.getTaskList(1, 20)
