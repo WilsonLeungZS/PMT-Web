@@ -53,7 +53,43 @@
                 </el-dropdown-menu>
               </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
-                <el-button :style="{'background-color': btnColor}" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>
+                <el-popover
+                  placement="top-start"
+                  width="250"
+                  trigger="hover"
+                  @show="getEmailGroupsAndSkillType">
+                  <el-row style="margin: 5px;">
+                    <el-col :span="6">Team:</el-col>
+                    <el-col class="nameInfo" :span="18">{{userInfo.user_team}}</el-col>
+                  </el-row>
+                  <el-row style="margin: 5px;">
+                    <el-col :span="8">Skill Type:</el-col>
+                    <el-col :span="16">
+                        <div v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item" class="nameInfo" >{{item}}</div>
+                    </el-col>
+                  </el-row>
+                  <el-row style="margin: 5px;">
+                    <el-col :span="12">My Email Groups:</el-col>
+                    <el-col :span="12">
+                        <div v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item" class="nameInfo" >{{item}}</div>
+                    </el-col>
+                  </el-row>
+                  <!-- <div>
+                    <div>
+                      <span></span>
+                      <span style="text-decoration: underline"></span>                      
+                    </div>
+                    <div>
+                      <span></span>
+                      <span style="text-decoration: underline"></span>
+                    </div>
+                    <div>
+                      <span></span>
+                      <span style="text-decoration: underline"></span>
+                    </div>
+                  </div> -->
+                  <el-button slot="reference" :style="{'background-color': btnColor}" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>    
+                </el-popover>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
                   <el-dropdown-item command="theme">
                     <div class="main-user-info-panel-item"><span>Theme</span><div class="main-user-info-panel-colorbox" :style="{'background': mainColor}"></div></div>
@@ -110,7 +146,12 @@ export default {
       themeData: utils.themeStyle,
       currentRow: null,
       mainColor: utils.themeStyle[this.$store.getters.getThemeStyle].mainColor,
-      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
+      btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
+      userInfo:{
+        user_email_groups: '',
+        user_skill_type: '',
+        user_team: ''
+      },
     }
   },
   methods: {
@@ -123,6 +164,16 @@ export default {
     selectTheme (val) {
       this.$data.currentRow = Number(val.themeValue)
     },
+    async getEmailGroupsAndSkillType () {
+      const res = await http.get('/users/getEmailGroupsAndSkillType', {
+        userEid: this.$store.getters.getUserEid,
+      })
+      if(res.data.status === 0){
+        this.$data.userInfo.user_team = res.data.data.user_team
+        this.$data.userInfo.user_email_groups = res.data.data.user_email_groups
+        this.$data.userInfo.user_skill_type = res.data.data.user_skill_type
+      }
+    } ,
     async submitTheme() {
       const res = await http.get('/users/setUserThemeStyle', {
         userEid: this.$store.getters.getUserEid,
@@ -311,5 +362,9 @@ export default {
 }
 .hide-view {
   visibility: hidden;
+}
+
+.nameInfo {
+  text-decoration: underline ;
 }
 </style>
