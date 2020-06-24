@@ -319,19 +319,10 @@
       <el-row class="tp-main" v-if="!showForLv1AndLv2">
         <el-col :span="24">          
           <div v-for="(task,index) in lv2TaskList" :key="index" :name="index">
-            <el-table :data="task" style="width: 100%">
-              <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-              <el-table-column prop="task_name" label="Number" width="150px" key="2">
-                <template slot-scope="scope">
-                  <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4"></el-table-column>
-              <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
-            </el-table>
-           <!-- <el-table :data="task.task_plan_tasks_list" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
+            ~~{{task}}~~
+            <!-- <el-table :data="task.task_plan_tasks_list" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
               <el-table-column type="expand">
-                <template slot-scope="props">
+               <template slot-scope="props">
                   <el-row>
                     <el-col :span="23" :offset="1">
                       <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
@@ -405,7 +396,6 @@
                   </el-col>
                 </el-row>
               </div> -->
-              
             </div>
           </el-col>
         </el-row>
@@ -1849,7 +1839,7 @@ export default {
           }                  
         }         
       }
-      console.log(this.$data.lv2TaskList.task_plan_tasks_list)
+      console.log(this.$data.lv2TaskList)
     },
     async getLevel2TaskListByParentTask (iTaskId) {
       console.log('Start to get level 2 task list')
