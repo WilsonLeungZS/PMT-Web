@@ -1686,6 +1686,7 @@ export default {
         this.$data.taskLv3WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
+          console.log('Not PMT Task')
           this.$data.lv3TaskItemRule.disableTaskEst = true
           this.$data.lv3TaskItemRule.disableDesc = true
           this.$data.lv3TaskItemRule.disableAssignee = true
@@ -1700,6 +1701,7 @@ export default {
             this.$data.lv3TaskItemRule.showTypeTag = false
             this.$data.lv3TaskItemRule.showDeliverableTag = false
             this.$data.lv3TaskItemRule.showTaskGroup = false
+            this.$data.lv3TaskItemRule.showCreator = false
             this.$nextTick(() => {
               this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // For ref pool, hide "Sub Tasks List" Tab
               this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // For ref pool, hide "Worklog History" tab
@@ -1749,6 +1751,9 @@ export default {
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
         this.$data.lv3TaskItemRule.showCreator = false
+        this.$data.lv3TaskItemRule.showTypeTag = true
+        this.$data.lv3TaskItemRule.showDeliverableTag = true
+        this.$data.lv3TaskItemRule.showTaskGroup = true
         this.$data.taskLv3WorklogShow = false
       }
     },
