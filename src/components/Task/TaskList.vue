@@ -864,7 +864,7 @@
                       <el-radio  :label="2">Every <el-input :disabled="isDailyInputDisable" style="width:50px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> days</el-radio>
                     </el-radio-group>                      
                     <div  v-if="RegularTaskTimeOps===2">
-                      Recur every <el-input style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeWeek" ></el-input> week(s) on:
+                      Recur every <el-input style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeWeek" ></el-input> week(s) on
                         <el-select style="width:23%;height:25px" v-model="week" placeholder="Monday">
                           <el-option
                             v-for="item in weeks"
@@ -1384,7 +1384,7 @@ export default {
       weeks:[
         {value: 'Monday',lable: 'Monday'},
         {value: 'Thuesday',lable: 'Thuesday'},
-        {value: 'Wednessday',lable: 'Wednessday'},
+        {value: 'Wednesday',lable: 'Wednesday'},
         {value: 'Thursday',lable: 'Thursday'},
         {value: 'Friday',lable: 'Friday'},
         {value: 'Saturday',lable: 'Saturday'},
@@ -1646,10 +1646,11 @@ export default {
                 }
               }else if(res1.data.data.task_RegularTaskTime === 'Weekly'){
                 this.$data.RegularTaskTimeOps = 2
-                var index = schedule.split(' ')         
+                var index = schedule.split(' ') 
+                console.log(index)        
                 this.$data.Scheduletime.ScheduletimeWeek = index[2]
-                var index=schedule.lastIndexOf("\:");
-                this.$data.week = schedule.substring(index+1,schedule.length)
+                //var index=schedule.lastIndexOf("\:");
+                this.$data.week = index[5]
               }else{
                 this.$data.RegularTaskTimeOps = 3
                 if(schedule.substring(0,3) === 'Day'){
@@ -2260,7 +2261,7 @@ export default {
         }
         if(reqTask.task_TypeTag === 'Regular Task'){
           if(this.$data.taskLv3Form.task_RegularTaskTime === 'Weekly'&&this.$data.Scheduletime.ScheduletimeWeek!=null&&this.$data.week!=null){
-            this.$data.taskLv3Form.task_scheduletime= "Recur every " +this.$data.Scheduletime.ScheduletimeWeek +" weeks(s) on:"+this.$data.week
+            this.$data.taskLv3Form.task_scheduletime= "Recur every " +this.$data.Scheduletime.ScheduletimeWeek +" weeks(s) on "+this.$data.week
           }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'){
             if(this.$data.MonthlyOps === 1&&this.$data.Scheduletime.ScheduletimeDay!=null&&this.$data.Scheduletime.ScheduletimeMonth1!=null){
               this.$data.taskLv3Form.task_scheduletime = "Day "+this.$data.Scheduletime.ScheduletimeDay+" of every " +this.$data.Scheduletime.ScheduletimeMonth1 +" month(s)"   
