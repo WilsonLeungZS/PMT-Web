@@ -1638,7 +1638,7 @@ export default {
       showForLv1AndLv2 : true,
       selection : {},
       currentTaskGroupId : '',
-      taskGroups = []
+      taskGroups : []
     }
   },
   methods: {
@@ -1669,9 +1669,25 @@ export default {
         this.getTaskList(1, 20)
       }else{
         this.$data.showForLv1AndLv2 = false
-        var today = getDay()
+        var firstDate = this.getNowFormatDate()
+        console.log(firstDate)
+        this.getTaskGroup()
       }
       
+    },
+    getNowFormatDate() {//获取当月时间 yyyy-MM-dd
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = '0' + month;
+        }
+        if (strDate >= 1 && strDate <= 9) {
+            strDate = '0' + strDate ;
+        }
+        var currentdate = year + '-' + month + '-' + strDate 
+        return currentdate;
     },
     async searchTask () {
       this.getTaskList(1, 20)
@@ -1753,7 +1769,6 @@ export default {
       }else{
         console.log("~~~")
         this.$data.showForLv1AndLv2 = false
-        
       }
       this.$data.taskslistLoading = false
     },
@@ -3137,12 +3152,7 @@ export default {
         this.$message.error(res.data.message)
       }
     },
-    getDay (day) {
-      var today = new Date()
-      var targetDayMilliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day
-      today.setTime(targetDayMilliseconds)
-      return this.dateToString(today)
-    },
+    
     // Common Function
     async getActiveUserList () {
       const res = await http.get('/users/getUserList', {

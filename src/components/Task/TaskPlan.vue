@@ -2592,6 +2592,7 @@ export default {
         tGroupId: iGroupId,
         tGroupRelatedTask: iGroupRelatedTask
       })
+      console.log(res)
       if (res.data.status === 0) {
         if (iGroupId === 0) {
           this.$data.taskGroups = []
