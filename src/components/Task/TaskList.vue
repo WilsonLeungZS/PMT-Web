@@ -245,10 +245,14 @@
         <el-row v-if="showTaskPath">
             <el-col :span="24">
               <el-breadcrumb separator-class="el-icon-arrow-right">
-                <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-                <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-                <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+                <el-breadcrumb-item >{{lv1TaskPath}}</el-breadcrumb-item>
+                <el-breadcrumb-item v-if="!showForLv1AndLv2" >{{lv2TaskPath}}</el-breadcrumb-item>
+                <el-breadcrumb-item v-if="!showForLv1AndLv2">
+                  <el-select @change="((val)=>{changeTaskGroup()})" v-model="currentTaskGroupId" style="width: 100%" size="small">
+                    <el-option label=" " value="0"></el-option>
+                    <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                  </el-select>
+                </el-breadcrumb-item>
               </el-breadcrumb>                  
             </el-col>
         </el-row>
@@ -1627,13 +1631,16 @@ export default {
       expandRowArray: [],
       //Path 
       showTaskPath : false,
+      lv1TaskPath : '',
+      lv2TaskPath : '',
       // Tab Item Value
       lv2TaskList: [],
       lv2TaskListLoading: false,
       showForLv1AndLv2 : true,
       selection : {},
       currentTaskGroupId : '',
-      taskGroups : []
+      taskGroups : [],
+      
     }
   },
   methods: {
@@ -1723,6 +1730,7 @@ export default {
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqTaskLevel = Number(this.$data.formFilter.filterTaskLevel)
+      var reqCurrentTimeGroup = []
       this.ruleShowListColumn(reqTaskLevel)
       var sizeCriteria = {
         reqTaskLevel: reqTaskLevel,
@@ -1743,7 +1751,7 @@ export default {
         reqFilterIssueDateStart: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[0] : null,
         reqFilterIssueDateEnd: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[1] : null,
         reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool,
-        reqCurrentTimeGroup : stringify(this.$data.taskGroupArray)
+        reqCurrentTimeGroup : this.$data.taskGroupArray
       }      
       if(reqTaskLevel === 1 || reqTaskLevel ===2){
         this.$data.showForLv1AndLv2 = true
@@ -1776,9 +1784,14 @@ export default {
         } else {
           this.$data.tasksTotalSize = 0
         }
-        console.log(this.$data.taskslistData)        
+        console.log(this.$data.taskslistData)
+        var parentGroup = []
+        for(var i = 0 ; i < this.$data.taskslistData.length-1 ; i ++){
+          if(this.$data.taskslistData[i].iParentTaskName === this.$data.taskslistData[i+1].iParentTaskName) {
+
+          }
+        }
       }
-      
       this.$data.taskslistLoading = false
     },
     handleSizeChange (val) {
@@ -1847,7 +1860,7 @@ export default {
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
           this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
         }
-        console.log(this.$data.taskGroupArray)
+        //console.log(this.$data.taskGroupArray)
         this.getTaskList(1, 20)
       }
     },
@@ -1869,12 +1882,15 @@ export default {
     openTaskById (iTaskId,iTaskLevel) {
       console.log('Click~')
       console.log(iTaskId,iTaskLevel)
+      this.$data.showTaskPath = false
       if(Number(this.$data.formFilter.filterTaskLevel) === 1){
         this.$data.showTaskPath = true
           if(iTaskLevel===1){
+            this.$data.lv1TaskPath = iTaskId
             this.getLevel2TaskListByParentTask(iTaskId)
             this.$data.showForLv1AndLv2 = true
           }else if(iTaskLevel===2){
+            this.$data.lv2TaskPath = iTaskId
             this.ruleShowListColumn(3)
             this.$data.showForLv1AndLv2 = false  
             this.openTaskTab(iTaskId, 1, 20)
