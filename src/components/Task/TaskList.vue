@@ -144,17 +144,12 @@
                   <el-row style="margin: 5px;">
                     <el-col :span="8">Time Group</el-col>
                     <el-col :span="16">
-                      <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
-                        <el-option label="" value=""></el-option>
-                        <el-option
-                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
-                            :key="index"
-                            :label="activeUser.user_eid"
-                            :value="activeUser.user_id">
-                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
-                          </el-option>
-                      </el-select>
+                      <!-- <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
+                        <el-select @change="((val)=>{changeTaskGroup(val, scope.row.task_id, task.task_name, index)})" v-model="formFilter.filterTimeGroup" style="width: 100%" size="small">
+                          <el-option label=" " value="0"></el-option>
+                          <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                        </el-select>
+                      </el-select> -->
                     </el-col>
                   </el-row>
                   <el-row>
@@ -1660,20 +1655,18 @@ export default {
     changeInput () {
       this.$forceUpdate()
     },
-    handleTabChange () {
-
-    },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     filterTask () {
+      this.$data.taskGroupArray = []
       if(Number(this.$data.formFilter.filterTaskLevel) === 1 ||Number(this.$data.formFilter.filterTaskLevel)===2){
         this.getTaskList(1, 20)
       }else{
         this.$data.showForLv1AndLv2 = false
-        var firstDate = this.getNowFormatDate()
-        console.log(firstDate)
-        this.getTaskGroup()
+        //this.getLevel3TaskListByCurrentTimegroup()
+        this.getTaskGroup(0,true)
+        //this.getTaskList(1, 20)
+
       }
-      
     },
     getNowFormatDate() {//获取当月时间 yyyy-MM-dd
         var date = new Date();
@@ -1749,7 +1742,8 @@ export default {
         reqFilterStatus: this.$data.formFilter.filterStatus,
         reqFilterIssueDateStart: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[0] : null,
         reqFilterIssueDateEnd: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[1] : null,
-        reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool
+        reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool,
+        reqCurrentTimeGroup : stringify(this.$data.taskGroupArray)
       }      
       if(reqTaskLevel === 1 || reqTaskLevel ===2){
         this.$data.showForLv1AndLv2 = true
@@ -1769,7 +1763,22 @@ export default {
       }else{
         console.log("~~~")
         this.$data.showForLv1AndLv2 = false
+        const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
+        console.log(res1)
+        if (res1.data.status === 0) {
+          this.$data.tasksTotalSize = res1.data.data.task_list_total_size
+          const res2 = await http.get('/tasks/getTaskList', listCriteria)
+          if (res2.data.status === 0) {
+            this.$data.taskslistData = res2.data.data
+          } else {
+            this.$data.taskslistData = []
+          }
+        } else {
+          this.$data.tasksTotalSize = 0
+        }
+        console.log(this.$data.taskslistData)        
       }
+      
       this.$data.taskslistLoading = false
     },
     handleSizeChange (val) {
@@ -1809,10 +1818,15 @@ export default {
         this.$data.taskListRule.showColRef = false
       }
     },
-    async getTaskGroup (iGroupId, iGroupRelatedTask) {
+    async getTaskGroup (iGroupId,isShowCurrent) {
+      var today = this.getNowFormatDate()
+      console.log(today)
+      console.log(iGroupId,isShowCurrent)
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
-        tGroupRelatedTask: iGroupRelatedTask
+        //tGroupRelatedTask: iGroupRelatedTask,
+        tToday : today,
+        isShowCurrent : isShowCurrent
       })
       if (res.data.status === 0) {
         if (iGroupId === 0) {
@@ -1833,6 +1847,8 @@ export default {
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
           this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
         }
+        console.log(this.$data.taskGroupArray)
+        this.getTaskList(1, 20)
       }
     },
     async changeTaskGroup (iNewGroupId, iTaskId, iParentTaskName, iParentTaskIndex) {
