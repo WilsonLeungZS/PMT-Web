@@ -55,7 +55,7 @@
               <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
                 <el-popover
                   placement="top-start"
-                  width="250"
+                  width="190"
                   trigger="hover"
                   @show="getEmailGroupsAndSkillType">
                   <el-row style="margin: 5px;">
@@ -63,14 +63,14 @@
                     <el-col class="nameInfo" :span="18">{{userInfo.user_team}}</el-col>
                   </el-row>
                   <el-row style="margin: 5px;">
-                    <el-col :span="8">Skill Type:</el-col>
-                    <el-col :span="16">
+                    <el-col :span="9">Skill Type:</el-col>
+                    <el-col :span="14" :offset="1">
                         <div v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item" class="nameInfo" >{{item}}</div>
                     </el-col>
                   </el-row>
                   <el-row style="margin: 5px;">
-                    <el-col :span="12">My Email Groups:</el-col>
-                    <el-col :span="12">
+                    <el-col :span="8">My Email Groups:</el-col>
+                    <el-col :span="14" :offset="2">
                         <div v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item" class="nameInfo" >{{item}}</div>
                     </el-col>
                   </el-row>
