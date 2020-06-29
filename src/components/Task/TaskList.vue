@@ -1784,10 +1784,6 @@ export default {
           this.$data.tasksTotalSize = 0
         }
         console.log(this.$data.taskslistData)
-        for(var i = 0 ; i <this.$data.taskslistData.length;i++ ){
-          console.log(this.$data.taskslistData[i][0])
-          this.$refs.multipleTable.setCurrentRow(this.$data.taskslistData[i][0],true)
-        }
         this.$data.lv2TaskList = this.$data.taskslistData
       }
       this.$data.taskslistLoading = false
@@ -1945,10 +1941,6 @@ export default {
           }                      
       }
       this.$data.lv2TaskList.push(res2.data.data)
-        for(var i = 0 ; i <this.$data.taskslistData.length;i++ ){
-          console.log(this.$data.taskslistData[i][0])
-          this.$refs.multipleTable.setCurrentRow(this.$data.taskslistData[i][0],true)
-        }
     },
     async getLevel2TaskListByParentTask (iTaskId) {
       console.log('Start to get level 2 task list')
