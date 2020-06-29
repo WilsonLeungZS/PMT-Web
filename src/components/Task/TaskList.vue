@@ -1237,7 +1237,6 @@ export default {
       taskLv2FormProgressStatus: 'success',
       taskLv2FormSubTasks: [],
       taskLv2FormRegularTasks: [],
-      taskLv2FormRegularTasks: [],
       taskLv2SaveBtnDisabled: false,
       // Level 3 Task Dialog Value
       taskLv3DialogVisible: false,
