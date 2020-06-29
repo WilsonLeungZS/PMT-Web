@@ -647,7 +647,7 @@
             <el-row>
               <el-col :span="11" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select disabled @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%">
+                  <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%" :disabled = "lv3TaskItemRule.disableTypeTag">
                     <el-option
                       v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
@@ -1570,9 +1570,15 @@ export default {
       }else{
         this.$data.lv3TaskItemRule.showDeliverableTag = true
         this.$data.lv4TaskItemRule.showDeliverableTag = true
+        this.$data.lv3TaskItemRule.showActualComplete = true
+        this.$data.lv3TaskItemRule.showProgress = true
+        this.$data.lv3TaskItemRule.showEffort = true
         // this.$data.taskLv3WorklogDisabled = false
         // this.$data.taskLv4WorklogDisabled = false
         this.$data.taskLv3WorklogShow = true
+        this.$data.lv4TaskItemRule.showEffort = true
+        this.$data.lv4TaskItemRule.showProgress = true
+        this.$data.lv4TaskItemRule.showActualComplete = true
         this.$data.taskLv4WorklogShow = true
         this.$data.RegularTaskTimeVisible = false  
       }
@@ -2313,6 +2319,7 @@ export default {
             this.isFieldEmpty(reqTask.task_RegularTaskTime, 'Recurrence pattern could not be empty!')||
             this.isFieldEmpty(reqTask.task_scheduletime, 'Scheduletime could not be empty!')||
             this.isFieldEmpty(reqTask.task_startTime, 'Range of recurrence could not be empty!')){
+              this.$data.lv3TaskItemRule.showRegularTaskList = false
               return
             }
         }
@@ -2328,7 +2335,9 @@ export default {
             this.$data.lv3TaskItemRule.showActualComplete = false
             this.$data.taskLv3WorklogShow = false
           }else{
+            this.$data.lv3TaskItemRule.showActualComplete = true
             this.$data.taskLv3WorklogShow = true
+            this.$data.lv3TaskItemRule.showEffort = true
             console.log("reqTask.task_TypeTag != 'Regular Task'")
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
@@ -2392,13 +2401,7 @@ export default {
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         this.$data.taskLv3WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
         this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
-        if(this.$data.taskLv3Form.task_TypeTag ==='Regular Task'){
-          this.$data.taskLv3WorklogShow = false
-          this.$data.lv3TaskItemRule.showProgress = false
-          this.$data.lv3TaskItemRule.showEffort = false
-          this.$data.lv3TaskItemRule.showActualComplete = false
-          this.$data.lv3TaskItemRule.disableTypeTag = true
-        }        
+                
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
           console.log('Not PMT Task')
@@ -2435,6 +2438,15 @@ export default {
           this.$data.lv3TaskItemRule.showTypeTag = true
           this.$data.lv3TaskItemRule.showDeliverableTag = true
           this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
+        }
+        this.$data.lv3TaskItemRule.disableTypeTag = true
+        if(this.$data.taskLv3Form.task_TypeTag ==='Regular Task'){
+          this.$data.taskLv3WorklogShow = false
+          this.$data.lv3TaskItemRule.showProgress = false
+          this.$data.lv3TaskItemRule.showEffort = false
+          this.$data.lv3TaskItemRule.showActualComplete = false
+          this.$data.lv3TaskItemRule.disableTypeTag = true
+          this.$data.lv3TaskItemRule.showDeliverableTag = false
         }
       }
       if (iAction === 'Create') {
@@ -2511,9 +2523,10 @@ export default {
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if(reqTask.task_TypeTag !== 'Regular Task') {
             this.$data.taskLv3WorklogShow = true
-            this.$data.lv3TaskItemRule.showActualComplete = false
-            this.$data.lv3TaskItemRule.showProgress = false
-            this.$data.lv3TaskItemRule.showEffort = false
+            //george
+            //this.$data.lv3TaskItemRule.showActualComplete = false
+            //this.$data.lv3TaskItemRule.showProgress = false
+            //this.$data.lv3TaskItemRule.showEffort = false
           //if (reqTask.task_TypeTag !== 'Public Task') {
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
