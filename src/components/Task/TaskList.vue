@@ -408,7 +408,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv2Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
+              <el-input type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
             </el-form-item>
             <el-row v-if="lv2TaskItemRule.showCreator">
               <el-col :span="11">
@@ -558,7 +558,7 @@
             </el-row>
           </el-tab-pane>
           <!-- Regular Task List -->
-          <el-tab-pane label="Regular Tasks List" name="tab_regular_list">
+          <el-tab-pane label="Regular Tasks List"  name="tab_regular_list">
             <el-row>
               <el-col :span="24">
                 <el-button @click="createRegularTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Regular Task</el-button>
@@ -647,7 +647,7 @@
             <el-row>
               <el-col :span="11" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%">
+                  <el-select disabled @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%">
                     <el-option
                       v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
@@ -682,7 +682,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
+              <el-input type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>
             <el-row v-if="lv3TaskItemRule.showCreator">
               <el-col :span="11">
@@ -716,7 +716,7 @@
                   <el-date-picker v-model="taskLv3Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :offset="1">
+              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showActualComplete">
                 <el-form-item label="Actual Complete">
                   <el-date-picker v-model="taskLv3Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
@@ -767,7 +767,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="11">
+              <el-col :span="11" v-if="lv3TaskItemRule.showEffort">
                 <el-form-item label="Effort">
                   <el-col :span="21">
                     <el-input v-model="taskLv3Form.task_effort" disabled></el-input>
@@ -864,7 +864,7 @@
                       <el-radio  :label="2">Every <el-input :disabled="isDailyInputDisable" style="width:50px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> days</el-radio>
                     </el-radio-group>                      
                     <div  v-if="RegularTaskTimeOps===2">
-                      Recur every <el-input style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeWeek" ></el-input> week(s) on:
+                      Recur every <el-input style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeWeek" ></el-input> week(s) on
                         <el-select style="width:23%;height:25px" v-model="week" placeholder="Monday">
                           <el-option
                             v-for="item in weeks"
@@ -876,7 +876,7 @@
                     </div>
                     <div  v-if="RegularTaskTimeOps===3">
                       <el-radio-group  @change="changeMonthly" v-model="MonthlyOps" >
-                        <el-radio style="padding-bottom:20px" :label="1">Day <el-input :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> of every <el-input :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth1" ></el-input> month(s)</el-radio><br>
+                        <el-radio style="padding-bottom:20px" :label="1">Day <el-input @input="changeInput()" :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> of every <el-input :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth1" ></el-input> month(s)</el-radio><br>
                         <el-radio  :label="2">The                         
                           <el-select :disabled="ScheduletimeMonth2Disable" v-model="num" style="width:17%;height:20px" placeholder="Frist"><el-option v-for="item in nums" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select> 
                           of <el-select :disabled="ScheduletimeMonth2Disable" v-model="week" style="width:23%;height:25px" placeholder="Monday"><el-option v-for="item in weeks" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select>
@@ -1021,7 +1021,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
+              <el-input type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
             <el-row v-if="lv4TaskItemRule.showCreator">
               <el-col :span="11">
@@ -1055,7 +1055,7 @@
                   <el-date-picker v-model="taskLv4Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :offset="1">
+              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showActualComplete">
                 <el-form-item label="Actual Complete">
                   <el-date-picker v-model="taskLv4Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
@@ -1092,7 +1092,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="11">
+              <el-col :span="11" v-if="lv4TaskItemRule.showEffort">
                 <el-form-item label="Effort">
                   <el-col :span="21">
                     <el-input v-model="taskLv4Form.task_effort" disabled></el-input>
@@ -1296,6 +1296,7 @@ export default {
         disableTaskEst: false,
         disableDesc: false,
         disableStatus: false,
+        disableTypeTag: false,
         showProgress: true,
         showRefPoolInput: true,
         showRespLeader: true,
@@ -1304,7 +1305,9 @@ export default {
         showDeliverableTag: true,
         showCreator: true,
         showRegularTaskList: false,
-        showSubTaskList : false
+        showSubTaskList : false,
+        showActualComplete : true,
+        showEffort : true
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1318,9 +1321,12 @@ export default {
       lv4TaskItemRule: {
         disableParentNameInput: true,
         disableTaskEst: false,
+        disableTypeTag: false,
         showProgress: true,
         showCreator: true,
-        showDeliverableTag:true
+        showDeliverableTag:true,
+        showActualComplete : true,
+        showEffort : true
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1383,7 +1389,7 @@ export default {
       weeks:[
         {value: 'Monday',lable: 'Monday'},
         {value: 'Thuesday',lable: 'Thuesday'},
-        {value: 'Wednessday',lable: 'Wednessday'},
+        {value: 'Wednesday',lable: 'Wednesday'},
         {value: 'Thursday',lable: 'Thursday'},
         {value: 'Friday',lable: 'Friday'},
         {value: 'Saturday',lable: 'Saturday'},
@@ -1400,6 +1406,9 @@ export default {
     }
   },
   methods: {
+    changeInput () {
+      this.$forceUpdate()
+    },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     filterTask () {
       this.getTaskList(1, 20)
@@ -1424,6 +1433,7 @@ export default {
       }   
     },
     changeMonthly () {
+      console.log("~~~~")
       this.$data.Scheduletime = {}
       this.$data.num = ''      
       this.$data.week = ''
@@ -1524,6 +1534,7 @@ export default {
       this.getTask(url, criteria)
     },
     openTaskByName (iTaskName) {
+      console.log('openTaskByName')
       var reqTaskName = iTaskName
       if (reqTaskName === 'N/A') {
         return
@@ -1537,27 +1548,38 @@ export default {
     TypeTagChange () {
       if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task' || this.$data.taskLv4Form.task_TypeTag === 'Regular Task' ){
         this.$data.lv3TaskItemRule.showDeliverableTag = false
+        this.$data.lv3TaskItemRule.showActualComplete = false
+        this.$data.lv3TaskItemRule.showProgress = false
+        this.$data.lv3TaskItemRule.showEffort = false
+        this.$data.lv4TaskItemRule.showProgress = false
+        this.$data.lv4TaskItemRule.showEffort = false
         this.$data.lv4TaskItemRule.showDeliverableTag = false
+        this.$data.lv4TaskItemRule.showActualComplete = false
         this.$data.RegularTaskTimeVisible = true
         if(this.$data.taskLv3Form.task_status === 'Running' || this.$data.taskLv3Form.task_status === 'Done'){
-          this.$data.taskLv3WorklogDisabled = true
+          // this.$data.taskLv3WorklogDisabled = true
+          this.$data.taskLv3WorklogShow = false
         }else if(this.$data.taskLv4Form.task_status === 'Running' || this.$data.taskLv4Form.task_status === 'Done'){
-          this.$data.taskLv4WorklogDisabled = true
+          // this.$data.taskLv4WorklogDisabled = true
+          this.$data.taskLv4WorklogShow = false
+        }else if(this.$data.taskLv3Form.task_status === 'Drafting' || this.$data.taskLv4Form.task_status === 'Drafting'){
+          this.$data.taskLv3Form.task_status = 'Planning'
+          this.$data.taskLv4Form.task_status = 'Planning'
         }
       }else{
         this.$data.lv3TaskItemRule.showDeliverableTag = true
         this.$data.lv4TaskItemRule.showDeliverableTag = true
-        this.$data.taskLv3WorklogDisabled = false
-        this.$data.taskLv4WorklogDisabled = false
+        // this.$data.taskLv3WorklogDisabled = false
+        // this.$data.taskLv4WorklogDisabled = false
+        this.$data.taskLv3WorklogShow = true
+        this.$data.taskLv4WorklogShow = true
         this.$data.RegularTaskTimeVisible = false  
       }
     },
      async getTask (iUrl, iCriteria) {
       const res = await http.post(iUrl, iCriteria)
-      this.$data.Scheduletime = {}
-      this.$data.RegularTaskTimeOps = ''
-      this.$data.week = ''
-      this.$data.num = ''
+      console.log(res)
+      //this.$data.Scheduletime = {}
       if (res.data.status === 0) {
         var rtnTask = res.data.data
         if (rtnTask.task_level === 1) {
@@ -1610,14 +1632,17 @@ export default {
           }
           this.$data.lv3TaskItemRule.showSubTaskList = true
           if(res.data.data.task_TypeTag === 'Regular Task'){
+            this.$data.lv3TaskItemRule.showActualComplete = false
             this.$data.lv3TaskItemRule.showRegularTaskList = true
-            this.$data.taskLv3Form.task_status = 'Planning'
+            this.$data.lv3TaskItemRule.disableTypeTag = true
+            this.$data.taskLv3WorklogShow = false
+            this.$data.lv3TaskItemRule.showProgress = false
+            this.$data.lv3TaskItemRule.showEffort = false
             const res1 = await http.post('/schedules/getSchedulesByTaskName',{
               reqTaskName : rtnTask.task_name
             })
+            console.log(res1)
             if(res1.data.status === 0 ){
-              this.$data.DailyOps = ''
-              this.$data.RegularTaskTimeOps = ''
               this.$data.taskLv3Form.rangeRecurrence = []
               this.$data.taskLv3Form.rangeRecurrence.push(res1.data.data.task_startTime)
               this.$data.taskLv3Form.rangeRecurrence.push(res1.data.data.task_endTime)
@@ -1636,10 +1661,11 @@ export default {
                 }
               }else if(res1.data.data.task_RegularTaskTime === 'Weekly'){
                 this.$data.RegularTaskTimeOps = 2
-                var index = schedule.split(' ')         
+                var index = schedule.split(' ') 
+                console.log(index)        
                 this.$data.Scheduletime.ScheduletimeWeek = index[2]
-                var index=schedule.lastIndexOf("\:");
-                this.$data.week = schedule.substring(index+1,schedule.length)
+                //var index=schedule.lastIndexOf("\:");
+                this.$data.week = index[5]
               }else{
                 this.$data.RegularTaskTimeOps = 3
                 if(schedule.substring(0,3) === 'Day'){
@@ -1663,6 +1689,13 @@ export default {
               this.$data.taskLv3Form.task_startTime = res1.data.data.task_startTime
               this.$data.taskLv3Form.task_endTime = res1.data.data.task_endTime
               this.getRegularTaskList(rtnTask.task_name,'taskLv3FormRegularTasks', 3)               
+            }else{
+              this.$data.Scheduletime = {}
+              this.$data.RegularTaskTimeOps = ''
+              this.$data.week = ''
+              this.$data.num = ''
+              this.$data.DailyOps = ''
+              this.$data.RegularTaskTimeOps = ''
             }      
           }else{
             this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)  
@@ -1674,7 +1707,7 @@ export default {
         if (rtnTask.task_level === 4) {
           // Clear existing data
           this.getActiveUserList()
-          this.getTaskStatus(rtnTask.task_status)
+          this.getTaskStatus(this.$data.taskLv3Form.task_status)
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
           this.changeParentName('taskLv4Form')
@@ -1689,7 +1722,10 @@ export default {
             this.$data.taskLv4FormProgressStatus = 'exception'
           }
           if(res.data.data.task_TypeTag === 'Regular Task'){
-            this.$data.taskLv4Form.task_status = 'Planning'
+            this.$data.taskLv4Form.task_status = this.$data.taskLv3Form.task_status
+            this.$data.lv4TaskItemRule.showActualComplete = false
+            this.$data.lv4TaskItemRule.showProgress = false
+            this.$data.lv4TaskItemRule.showEffort = false
             const res1 = await http.post('/schedules/getSchedulesByTaskName',{
               reqTaskName : rtnTask.task_name
             })
@@ -1709,7 +1745,6 @@ export default {
               this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime  
               this.$data.taskLv4Form.task_endTime = res1.data.data.task_endTime             
             }  
-          }else{
             this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
           }
           this.ruleControlLv4TaskItem('Edit', null)
@@ -1752,6 +1787,9 @@ export default {
       if (this[iSubTaskListItem].length > 0) {
         if (iLevel === 3) {
           console.log('Sub task > 0')
+          for(var i = 0 ; i < this[iSubTaskListItem].length ; i++){
+            this[iSubTaskListItem][i].task_status = this.$data.taskLv3Form.task_status
+          }
           this.$data.taskLv3WorklogShow = false
           this.$data.lv3TaskItemRule.disableTaskEst = true
         }
@@ -1773,19 +1811,29 @@ export default {
     },
     async changeParentName (iObj) {
       console.log('changeParentName')
+      console.log(this[iObj].task_parent_name)
       const res  = await http.post('/tasks/getTaskByName',{
         reqTaskName : this[iObj].task_parent_name
       })
+      console.log(res)
       if(res.data.status ===0 && res.data.data != null ){
         this[iObj].task_TypeTag = res.data.data.task_TypeTag
       }
       if(this[iObj].task_TypeTag === 'Regular Task' ){
+        this.$data.lv3TaskItemRule.showActualComplete = false
         this.$data.lv3TaskItemRule.showDeliverableTag = false
+        this.$data.lv3TaskItemRule.disableTypeTag = true
+        this.$data.lv3TaskItemRule.showProgress = false
+        this.$data.lv3TaskItemRule.showEffort = false
+        this.$data.lv4TaskItemRule.showProgress = false
+        this.$data.lv4TaskItemRule.showEffort = false
+        this.$data.lv4TaskItemRule.showActualComplete = false
         this.$data.lv4TaskItemRule.showDeliverableTag = false
         this.$data.RegularTaskTimeVisible = true
         const res1 = await http.post('/schedules/getSchedulesByTaskName',{
            reqTaskName :res.data.data.task_name
         })
+        console.log(res1.data.data)
         if(res1.data.status === 0){
           this.$data.taskLv4Form.task_scheduletime = res1.data.data.task_scheduletime
           this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime    
@@ -1855,11 +1903,11 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
-        this.$data.DailyOps = ''
-        this.$data.MonthlyOps = ''
-        this.$data.Scheduletime = {}
-        this.$data.week = ''
-        this.$data.num =''
+        // this.$data.DailyOps = ''
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
         this.$data.lv3TaskItemRule.showDeliverableTag = true
         this.$data.taskTypeArrayForLv2Task = []
         this.$data.RegularTaskTimeVisible = false
@@ -1879,11 +1927,11 @@ export default {
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
         this.changeParentName('taskLv4Form')
-        this.$data.DailyOps = ''
-        this.$data.MonthlyOps = ''
-        this.$data.Scheduletime = {}
-        this.$data.week = ''
-        this.$data.num =''
+        // this.$data.DailyOps = ''
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
         this.$data.lv4TaskItemRule.showDeliverableTag = true
         this.$data.taskTypeArrayForLv2Task = []
         this.$data.RegularTaskTimeVisible = false
@@ -1894,7 +1942,6 @@ export default {
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv4Form.task_progress_nosymbol = 0
         // Show or hide column
-
         this.ruleControlLv4TaskItem('Create', true)
         this.$data.taskLv4DialogVisible = true
       }
@@ -1950,7 +1997,8 @@ export default {
         this.$data.taskLv4Form = {}
         // Set dialog value
         this.getActiveUserList()
-        this.getTaskStatus('Drafting')
+        this.getTaskStatus('Planning')
+        console.log(this[iParentObj].task_name)
         // Set data default value
         const res  = await http.post('/tasks/getTaskByName',{
           reqTaskName : this[iParentObj].task_name
@@ -1958,7 +2006,7 @@ export default {
         if(res.data.status ===0 && res.data.data != null ){
           this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
         }
-        this.$data.taskLv4Form.task_status = 'Drafting'
+        this.$data.taskLv4Form.task_status = res.data.data.task_status
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
@@ -1982,15 +2030,15 @@ export default {
         this.$data.taskLv3Form = {}
         // Set dialog value
         this.getActiveUserList()
-        this.getTaskStatus('Drafting')
+        this.getTaskStatus('Planning')
         // Set data default value
-        this.$data.taskLv3Form.task_status = 'Drafting'
+        this.$data.taskLv3Form.task_status = 'Planning'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv3Form.task_level = 3
-        this.$data.MonthlyOps = ''
-        this.$data.Scheduletime = {}
-        this.$data.week = ''
-        this.$data.num =''
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
         this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv3Form.task_progress_nosymbol = 0
         this.$data.taskLv3Form.task_TypeTag = 'Regular Task'
@@ -2007,19 +2055,20 @@ export default {
       }
       if (Number(iSubTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
+        console.log(this[iParentObj])
         console.log("Number(iSubTaskLevel) === 4")
         // Set dialog value
         this.getActiveUserList()
-        this.getTaskStatus('Drafting')
+        this.getTaskStatus(this[iParentObj].task_status)
         // Set data default value
-        this.$data.taskLv4Form.task_status = 'Drafting'
+        this.$data.taskLv4Form.task_status = this[iParentObj].task_status
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
-        this.$data.DailyOps = ''
-        this.$data.MonthlyOps = ''
-        this.$data.Scheduletime = {}
-        this.$data.week = ''
-        this.$data.num =''
+        // this.$data.DailyOps = ''
+        // this.$data.MonthlyOps = ''
+        // this.$data.Scheduletime = {}
+        // this.$data.week = ''
+        // this.$data.num =''
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv4Form.task_progress_nosymbol = 0
         this.$data.taskLv4Form.task_TypeTag = 'Regular Task'
@@ -2169,6 +2218,7 @@ export default {
       }
     },
     ruleControlLv2TaskItem (iAction, iNeedInputParent) {
+      console.log(iAction)
       if (iAction === 'Edit') {
         // Set Dialog Default Value
         this.$data.taskLv2DialogTitle = '2 - Business Implementation'
@@ -2182,6 +2232,7 @@ export default {
         this.$data.lv2TaskItemRule.showCreator = true
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
+          this.$refs.taskLv2Tabs.$children[0].$refs.tabs[3].style.display = '' // Show "Sub Tasks List" Tab
         })
       }
       if (iAction === 'Create') {
@@ -2200,6 +2251,7 @@ export default {
         this.$data.lv2TaskItemRule.showCreator = false
         this.$nextTick(() => {
           this.$refs.taskLv2Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+          this.$refs.taskLv2Tabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Sub Tasks List" Tab
         })
       }
     },
@@ -2218,28 +2270,6 @@ export default {
     async saveLv3Task () {
       console.log("debug")
       console.log(this.$data.taskLv3Form)
-      if(this.$data.taskLv3Form.task_RegularTaskTime === 'Weekly'&&this.$data.Scheduletime.ScheduletimeWeek!=null&&this.$data.week!=null){
-        this.$data.taskLv3Form.task_scheduletime= "Recur every " +this.$data.Scheduletime.ScheduletimeWeek +" weeks(s) on:"+this.$data.week
-      }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'){
-        if(this.$data.MonthlyOps === 1&&this.$data.Scheduletime.ScheduletimeDay!=null&&this.$data.Scheduletime.ScheduletimeMonth1!=null){
-          this.$data.taskLv3Form.task_scheduletime = "Day "+this.$data.Scheduletime.ScheduletimeDay+" of every " +this.$data.Scheduletime.ScheduletimeMonth1 +" month(s)"   
-        }else if(this.$data.MonthlyOps === 2&&this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'&&this.$data.MonthlyOps === 2&&this.$data.num!=null&&this.$data.Scheduletime.ScheduletimeMonth2!=null&&this.$data.week!=null){
-          this.$data.taskLv3Form.task_scheduletime = "The " +this.$data.num+" "+this.$data.week+" of every "+this.$data.Scheduletime.ScheduletimeMonth2 +" month(s)"}
-      }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Daily'){
-          if(this.$data.DailyOps === 1){
-          this.$data.taskLv3Form.task_scheduletime = "Every Weekday"
-          this.$data.taskLv4Form.task_scheduletime = "Every Weekday"
-        }else{
-          if(this.$data.Scheduletime.ScheduletimeDay!=null){ 
-            this.$data.taskLv3Form.task_scheduletime = "Every "+this.$data.Scheduletime.ScheduletimeDay +" days"
-            this.$data.taskLv4Form.task_scheduletime = "Every "+this.$data.Scheduletime.ScheduletimeDay +" days"           
-          }
-        }
-      }
-      if( this.$data.taskLv3Form.rangeRecurrence!=null){
-        this.$data.taskLv3Form.task_startTime = this.$data.taskLv3Form.rangeRecurrence[0]
-        this.$data.taskLv3Form.task_endTime = this.$data.taskLv3Form.rangeRecurrence[1]      
-      }
       var reqTask = this.$data.taskLv3Form 
       if(this.$data.taskLv3Form.task_deliverableTag!=null&&typeof(this.$data.taskLv3Form.task_deliverableTag)==='object'){
           reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
@@ -2255,6 +2285,28 @@ export default {
           return
         }
         if(reqTask.task_TypeTag === 'Regular Task'){
+          if(this.$data.taskLv3Form.task_RegularTaskTime === 'Weekly'&&this.$data.Scheduletime.ScheduletimeWeek!=null&&this.$data.week!=null){
+            this.$data.taskLv3Form.task_scheduletime= "Recur every " +this.$data.Scheduletime.ScheduletimeWeek +" weeks(s) on "+this.$data.week
+          }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'){
+            if(this.$data.MonthlyOps === 1&&this.$data.Scheduletime.ScheduletimeDay!=null&&this.$data.Scheduletime.ScheduletimeMonth1!=null){
+              this.$data.taskLv3Form.task_scheduletime = "Day "+this.$data.Scheduletime.ScheduletimeDay+" of every " +this.$data.Scheduletime.ScheduletimeMonth1 +" month(s)"   
+            }else if(this.$data.MonthlyOps === 2&&this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'&&this.$data.MonthlyOps === 2&&this.$data.num!=null&&this.$data.Scheduletime.ScheduletimeMonth2!=null&&this.$data.week!=null){
+              this.$data.taskLv3Form.task_scheduletime = "The " +this.$data.num+" "+this.$data.week+" of every "+this.$data.Scheduletime.ScheduletimeMonth2 +" month(s)"}
+          }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Daily'){
+              if(this.$data.DailyOps === 1){
+              this.$data.taskLv3Form.task_scheduletime = "Every Weekday"
+              this.$data.taskLv4Form.task_scheduletime = "Every Weekday"
+            }else{
+              if(this.$data.Scheduletime.ScheduletimeDay!=null){ 
+                this.$data.taskLv3Form.task_scheduletime = "Every "+this.$data.Scheduletime.ScheduletimeDay +" days"
+                this.$data.taskLv4Form.task_scheduletime = "Every "+this.$data.Scheduletime.ScheduletimeDay +" days"           
+              }
+            }
+          }
+          if( this.$data.taskLv3Form.rangeRecurrence!=null){
+            this.$data.taskLv3Form.task_startTime = this.$data.taskLv3Form.rangeRecurrence[0]
+            this.$data.taskLv3Form.task_endTime = this.$data.taskLv3Form.rangeRecurrence[1]      
+          }
           this.$data.lv3TaskItemRule.showRegularTaskList = true
           if( 
             this.isFieldEmpty(reqTask.task_RegularTaskTime, 'Recurrence pattern could not be empty!')||
@@ -2269,16 +2321,20 @@ export default {
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if(reqTask.task_TypeTag === 'Regular Task'){
+            console.log("reqTask.task_TypeTag === 'Regular Task'")
+            this.$data.lv3TaskItemRule.showProgress = false
+            this.$data.lv3TaskItemRule.showEffort = false
+            this.$data.lv3TaskItemRule.showActualComplete = false
+            this.$data.taskLv3WorklogShow = false
+          }else{
             this.$data.taskLv3WorklogShow = true
-          }
-          if(reqTask.task_TypeTag !== 'Regular Task') {
-          //if (reqTask.task_TypeTag !== 'Public Task') {
+            console.log("reqTask.task_TypeTag != 'Regular Task'")
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
             }
             if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
               return
-            }
+            }            
           }
         }
         if (reqTask.task_status === 'Done') {
@@ -2300,7 +2356,7 @@ export default {
             reqRegularTaskTime : reqTask.task_RegularTaskTime,
             reqStartTime : reqTask.task_startTime,
             reqEndTime : reqTask.task_endTime,
-            reqTaskId : res.data.data.TaskName,
+            reqTaskName : res.data.data.TaskName,
             reqSchedule : reqTask.task_scheduletime,
           })      
         }
@@ -2329,16 +2385,22 @@ export default {
         this.$data.lv3TaskItemRule.showProgress = true
         this.$data.lv3TaskItemRule.showCreator = true
         // Default value
-        this.$data.taskLv3WorklogShow = true
         this.$data.lv3TaskItemRule.disableTaskEst = false
         // Common Rule for estimation and worklog button
-        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         // Common Rule 1
-        this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
-        // Common Rule 2
+        var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
         this.$data.taskLv3WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
+        this.$data.lv3TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
+        if(this.$data.taskLv3Form.task_TypeTag ==='Regular Task'){
+          this.$data.taskLv3WorklogShow = false
+          this.$data.lv3TaskItemRule.showProgress = false
+          this.$data.lv3TaskItemRule.showEffort = false
+          this.$data.lv3TaskItemRule.showActualComplete = false
+          this.$data.lv3TaskItemRule.disableTypeTag = true
+        }        
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
+          console.log('Not PMT Task')
           this.$data.lv3TaskItemRule.disableTaskEst = true
           this.$data.lv3TaskItemRule.disableDesc = true
           this.$data.lv3TaskItemRule.disableStatus = true
@@ -2370,6 +2432,7 @@ export default {
           this.$data.lv3TaskItemRule.showRespLeader = true
           this.$data.lv3TaskItemRule.showSubTaskEst = true
           this.$data.lv3TaskItemRule.showTypeTag = true
+          this.$data.lv3TaskItemRule.showDeliverableTag = true
           this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
         }
       }
@@ -2386,6 +2449,12 @@ export default {
         } else {
           this.$data.lv3TaskItemRule.disableParentNameInput = true
         }
+        this.$data.RegularTaskTimeOps = ''
+        this.$data.DailyOps = ''
+        this.$data.MonthlyOps = ''
+        this.$data.Scheduletime = {}
+        this.$data.week = ''
+        this.$data.num =''               
         this.$data.lv3TaskItemRule.disableTaskEst = false
         this.$data.lv3TaskItemRule.disableDesc = false
         this.$data.lv3TaskItemRule.disableStatus = false
@@ -2393,6 +2462,8 @@ export default {
         this.$data.lv3TaskItemRule.showRespLeader = true
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
+        this.$data.lv3TaskItemRule.showTypeTag = true
+        this.$data.lv3TaskItemRule.showDeliverableTag = true
         this.$data.taskLv3WorklogShow = false
         this.$data.lv3TaskItemRule.showCreator = false
         this.$data.lv3TaskItemRule.showRegularTaskList = false
@@ -2403,11 +2474,11 @@ export default {
       console.log('Close lv 3 dialog')
       this.$data.taskLv3DialogVisible = false
       this.$data.taskLv3Form = {}
-      this.$data.DailyOps = ''
-      this.$data.MonthlyOps = ''
-      this.$data.Scheduletime = {}
-      this.$data.week = ''
-      this.$data.num =''
+      // this.$data.DailyOps = ''
+      // this.$data.MonthlyOps = ''
+      //this.$data.Scheduletime = {}
+      // this.$data.week = ''
+      // this.$data.num =''
       this.$data.taskLv3Form.task_progress_nosymbol = 0
       this.$data.taskLv3FormSubTasks = []
       this.$data.taskLv3FormRegularTasks = []
@@ -2428,7 +2499,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
+            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')||
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
@@ -2438,6 +2509,10 @@ export default {
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if(reqTask.task_TypeTag !== 'Regular Task') {
+            this.$data.taskLv3WorklogShow = true
+            this.$data.lv3TaskItemRule.showActualComplete = false
+            this.$data.lv3TaskItemRule.showProgress = false
+            this.$data.lv3TaskItemRule.showEffort = false
           //if (reqTask.task_TypeTag !== 'Public Task') {
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
@@ -2445,6 +2520,8 @@ export default {
             if (this.isFieldEmpty(reqTask.task_assignee, 'Assignee could not be empty!')) {
               return
             }
+          }else{
+            this.$data.taskLv4WorklogShow = false
           }
         }
         this.$data.taskLv4SaveBtnDisabled = true
@@ -2454,13 +2531,13 @@ export default {
         const res = await http.post('/tasks/saveTask', {
           reqTask: JSON.stringify(reqTask)
         })
-        const res1 = await http.post('/schedules/saveRegularTask',{
+        /*const res1 = await http.post('/schedules/saveRegularTask',{
           reqRegularTaskTime : reqTask.task_RegularTaskTime,
           reqStartTime : reqTask.task_startTime,
           reqEndTime : reqTask.task_endTime,
-          reqTaskId : res.data.data.TaskName,
+          reqTaskName : res.data.data.TaskName,
           reqSchedule : reqTask.task_scheduletime,
-        })  
+        })*/
         if (res.data.status === 0) {
           this.$message({message: 'Task created successfully!', type: 'success'})
         } else {
@@ -2488,6 +2565,12 @@ export default {
         this.$data.lv4TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         // Common Rule 2
         this.$data.taskLv4WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
+        if(this.$data.taskLv4Form.task_TypeTag ==='Regular Task'){
+          this.$data.taskLv4WorklogShow = false
+          this.$data.lv4TaskItemRule.showActualComplete = false
+          this.$data.lv4TaskItemRule.showProgress = false
+          this.$data.lv4TaskItemRule.showEffort = false
+        }
         this.$data.lv4TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
       }
       if (iAction === 'Create') {
@@ -2604,7 +2687,7 @@ export default {
       var reqWorklogMonth = arr[0] + '-' + arr[1]
       var reqWorklogDay = arr[2]
       if (reqWorklogEffort <= 0 || reqWorklogEffort > 24) {
-        this.$message.error('Invalid Effort (Worklog effort could not less than 0 or over 24 hrs)!')
+        this.$message.error('Invalid Effort (Worklog effort cannot less than 0 or over 24 hrs)!')
         return
       }
       if (!this.checkEffortIsValid(reqWorklogEffort)) {
@@ -2913,6 +2996,11 @@ export default {
     }
   },
   created () {
+    // this.$data.RegularTaskTimeOps = ''
+    // this.$data.week = ''
+    // this.$data.num = ''
+    // this.$data.DailyOps = ''
+    // this.$data.RegularTaskTimeOps = ''
     this.$data.pageSize = 20
     this.$data.currentPage = 1
     this.getTaskList(1, 20)
