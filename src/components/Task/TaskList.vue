@@ -804,7 +804,8 @@
               <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="Number(taskLv3Form.task_progress_nosymbol)" :status="taskLv3FormProgressStatus"></el-progress>
             </el-form-item>
           </el-tab-pane>
-          <!-- Second Tab -->
+          <!-- End Second Tab -->
+          <!-- Sub Task List Tab -->
           <el-tab-pane v-if="taskLv3Form.task_TypeTag!='Regular Task'&&lv3TaskItemRule.showSubTaskList" label="Sub-Tasks List" name="tab_subtasks_list">
             <el-row>
               <el-col :span="24">
@@ -964,7 +965,7 @@
                 <el-form-item label="Parent Task" prop="task_parent_name">
                   <el-col :span="6">
                     <el-autocomplete :disabled="lv4TaskItemRule.disableParentNameInput" placeholder="Search Parent Task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
-                      @input="changeParentName('taskLv4Form')" v-model="taskLv4Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv4Form')})" @clear="clearSelectForParentTask('taskLv4Form')">
+                      v-model="taskLv4Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv4Form')})" @clear="clearSelectForParentTask('taskLv4Form')">
                       <template slot-scope="{ item }">
                         <div class="form_list_task_name">{{ item.value }}</div>
                         <span class="form_list_task_desc">{{ item.description }}</span>
@@ -1236,7 +1237,6 @@ export default {
       taskLv2Form: {},
       taskLv2FormProgressStatus: 'success',
       taskLv2FormSubTasks: [],
-      taskLv2FormRegularTasks: [],
       taskLv2FormRegularTasks: [],
       taskLv2SaveBtnDisabled: false,
       // Level 3 Task Dialog Value
@@ -1526,7 +1526,7 @@ export default {
     },
     // 2. Task info
     openTaskById (iTaskId) {
-      console.log('Click~')
+      console.log('Click to open task by Id')
       var reqTaskId = iTaskId
       var url = '/tasks/getTaskById'
       var criteria = {
@@ -1713,11 +1713,12 @@ export default {
         }
         if (rtnTask.task_level === 4) {
           // Clear existing data
+          console.log('Start to show level 4 task')
           this.getActiveUserList()
-          this.getTaskStatus(this.$data.taskLv3Form.task_status)
+          this.getTaskStatus(rtnTask.task_status)
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
-          this.changeParentName('taskLv4Form')
+          // this.changeParentName('taskLv4Form')
           this.$data.taskLv4Form = res.data.data
           this.TypeTagChange()
           if(this.$data.taskLv4Form.task_deliverableTag!=null){
@@ -1729,7 +1730,6 @@ export default {
             this.$data.taskLv4FormProgressStatus = 'exception'
           }
           if(res.data.data.task_TypeTag === 'Regular Task'){
-            this.$data.taskLv4Form.task_status = this.$data.taskLv3Form.task_status
             this.$data.lv4TaskItemRule.showActualComplete = false
             this.$data.lv4TaskItemRule.showProgress = false
             this.$data.lv4TaskItemRule.showEffort = false
@@ -1816,6 +1816,7 @@ export default {
       }
       this.$data.tasksWorklogHistoriesLoading = false
     },
+    // Change parent name no use
     async changeParentName (iObj) {
       console.log('changeParentName')
       console.log(this[iObj].task_parent_name)
@@ -1933,7 +1934,7 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
-        this.changeParentName('taskLv4Form')
+        // this.changeParentName('taskLv4Form')
         // this.$data.DailyOps = ''
         // this.$data.MonthlyOps = ''
         // this.$data.Scheduletime = {}
@@ -2868,6 +2869,7 @@ export default {
           returnJson.description = queryResult[i].task_desc
           returnJson.type_name = queryResult[i].task_type
           returnJson.type_id = queryResult[i].task_type_id
+          returnJson.type_tag = queryResult[i].task_type_tag
           returnJson.responsible_leader = queryResult[i].task_responsible_leader
           returnJson.group_id = queryResult[i].task_group_id
           returnJson.reference = queryResult[i].task_reference
@@ -2888,6 +2890,7 @@ export default {
         this[iObj].task_type_id = item.type_id
         this[iObj].task_responsible_leader = item.responsible_leader
         if (this[iObj].task_level === 4) {
+          this[iObj].task_TypeTag = item.type_tag
           this[iObj].task_group_id = item.group_id
           this[iObj].task_reference = item.reference
           this[iObj].task_reference_desc = item.reference_desc
@@ -2899,6 +2902,7 @@ export default {
       this[iObj].task_parent_desc = null
       this[iObj].task_TypeTag = null
       this[iObj].task_type_id = null
+      this[iObj].task_TypeTag = null
       this[iObj].task_responsible_leader = null
       this.$data.RegularTaskTimeVisible = false
       this[iObj].showDeliverableTag = true

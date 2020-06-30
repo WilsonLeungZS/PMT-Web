@@ -1305,6 +1305,7 @@ export default {
         this.$data.ScheduletimeMonth2Disable = false              
       }
     },
+    // No use for now
     async changeParentName (iObj) {
       console.log('changeParentName')
       const res  = await http.post('/tasks/getTaskByName',{
@@ -1459,7 +1460,7 @@ export default {
         // Set dialog value
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
-        this.changeParentName(iTaskObj)
+        // this.changeParentName(iTaskObj)
         // Set data default value
         this.$data.taskLv4Form.task_status = 'Drafting'
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
@@ -2632,6 +2633,7 @@ export default {
           returnJson.type_name = queryResult[i].task_type
           returnJson.type_id = queryResult[i].task_type_id
           returnJson.id = queryResult[i].task_id
+          returnJson.type_tag = queryResult[i].task_type_tag
           returnJson.responsible_leader = queryResult[i].task_responsible_leader
           returnJson.group_id = queryResult[i].task_group_id
           returnJson.reference = queryResult[i].task_reference
@@ -2652,6 +2654,7 @@ export default {
         this[iObj].task_type_id = item.type_id
         this[iObj].task_responsible_leader = item.responsible_leader
         if (this[iObj].task_level === 4) {
+          this[iObj].task_TypeTag = item.type_tag
           this[iObj].task_group_id = item.group_id
           this[iObj].task_reference = item.reference
           this[iObj].task_reference_desc = item.reference_desc
