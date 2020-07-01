@@ -1056,7 +1056,7 @@
                   <el-date-picker v-model="taskLv4Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showActualComplete">
+              <el-col :span="12" :offset="1" v-if="lv4TaskItemRule.showActualComplete">
                 <el-form-item label="Actual Complete">
                   <el-date-picker v-model="taskLv4Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
@@ -1322,7 +1322,6 @@ export default {
       lv4TaskItemRule: {
         disableParentNameInput: true,
         disableTaskEst: false,
-        disableTypeTag: false,
         showProgress: true,
         showCreator: true,
         showDeliverableTag:true,
@@ -2524,10 +2523,6 @@ export default {
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if(reqTask.task_TypeTag !== 'Regular Task') {
             this.$data.taskLv3WorklogShow = true
-            //george
-            //this.$data.lv3TaskItemRule.showActualComplete = false
-            //this.$data.lv3TaskItemRule.showProgress = false
-            //this.$data.lv3TaskItemRule.showEffort = false
           //if (reqTask.task_TypeTag !== 'Public Task') {
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
               return
