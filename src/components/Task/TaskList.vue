@@ -1790,7 +1790,7 @@ export default {
       } else {
         this[iSubTaskListItem] = []
       }
-      if (this[iSubTaskListItem].length > 0) {
+      /*if (this[iSubTaskListItem].length > 0) {
         if (iLevel === 3) {
           console.log('Sub task > 0')
           for(var i = 0 ; i < this[iSubTaskListItem].length ; i++){
@@ -1799,7 +1799,7 @@ export default {
           this.$data.taskLv3WorklogShow = false
           this.$data.lv3TaskItemRule.disableTaskEst = true
         }
-      }
+      }*/
       this.$data.tasksSubTaskLoading = false
     },
     async getTaskWorklogHistory (iTaskId, iTaskHistory) {
