@@ -2059,6 +2059,12 @@ export default {
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', false)
         this.$data.taskLv3DialogVisible = true
+        this.$data.taskLv3WorklogShow = false
+        this.$data.lv3TaskItemRule.showProgress = false
+        this.$data.lv3TaskItemRule.showEffort = false
+        this.$data.lv3TaskItemRule.showActualComplete = false
+        this.$data.lv3TaskItemRule.disableTypeTag = true
+        this.$data.lv3TaskItemRule.showDeliverableTag = false
       }
       if (Number(iSubTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
@@ -2094,7 +2100,13 @@ export default {
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
-        this.$data.lv4TaskItemRule.showDeliverableTag = false        
+        this.$data.lv4TaskItemRule.showDeliverableTag = false    
+        this.$data.taskLv4WorklogShow = false
+        this.$data.lv4TaskItemRule.showProgress = false
+        this.$data.lv4TaskItemRule.showEffort = false
+        this.$data.lv4TaskItemRule.showActualComplete = false
+        this.$data.lv4TaskItemRule.disableTypeTag = true
+        this.$data.lv4TaskItemRule.showDeliverableTag = false    
       }
     },
     // 3. Level 1 task dialog
