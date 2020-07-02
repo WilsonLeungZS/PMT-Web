@@ -76,7 +76,7 @@
                       </el-select>
                     </el-col>
                   </el-row>
-                  <el-row  style="margin: 5px;">
+                  <!-- <el-row  style="margin: 5px;">
                     <el-col :span="8">Assignee To</el-col>
                     <el-col :span="16">
                       <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
@@ -91,8 +91,8 @@
                           </el-option>
                       </el-select>
                     </el-col>
-                  </el-row>
-                  <el-row style="margin: 5px;">
+                  </el-row> -->
+                  <el-row v-if="isPathSelectionLv3" style="margin: 5px;">
                     <el-col :span="8">Assignee To</el-col>
                     <el-col :span="16">
                       <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
@@ -109,47 +109,35 @@
                     </el-col>
                   </el-row>
                   <el-divider></el-divider>
-                  <el-row style="margin: 5px;">
+                  <el-row v-if="isFullSelectionLv3" style="margin: 5px;">
                     <el-col :span="8">Opportunity</el-col>
                     <el-col :span="16">
-                      <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
+                      <el-select v-model="formFilter.filterOpportunity" filterable size="small" style="width:100%">
                         <el-option label="" value=""></el-option>
                         <el-option
-                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
+                            v-for="(opportunity, index) in OpportunityNameOps"
                             :key="index"
-                            :label="activeUser.user_eid"
-                            :value="activeUser.user_id">
-                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                            :label="opportunity.task_opp_name"
+                            :value="opportunity.task_name">
                           </el-option>
                       </el-select>
                     </el-col>
                   </el-row>
-                  <el-row style="margin: 5px;">
+                  <el-row v-if="isFullSelectionLv3" style="margin: 5px;">
                     <el-col :span="8">Skill</el-col>
                     <el-col :span="16">
-                      <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
-                        <el-option label="" value=""></el-option>
-                        <el-option
-                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
-                            :key="index"
-                            :label="activeUser.user_eid"
-                            :value="activeUser.user_id">
-                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
-                          </el-option>
-                      </el-select>
+                      <el-select  v-model="formFilter.filterSkill" multiple filterable allow-create default-first-option size="small" style="width: 100%">
+                        <el-option v-for="item in SkillTypeOps" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                      </el-select> 
                     </el-col>
                   </el-row>
-                  <el-row style="margin: 5px;">
+                  <el-row v-if="isFullSelectionLv3" style="margin: 5px;">
                     <el-col :span="8">Time Group</el-col>
                     <el-col :span="16">
-                      <!-- <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
-                        <el-select @change="((val)=>{changeTaskGroup(val, scope.row.task_id, task.task_name, index)})" v-model="formFilter.filterTimeGroup" style="width: 100%" size="small">
-                          <el-option label=" " value="0"></el-option>
-                          <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
-                        </el-select>
-                      </el-select> -->
+                    <el-select @change="((val)=>{changeGroup()})" v-model="formFilter.filterTimeGroup" style="width: 100%" size="small">
+                      <el-option label=" " value="0"></el-option>
+                      <el-option v-for="(group, index) in taskGroups2" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                    </el-select>
                     </el-col>
                   </el-row>
                   <el-row>
@@ -157,7 +145,7 @@
                       <el-button type="primary" size="mini" @click="filterTask">Confirm</el-button>
                     </el-col>
                     <el-col :span="12">
-                      <el-button type="primary" size="mini" @click="filterTask">Clear All</el-button>
+                      <el-button type="primary" size="mini" @click="clearFilterTask">Clear All</el-button>
                     </el-col>
                   </el-row>
                 <el-button slot="reference" type="warning" icon="el-icon-edit-outline"></el-button>
@@ -166,102 +154,27 @@
           </el-col>
         </el-row>
 <!------- 2. End of Search Bar -->
-<!------- 3. Filter Criteria -->
-        <!-- <el-row>
-          <el-col :span="24">
-            <el-form :inline="true" :model="formFilter" class="tl-form-filter" size="small" label-width="85px" label-position="Top">
-              <el-form-item label="Task Level">
-                <el-radio-group v-model="formFilter.filterTaskLevel" @change="formFilter.filterShowRefPool = false; formFilter.filterAssignTo = null; filterTask()" size="small">
-                  <el-radio-button label="1"></el-radio-button>
-                  <el-radio-button label="2"></el-radio-button>
-                  <el-radio-button label="3"></el-radio-button>
-                  <el-radio-button label="4"></el-radio-button>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item label="Assign To" v-if="taskListRule.showColForLv1">
-                <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
-                  <el-option label="" value=""></el-option>
-                  <el-option
-                      v-for="(activeUser, index) in activeUserListForLv1RespLeader"
-                      :key="index"
-                      :label="activeUser.user_eid"
-                      :value="activeUser.user_id">
-                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
-                    </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="Assign To" v-if="taskListRule.showColForLv2">
-                <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
-                  <el-option label="" value=""></el-option>
-                  <el-option
-                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
-                      :key="index"
-                      :label="activeUser.user_eid"
-                      :value="activeUser.user_id">
-                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
-                    </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="Assign To" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2">
-                <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
-                  <el-option label="" value=""></el-option>
-                  <el-option
-                      v-for="(activeUser, index) in activeUserListForAll"
-                      :key="index"
-                      :label="activeUser.user_eid"
-                      :value="activeUser.user_id">
-                      <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
-                    </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="Status">
-                <el-select v-model="formFilter.filterStatus" size="small" style="width:auto">
-                  <el-option label="" value=""></el-option>
-                  <el-option label="Drafting" value="Drafting"></el-option>
-                  <el-option label="Planning" value="Planning"></el-option>
-                  <el-option label="Running" value="Running"></el-option>
-                  <el-option label="Done" value="Done"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="Issue Date">
-                <el-date-picker v-model="formFilter.filterIssueDateRange" type="daterange"
-                  start-placeholder="Start Date" end-placeholder="End Date" value-format="yyyy-MM-dd" size="small" style="width:auto">
-                </el-date-picker>
-              </el-form-item>
-              <el-form-item>
-                <el-checkbox v-model="formFilter.filterShowRefPool" v-if="formFilter.filterTaskLevel == 3">External System Tasks(Ref Pool)</el-checkbox>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" size="mini" @click="filterTask">Filter</el-button>
-              </el-form-item>
-            </el-form>
-          </el-col>
-        </el-row> -->
-<!------- 3. End of Filter Criteria -->
-<!---------->
+<!------- 3. Task Path----->
         <el-row v-if="showTaskPath">
             <el-col :span="24">
               <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item >{{lv1TaskPath}}</el-breadcrumb-item>
                 <el-breadcrumb-item v-if="!showForLv1AndLv2" >{{lv2TaskPath}}</el-breadcrumb-item>
                 <el-breadcrumb-item v-if="!showForLv1AndLv2">
-                  <el-select @change="((val)=>{changeTaskGroup()})" v-model="currentTaskGroupId" style="width: 100%" size="small">
+                  <el-select @change="((val)=>{changeGroup()})" v-model="selectTaskGroup" style="width: 100%" size="small">
                     <el-option label=" " value="0"></el-option>
-                    <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                    <el-option v-for="(group, index) in taskGroups2" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
                   </el-select>
                 </el-breadcrumb-item>
               </el-breadcrumb>                  
             </el-col>
         </el-row>
         <el-divider></el-divider>        
-<!----------->
+<!------- 3. End of Task Path------>
 <!------- 4. Task List -->
         <el-row class="tl-main" v-if="showForLv1AndLv2">
           <el-col :span="24">
-            <el-table v-loading="taskslistLoading" :data="taskslistData" @row-click="onRowClick" :row-class-name="getSubTaskRowClassName" class="tl-main-table" fit empty-text="No Data">
+            <el-table v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
               <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
               <el-table-column  prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
                 <template slot-scope="scope">
@@ -314,11 +227,10 @@
             </el-pagination>
           </el-col>
         </el-row>
-<!------- 4. End of Task List -->
       <el-row class="tp-main" v-if="!showForLv1AndLv2">
         <el-col :span="24">          
-          <div v-for="(task,index) in lv2TaskList" :key="index" :name="index">
-            <el-table ref="multipleTable" :highlight-current-row='true' v-loading="taskslistLoading" :data="task" @row-click="onRowClick" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
+          <div v-loading="taskslistLoading" v-for="(task,index) in lv2TaskList" :key="index" :name="index">
+            <el-table v-loading="taskslistLoading" :data="task" @row-click="onRowClick" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
               <el-table-column type="expand">
                <template slot-scope="props">
                   <el-row>
@@ -399,7 +311,8 @@
         </el-row>
       </el-main>
     </el-container>
-<!------- 5. Level 1 Task Details Dialog -->
+<!------- 4. End of Task List -->
+<!------- 7. Level 1 Task Details Dialog -->
     <el-dialog :before-close="closeLv1TaskDialog" :title="taskLv1DialogTitle" :visible.sync="taskLv1DialogVisible" width="70%" style="min-width: 600px;" :close-on-click-modal="false" class="tl-taskform abow_dialog">
       <el-form ref="form" :model="taskLv1Form" label-width="145px" label-position="left" class="tl-edit-form" :rules="taskLv1FormRules">
         <el-tabs v-model="activeTabForLv1" type="card" ref="taskLv1Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv1Form', 'activeTabForLv1')})">
@@ -588,8 +501,8 @@
         <el-button @click="saveLv1Task" :disabled="taskLv1SaveBtnDisabled" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
-<!------- 5. End of Level 1 Task Details Dialog -->
-<!------- 6. Level 2 Task Details Dialog -->
+<!------- 7. End of Level 1 Task Details Dialog -->
+<!------- 8. Level 2 Task Details Dialog -->
     <el-dialog :before-close="closeLv2TaskDialog" :title="taskLv2DialogTitle" :visible.sync="taskLv2DialogVisible" width="70%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="taskLv2Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv2FormRules">
         <el-tabs v-model="activeTabForLv2" type="card" ref="taskLv2Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv2Form', 'activeTabForLv2')})">
@@ -831,8 +744,8 @@
         <el-button @click="saveLv2Task" :disabled="taskLv2SaveBtnDisabled" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
-<!------- 6. End Level 2 Task Details Dialog -->
-<!------- 7. Level 3 Task Details Dialog -->
+<!------- 8. End Level 2 Task Details Dialog -->
+<!------- 9. Level 3 Task Details Dialog -->
     <el-dialog :before-close="closeLv3TaskDialog" :title="taskLv3DialogTitle" :visible.sync="taskLv3DialogVisible" width="70%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="taskLv3Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv3FormRules">
         <el-tabs v-model="activeTabForLv3" type="card" ref="taskLv3Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv3Form', 'activeTabForLv3')})">
@@ -1180,8 +1093,8 @@
         <el-button :disabled="taskLv3SaveBtnDisabled" @click="saveLv3Task" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
-<!------- 7. End Level 3 Task Details Dialog -->
-<!------- 8. Level 4 Task Details Dialog -->
+<!------- 9. End Level 3 Task Details Dialog -->
+<!------- 10. Level 4 Task Details Dialog -->
     <el-dialog :before-close="closeLv4TaskDialog" :title="taskLv4DialogTitle" :visible.sync="taskLv4DialogVisible" width="70%" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
       <el-form ref="form" :model="taskLv4Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv4FormRules">
         <el-tabs v-model="activeTabForLv4" type="card" ref="taskLv4Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv4Form', 'activeTabForLv4')})">
@@ -1363,8 +1276,8 @@
         <el-button :disabled="taskLv4SaveBtnDisabled" @click="saveLv4Task" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="medium">Save</el-button>
       </span>
     </el-dialog>
-<!------- 8. End Level 4 Task Details Dialog -->
-<!------- 9. Record Worklog Dialog -->
+<!------- 10. End Level 4 Task Details Dialog -->
+<!------- 11. Record Worklog Dialog -->
     <el-dialog title="Record Worklog" :visible.sync="worklogDialogVisible" width="35%" :close-on-click-modal="false">
       <el-form :model="worklogForm" label-width="70px" class="tl-worklog-form">
         <el-form-item label="Task" >
@@ -1390,8 +1303,8 @@
         <el-button @click="submitWorklog" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}">Submit</el-button>
       </div>
     </el-dialog>
-<!------- 9. End Record Worklog Dialog -->
-<!------- 10. Remove Task Dialog -->
+<!------- 11. End Record Worklog Dialog -->
+<!------- 12. Remove Task Dialog -->
     <el-dialog title="Remove Task" :visible.sync="removeTaskDialogVisible" width="25%" top="15%">
       <div class="tl-remove-task">
         <span>Confirm to remove task {{removeTaskName}}?</span>
@@ -1404,7 +1317,7 @@
         <el-button type="danger" size="small" @click="confirmRemoveTask()">Confirm</el-button>
       </span>
     </el-dialog>
-<!------- 10. End Remove Task Dialog -->
+<!------- 12. End Remove Task Dialog -->
   </div>
 </template>
 
@@ -1640,15 +1553,26 @@ export default {
       selection : {},
       currentTaskGroupId : '',
       taskGroups : [],
-      multipleTable:[],
+      taskGroups2 : [],
+      selectTaskGroup:'',
+      reqTaskParentName: [],
+      isFullSelectionLv3: false,
+      isPathSelectionLv3: false,
+      OpportunityNameOps: [],
+      SkillTypeOps:  [
+        {value: 'SAP related', label: 'SAP related'},
+        {value: 'Java/.net related', label: 'Java/.net related'}, 
+        {value: 'Infra related', label: 'Infra related'},
+        {value: 'Others', label: 'Others'}
+      ],
     }
   },
   methods: {
     getSubTaskRowClassName ({row, rowIndex}) {
-      if (this.tasksTotalSize.length === 0) {
+      if (row.task_sub_tasks.length === 0) {
         return 'row-expand-cover'
       }
-      row.index = rowIndex;
+      //row.index = rowIndex;
     },
     onRowClick (row, event, column) {
         if(row!=null){
@@ -1663,17 +1587,49 @@ export default {
       this.$forceUpdate()
     },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
-    filterTask () {
+    async filterTask () {
       this.$data.taskGroupArray = []
-      if(Number(this.$data.formFilter.filterTaskLevel) === 1 ||Number(this.$data.formFilter.filterTaskLevel)===2){
-        this.getTaskList(1, 20)
+      this.$data.taskGroups2 = []
+      this.$data.isFullSelectionLv3 = false
+      this.$data.isPathSelectionLv3 = false
+      if(Number(this.$data.formFilter.filterTaskLevel) === 1 ){
+         this.getTaskList(1, 20)
+      }else if(Number(this.$data.formFilter.filterTaskLevel)===2){
+        this.$data.showTaskPath = false
+         this.getTaskList(1, 20)
       }else{
         this.$data.showForLv1AndLv2 = false
+        this.$data.showTaskPath  = false
+        this.$data.isFullSelectionLv3 = true
+        this.$data.isPathSelectionLv3 = true
         //this.getLevel3TaskListByCurrentTimegroup()
-        this.getTaskGroup(0,true)
-        //this.getTaskList(1, 20)
-
+        await this.getTaskGroup(0,true)
+        //await this.getTaskList(1, 20)
+        for(var i = 0 ; i < this.$data.lv2TaskList.length ; i ++){
+          for(var j = 1 ; j < this.$data.lv2TaskList[i].length ; j ++){
+            if(this.$data.lv2TaskList[i][j].group_id != null){
+              var resJson = {}
+              resJson.group_id = this.$data.lv2TaskList[i][j].group_id
+              resJson.group_name = this.$data.lv2TaskList[i][j].group_name
+              if(JSON.stringify(this.$data.taskGroups2).indexOf(JSON.stringify(resJson)) == -1){
+                this.$data.taskGroups2.push(resJson)
+              }
+            }
+          }
+        }      
       }
+    },
+    clearFilterTask () {
+      console.log(this.$data.formFilter)
+      this.$data.formFilter = {
+        filterTaskLevel: this.$data.formFilter.filterTaskLevel,
+        filterAssignTo: '',
+        filterStatus: '',
+        filterIssueDateRange: [],
+        filterShowRefPool: false,
+        filterLeadingBy: ''
+      }
+      this.getTaskList(1, 20)
     },
     getNowFormatDate() {//获取当月时间 yyyy-MM-dd
         var date = new Date();
@@ -1712,7 +1668,6 @@ export default {
       console.log('Stop')
     },
     changeMonthly () {
-      console.log("~~~~")
       this.$data.Scheduletime = {}
       this.$data.num = ''      
       this.$data.week = ''
@@ -1724,9 +1679,27 @@ export default {
         this.$data.ScheduletimeMonth2Disable = false              
       }
     },
+    changeGroup(){
+      console.log(this.$data.selectTaskGroup)
+      this.reqTaskParentName = []
+      if(this.$data.lv2TaskList!=null && this.$data.lv2TaskList !=[]){
+        for(var i = 0 ; i <this.$data.lv2TaskList.length ; i++){
+          this.reqTaskParentName.push(this.$data.lv2TaskList[i][0].task_name)
+        }
+      }
+      console.log(this.reqTaskParentName[0])
+      if(Number(this.$data.formFilter.filterTaskLevel) === 1){
+        this.openTaskTab(this.reqTaskParentName[0], 1, 20)
+      }else{
+
+      }
+    },
     async getTaskList (iPage, iSize) {
+      console.log('getTaskList')
+      console.log(this.$data.formFilter)
       this.$data.taskslistLoading = true
       this.$data.taskslistData = []
+      this.$data.lv2TaskList = []
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqTaskLevel = Number(this.$data.formFilter.filterTaskLevel)
@@ -1739,7 +1712,8 @@ export default {
         reqFilterStatus: this.$data.formFilter.filterStatus,
         reqFilterIssueDateStart: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[0] : null,
         reqFilterIssueDateEnd: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[1] : null,
-        reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool
+        reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool,
+        reqCurrentTimeGroup : this.$data.taskGroupArray,
       }
       var listCriteria = {
         reqPage: iPage,
@@ -1751,8 +1725,11 @@ export default {
         reqFilterIssueDateStart: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[0] : null,
         reqFilterIssueDateEnd: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[1] : null,
         reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool,
-        reqCurrentTimeGroup : this.$data.taskGroupArray
-      }      
+        reqCurrentTimeGroup : this.$data.taskGroupArray,
+        reqLeadingBy : this.$data.formFilter.filterLeadingBy,
+        reqOpportunity :this.$data.formFilter.filterOpportunity
+      }
+      console.log(listCriteria)      
       if(reqTaskLevel === 1 || reqTaskLevel ===2){
         this.$data.showForLv1AndLv2 = true
         const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
@@ -1768,23 +1745,31 @@ export default {
           this.$data.tasksTotalSize = 0
         }
         console.log(this.$data.taskslistData)
+        if(reqTaskLevel === 1){
+          for(var i = 0 ; i < this.$data.taskslistData.length ; i++){
+            var Opportunity = {}
+            Opportunity.task_name = this.$data.taskslistData[i].task_name
+            Opportunity.task_opp_name = this.$data.taskslistData[i].task_top_opp_name
+            this.$data.OpportunityNameOps.push(Opportunity)
+          }
+        }        
       }else{
-        console.log("~~~")
         this.$data.showForLv1AndLv2 = false
         const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
+        console.log(res1)
         if (res1.data.status === 0) {
           this.$data.tasksTotalSize = res1.data.data.task_list_total_size
           const res2 = await http.get('/tasks/getLv3TaskList', listCriteria)
+          console.log(res2)
           if (res2.data.status === 0) {
-            this.$data.taskslistData = res2.data.data
+            this.$data.lv2TaskList = res2.data.data
           } else {
-            this.$data.taskslistData = []
+            this.$data.lv2TaskList = []
           }
         } else {
           this.$data.tasksTotalSize = 0
+          console.log(this.$data.lv2TaskList)
         }
-        console.log(this.$data.taskslistData)
-        this.$data.lv2TaskList = this.$data.taskslistData
       }
       this.$data.taskslistLoading = false
     },
@@ -1826,9 +1811,8 @@ export default {
       }
     },
     async getTaskGroup (iGroupId,isShowCurrent) {
-      var today = this.getNowFormatDate()
-      console.log(today)
-      console.log(iGroupId,isShowCurrent)
+      //var today = this.getNowFormatDate()
+      var today = '2020-06-22'
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
         //tGroupRelatedTask: iGroupRelatedTask,
@@ -1849,13 +1833,13 @@ export default {
             resResult.push(resJson)
           }
           this.$data.taskGroupArray = resResult
+          console.log(this.$data.taskGroupArray)
         } else {
           this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
           this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
         }
-        //console.log(this.$data.taskGroupArray)
-        this.getTaskList(1, 20)
+        
       }
     },
     async changeTaskGroup (iNewGroupId, iTaskId, iParentTaskName, iParentTaskIndex) {
@@ -1873,10 +1857,11 @@ export default {
       }
     },
     // 2. Task info
-    openTaskById (iTaskId,iTaskLevel) {
+    async openTaskById (iTaskId,iTaskLevel) {
       console.log('Click~')
       console.log(iTaskId,iTaskLevel)
       this.$data.showTaskPath = false
+      this.$data.isPathSelectionLv3 = false
       if(Number(this.$data.formFilter.filterTaskLevel) === 1){
         this.$data.showTaskPath = true
           if(iTaskLevel===1){
@@ -1886,11 +1871,25 @@ export default {
           }else if(iTaskLevel===2){
             this.$data.lv2TaskPath = iTaskId
             this.ruleShowListColumn(3)
-            this.$data.showForLv1AndLv2 = false  
-            this.openTaskTab(iTaskId, 1, 20)
+            this.$data.showForLv1AndLv2 = false
+            this.$data.isPathSelectionLv3 = true
+            await this.openTaskTab(iTaskId, 1, 20)
+            this.$data.taskGroups2 = []
+            for(var i = 0 ; i < this.$data.lv2TaskList.length ; i ++){
+              for(var j = 1 ; j < this.$data.lv2TaskList[i].length ; j ++){
+                if(this.$data.lv2TaskList[i][j].group_id != null){
+                  var resJson = {}
+                  resJson.group_id = this.$data.lv2TaskList[i][j].group_id
+                  resJson.group_name = this.$data.lv2TaskList[i][j].group_name
+                  if(JSON.stringify(this.$data.taskGroups2).indexOf(JSON.stringify(resJson)) == -1){
+                    this.$data.taskGroups2.push(resJson)
+                  }
+                }
+              }
+            }   
+            this.getTaskGroup(0,true)
          }  
         }else{
-          console.log("~~~")
           var url = '/tasks/getTaskByName'
           var criteria = {
             reqTaskName: iTaskId
@@ -1908,7 +1907,7 @@ export default {
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqTaskGroupFlag = this.$data.currentTaskGroupFlag
-      var reqTaskGroupId = this.$data.currentTaskGroupId
+      var reqTaskGroupId = Number(this.$data.selectTaskGroup)
       var sizeCriteria = {
         reqParentTaskName: iTaskName,
         reqTaskGroupId: reqTaskGroupId,
@@ -1923,14 +1922,14 @@ export default {
         reqTaskGroupId: reqTaskGroupId,
         reqTaskGroupFlag: reqTaskGroupFlag,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
-        reqFilterStatus: this.$data.formFilter.filterStatus
+        reqFilterStatus: this.$data.formFilter.filterStatus,
       }
+      console.log(listCriteria)
       const res = await http.post('/tasks/getPlanTaskSizeByParentTask', sizeCriteria)
       if (res.data.status === 0) {
           res2.data.data.task_page_number = iPage
           res2.data.data.task_page_size = iSize   
           const res1 = await http.post('/tasks/getPlanTaskListByParentTask', listCriteria)
-          console.log(res1.data.data)
           if (res1.data.status === 0) {
             res1.data.data.splice(0,0,res2.data.data)
             res2.data.data = []
@@ -1948,6 +1947,7 @@ export default {
       this.$data.activeTabArray = []
       var reqParentTaskName = iTaskId
       var reqTaskGroupId = this.$data.currentTaskGroupId
+      console.log(reqTaskGroupId)
       var reqTaskGroupFlag = this.$data.currentTaskGroupFlag
       this.ruleShowListColumn(2)
       const res = await http.post('/tasks/getLevel2TaskListByParentTask', {
@@ -3759,5 +3759,9 @@ input[type="number"]{
   position: relative;
   left:50%;
   transform:translateX(-50%); 
+}
+
+.row-expand-cover .el-table__expand-icon {
+  visibility:hidden;
 }
 </style>
