@@ -20,16 +20,17 @@
             <el-card class="box-card pt-title" shadow="never">
               <el-row :gutter="10" type="flex" justify="flex-start" align="center">
                 <el-col :span="3">
-                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select" style="width:100%" @change="changePtMonth"></el-date-picker>
+                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select" style="width:100%"
+                  @change="changePtMonth"></el-date-picker>
                 </el-col>
                 <el-col :span="2">
                   <el-popover placement="bottom" width="900" trigger="click" v-model="showList">
-                    <el-table :data="taskListData" height="500" max-height="500">
-                      <el-table-column align="left" property="tl_task" label="Task" sortable></el-table-column>
-                      <el-table-column align="left" property="tl_status" label="Status" sortable></el-table-column>
-                      <el-table-column align="center" property="tl_effort" label="Effort" sortable></el-table-column>
-                      <el-table-column align="center" property="tl_estimation" label="Estimation" sortable></el-table-column>
-                      <el-table-column align="center" property="tl_montheffort" label="Month Effort" sortable>
+                    <el-table :data="taskListData">
+                      <el-table-column align="center" width="100" property="tl_task" label="Task"></el-table-column>
+                      <el-table-column align="center" property="tl_status" label="Status"></el-table-column>
+                      <el-table-column align="center" width="110" property="tl_estimation" label="Estimation"></el-table-column>
+                      <el-table-column align="center" width="120" property="tl_effort" label="Actual Effort"></el-table-column>
+                      <el-table-column align="center" width="120" label="Month Effort">
                         <template slot-scope="scope">
                           <span style="color:#57606f; font-size: 20px; font-weight:bold">{{ scope.row.tl_montheffort }}</span>
                         </template>
@@ -110,6 +111,11 @@
                       <span>{{taskForm.taskStatus}}</span>
                     </el-col>
                   </el-form-item>
+                  <el-form-item label="Type">
+                     <el-col :span="24" class="pt-task-box-content-item">
+                      <span>{{taskForm.taskType}}</span>
+                    </el-col>
+                  </el-form-item>
                   <el-form-item label="Effort">
                      <el-col :span="24" class="pt-task-box-content-item">
                       <span>{{taskForm.taskEffort}} / {{taskForm.taskEstimation}} hrs</span>
@@ -173,6 +179,7 @@ export default {
         taskName: 'Task Number',
         taskDescription: '',
         taskStatus: '',
+        taskType: '',
         taskEffort: 0,
         taskEstimation: 0,
         taskMonthEffort: 0
@@ -291,13 +298,13 @@ export default {
         }
       }
     },
-    async getTaskWorklogs (iTask) {
+    async getTaskWorklogs (iTaskName) {
       this.$data.showList = false
       var reqTask = ''
-      if (iTask === null) {
+      if (iTaskName === null) {
         reqTask = this.$data.taskSelect
       } else {
-        reqTask = iTask
+        reqTask = iTaskName
       }
       var reqMonth = this.$data.monthValue
       if (reqMonth === '') {
@@ -336,6 +343,7 @@ export default {
       this.$data.taskForm.taskId = data[0].tl_task_id
       this.$data.taskForm.taskName = data[0].tl_task
       this.$data.taskForm.taskStatus = data[0].tl_status
+      this.$data.taskForm.taskType = data[0].tl_task_type
       this.$data.taskForm.taskEffort = data[0].tl_effort
       this.$data.taskForm.taskEstimation = data[0].tl_estimation
       this.$data.taskForm.taskDescription = data[0].tl_desc
@@ -347,6 +355,7 @@ export default {
       this.$data.taskForm.taskId = 0
       this.$data.taskForm.taskName = 'Task Number'
       this.$data.taskForm.taskStatus = ''
+      this.$data.taskForm.taskType = ''
       this.$data.taskForm.taskEffort = 0
       this.$data.taskForm.taskEstimation = 0
       this.$data.taskForm.taskDescription = ''
