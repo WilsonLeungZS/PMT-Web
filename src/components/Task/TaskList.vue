@@ -2100,13 +2100,6 @@ export default {
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
-        this.$data.lv4TaskItemRule.showDeliverableTag = false    
-        this.$data.taskLv4WorklogShow = false
-        this.$data.lv4TaskItemRule.showProgress = false
-        this.$data.lv4TaskItemRule.showEffort = false
-        this.$data.lv4TaskItemRule.showActualComplete = false
-        this.$data.lv4TaskItemRule.disableTypeTag = true
-        this.$data.lv4TaskItemRule.showDeliverableTag = false    
       }
     },
     // 3. Level 1 task dialog
