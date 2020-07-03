@@ -56,25 +56,23 @@
                 </el-dropdown-menu>
               </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
-                <el-popover
-                  placement="top-start"
-                  width="250"
-                  trigger="hover"
-                  @show="getEmailGroupsAndSkillType">
-                  <el-row style="margin: 5px;">
-                    <el-col :span="6">Team:</el-col>
-                    <el-col class="nameInfo" :span="18">{{userInfo.user_team}}</el-col>
+                <el-popover style="width:auto" placement="top-start" trigger="hover" @show="getEmailGroupsAndSkillType">
+                  <el-row class="info-text">
+                    <el-col :span="7">Team:</el-col>
+                    <el-col class="nameInfo" :span="17">{{userInfo.user_team}}</el-col>
                   </el-row>
-                  <el-row style="margin: 5px;">
-                    <el-col :span="8">Skill Type:</el-col>
-                    <el-col :span="16">
-                        <div v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item" class="nameInfo" >{{item}}</div>
+                  <el-row class="info-text">
+                    <el-col :span="7">Skill:</el-col>
+                    <el-col :span="17">
+                      <div v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item" class="nameInfo" >{{item}}</div>
                     </el-col>
                   </el-row>
-                  <el-row style="margin: 5px;">
-                    <el-col :span="12">My Email Groups:</el-col>
-                    <el-col :span="12">
-                        <div v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item" class="nameInfo" >{{item}}</div>
+                  <el-row class="info-text">
+                    <el-col :span="24">My Email Groups:</el-col>
+                  </el-row>
+                  <el-row class="info-text">
+                    <el-col :span="24">
+                      <div v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item" class="nameInfo" >{{item}}</div>
                     </el-col>
                   </el-row>
                   <!-- <div>
@@ -547,7 +545,17 @@ export default {
 .hide-view {
   visibility: hidden;
 }
-
+.info-panel {
+  height: auto;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.info-text {
+  margin: 5px;
+}
 .nameInfo {
   text-decoration: underline ;
 }
