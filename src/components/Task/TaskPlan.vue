@@ -1460,6 +1460,10 @@ export default {
         if(this.$data.isRegular === true){
           this.$data.taskLv3Form.task_TypeTag = 'Regular Task'
           this.$data.lv3TaskItemRule.showDeliverableTag = false
+          this.$data.lv3TaskItemRule.showActualComplete = false
+          this.$data.lv3TaskItemRule.showProgress = false
+          this.$data.lv3TaskItemRule.showEffort = false
+          this.$data.lv3TaskItemRule.disableTypeTag = true
         }        
         this.$data.taskLv3Form.task_status = 'Drafting'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
@@ -2371,12 +2375,6 @@ export default {
         // Common Rule 2
         this.$data.taskLv4WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
         this.$data.lv4TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
-        if(this.$data.taskLv4Form.task_TypeTag ==='Regular Task'){
-          this.$data.taskLv4WorklogShow = false
-          this.$data.lv4TaskItemRule.showActualComplete = false
-          this.$data.lv4TaskItemRule.showProgress = false
-          this.$data.lv4TaskItemRule.showEffort = false
-        }
       }
       if (iAction === 'Create') {
         // Set Dialog Default Value
