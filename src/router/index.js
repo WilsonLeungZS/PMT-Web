@@ -21,7 +21,6 @@ export default new Router({
     {path: '/Task', redirect: '/Task/TaskList'},
     {path: '/Management', redirect: '/Management/PrjManagement'},
     {path: '/Others', redirect: '/Others/Charts'},
-    {path: '/AssignToMe', redirect: '/MyView/AssignToMe'},
     {
       path: '/',
       name: 'Main',
