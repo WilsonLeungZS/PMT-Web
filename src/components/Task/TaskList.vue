@@ -311,7 +311,7 @@
                     layout="total, sizes, prev, pager, next, jumper"
                     :current-page="task[0].task_current_page"
                     :page-size="task[0].task_page_size"
-                    :total="task.length">
+                    :total="task[0].task_length">
                   </el-pagination>
                 </el-col>
               </el-row>
@@ -1335,6 +1335,7 @@
 <script>
 import http from '../../utils/http'
 import utils from '../../utils/utils'
+import Vue from "vue"
 export default {
   name: 'TaskList',
   data () {
@@ -1568,7 +1569,6 @@ export default {
       selection : {},
       currentTaskGroupId : '',
       taskGroups : [],
-      taskGroups2 : [],
       selectTaskGroup : [],
       selectTaskGroupName: '',
       isFullSelectionLv3: false,
@@ -1586,14 +1586,16 @@ export default {
   },
   methods: {
     getSubTaskRowClassName ({row, rowIndex}) {
-      if (row.task_sub_tasks.length === 0) {
-        return 'row-expand-cover'
+      if(row!=null){
+        if (row.task_sub_tasks.length === 0) {
+          return 'row-expand-cover'
+        }        
       }
       //row.index = rowIndex;
     },
     async onRowClick (row,event,column) {
+      console.log(row)
       if(row!=null){
-          this.$data.pathSelection = true
           this.$data.selection = row
           var iTaskId = this.$data.selection.task_name
           var iTaskLevel = this.$data.selection.task_level
@@ -1606,6 +1608,7 @@ export default {
           this.$data.TaskLv2Id = iTaskId
           this.$data.selectTaskGroup = []
         if(Number(this.$data.formFilter.filterTaskLevel) === 1 || Number(this.$data.formFilter.filterTaskLevel) === 2){
+          this.$data.pathSelection = true    
           this.$data.showTaskPath = true
             if(iTaskLevel===1){
               this.$data.lv1TaskPath = iTaskId
@@ -1618,26 +1621,12 @@ export default {
               this.$data.showForLv1AndLv2 = false
               this.$data.isPathSelectionLv3 = true
               await this.getTaskGroup(0,false,true)
-              await this.openTaskTab(iTaskId, 1, 20)
-              this.$data.taskGroups2 = []
-              for(var i = 0 ; i < this.$data.lv2TaskList.length ; i ++){
-                for(var j = 1 ; j < this.$data.lv2TaskList[i].length ; j ++){
-                  if(this.$data.lv2TaskList[i][j].group_id != null){
-                    var resJson = {}
-                    resJson.group_id = this.$data.lv2TaskList[i][j].group_id
-                    resJson.group_name = this.$data.lv2TaskList[i][j].group_name
-                    if(JSON.stringify(this.$data.taskGroups2).indexOf(JSON.stringify(resJson)) == -1){
-                      this.$data.taskGroups2.push(resJson)
-                    }
-                  }
-                }
-              }   
+              await this.openTaskTab(iTaskId, 1, 20)  
               this.getTaskGroup(0,true,true)
               this.$data.subTaskListLoading = false
            }  
           }
       }
-
     },
     rowKey (row) {
       return row.task_id
@@ -1656,12 +1645,15 @@ export default {
       var row = {}
       row.task_name = this.$data.lv1TaskPath
       row.task_level =1
-      this.onRowClick(row)
+      if(Number(this.$data.formFilter.filterTaskLevel) === 1){
+        this.onRowClick(row)
+      }else{
+        this.filterTask()
+      }
     },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     async filterTask () {
       this.$data.taskGroupArray = []
-      this.$data.taskGroups2 = []
       this.$data.isFullSelectionLv3 = false
       this.$data.isPathSelectionLv3 = false
       if(Number(this.$data.formFilter.filterTaskLevel) === 1 ){
@@ -1715,17 +1707,19 @@ export default {
       console.log('Start to refresh level 2 task')
       //this.$data.lv2TaskList[index] = 
       //this.openTaskTab(iTaskName, 1, 20)
-      // var reqTaskGroupId = this.$data.currentTaskGroupId
-      // var reqTaskGroupFlag = this.$data.currentTaskGroupFlag
-      // const res = await http.post('/tasks/refreshLevel2TaskSubEstimation', {
-      //   reqTaskId: iTaskId,
-      //   reqTaskGroupId: reqTaskGroupId,
-      //   reqTaskGroupFlag: reqTaskGroupFlag
-      // })         
-      // if (res.data.status === 0) {
-      //   this.$data.lv2TaskList[iTaskIndex].task_subtasks_estimation = 0
-      //   this.$data.lv2TaskList[iTaskIndex].task_subtasks_estimation = res.data.data.task_subtasks_estimation
-      // }
+      console.log(iTask,index)
+      var reqTaskGroupId = this.$data.currentTaskGroupId
+      var reqTaskGroupFlag = 1
+      const res = await http.post('/tasks/refreshLevel2TaskSubEstimation', {
+        reqTaskId: iTask[0].task_id,
+        reqTaskGroupId: iTask[0].group_id,
+        reqTaskGroupFlag: reqTaskGroupFlag
+      })      
+      console.log(res.data)   
+      if (res.data.status === 0) {
+        this.$data.lv2TaskList[index][0].task_subtasks_estimation = 0
+        this.$data.lv2TaskList[index][0].task_subtasks_estimation = res.data.data.task_subtasks_estimation
+      }
     },
     clearFilterTask () {
       this.$data.formFilter = {
@@ -1903,7 +1897,6 @@ export default {
         const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
         if (res1.data.status === 0) {
           this.$data.tasksTotalSize = res1.data.data.task_list_total_size
-          console.log(this.$data.tasksTotalSize)
           const res2 = await http.get('/tasks/getTaskList', listCriteria)
           if (res2.data.status === 0) {
             this.$data.taskslistData = res2.data.data
@@ -1930,15 +1923,11 @@ export default {
             this.$data.tasksTotalSize = res1.data.data.task_list_total_size
             const res2 = await http.get('/tasks/getLv3TaskList', listCriteria)
             if (res2.data.status === 0) {
-            console.log(res2.data.data.length)  
             for(var i = 0; i < res2.data.data.length ; i ++){
-              
                 if(res2.data.data[i].length > 20){
                   var task_length = res2.data.data[i].length
-                  console.log(task_length)
                     res2.data.data[i] = res2.data.data[i].slice(0,20)
                     res2.data.data[i].length = task_length
-                  console.log(res2.data.data[i])
                 }
               }
               this.$data.lv2TaskList = res2.data.data
@@ -1981,16 +1970,13 @@ export default {
       this.getTaskList(val, pageSize)
     },
     handleCurrentChange1 (val) {
-      var pageSize1 = this.$data.pageSize1
       this.$data.currentPage1 = val
-      for(var i = 0 ; i < this.$data.lv2TaskList.length ; i++){
-        if(this.$data.lv2TaskList[i][0].task_name === this.$data.currentTask[0].task_name ){
-          this.$data.lv2TaskList[i] = this.$data.lv2TaskList[i].slice((this.$data.currentPage1-1)*pageSize1,this.$data.currentPage1*pageSize1)
-        }
-      }
     },
     getTaskIndex (task) {
+      var iTask = []
       this.$data.currentTask = task
+      console.log(this.$data.currentTask)
+      this.handleCurrentChangeOfEachTable (this.$data.currentPage1, this.$data.currentTask[0].task_name, 0)
     },
     ruleShowListColumn (iTaskLevel) {
       if (iTaskLevel === 1) {
@@ -2003,21 +1989,21 @@ export default {
         this.$data.taskListRule.showColForLv2 = true
         this.$data.taskListRule.showColForLv3 = false
         this.$data.taskListRule.showColRef = false
-      } else if (iTaskLevel === 3) {
-        this.$data.taskListRule.showColForLv1 = true
+      } else{
+        this.$data.taskListRule.showColForLv1 = false
         this.$data.taskListRule.showColForLv2 = false
         this.$data.taskListRule.showColForLv3 = true
         if (this.$data.formFilter.filterShowRefPool) {
-          this.$data.taskListRule.showColRef = false
-        } else {
           this.$data.taskListRule.showColRef = true
+        } else {
+          this.$data.taskListRule.showColRef = false
         }
-      } else {
-        this.$data.taskListRule.showColForLv1 = false
-        this.$data.taskListRule.showColForLv2 = false
-        this.$data.taskListRule.showColForLv3 = false
-        this.$data.taskListRule.showColRef = false
-      }
+      // } else {
+      //   this.$data.taskListRule.showColForLv1 = false
+      //   this.$data.taskListRule.showColForLv2 = false
+      //   this.$data.taskListRule.showColForLv3 = false
+      //   this.$data.taskListRule.showColRef = false
+       }
     },
     async getTaskGroup (iGroupId,isShowRelate,isShowCurrent) {
       //var today = this.getNowFormatDate()
@@ -2050,7 +2036,8 @@ export default {
           this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
           this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
-        }       
+        }
+        console.log(this.$data.taskGroupArray)       
       }
     },
     async changeTaskGroup (iNewGroupId, iTaskId, iParentTaskName, iParentTaskIndex) {
@@ -2094,14 +2081,15 @@ export default {
       }
       var reqTaskGroupId = ''
       if(this.$data.selectTaskGroup==''||this.$data.selectTaskGroup == null){
-        reqTaskGroupId = this.$data.taskGroups
+        await this.getTaskGroup(0,false,true)
       }else{
-        reqTaskGroupId = this.$data.selectTaskGroup
+        reqCurrentTimeGroup = this.$data.selectTaskGroup
       }
       var reqTaskGroupFlag = this.$data.currentTaskGroupFlag
       var sizeCriteria = {
         reqParentTaskName: iTaskName,
         reqTaskGroupId: reqTaskGroupId,
+        reqCurrentTimeGroup : this.$data.taskGroupArray,
         reqTaskGroupFlag: reqTaskGroupFlag,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
         reqFilterStatus: this.$data.formFilter.filterStatus
@@ -2110,6 +2098,7 @@ export default {
         reqPage: iPage,
         reqSize: iSize,
         reqParentTaskName: iTaskName,
+        reqCurrentTimeGroup : this.$data.taskGroupArray,
         reqTaskGroupId: this.$data.selectTaskGroup,
         reqTaskGroupFlag: reqTaskGroupFlag,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
@@ -2117,26 +2106,34 @@ export default {
       }
       console.log('Path mode: Start to get task list size')
       const res = await http.get('/tasks/getPlanTaskSizeByParentTask', sizeCriteria)
+      console.log(res)
       if (res.data.status === 0) {
           res2.data.data.task_page_number = iPage
           res2.data.data.task_page_size = iSize  
           console.log('Path mode: Start to get task list data') 
           const res1 = await http.get('/tasks/getPlanTaskListByParentTask', listCriteria)
+          console.log(res1.data.data)
           if (res1.data.status === 0) {
             res2.data.data.task_sub_tasks = []
             res1.data.data.splice(0,0,res2.data.data)
             res2.data.data = []
             res2.data.data = res1.data.data
-            res2.data.data.task_total_size = res.data.data.task_list_total_size
+            if(res2.data.data.length > 20){
+              var task_length = res2.data.data.length
+                res2.data.data = res2.data.data.slice(0,20)
+                res2.data.data.length = task_length
+            }
+            res2.data.data.length = res.data.data.task_list_total_size
           } else {
             res2.data.data = []
           }                      
       }else{
         res2.data.data = []
+        //res2.data.data[0] = {task_length:0}
         res2.data.data.task_total_size = 0
       }
-      console.log(res2.data.data)
       this.$data.lv2TaskList.push(res2.data.data)
+      console.log(this.$data.lv2TaskList)
     },
     async getLevel2TaskListByParentTask (iTaskId,iPage,iSize) {
       console.log('Start to get level 2 task list')
@@ -2157,6 +2154,7 @@ export default {
         this.$data.taskslistData = []
         this.$data.tasksTotalSize = res.data.data.length
         this.$data.taskslistData = res.data.data
+        console.log(this.$data.taskslistData)
       } else {
         this.$data.taskslistData = []
       }
@@ -2754,72 +2752,6 @@ export default {
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
-      }
-    },
-    async createRegularTask (iSubTaskLevel, iParentObj) {
-      console.log('Create regular task' )
-      if (Number(iSubTaskLevel) === 3) {
-        this.$data.taskLv3Form = {}
-        // Set dialog value
-        this.getActiveUserList()
-        this.getTaskStatus('Planning')
-        // Set data default value
-        this.$data.taskLv3Form.task_status = 'Planning'
-        this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
-        this.$data.taskLv3Form.task_level = 3
-        // this.$data.MonthlyOps = ''
-        // this.$data.Scheduletime = {}
-        // this.$data.week = ''
-        // this.$data.num =''
-        this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
-        this.$data.taskLv3Form.task_progress_nosymbol = 0
-        this.$data.taskLv3Form.task_TypeTag = 'Regular Task'
-        this.$data.lv3TaskItemRule.showDeliverableTag = false
-        this.$data.RegularTaskTimeVisible = true
-        // Set parent data of sub task
-        this.$data.taskLv3Form.task_parent_name = this[iParentObj].task_name
-        this.$data.taskLv3Form.task_parent_desc = this[iParentObj].task_desc
-        this.$data.taskLv3Form.task_type_id = this[iParentObj].task_type_id
-        this.$data.taskLv3Form.task_responsible_leader = this[iParentObj].task_responsible_leader
-        // Show or hide column
-        this.ruleControlLv3TaskItem('Create', false)
-        this.$data.taskLv3DialogVisible = true
-      }
-      if (Number(iSubTaskLevel) === 4) {
-        this.$data.taskLv4Form = {}
-        console.log(this[iParentObj])
-        console.log("Number(iSubTaskLevel) === 4")
-        // Set dialog value
-        this.getActiveUserList()
-        this.getTaskStatus(this[iParentObj].task_status)
-        // Set data default value
-        this.$data.taskLv4Form.task_status = this[iParentObj].task_status
-        this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
-        this.$data.taskLv4Form.task_level = 4
-        this.$data.DailyOps = ''
-        this.$data.MonthlyOps = ''
-        this.$data.Scheduletime = {}
-        this.$data.week = ''
-        this.$data.num =''
-        this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
-        this.$data.taskLv4Form.task_progress_nosymbol = 0
-        this.$data.taskLv4Form.task_TypeTag = 'Regular Task'
-        this.$data.taskLv4Form.task_RegularTaskTime = this[iParentObj].task_RegularTaskTime
-        this.$data.taskLv4Form.task_startTime = this[iParentObj].task_startTime
-        this.$data.taskLv4Form.task_endTime = this[iParentObj].task_endTime
-        this.$data.taskLv4Form.task_scheduletime = this[iParentObj].task_scheduletime
-        // Set parent data of sub task
-        this.$data.taskLv4Form.task_parent_name = this[iParentObj].task_name
-        this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
-        this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
-        this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
-        this.$data.taskLv4Form.task_group_id = this[iParentObj].task_group_id
-        this.$data.taskLv4Form.task_reference = this[iParentObj].task_reference
-        this.$data.taskLv4Form.task_reference_desc = this[iParentObj].task_reference_desc
-        // Show or hide column
-        this.ruleControlLv4TaskItem('Create', false)
-        this.$data.taskLv4DialogVisible = true
-        this.$data.lv4TaskItemRule.showDeliverableTag = false        
       }
     },
     // 3. Level 1 task dialog
@@ -3729,15 +3661,15 @@ export default {
       console.log('iPage: ' + iPage)
       console.log('iTaskName: ' + iTaskName)
       console.log('Index: ' + Index)
-      var pageSize = this.$data.lv2TaskList[Index][0].task_page_size
-      console.log(iPage, iTaskName, Index,pageSize)
       console.log(this.$data.lv2TaskList[Index])
+      var pageSize = this.$data.lv2TaskList[Index][0].task_page_size
       this.$data.lv2TaskList[Index].task_current_page = iPage 
       if(this.$data.formFilter.filterTimeGroup!=null&&this.$data.formFilter.filterTimeGroup!=''){
         this.getTaskListForEachTable(iPage, pageSize, iTaskName, Index)
       }else{
         await this.getTaskGroup(0,false,true)
         this.getTaskListForEachTable(iPage, pageSize, iTaskName, Index)
+        await this.getTaskGroup(0,true,true)
       }
     },
     handleSizeChangeOfEachTable (iSize, iTaskName, Index) {
@@ -3752,7 +3684,6 @@ export default {
       var reqTaskLevel = 3
       var reqCurrentTimeGroup = []
       this.ruleShowListColumn(reqTaskLevel)
-      console.log(iPage, iSize, iTaskName, Index)
       var sizeCriteria = {
         reqTaskLevel: reqTaskLevel,
         reqParentTaskName: iTaskName,
@@ -3788,15 +3719,20 @@ export default {
       if(Boolean(this.$data.formFilter.filterShowRefPool) === false){
         this.$data.showForLv1AndLv2 = false
         const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
-        console.log(res1.data.data)
+        console.log(this.$data.tasksTotalSize)
         if (res1.data.status === 0) {
           this.$data.tasksTotalSize = res1.data.data.task_list_total_size
           const res3 = await http.get('/tasks/getLv3TaskListForSingleTable', listCriteria)
           if (res3.data.status === 0) {
-            this.$data.lv2TaskList[Index] = res3.data.data
             console.log('Lv3 table List --->')
-            console.log(res3.data.data)
+            this.$data.lv2TaskList[Index] = []
+            this.$data.lv2TaskList[Index] = res3.data.data
+            console.log(this.$data.lv2TaskList[Index])
+            this.$data.lv2TaskList[Index][0].task_length = this.$data.tasksTotalSize
+             this.$data.lv2TaskList[Index].length = this.$data.tasksTotalSize
             console.log('Lv3 table List ---<')
+            //update singel table after pagination 
+            this.$forceUpdate(); 
           }
         }        
       }
