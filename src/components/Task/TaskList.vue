@@ -1706,6 +1706,7 @@ export default {
           }else{
             this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)  
             this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+            this.$data.lv3TaskItemRule.disableTypeTag = false
           }
           this.ruleControlLv3TaskItem('Edit', null)
           this.$data.taskLv3DialogVisible = true
@@ -1927,6 +1928,7 @@ export default {
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', true)
         this.$data.taskLv3DialogVisible = true
+        this.$data.lv3TaskItemRule.disableTypeTag = false
       }
       if (Number(iTaskLevel) === 4) {
         this.$data.taskLv4Form = {}
@@ -1998,6 +2000,7 @@ export default {
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', false)
         this.$data.taskLv3DialogVisible = true
+        this.$data.lv3TaskItemRule.disableTypeTag = false
       }
       if (Number(iSubTaskLevel) === 4) {
         console.log('Number(iSubTaskLevel) === 4')
@@ -2444,7 +2447,7 @@ export default {
           this.$data.lv3TaskItemRule.showDeliverableTag = true
           this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
         }
-        this.$data.lv3TaskItemRule.disableTypeTag = true
+        
         if(this.$data.taskLv3Form.task_TypeTag ==='Regular Task'){
           this.$data.taskLv3WorklogShow = false
           this.$data.lv3TaskItemRule.showProgress = false
@@ -2452,6 +2455,8 @@ export default {
           this.$data.lv3TaskItemRule.showActualComplete = false
           this.$data.lv3TaskItemRule.disableTypeTag = true
           this.$data.lv3TaskItemRule.showDeliverableTag = false
+        }else{
+          this.$data.lv3TaskItemRule.disableTypeTag = false
         }
       }
       if (iAction === 'Create') {
