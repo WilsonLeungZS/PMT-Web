@@ -1357,7 +1357,7 @@ export default {
     TypeTagChange () {
       if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task' || this.$data.taskLv4Form.task_TypeTag === 'Regular Task' ){
         this.$data.lv3TaskItemRule.showDeliverableTag = false
-        this.$data.lv3TaskItemRule.disableTypeTag = true
+        //this.$data.lv3TaskItemRule.disableTypeTag = true
         this.$data.lv3TaskItemRule.showActualComplete = false
         this.$data.lv3TaskItemRule.showEffort = false
         this.$data.lv3TaskItemRule.showProgress = false
@@ -1446,7 +1446,7 @@ export default {
       this.$data.lv2TaskList[Index].task_page_number = iPage
       this.openTaskTab(iTaskName, Index, iPage, pageSize)
     },
-    createTaskInPlanMode (iSubTaskLevel, iTaskObj) {
+    async createTaskInPlanMode (iSubTaskLevel, iTaskObj) {
       console.log("createTaskInPlanMode")
       if (Number(iSubTaskLevel) === 3) {
         this.$data.taskLv3Form = {}
@@ -1464,7 +1464,7 @@ export default {
           this.$data.lv3TaskItemRule.showProgress = false
           this.$data.lv3TaskItemRule.showEffort = false
           this.$data.lv3TaskItemRule.disableTypeTag = true
-        }        
+        }   
         this.$data.taskLv3Form.task_status = 'Drafting'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv3Form.task_level = 3
@@ -1491,7 +1491,11 @@ export default {
         this.getTaskStatus('Drafting')
         // this.changeParentName(iTaskObj)
         // Set data default value
-        this.$data.taskLv4Form.task_status = 'Drafting'
+        const res  = await http.post('/tasks/getTaskByName',{
+          reqTaskName : iTaskObj.task_name
+        })
+        this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
+        this.$data.taskLv4Form.task_status = res.data.data.task_status
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
@@ -1507,6 +1511,11 @@ export default {
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
+        this.$data.lv4TaskItemRule.showActualComplete = false
+        this.$data.lv4TaskItemRule.showProgress = false
+        this.$data.lv4TaskItemRule.showEffort = false
+        this.$data.lv4TaskItemRule.disableTypeTag = true
+        this.$data.lv4TaskItemRule.showDeliverableTag = false
       }
     },
     resetTaskGroupForm () {
@@ -1798,6 +1807,7 @@ export default {
           }
           if(res.data.data.task_TypeTag === 'Regular Task'){
             this.$data.taskLv4Form.task_status = 'Planning'
+            this.$data.taskLv4Form.task_deliverableTag = false
             const res1 = await http.post('/schedules/getSchedulesByTaskName',{
               reqTaskName : rtnTask.task_name
             })
@@ -1948,6 +1958,11 @@ export default {
         this.getActiveUserList()
         this.getTaskStatus('Drafting')
         this.$data.lv3TaskItemRule.showDeliverableTag = true
+        if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task'){
+          this.$data.lv3TaskItemRule.showDeliverableTag = false
+        }else{
+          this.$data.lv3TaskItemRule.showDeliverableTag = true
+        }
         // Set data default value
         this.$data.taskLv3Form.task_status = 'Drafting'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
@@ -1976,6 +1991,7 @@ export default {
           this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
         }
         this.$data.taskLv4Form.task_status = 'Drafting'
+        this.$data.taskLv4Form.task_type_tag = 'Regular Task'
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
@@ -1991,6 +2007,7 @@ export default {
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
+        this.$data.lv4TaskItemRule.showDeliverableTag = false
       }
     },
     // 4. Level 2 task dialog
@@ -2121,12 +2138,15 @@ export default {
           this.$data.lv3TaskItemRule.showEffort = false
           this.$data.lv3TaskItemRule.showProgress = false
           this.$data.lv3TaskItemRule.showActualComplete = false
+          this.$data.lv3TaskItemRule.showDeliverableTag = false
           if( 
             this.isFieldEmpty(reqTask.task_RegularTaskTime, 'Recurrence pattern could not be empty!')||
             this.isFieldEmpty(reqTask.task_scheduletime, 'Scheduletime could not be empty!')||
             this.isFieldEmpty(reqTask.task_startTime, 'Range of recurrence could not be empty!')){
               return
             }
+        }else{
+          this.$data.lv3TaskItemRule.disableTypeTag = false
         }
         if (Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
@@ -2170,7 +2190,7 @@ export default {
             reqRegularTaskTime : reqTask.task_RegularTaskTime,
             reqStartTime : reqTask.task_startTime,
             reqEndTime : reqTask.task_endTime,
-            reqTaskId : res.data.data.TaskName,
+            reqTaskName : res.data.data.TaskName,
             reqSchedule : reqTask.task_scheduletime,
           })       
         }
@@ -2250,6 +2270,8 @@ export default {
           this.$data.lv3TaskItemRule.showActualComplete = false
           this.$data.lv3TaskItemRule.disableTypeTag = true
           this.$data.lv3TaskItemRule.showDeliverableTag = false
+        }else{
+          this.$data.lv3TaskItemRule.disableTypeTag = false
         }
       }
       if (iAction === 'Create') {
@@ -2273,9 +2295,16 @@ export default {
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
         this.$data.lv3TaskItemRule.showCreator = false
+        this.$data.lv3TaskItemRule.showTypeTag = true
+        this.$data.lv3TaskItemRule.showDeliverableTag = true
+        if(this.$data.taskLv3Form.task_TypeTag === 'Regular Task'){
+          this.$data.lv3TaskItemRule.showDeliverableTag = false
+        }
+        this.$data.lv3TaskItemRule.showTaskGroup = true
         this.$data.taskLv3WorklogShow = false
         this.$data.lv3TaskItemRule.showRegularTaskList = false
         this.$data.lv3TaskItemRule.showSubTaskList = false
+        this.$data.lv3TaskItemRule.disableTypeTag = false
       }
       
     },
