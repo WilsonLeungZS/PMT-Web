@@ -1023,13 +1023,14 @@
                           </el-option>
                         </el-select>
                     </div>
-                    <div  v-if="RegularTaskTimeOps===3">
+                   <div  v-if="RegularTaskTimeOps===3">
                       <el-radio-group  @change="changeMonthly" v-model="MonthlyOps" >
                         <el-radio style="padding-bottom:20px" :label="1">Day <el-input @input="changeInput()" :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> of every <el-input :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth1" ></el-input> month(s)</el-radio><br>
-                        <el-radio  :label="2">The                         
+                      <!--  <el-radio  :label="2">The                         
                           <el-select :disabled="ScheduletimeMonth2Disable" v-model="num" style="width:17%;height:20px" placeholder="Frist"><el-option v-for="item in nums" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select> 
                           of <el-select :disabled="ScheduletimeMonth2Disable" v-model="week" style="width:23%;height:25px" placeholder="Monday"><el-option v-for="item in weeks" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select>
                           every <el-input :disabled="ScheduletimeMonth2Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth2" ></el-input> month(s)</el-radio>
+                      -->
                       </el-radio-group>     
                     </div>                    
                   </div>
