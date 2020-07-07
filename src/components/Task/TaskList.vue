@@ -179,7 +179,7 @@
               </el-table-column>
               <el-table-column prop="task_name" label="Number" width="170px" key="3">
                 <template slot-scope="scope">
-                   <el-button type="text" @click.stop="openTaskById(scope.row.task_name,scope.row.task_level)">{{scope.row.task_name}}</el-button>
+                   <el-button type="text" @click.stop="openTaskById(scope.row.task_id,scope.row.task_level)">{{scope.row.task_name}}</el-button>
                 </template>
               </el-table-column>
               <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="230px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
@@ -258,7 +258,7 @@
                 <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
                 <el-table-column prop="task_name" label="Number" width="150px" key="2">
                   <template slot-scope="scope">
-                    <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_name)">{{scope.row.task_name}}</el-button>
+                    <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
                   </template>
                 </el-table-column>
                 <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
@@ -2049,9 +2049,10 @@ export default {
     // 2. Task info
     openTaskById (iTaskId,iTaskLevel) {
       console.log('Click~')
-      var url = '/tasks/getTaskByName'
+      console.log()
+      var url = '/tasks/getTaskById'
       var criteria = {
-        reqTaskName: iTaskId
+        reqTaskId: iTaskId
       }
       this.getTask(url, criteria)  
     },
