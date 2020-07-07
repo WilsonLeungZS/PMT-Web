@@ -164,8 +164,6 @@
                 <el-option label=" " value="0"></el-option>
                 <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
               </el-select>
-              <!-- <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
-              <span>{{selectTaskGroupName}}</span> -->
         </div>
         <el-divider class="el-divider--horizontal"></el-divider>
 <!------- 3. End of Task Path------>
@@ -228,94 +226,94 @@
       <el-row class="tp-main" v-if="!showForLv1AndLv2">
         <el-col :span="24">
           <div v-if="subTaskListLoading"><i class="el-icon-loading"></i></div>          
-          <div style="margin-bottom:20px"  v-for="(task,index) in lv2TaskList" :key="index" :name="index">
-            <el-table v-loading="taskslistLoading" :data="task" @row-click="onRowClick" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
-              <el-table-column type="expand">
-               <template slot-scope="props">
-                  <el-row>
-                    <el-col :span="23" :offset="1">
-                      <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
-                        <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
-                        <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
-                          <template slot-scope="scope">
-                            <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.sub_task_id)" type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
-                          </template>
-                        </el-table-column>
-                        <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>   
-                        <el-table-column label="Status" prop="sub_task_status" align="center" width="100"></el-table-column>
-                        <el-table-column label="Effort" prop="sub_task_effort" align="center" width="100px"></el-table-column>
-                        <el-table-column label="Est" prop="sub_task_estimation" align="center" width="100px"></el-table-column>
-                        <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px"></el-table-column>
-                        <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px"></el-table-column>
-                        <el-table-column fixed="right" align="center" width="110">
-                          <template slot-scope="scope">
-                            <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.sub_task_id, scope.row.sub_task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
-                          </template>
-                        </el-table-column>
-                      </el-table>
-                    </el-col>
-                  </el-row>
-                </template>
-              </el-table-column>
-              <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-              <el-table-column prop="task_name" label="Number" width="150px" key="2">
-                <template slot-scope="scope">
-                  <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_name)">{{scope.row.task_name}}</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
-              <el-table-column prop="task_group" label="Time Group" align="center" min-width="180px" key="6">
-                <template slot-scope="scope">
-                  <el-select v-if="scope.row.task_level===3"  @change="((val)=>{changeTaskGroup(val, scope.row.task_id, scope.row.task_parent_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
-                    <el-option label=" " value="0"></el-option>
-                    <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
-                  </el-select>
-                </template>
-              </el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
-                <template slot-scope="scope">
-                  <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
-                </template>
-              </el-table-column>                            
-              <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4"></el-table-column>
-              <el-table-column prop="task_effort" label="Effort" align="center" width="100px" key="7"></el-table-column>
-              <el-table-column prop="task_estimation" label="Est" align="center" width="100px" key="8"></el-table-column>
-              <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
-              <el-table-column prop="task_assignee" label="Leading By/Assignee" align="center" width="180px" key="10"></el-table-column>
-              <el-table-column fixed="right" label="Edit" align="center" width="120">
-                <template slot-scope="scope">
-                  <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(4, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
-                  <el-button v-if="scope.row.task_level===2" @click.stop="refreshLv2Task(task)" type="info" size="mini" icon="el-icon-refresh"></el-button>
-                  <el-button v-if="scope.row.task_level===3" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+            <div style="margin-bottom:20px"  v-for="(task,index) in lv2TaskList" :key="index" :name="index">
+              <el-table  v-loading="tableLoading == index" :data="task" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
+                <el-table-column type="expand">
+                <template slot-scope="props">
+                    <el-row>
+                      <el-col :span="23" :offset="1">
+                        <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
+                          <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
+                          <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
+                            <template slot-scope="scope">
+                              <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.sub_task_id)" type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
+                            </template>
+                          </el-table-column>
+                          <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>   
+                          <el-table-column label="Status" prop="sub_task_status" align="center" width="100"></el-table-column>
+                          <el-table-column label="Effort" prop="sub_task_effort" align="center" width="100px"></el-table-column>
+                          <el-table-column label="Est" prop="sub_task_estimation" align="center" width="100px"></el-table-column>
+                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px"></el-table-column>
+                          <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px"></el-table-column>
+                          <el-table-column fixed="right" align="center" width="110">
+                            <template slot-scope="scope">
+                              <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.sub_task_id, scope.row.sub_task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
+                            </template>
+                          </el-table-column>
+                        </el-table>
+                      </el-col>
+                    </el-row>
                   </template>
-              </el-table-column>
-            </el-table> 
-            <div >
-              <el-row class="tl-pagination">
-                <el-col :span="24" class="tl-pagination-col">
-                  <el-pagination v-if="pathSelection"
-                    background
-                    @current-change="handleCurrentChange1"
-                    @click.native="getTaskIndex(task)"
-                    :current-page="currentPage1"
-                    :page-sizes="[20, 50, 100, 500]"
-                    :page-size="pageSize1"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="task.length">
-                  </el-pagination>
-                  <el-pagination v-if="!pathSelection"
-                    background
-                    @current-change="((page)=>{handleCurrentChangeOfEachTable(page, task[0].task_name, index)})"
-                    @size-change="((size)=>{handleSizeChangeOfEachTable(size, task[0].task_name, index)})"
-                    :page-sizes="[20, 50, 100, 500]"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :current-page="task[0].task_current_page"
-                    :page-size="task[0].task_page_size"
-                    :total="task.length">
-                  </el-pagination>
-                </el-col>
-              </el-row>
-            </div>
+                </el-table-column>
+                <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
+                <el-table-column prop="task_name" label="Number" width="150px" key="2">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_name)">{{scope.row.task_name}}</el-button>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
+                <el-table-column prop="task_group" label="Time Group" align="center" min-width="180px" key="6">
+                  <template slot-scope="scope">
+                    <el-select v-if="scope.row.task_level===3"  @change="((val)=>{changeTaskGroup(val, scope.row.task_id, scope.row.task_parent_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
+                      <el-option label=" " value="0"></el-option>
+                      <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="task_reference" label="Ref Pool" width="150px" key="5">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
+                  </template>
+                </el-table-column>                            
+                <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4"></el-table-column>
+                <el-table-column prop="task_effort" label="Effort" align="center" width="100px" key="7"></el-table-column>
+                <el-table-column prop="task_estimation" label="Est" align="center" width="100px" key="8"></el-table-column>
+                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
+                <el-table-column prop="task_assignee" label="Leading By/Assignee" align="center" width="180px" key="10"></el-table-column>
+                <el-table-column fixed="right" label="Edit" align="center" width="120">
+                  <template slot-scope="scope">
+                    <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(4, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
+                    <el-button v-if="scope.row.task_level===2" @click.stop="refreshLv2Task(task,index)" type="info" size="mini" icon="el-icon-refresh"></el-button>
+                    <el-button v-if="scope.row.task_level===3" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                    </template>
+                </el-table-column>
+              </el-table> 
+              <div >
+                <el-row class="tl-pagination">
+                  <el-col :span="24" class="tl-pagination-col">
+                    <el-pagination v-if="pathSelection"
+                      background
+                      @current-change="handleCurrentChange1"
+                      @click.native="getTaskIndex(task)"
+                      :current-page="currentPage1"
+                      :page-sizes="[20, 50, 100, 500]"
+                      :page-size="pageSize1"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="task.length">
+                    </el-pagination>
+                    <el-pagination v-if="!pathSelection"
+                      background
+                      @current-change="((page)=>{handleCurrentChangeOfEachTable(page, task[0].task_name, index)})"
+                      @size-change="((size)=>{handleSizeChangeOfEachTable(size, task[0].task_name, index)})"
+                      :page-sizes="[20, 50, 100, 500]"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :current-page="task[0].task_current_page"
+                      :page-size="task[0].task_page_size"
+                      :total="task[0].task_length">
+                    </el-pagination>
+                  </el-col>
+                </el-row>
+              </div>
             </div>
           </el-col>
         </el-row>
@@ -1115,7 +1113,7 @@
                 <el-form-item label="Parent Task" prop="task_parent_name">
                   <el-col :span="6">
                     <el-autocomplete :disabled="lv4TaskItemRule.disableParentNameInput" placeholder="Search Parent Task..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
-                      v-model="taskLv4Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv4Form')})" @clear="clearSelectForParentTask('taskLv4Form')">
+                      @input="changeParentName('taskLv4Form')" v-model="taskLv4Form.task_parent_name" :fetch-suggestions="queryTaskAsyncForParentTask" @select="((item)=>{handleSelectForParentTask(item, 'taskLv4Form')})" @clear="clearSelectForParentTask('taskLv4Form')">
                       <template slot-scope="{ item }">
                         <div class="form_list_task_name">{{ item.value }}</div>
                         <span class="form_list_task_desc">{{ item.description }}</span>
@@ -1335,6 +1333,7 @@
 <script>
 import http from '../../utils/http'
 import utils from '../../utils/utils'
+import Vue from "vue"
 export default {
   name: 'TaskList',
   data () {
@@ -1568,9 +1567,7 @@ export default {
       selection : {},
       currentTaskGroupId : '',
       taskGroups : [],
-      taskGroups2 : [],
       selectTaskGroup : [],
-      selectTaskGroupName: '',
       isFullSelectionLv3: false,
       isPathSelectionLv3: false,
       OpportunityNameOps: [],
@@ -1581,19 +1578,22 @@ export default {
         {value: 'Others', label: 'Others'}
       ],
       TaskLv2Id: '',
-      currentTask: []
+      currentTask: [],
+      tableLoading: null
     }
   },
   methods: {
     getSubTaskRowClassName ({row, rowIndex}) {
-      if (row.task_sub_tasks.length === 0) {
-        return 'row-expand-cover'
+      if(row!=null){
+        if (row.task_sub_tasks.length === 0) {
+          return 'row-expand-cover'
+        }        
       }
       //row.index = rowIndex;
     },
     async onRowClick (row,event,column) {
+      console.log(row)
       if(row!=null){
-          this.$data.pathSelection = true
           this.$data.selection = row
           var iTaskId = this.$data.selection.task_name
           var iTaskLevel = this.$data.selection.task_level
@@ -1606,6 +1606,7 @@ export default {
           this.$data.TaskLv2Id = iTaskId
           this.$data.selectTaskGroup = []
         if(Number(this.$data.formFilter.filterTaskLevel) === 1 || Number(this.$data.formFilter.filterTaskLevel) === 2){
+          this.$data.pathSelection = true    
           this.$data.showTaskPath = true
             if(iTaskLevel===1){
               this.$data.lv1TaskPath = iTaskId
@@ -1618,26 +1619,12 @@ export default {
               this.$data.showForLv1AndLv2 = false
               this.$data.isPathSelectionLv3 = true
               await this.getTaskGroup(0,false,true)
-              await this.openTaskTab(iTaskId, 1, 20)
-              this.$data.taskGroups2 = []
-              for(var i = 0 ; i < this.$data.lv2TaskList.length ; i ++){
-                for(var j = 1 ; j < this.$data.lv2TaskList[i].length ; j ++){
-                  if(this.$data.lv2TaskList[i][j].group_id != null){
-                    var resJson = {}
-                    resJson.group_id = this.$data.lv2TaskList[i][j].group_id
-                    resJson.group_name = this.$data.lv2TaskList[i][j].group_name
-                    if(JSON.stringify(this.$data.taskGroups2).indexOf(JSON.stringify(resJson)) == -1){
-                      this.$data.taskGroups2.push(resJson)
-                    }
-                  }
-                }
-              }   
+              await this.openTaskTab(iTaskId, 1, 20)  
               this.getTaskGroup(0,true,true)
               this.$data.subTaskListLoading = false
            }  
           }
       }
-
     },
     rowKey (row) {
       return row.task_id
@@ -1656,12 +1643,15 @@ export default {
       var row = {}
       row.task_name = this.$data.lv1TaskPath
       row.task_level =1
-      this.onRowClick(row)
+      if(Number(this.$data.formFilter.filterTaskLevel) === 1){
+        this.onRowClick(row)
+      }else{
+        this.filterTask()
+      }
     },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     async filterTask () {
       this.$data.taskGroupArray = []
-      this.$data.taskGroups2 = []
       this.$data.isFullSelectionLv3 = false
       this.$data.isPathSelectionLv3 = false
       if(Number(this.$data.formFilter.filterTaskLevel) === 1 ){
@@ -1669,8 +1659,6 @@ export default {
         if(this.$data.formFilter.filterTimeGroup!=[]){
           this.$data.formFilter.filterTimeGroup = []
         }
-        console.log(this.$data.showForLv1AndLv2)
-        console.log(this.$data.showTaskPath)
         this.$data.showTaskPath = false
         // if(this.$data.showForLv1AndLv2 === false&&this.$data.showTaskPath===true){
         //   await this.openTaskById(this.$data.lv2TaskPath,2)
@@ -1713,19 +1701,19 @@ export default {
         this.getTaskList(1, 20)
       }
     },
-    async refreshLv2Task (iTask) {
+    async refreshLv2Task (iTask,index) {
       console.log('Start to refresh level 2 task')
-      //this.openTaskTab(iTaskName, 1, 20)
       var reqTaskGroupId = this.$data.currentTaskGroupId
-      var reqTaskGroupFlag = this.$data.currentTaskGroupFlag
+      var reqTaskGroupFlag = 1
       const res = await http.post('/tasks/refreshLevel2TaskSubEstimation', {
-        reqTaskId: iTaskId,
-        reqTaskGroupId: reqTaskGroupId,
+        reqTaskId: iTask[0].task_id,
+        reqTaskGroupId: iTask[0].group_id,
         reqTaskGroupFlag: reqTaskGroupFlag
-      })         
+      })      
+      console.log(res.data)   
       if (res.data.status === 0) {
-        this.$data.lv2TaskList[iTaskIndex].task_subtasks_estimation = 0
-        this.$data.lv2TaskList[iTaskIndex].task_subtasks_estimation = res.data.data.task_subtasks_estimation
+        this.$data.lv2TaskList[index][0].task_subtasks_estimation = 0
+        this.$data.lv2TaskList[index][0].task_subtasks_estimation = res.data.data.task_subtasks_estimation
       }
     },
     clearFilterTask () {
@@ -1785,18 +1773,66 @@ export default {
         this.$data.ScheduletimeMonth2Disable = false              
       }
     },
+    createTaskInPlanMode (iSubTaskLevel, iTaskObj) {
+      console.log("createTaskInPlanMode")
+      if (Number(iSubTaskLevel) === 3) {
+        this.$data.taskLv3Form = {}
+        this.$data.lv3TaskItemRule.showSubTaskList = false
+        this.$data.lv3TaskItemRule.showRegularTaskList = false
+        this.$data.lv3TaskItemRule.showDeliverableTag = true
+        // Set dialog value
+        this.getActiveUserList()
+        this.getTaskStatus('Drafting')
+        // Set data default value   
+        this.$data.taskLv3Form.task_status = 'Drafting'
+        this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
+        this.$data.taskLv3Form.task_level = 3
+        this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv3Form.task_progress_nosymbol = 0
+        // Set parent data of sub task
+        this.$data.taskLv3Form.task_parent_name = iTaskObj.task_name
+        this.$data.taskLv3Form.task_parent_desc = iTaskObj.task_desc
+        this.$data.taskLv3Form.task_type_id = iTaskObj.task_type_id
+        this.$data.taskLv3Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
+        if (this.$data.currentTaskGroupId > 0) {
+          this.$data.taskLv3Form.task_group_id = this.$data.currentTaskGroupId
+        } else {
+          this.$data.taskLv3Form.task_group_id = null
+        }
+        // Show or hide column
+        this.ruleControlLv3TaskItem('Create', false)
+        this.$data.taskLv3DialogVisible = true
+      }
+      if (Number(iSubTaskLevel) === 4) {
+        this.$data.taskLv4Form = {}
+        // Set dialog value
+        this.getActiveUserList()
+        this.getTaskStatus('Drafting')
+        // this.changeParentName(iTaskObj)
+        // Set data default value
+        this.$data.taskLv4Form.task_status = 'Drafting'
+        this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
+        this.$data.taskLv4Form.task_level = 4
+        this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv4Form.task_progress_nosymbol = 0
+        // Set parent data of sub task
+        this.$data.taskLv4Form.task_parent_name = iTaskObj.task_name
+        this.$data.taskLv4Form.task_parent_desc = iTaskObj.task_desc
+        this.$data.taskLv4Form.task_type_id = iTaskObj.task_type_id
+        this.$data.taskLv4Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
+        this.$data.taskLv4Form.task_group_id = iTaskObj.task_group_id
+        this.$data.taskLv4Form.task_reference = iTaskObj.task_reference
+        this.$data.taskLv4Form.task_reference_desc = iTaskObj.task_reference_desc
+        // Show or hide column
+        this.ruleControlLv4TaskItem('Create', false)
+        this.$data.taskLv4DialogVisible = true
+      }
+    },
     async changeGroup(){
       this.$refs.fuzzySearch.$refs.input.blur = () => {
-        this.$data.selectTaskGroupName = ''
         if(Number(this.$data.formFilter.filterTaskLevel) === 1||Number(this.$data.formFilter.filterTaskLevel) === 2){
           this.openTaskTab(this.TaskLv2Id, 1, 20)
-        }
-        // for(var i = 0 ; i < this.$data.selectTaskGroup ; i ++){
-        //   const res = await http.get('/tasks/getTimeGroupById',{
-        //     reqTimeGroupId = this.$data.selectTaskGroup[i]
-        //   })
-        //   this.$data.selectTaskGroupName = this.$data.selectTaskGroupName + reqTimeGroupId + ' '
-        // }          
+        }          
       };
     },
     async getTaskList (iPage, iSize) {
@@ -1829,6 +1865,7 @@ export default {
       var listCriteria = {
         reqPage: iPage,
         reqSize: iSize,
+        reqParentTaskName: null,
         reqTaskLevel: reqTaskLevel,
         reqTaskKeyword: this.$data.searchVal,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
@@ -1841,12 +1878,13 @@ export default {
         reqOpportunity :this.$data.formFilter.filterOpportunity,
         reqTaskGroup : this.$data.formFilter.filterTimeGroup
       }
+      console.log(sizeCriteria)
+      console.log(listCriteria)
       if(reqTaskLevel === 1 || reqTaskLevel ===2){
         this.$data.showForLv1AndLv2 = true
         const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
         if (res1.data.status === 0) {
           this.$data.tasksTotalSize = res1.data.data.task_list_total_size
-          console.log(this.$data.tasksTotalSize)
           const res2 = await http.get('/tasks/getTaskList', listCriteria)
           if (res2.data.status === 0) {
             this.$data.taskslistData = res2.data.data
@@ -1873,6 +1911,13 @@ export default {
             this.$data.tasksTotalSize = res1.data.data.task_list_total_size
             const res2 = await http.get('/tasks/getLv3TaskList', listCriteria)
             if (res2.data.status === 0) {
+            for(var i = 0; i < res2.data.data.length ; i ++){
+                if(res2.data.data[i].length > 20){
+                  var task_length = res2.data.data[i].length
+                    res2.data.data[i] = res2.data.data[i].slice(0,20)
+                    res2.data.data[i].length = task_length
+                }
+              }
               this.$data.lv2TaskList = res2.data.data
               console.log('Lv3 List --->')
               console.log(res2.data.data)
@@ -1913,16 +1958,13 @@ export default {
       this.getTaskList(val, pageSize)
     },
     handleCurrentChange1 (val) {
-      var pageSize1 = this.$data.pageSize1
       this.$data.currentPage1 = val
-      for(var i = 0 ; i < this.$data.lv2TaskList.length ; i++){
-        if(this.$data.lv2TaskList[i][0].task_name === this.$data.currentTask[0].task_name ){
-          this.$data.lv2TaskList[i] = this.$data.lv2TaskList[i].slice((this.$data.currentPage1-1)*pageSize1,this.$data.currentPage1*pageSize1)
-        }
-      }
     },
     getTaskIndex (task) {
+      var iTask = []
       this.$data.currentTask = task
+      console.log(this.$data.currentTask)
+      this.handleCurrentChangeOfEachTable (this.$data.currentPage1, this.$data.currentTask[0].task_name, 0)
     },
     ruleShowListColumn (iTaskLevel) {
       if (iTaskLevel === 1) {
@@ -1935,21 +1977,21 @@ export default {
         this.$data.taskListRule.showColForLv2 = true
         this.$data.taskListRule.showColForLv3 = false
         this.$data.taskListRule.showColRef = false
-      } else if (iTaskLevel === 3) {
+      } else{
         this.$data.taskListRule.showColForLv1 = false
         this.$data.taskListRule.showColForLv2 = false
         this.$data.taskListRule.showColForLv3 = true
         if (this.$data.formFilter.filterShowRefPool) {
-          this.$data.taskListRule.showColRef = false
-        } else {
           this.$data.taskListRule.showColRef = true
+        } else {
+          this.$data.taskListRule.showColRef = false
         }
-      } else {
-        this.$data.taskListRule.showColForLv1 = false
-        this.$data.taskListRule.showColForLv2 = false
-        this.$data.taskListRule.showColForLv3 = false
-        this.$data.taskListRule.showColRef = false
-      }
+      // } else {
+      //   this.$data.taskListRule.showColForLv1 = false
+      //   this.$data.taskListRule.showColForLv2 = false
+      //   this.$data.taskListRule.showColForLv3 = false
+      //   this.$data.taskListRule.showColRef = false
+       }
     },
     async getTaskGroup (iGroupId,isShowRelate,isShowCurrent) {
       //var today = this.getNowFormatDate()
@@ -1982,7 +2024,8 @@ export default {
           this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
           this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
-        }       
+        }
+        console.log(this.$data.taskGroupArray)       
       }
     },
     async changeTaskGroup (iNewGroupId, iTaskId, iParentTaskName, iParentTaskIndex) {
@@ -2014,8 +2057,9 @@ export default {
       this.getTask(url, criteria)  
     },
     async openTaskTab (iTaskName, iPage, iSize) {
+      this.$data.subTaskListLoading = true
       this.$data.lv2TaskList = []
-      var resArr = []
+      var reqCurrentTimeGroup = ''
       const res2 = await http.post('/tasks/getTaskByName',{
         reqTaskName : iTaskName
       })
@@ -2024,16 +2068,16 @@ export default {
       if(this.$data.selectTaskGroup.length === 0){
         this.$data.selectTaskGroup = ''
       }
-      var reqTaskGroupId = ''
-      if(this.$data.selectTaskGroup==''||this.$data.selectTaskGroup == null){
-        reqTaskGroupId = this.$data.taskGroups
+      if(this.$data.selectTaskGroup == ''||this.$data.selectTaskGroup == null){
+        await this.getTaskGroup(0,true,true)
+        reqCurrentTimeGroup = this.$data.taskGroupArray
       }else{
-        reqTaskGroupId = this.$data.selectTaskGroup
+        reqCurrentTimeGroup = this.$data.selectTaskGroup
       }
       var reqTaskGroupFlag = this.$data.currentTaskGroupFlag
       var sizeCriteria = {
         reqParentTaskName: iTaskName,
-        reqTaskGroupId: reqTaskGroupId,
+        reqCurrentTimeGroup : reqCurrentTimeGroup,
         reqTaskGroupFlag: reqTaskGroupFlag,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
         reqFilterStatus: this.$data.formFilter.filterStatus
@@ -2042,11 +2086,13 @@ export default {
         reqPage: iPage,
         reqSize: iSize,
         reqParentTaskName: iTaskName,
-        reqTaskGroupId: this.$data.selectTaskGroup,
+        reqCurrentTimeGroup : reqCurrentTimeGroup,
         reqTaskGroupFlag: reqTaskGroupFlag,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
         reqFilterStatus: this.$data.formFilter.filterStatus,
       }
+      console.log(sizeCriteria)
+      console.log(listCriteria)
       console.log('Path mode: Start to get task list size')
       const res = await http.get('/tasks/getPlanTaskSizeByParentTask', sizeCriteria)
       if (res.data.status === 0) {
@@ -2054,12 +2100,18 @@ export default {
           res2.data.data.task_page_size = iSize  
           console.log('Path mode: Start to get task list data') 
           const res1 = await http.get('/tasks/getPlanTaskListByParentTask', listCriteria)
+          console.log(res1.data.data)
           if (res1.data.status === 0) {
             res2.data.data.task_sub_tasks = []
             res1.data.data.splice(0,0,res2.data.data)
             res2.data.data = []
             res2.data.data = res1.data.data
-            res2.data.data.task_total_size = res.data.data.task_list_total_size
+            if(res2.data.data.length > 20){
+              var task_length = res2.data.data.length
+                res2.data.data = res2.data.data.slice(0,20)
+                res2.data.data.length = task_length
+            }
+            res2.data.data.length = res.data.data.task_list_total_size
           } else {
             res2.data.data = []
           }                      
@@ -2067,8 +2119,9 @@ export default {
         res2.data.data = []
         res2.data.data.task_total_size = 0
       }
-      console.log(res2.data.data)
       this.$data.lv2TaskList.push(res2.data.data)
+      console.log(this.$data.lv2TaskList)
+      this.$data.subTaskListLoading = false
     },
     async getLevel2TaskListByParentTask (iTaskId,iPage,iSize) {
       console.log('Start to get level 2 task list')
@@ -2089,6 +2142,7 @@ export default {
         this.$data.taskslistData = []
         this.$data.tasksTotalSize = res.data.data.length
         this.$data.taskslistData = res.data.data
+        console.log(this.$data.taskslistData)
       } else {
         this.$data.taskslistData = []
       }
@@ -2139,6 +2193,8 @@ export default {
     },
      async getTask (iUrl, iCriteria) {
       const res = await http.post(iUrl, iCriteria)
+      console.log(res)
+      //this.$data.Scheduletime = {}
       if (res.data.status === 0) {
         var rtnTask = res.data.data
         if (rtnTask.task_level === 1) {
@@ -2261,10 +2317,9 @@ export default {
           // Clear existing data
           console.log('Start to show level 4 task')
           this.getActiveUserList()
-          this.getTaskStatus(rtnTask.task_status)
+          this.getTaskStatus(this.$data.taskLv3Form.task_status)
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
-          // this.changeParentName('taskLv4Form')
           this.$data.taskLv4Form = res.data.data
           this.TypeTagChange()
           if(this.$data.taskLv4Form.task_deliverableTag!=null){
@@ -2349,6 +2404,45 @@ export default {
         this[iTaskHistory] = []
       }
       this.$data.tasksWorklogHistoriesLoading = false
+    },
+    async changeParentName (iObj) {
+      console.log('changeParentName')
+      console.log(this[iObj].task_parent_name)
+      const res  = await http.post('/tasks/getTaskByName',{
+        reqTaskName : this[iObj].task_parent_name
+      })
+      console.log(res)
+      if(res.data.status ===0 && res.data.data != null ){
+        this[iObj].task_TypeTag = res.data.data.task_TypeTag
+      }
+      if(this[iObj].task_TypeTag === 'Regular Task' ){
+        this.$data.lv3TaskItemRule.showDeliverableTag = false
+        this.$data.lv4TaskItemRule.showDeliverableTag = false
+        this.$data.RegularTaskTimeVisible = true
+        const res1 = await http.post('/schedules/getSchedulesByTaskName',{
+           reqTaskName :res.data.data.task_name
+        })
+        console.log(res1.data.data)
+        if(res1.data.status === 0){
+          this.$data.taskLv4Form.task_scheduletime = res1.data.data.task_scheduletime
+          this.$data.taskLv4Form.task_startTime = res1.data.data.task_startTime    
+          this.$data.taskLv4Form.task_endTime = res1.data.data.task_endTime             
+          this.$data.taskLv4Form.task_RegularTaskTime = res1.data.data.task_RegularTaskTime
+          if(this.$data.taskLv4Form.task_RegularTaskTime === 'Daily'){
+            if(res1.data.data.task_scheduletime === 'Every Weekday'){
+              this.$data.DailyOps = 1
+            }else{
+              this.$data.DailyOps = 2          
+            }
+          }else{
+            this.$data.Scheduletime = res1.data.data.task_scheduletime.substring(6,8)    
+          }     
+        }       
+        if(this[iObj].task_status === 'Running' || this[iObj].task_status === 'Done'){
+          this.$data.taskLv4WorklogDisabled = true
+          this.$data.taskLv3WorklogDisabled = true
+        }
+      }
     },
     async createNewTask (iTaskLevel) {
       console.log('Create new task: ' + iTaskLevel)
@@ -2616,27 +2710,25 @@ export default {
         this.$data.taskLv3DialogVisible = true
       }
       if (Number(iSubTaskLevel) === 4) {
+        console.log('Number(iSubTaskLevel) === 4')
         this.$data.taskLv4Form = {}
         console.log("Number(iSubTaskLevel) === 4")
         // Set dialog value
         this.getActiveUserList()
-        this.getTaskStatus('Drafting')
+        this.getTaskStatus('Planning')
+        console.log(this[iParentObj].task_name)
         // Set data default value
-        this.$data.taskLv4Form.task_status = 'Drafting'
+        const res  = await http.post('/tasks/getTaskByName',{
+          reqTaskName : this[iParentObj].task_name
+        })
+        if(res.data.status ===0 && res.data.data != null ){
+          this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
+        }
+        this.$data.taskLv4Form.task_status = res.data.data.task_status
         this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv4Form.task_level = 4
-        this.$data.DailyOps = ''
-        this.$data.MonthlyOps = ''
-        this.$data.Scheduletime = {}
-        this.$data.week = ''
-        this.$data.num =''
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv4Form.task_progress_nosymbol = 0
-        this.$data.taskLv4Form.task_TypeTag = 'Regular Task'
-        this.$data.taskLv4Form.task_RegularTaskTime = this[iParentObj].task_RegularTaskTime
-        this.$data.taskLv4Form.task_startTime = this[iParentObj].task_startTime
-        this.$data.taskLv4Form.task_endTime = this[iParentObj].task_endTime
-        this.$data.taskLv4Form.task_scheduletime = this[iParentObj].task_scheduletime
         // Set parent data of sub task
         this.$data.taskLv4Form.task_parent_name = this[iParentObj].task_name
         this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
@@ -2648,7 +2740,6 @@ export default {
         // Show or hide column
         this.ruleControlLv4TaskItem('Create', false)
         this.$data.taskLv4DialogVisible = true
-        this.$data.lv4TaskItemRule.showDeliverableTag = false        
       }
     },
     // 3. Level 1 task dialog
@@ -3033,6 +3124,11 @@ export default {
       console.log('Close lv 3 dialog')
       this.$data.taskLv3DialogVisible = false
       this.$data.taskLv3Form = {}
+      // this.$data.DailyOps = ''
+      // this.$data.MonthlyOps = ''
+      //this.$data.Scheduletime = {}
+      // this.$data.week = ''
+      // this.$data.num =''
       this.$data.taskLv3Form.task_progress_nosymbol = 0
       this.$data.taskLv3FormSubTasks = []
       this.$data.taskLv3FormRegularTasks = []
@@ -3549,13 +3645,21 @@ export default {
         return false
       }
     },
-    handleCurrentChangeOfEachTable (iPage, iTaskName, Index) {
+    async handleCurrentChangeOfEachTable (iPage, iTaskName, Index) {
       console.log('iPage: ' + iPage)
       console.log('iTaskName: ' + iTaskName)
       console.log('Index: ' + Index)
-      var pageSize = this.$data.lv2TaskList[Index].task_page_size
-      this.$data.lv2TaskList[Index].task_current_page = iPage
-      this.getTaskListForEachTable(iPage, pageSize, iTaskName, Index)
+      console.log(this.$data.lv2TaskList[Index])
+      this.$data.tableLoading = Index
+      var pageSize = this.$data.lv2TaskList[Index][0].task_page_size
+      this.$data.lv2TaskList[Index].task_current_page = iPage 
+      if(this.$data.formFilter.filterTimeGroup!=null&&this.$data.formFilter.filterTimeGroup!=''){
+        this.getTaskListForEachTable(iPage, pageSize, iTaskName, Index)
+      }else{
+        await this.getTaskGroup(0,false,true)
+        this.getTaskListForEachTable(iPage, pageSize, iTaskName, Index)
+        await this.getTaskGroup(0,true,true)
+      }
     },
     handleSizeChangeOfEachTable (iSize, iTaskName, Index) {
       console.log('Size: ' + iSize)
@@ -3604,17 +3708,24 @@ export default {
       if(Boolean(this.$data.formFilter.filterShowRefPool) === false){
         this.$data.showForLv1AndLv2 = false
         const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
+        console.log(this.$data.tasksTotalSize)
         if (res1.data.status === 0) {
           this.$data.tasksTotalSize = res1.data.data.task_list_total_size
           const res3 = await http.get('/tasks/getLv3TaskListForSingleTable', listCriteria)
           if (res3.data.status === 0) {
-            this.$data.lv2TaskList[Index] = res3.data.data
             console.log('Lv3 table List --->')
-            console.log(res3.data.data)
+            this.$data.lv2TaskList[Index] = []
+            this.$data.lv2TaskList[Index] = res3.data.data
+            console.log(this.$data.lv2TaskList[Index])
+            this.$data.lv2TaskList[Index][0].task_length = this.$data.tasksTotalSize
+             this.$data.lv2TaskList[Index].length = this.$data.tasksTotalSize
             console.log('Lv3 table List ---<')
+            //update singel table after pagination 
+            this.$forceUpdate(); 
           }
         }        
       }
+      this.$data.tableLoading = null
     }
   },
   created () {

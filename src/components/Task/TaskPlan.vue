@@ -2135,6 +2135,7 @@ export default {
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if(reqTask.task_TypeTag === 'Regular Task'){
             this.$data.taskLv3WorklogShow = true
+
             this.$data.lv3TaskItemRule.showActualComplete = false
             this.$data.lv3TaskItemRule.showProgress = false
             this.$data.lv3TaskItemRule.showEffort = false
