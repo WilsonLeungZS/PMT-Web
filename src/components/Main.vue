@@ -24,6 +24,9 @@
               <el-tooltip class="item" effect="dark" content="Task List" placement="bottom">
                 <el-button icon="el-icon-tickets" circle @click="handleMenuCommand('task')"></el-button>
               </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="Global Time Group" placement="bottom">
+                <el-button icon="el-icon-time" circle @click="handleMenuCommand('timegroup')"></el-button>
+              </el-tooltip>
             </div>
           </el-col>
           <el-col :span="12">
@@ -123,6 +126,55 @@
         <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitTheme">Submit</el-button>
       </span>
     </el-dialog>
+<!------- 5. Task Group Drawer -->
+    <el-drawer title="Task Group" :visible.sync="groupDrawerVisible" :direction="groupDrawerDirection" size="20%">
+      <div class="tl-task-group">
+        <el-divider></el-divider>
+        <el-row :gutter="15" style="margin-bottom: 15px;">
+          <el-col :span="16" :offset="4">
+            <el-button @click.stop="createNewTaskGroup" type="primary" size="small" style="width: 100%">Add New Group</el-button>
+          </el-col>
+          <!-- <el-col :span="8">
+            <el-button @click.stop="selectTaskByUnassign" type="warning" size="small" style="width: 100%">Show Unassign</el-button>
+          </el-col>
+          <el-col :span="8">
+            <el-button @click.stop="selectTaskByAllTaskGroup" type="info" size="small" style="width: 100%">Show All</el-button>
+          </el-col> -->
+        </el-row>
+        <el-card @click.native="editTaskGroup(taskGroup.group_id)" class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index">
+          <div slot="header" class="clearfix">
+            <el-row :gutter="20">
+              <el-col :span="22">
+                <div @click.stop="editTaskGroup(taskGroup.group_id)" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;text-decoration:underline;color:#409EFF;cursor:pointer">{{taskGroup.group_name}}</div>
+              </el-col>
+              <!--<el-col :span="2">
+                <el-button @click.stop="selectTaskByNewTaskGroup(taskGroup)" style="float:right; padding:3px 0;" type="text">Plan Task</el-button>
+              </el-col>-->
+            </el-row>
+          </div>
+          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
+        </el-card>
+      </div>
+    </el-drawer>
+<!------- 5. End Task Group Drawer -->
+<!------- 6. Task Group Dialog -->
+    <el-dialog title="Time Group" :visible.sync="groupDialogVisible" width="35%" :close-on-click-modal="false" top="15%">
+      <el-form :model="taskGroupForm" label-width="100px" class="tl-edit-form">
+        <el-form-item label="Group Name" >
+          <el-input v-model="taskGroupForm.formGroupName" style="width: 100%"></el-input>
+        </el-form-item>
+        <el-form-item label="Time Range">
+          <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange"
+            start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width:100%">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="groupDialogVisible = false">Cancel</el-button>
+        <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitTaskGroup">Submit</el-button>
+      </div>
+    </el-dialog>
+<!------- 6. End Task Group Dialog -->
   </div>
 </template>
 
@@ -149,6 +201,25 @@ export default {
         user_email_groups: '',
         user_skill_type: '',
         user_team: ''
+      },
+      // Task Group Value
+      groupDrawerVisible: false,
+      groupDrawerDirection: 'ltr',
+      activeTabArray: [],
+      taskGroups: [],
+      taskGroupArray: [],
+      currentTaskGroupFlag: 0,
+      currentTaskGroupId: 0,
+      currentTaskGroup: 'All Time Group',
+      selectedLv1TaskId: null,
+      selectedLv1TaskName: (this.$store.getters.getPlanTaskName !== null && this.$store.getters.getPlanTaskName !== '') ? this.$store.getters.getPlanTaskName : this.$route.query.planTaskName,
+      selectedLv1TaskDesc: (this.$store.getters.getPlanTaskDesc !== null && this.$store.getters.getPlanTaskDesc !== '') ? this.$store.getters.getPlanTaskDesc : this.$route.query.planTaskDesc,
+      groupDialogVisible: false,
+      taskGroupForm: {
+        formGroupId: 0,
+        formGroupName: null,
+        formGroupTimeRange: null,
+        formGroupRelatedTask: null
       },
     }
   },
@@ -215,7 +286,120 @@ export default {
       else if (command === 'others') {
         this.$router.push({path: '/Others'})
       }
-    }
+      else if (command === 'timegroup') {
+        this.openTaskGroupDrawer()
+      }
+    },
+    openTaskGroupDrawer () {
+      this.getTaskGroup(0, false)
+      console.log('openTaskGroupDrawer')
+      this.$data.groupDrawerVisible = true
+    },
+    selectTaskByTaskGroupId (iTaskGroup) {
+      console.log('Selected Group')
+      var taskGroupId = iTaskGroup.group_id
+      var taskGroupName = iTaskGroup.group_name
+      var taskGroupTimeStart = iTaskGroup.group_start_time
+      var taskGroupTimeEnd = iTaskGroup.group_end_time
+      this.$data.currentTaskGroupFlag = 0
+      this.$data.currentTaskGroupId = taskGroupId
+      this.$data.currentTaskGroup = taskGroupName + ' ' + taskGroupTimeStart + ' ~ ' + taskGroupTimeEnd
+      this.$data.groupDrawerVisible = false
+      this.getTaskList()
+    },
+    selectTaskByAllTaskGroup () {
+      console.log('All Group')
+      this.$data.currentTaskGroupFlag = 0
+      this.$data.currentTaskGroupId = 0
+      this.$data.currentTaskGroup = 'All Time Group'
+      this.$data.groupDrawerVisible = false
+      this.getTaskList()
+    },
+    resetTaskGroupForm () {
+      this.$data.taskGroupForm.formGroupId = 0
+      this.$data.taskGroupForm.formGroupName = ''
+      this.$data.taskGroupForm.formGroupTimeRange = null
+      this.$data.taskGroupForm.formGroupRelatedTask = null
+    },
+    async editTaskGroup (iGroupId) {
+      console.log(iGroupId)
+      this.resetTaskGroupForm()
+      this.$data.taskGroupForm.formGroupRelatedTask = this.$data.selectedLv1TaskName
+      await this.getTaskGroup(iGroupId, false)
+      this.$data.groupDialogVisible = true
+    },
+    createNewTaskGroup () {
+      this.resetTaskGroupForm()
+      this.$data.taskGroupForm.formGroupRelatedTask = this.$data.selectedLv1TaskName
+      this.$data.groupDialogVisible = true
+    },
+    selectTaskByUnassign () {
+      console.log('Unassign Group')
+      this.$data.currentTaskGroupFlag = 0
+      this.$data.currentTaskGroupId = -1
+      this.$data.currentTaskGroup = 'Unassign Task'
+      this.$data.groupDrawerVisible = false
+      this.getTaskList()
+    },
+    async getTaskGroup (iGroupId, isShowCurrent) {
+      console.log(isShowCurrent)
+      const res = await http.get('/tasks/getTaskGroup', {
+        tGroupId: iGroupId,
+        isShowCurrent : isShowCurrent
+      })
+      console.log(res)
+      if (res.data.status === 0) {
+        if (iGroupId === 0) {
+          this.$data.taskGroups = []
+          this.$data.taskGroupArray = []
+          var taskGroupArr = res.data.data
+          this.$data.taskGroups = taskGroupArr
+          var resResult = []
+          for (var i = 0; i < taskGroupArr.length; i++) {
+            var resJson = {}
+            resJson.group_long_name = taskGroupArr[i].group_name + ' ' + taskGroupArr[i].group_start_time + ' ~ ' + taskGroupArr[i].group_end_time
+            resJson.group_id = taskGroupArr[i].group_id
+            resResult.push(resJson)
+          }
+          this.$data.taskGroupArray = resResult
+        } else {
+          this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
+          this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
+          this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
+        }
+      }
+    },
+    async submitTaskGroup () {
+      var tGroupId = this.$data.taskGroupForm.formGroupId
+      var tGroupName = this.$data.taskGroupForm.formGroupName
+      var tGroupTimeRange = this.$data.taskGroupForm.formGroupTimeRange
+      var tGroupRelatedTask = this.$data.taskGroupForm.formGroupRelatedTask
+      if (tGroupName === '' || tGroupName === null) {
+        this.$message.error('Task Group Could not be empty!')
+        return
+      }
+      if (tGroupTimeRange === null) {
+        this.$message.error('Task Group Time Range Invalid!')
+        return
+      }
+      var tGroupStartTime = tGroupTimeRange[0]
+      var tGroupEndTime = tGroupTimeRange[1]
+      this.$data.disabledGroupSubmit = true
+      const res = await http.post('/tasks/addOrUpdateTaskGroup', {
+        tGroupId: tGroupId,
+        tGroupName: tGroupName,
+        tGroupStartTime: tGroupStartTime,
+        tGroupEndTime: tGroupEndTime,
+        tGroupRelatedTask: tGroupRelatedTask
+      })
+      if (res.data.status === 0) {
+        this.$message({message: 'Task group created/updated successfully!', type: 'success'})
+        this.getTaskGroup(0, tGroupRelatedTask)
+        this.$data.groupDialogVisible = false
+      } else {
+        this.$message.error('Task group created/updated fail!')
+      }
+    },
   }
 }
 </script>
@@ -374,5 +558,26 @@ export default {
 }
 .nameInfo {
   text-decoration: underline ;
+}
+
+/* Task Group Style */
+.tl-task-group {
+  height: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.tl-task-group-card {
+  height: auto;
+  margin-bottom: 10px;
+  border: 2px solid #E4E7ED;
+}
+.tl-remove-task {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 17px;
 }
 </style>

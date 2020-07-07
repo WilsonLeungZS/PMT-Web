@@ -275,7 +275,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv2Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
+              <el-input class="span-format-text" type="textarea" v-model="taskLv2Form.task_detail" :rows="4"></el-input>
             </el-form-item>
             <el-row v-if="lv2TaskItemRule.showCreator">
               <el-col :span="11">
@@ -516,7 +516,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv3Form.task_desc" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
+              <el-input class="span-format-text" type="textarea" v-model="taskLv3Form.task_detail" :rows="4" :disabled="lv3TaskItemRule.disableDesc"></el-input>
             </el-form-item>
             <el-row v-if="lv3TaskItemRule.showCreator">
               <el-col :span="11">
@@ -865,7 +865,7 @@
               <el-input class="span-format-text" type="text" v-model="taskLv4Form.task_desc"></el-input>
             </el-form-item>            
             <el-form-item label="Description" prop="task_detail">
-              <el-input type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
+              <el-input class="span-format-text" type="textarea" v-model="taskLv4Form.task_detail" :rows="4"></el-input>
             </el-form-item>
             <el-row v-if="lv4TaskItemRule.showCreator">
               <el-col :span="11">
@@ -2016,7 +2016,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')) {
+            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')) {
           return
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
@@ -2127,7 +2127,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')||
+            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
@@ -2155,6 +2155,7 @@ export default {
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if(reqTask.task_TypeTag === 'Regular Task'){
             this.$data.taskLv3WorklogShow = true
+
             this.$data.lv3TaskItemRule.showActualComplete = false
             this.$data.lv3TaskItemRule.showProgress = false
             this.$data.lv3TaskItemRule.showEffort = false
@@ -2227,7 +2228,6 @@ export default {
         this.$data.taskLv3WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
         // Validate External Task(Pool Task/Auto Assign Task)
         if (!this.$data.taskLv3Form.task_creator.startsWith('PMT')) {
-          console.log('Not PMT Task')
           this.$data.lv3TaskItemRule.disableTaskEst = true
           this.$data.lv3TaskItemRule.disableDesc = true
           this.$data.lv3TaskItemRule.disableStatus = true
@@ -2240,11 +2240,10 @@ export default {
             this.$data.lv3TaskItemRule.showSubTaskEst = false
             this.$data.lv3TaskItemRule.showTypeTag = false
             this.$data.lv3TaskItemRule.showTaskGroup = false
-            this.$data.lv3TaskItemRule.showCreator = false
-            this.$nextTick(() => {
-              this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // For ref pool, hide "Sub Tasks List" Tab
-              this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // For ref pool, hide "Worklog History" tab
-            })
+            // this.$nextTick(() => {
+            //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // For ref pool, hide "Sub Tasks List" Tab
+            //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // For ref pool, hide "Worklog History" tab
+            // })
           } else {
             console.log('Not Pool Task')
             this.$data.lv3TaskItemRule.showRespLeader = true
@@ -2347,7 +2346,7 @@ export default {
       if (reqTask != null) {
         if (this.isFieldEmpty(reqTask.task_parent_name, 'Task parent name could not be empty!') ||
             this.isFieldEmpty(reqTask.task_type_id, 'Task type could not be empty!') ||
-            this.isFieldEmpty(reqTask.task_desc, 'Title could not be empty!')||
+            this.isFieldEmpty(reqTask.task_desc, 'Description could not be empty!')||
             this.isFieldEmpty(reqTask.task_TypeTag, 'Type Tag could not be empty!')) {
           return
         }
@@ -2670,6 +2669,7 @@ export default {
         tGroupId: iGroupId,
         tGroupRelatedTask: iGroupRelatedTask
       })
+      console.log(res)
       if (res.data.status === 0) {
         if (iGroupId === 0) {
           this.$data.taskGroups = []
