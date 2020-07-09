@@ -870,7 +870,7 @@
                   <el-date-picker v-model="taskLv3Form.task_target_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :offset="1">
+              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showActualComplete">
                 <el-form-item label="Actual Complete">
                   <el-date-picker v-model="taskLv3Form.task_actual_complete" type="date" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
@@ -1029,13 +1029,14 @@
                           </el-option>
                         </el-select>
                     </div>
-                    <div  v-if="RegularTaskTimeOps===3">
+                   <div  v-if="RegularTaskTimeOps===3">
                       <el-radio-group  @change="changeMonthly" v-model="MonthlyOps" >
                         <el-radio style="padding-bottom:20px" :label="1">Day <el-input @input="changeInput()" :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeDay" ></el-input> of every <el-input :disabled="ScheduletimeMonth1Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth1" ></el-input> month(s)</el-radio><br>
-                        <el-radio  :label="2">The                         
+                      <!--  <el-radio  :label="2">The                         
                           <el-select :disabled="ScheduletimeMonth2Disable" v-model="num" style="width:17%;height:20px" placeholder="Frist"><el-option v-for="item in nums" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select> 
                           of <el-select :disabled="ScheduletimeMonth2Disable" v-model="week" style="width:23%;height:25px" placeholder="Monday"><el-option v-for="item in weeks" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select>
                           every <el-input :disabled="ScheduletimeMonth2Disable" style="width:50px;height:25px" maxlength="2"  v-model="Scheduletime.ScheduletimeMonth2" ></el-input> month(s)</el-radio>
+                      -->
                       </el-radio-group>     
                     </div>                    
                   </div>
@@ -2173,6 +2174,8 @@ export default {
         this.$data.lv3TaskItemRule.showDeliverableTag = false
         this.$data.lv4TaskItemRule.showDeliverableTag = false
         this.$data.RegularTaskTimeVisible = true
+        this.$data.lv3TaskItemRule.showActualComplete = false
+        this.$data.lv4TaskItemRule.showActualComplete = false
         if(this.$data.taskLv3Form.task_status === 'Running' || this.$data.taskLv3Form.task_status === 'Done'){
           // this.$data.taskLv3WorklogDisabled = true
           this.$data.taskLv3WorklogShow = false
@@ -2261,6 +2264,7 @@ export default {
           this.$data.lv3TaskItemRule.showSubTaskList = true
           if(res.data.data.task_TypeTag === 'Regular Task'){
             this.$data.lv3TaskItemRule.showRegularTaskList = true
+            this.$data.lv3TaskItemRule.showActualComplete = false
             this.$data.taskLv3WorklogShow = false
             const res1 = await http.post('/schedules/getSchedulesByTaskName',{
               reqTaskName : rtnTask.task_name
@@ -2430,6 +2434,8 @@ export default {
       if(this[iObj].task_TypeTag === 'Regular Task' ){
         this.$data.lv3TaskItemRule.showDeliverableTag = false
         this.$data.lv4TaskItemRule.showDeliverableTag = false
+        this.$data.lv3TaskItemRule.showActualComplete = false
+        this.$data.lv4TaskItemRule.showActualComplete = false
         this.$data.RegularTaskTimeVisible = true
         const res1 = await http.post('/schedules/getSchedulesByTaskName',{
            reqTaskName :res.data.data.task_name
@@ -2727,6 +2733,7 @@ export default {
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', false)
         this.$data.taskLv3DialogVisible = true
+        this.$data.lv3TaskItemRule.showActualComplete = false
       }
       if (Number(iSubTaskLevel) === 4) {
         console.log('Number(iSubTaskLevel) === 4')
@@ -2961,7 +2968,7 @@ export default {
         }
         if(reqTask.task_TypeTag === 'Regular Task'){
           if(this.$data.taskLv3Form.task_RegularTaskTime === 'Weekly'&&this.$data.Scheduletime.ScheduletimeWeek!=null&&this.$data.week!=null){
-            this.$data.taskLv3Form.task_scheduletime= "Recur every " +this.$data.Scheduletime.ScheduletimeWeek +" weeks(s) on:"+this.$data.week
+            this.$data.taskLv3Form.task_scheduletime= "Recur every " +this.$data.Scheduletime.ScheduletimeWeek +" weeks(s) on "+this.$data.week
           }else if(this.$data.taskLv3Form.task_RegularTaskTime === 'Monthly'){
             if(this.$data.MonthlyOps === 1&&this.$data.Scheduletime.ScheduletimeDay!=null&&this.$data.Scheduletime.ScheduletimeMonth1!=null){
               this.$data.taskLv3Form.task_scheduletime = "Day "+this.$data.Scheduletime.ScheduletimeDay+" of every " +this.$data.Scheduletime.ScheduletimeMonth1 +" month(s)"   
@@ -2999,6 +3006,7 @@ export default {
           if(reqTask.task_TypeTag === 'Regular Task'){
             console.log("reqTask.task_TypeTag === 'Regular Task'")
             this.$data.taskLv3WorklogShow = false
+            this.$data.lv3TaskItemRule.showActualComplete = false
           }else{
             this.$data.lv3TaskItemRule.showActualComplete = true
             this.$data.taskLv3WorklogShow = true
@@ -3031,7 +3039,7 @@ export default {
             reqRegularTaskTime : reqTask.task_RegularTaskTime,
             reqStartTime : reqTask.task_startTime,
             reqEndTime : reqTask.task_endTime,
-            reqTaskId : res.data.data.TaskName,
+            reqTaskName : res.data.data.TaskName,
             reqSchedule : reqTask.task_scheduletime,
           })      
         }
@@ -3148,6 +3156,9 @@ export default {
         this.$data.lv3TaskItemRule.showCreator = false
         this.$data.lv3TaskItemRule.showRegularTaskList = false
         this.$data.lv3TaskItemRule.showSubTaskList = false
+        if(this.$data.taskLv3Form.task_TypeTag ==='Regular Task'){
+          this.$data.lv3TaskItemRule.showActualComplete = false
+        }
       }
     },
     closeLv3TaskDialog (done) {
