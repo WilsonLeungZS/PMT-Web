@@ -33,7 +33,7 @@
           <el-col :span="9">
             <div class="tl-bar-item">
               <span style="margin-right:10px">Task Level</span>
-              <el-radio-group v-model="formFilter.filterTaskLevel" @change="filterTask()" >
+              <el-radio-group v-model="formFilter.filterTaskLevel" @change="changeLevel()" >
                 <el-radio-button label="1"></el-radio-button>
                 <el-radio-button label="2"></el-radio-button>
                 <el-radio-button label="3"></el-radio-button>
@@ -1676,6 +1676,10 @@ export default {
         this.filterTask()
       }
     },
+    changeLevel () {
+      this.$data.pathSelection = false
+      this.filterTask()
+    },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     async filterTask () {
       this.$data.taskGroupArray = []
@@ -1689,6 +1693,7 @@ export default {
         this.$data.showTaskPath = false
         this.$data.isFullSelectionLv3 = false
         this.$data.isPathSelectionLv3 = false
+        console.log(this.$data.showForLv1AndLv2)
         this.getTaskList(1, 20)
       }else if((Number(this.$data.formFilter.filterTaskLevel) === 1 || Number(this.$data.formFilter.filterTaskLevel) === 2) && this.$data.pathSelection === true ){
         this.$data.formFilter.filterShowRefPool = false
@@ -1904,12 +1909,7 @@ export default {
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqCurrentTimeGroup = []
-      var reqTaskLevel
-      if(this.$data.formFilter.filterTaskLevel === 'EX'){
-        reqTaskLevel = 3
-      }else{
-        reqTaskLevel = Number(this.$data.formFilter.filterTaskLevel)
-      }
+      var reqTaskLevel = this.$data.formFilter.filterTaskLevel
       this.ruleShowListColumn(reqTaskLevel)
       if(this.$data.isChange&&this.$data.formFilter.filterTimeGroup.length<1){
         for(var i = 0 ; i < this.$data.taskGroupArray.length ; i++){
@@ -1923,6 +1923,12 @@ export default {
       }else{
         reqCurrentTimeGroup = this.$data.formFilter.filterTimeGroup
       }
+      if(this.$data.formFilter.filterTaskLevel === 'EX'){
+        reqTaskLevel = 3
+        reqCurrentTimeGroup = ''
+      }else{
+        reqTaskLevel = Number(this.$data.formFilter.filterTaskLevel)
+      }      
       var sizeCriteria = {
         reqTaskLevel: reqTaskLevel,
         reqTaskKeyword: this.$data.searchVal,
@@ -1978,6 +1984,7 @@ export default {
         }        
       }else{
         if(Boolean(this.$data.formFilter.filterShowRefPool) === false){
+          this.$data.subTaskListLoading = true
           this.$data.showForLv1AndLv2 = false
           const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
           console.log(res1)
@@ -2007,15 +2014,18 @@ export default {
             this.$data.tasksTotalSize = 0
             this.$data.noDataLoading = true
           }
+          this.$data.subTaskListLoading = false
           const res3 =  await http.post('/tasks/getSkillFromReference')
           this.$data.SkillTypeOps = res3.data.data         
         }else{
           this.ruleShowListColumn(3)
           this.$data.showForLv1AndLv2 = true
           const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
+          console.log(res1)
           if (res1.data.status === 0) {
             this.$data.tasksTotalSize = res1.data.data.task_list_total_size
             const res2 = await http.get('/tasks/getTaskList', listCriteria)
+            console.log(res2)
             if (res2.data.status === 0) {
               this.$data.taskslistData = res2.data.data
             } else {
@@ -3875,6 +3885,7 @@ export default {
   },
   created () {
     this.$data.isChange = false
+    this.$data.pathSelection = false
     this.$data.pageSize = 20
     this.$data.currentPage = 1
     this.$data.pageSize1 = 20
