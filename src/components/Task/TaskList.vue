@@ -1911,6 +1911,7 @@ export default {
       var reqCurrentTimeGroup = []
       var reqTaskLevel = this.$data.formFilter.filterTaskLevel
       this.ruleShowListColumn(reqTaskLevel)
+      console.log(reqTaskLevel)
       if(this.$data.isChange&&this.$data.formFilter.filterTimeGroup.length<1){
         for(var i = 0 ; i < this.$data.taskGroupArray.length ; i++){
           console.log('debug')   
@@ -2060,12 +2061,13 @@ export default {
       this.handleCurrentChangeOfEachTable (this.$data.currentPage1, this.$data.currentTask[0].task_name, 0)
     },
     ruleShowListColumn (iTaskLevel) {
-      if (iTaskLevel === 1) {
+      if (Number(iTaskLevel) === 1) {
+        console.log("~~~~")
         this.$data.taskListRule.showColForLv1 = true
         this.$data.taskListRule.showColForLv2 = false
         this.$data.taskListRule.showColForLv3 = false
         this.$data.taskListRule.showColRef = false
-      } else if (iTaskLevel === 2) {
+      } else if (Number(iTaskLevel) === 2) {
         this.$data.taskListRule.showColForLv1 = false
         this.$data.taskListRule.showColForLv2 = true
         this.$data.taskListRule.showColForLv3 = false
