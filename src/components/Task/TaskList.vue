@@ -155,16 +155,18 @@
         </el-row>
 <!------- 2. End of Search Bar -->
 <!------- 3. Task Path----->
-        <div style="float:left" v-if="showTaskPath">
-              <el-button @click.native="backToLv1()" type="text">{{lv1TaskPath}} </el-button> 
-              <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
-              <el-button @click.native="backToLv2()" v-if="!showForLv1AndLv2" type="text">{{lv2TaskPath}} </el-button> 
-              <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
-              <el-select collapse-tags @keyup.enter.native="changeGroup()" @change="selectCheck" v-if="!showForLv1AndLv2" ref="fuzzySearch" @focus="changeGroup()" v-model="selectTaskGroup" multiple filterable allow-create default-first-option style="width: auto" size="small">
-                <el-option label=" " value="0"></el-option>
-                <el-option :disabled="group.group_dis == true" v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
-              </el-select>
-        </div>
+        <el-row style="float:left" v-if="showTaskPath">
+          
+                <el-button @click.native="backToLv1()" type="text">{{lv1TaskPath}} </el-button> 
+                <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
+                <el-button @click.native="backToLv2()" v-if="!showForLv1AndLv2" type="text">{{lv2TaskPath}} </el-button> 
+                <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
+                <el-select collapse-tags @keyup.enter.native="changeGroup()" @change="selectCheck" v-if="!showForLv1AndLv2" ref="fuzzySearch" @focus="changeGroup()" v-model="selectTaskGroup" multiple filterable allow-create default-first-option style="width: 300px" size="small">
+                  <el-option label=" " value="0"></el-option>
+                  <el-option :disabled="group.group_dis == true" v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+                </el-select>
+                  
+        </el-row>
         <el-divider class="el-divider--horizontal"></el-divider>
 <!------- 3. End of Task Path------>
 <!------- 4. Task List -->
@@ -1664,6 +1666,7 @@ export default {
     backToLv1 () {
       this.$data.showForLv1AndLv2 = true
       this.$data.showTaskPath = false
+      this.$data.pathSelection = false
       this.filterTask()
     },
     backToLv2 () {
