@@ -1599,7 +1599,8 @@ export default {
       noDataLoading: false,
       isEx : false,
       currentTablePage: 1,
-      isChange : true
+      isChange : true,
+      defaultTimeGroup:[]
     }
   },
   methods: {
@@ -1752,7 +1753,7 @@ export default {
         filterIssueDateRange: [],
         filterShowRefPool: false,
         filterLeadingBy: '',
-        filterTimeGroup:''
+        filterTimeGroup:this.$data.defaultTimeGroup
       }
       this.$data.isChange = false
       this.filterTask()
@@ -1864,37 +1865,49 @@ export default {
     },
     selectCheck (){
       if(this.$data.selectTaskGroup.length != 0){
-        if(this.$data.selectTaskGroup.includes('0')||this.$data.selectTaskGroup.includes('All')){
+        if(this.$data.selectTaskGroup.includes('0')){
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = true
+          }
+          this.$data.selectTaskGroup = []
+          this.$data.selectTaskGroup.push('0')
+        }else if(this.$data.selectTaskGroup.includes('All')){
           for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
             this.$data.taskGroups[i].group_dis = true
           }
           this.$data.selectTaskGroup = []
-          this.$data.selectTaskGroup.push(this.$data.taskGroups[this.$data.taskGroups.length-1].group_name)
+          this.$data.selectTaskGroup.push('All')
         }
       }else{
-        for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
-          this.$data.taskGroups[i].group_dis = false
-        }         
-      }      
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = false
+          }         
+       }      
     },
     formSelectCheck () {
       if(this.$data.formFilter.filterTimeGroup.length != 0&&this.$data.isChange){
-        if(this.$data.formFilter.filterTimeGroup.includes('0')||this.$data.formFilter.filterTimeGroup.includes('All')){
+        console.log(this.$data.formFilter.filterTimeGroup)
+        if(this.$data.formFilter.filterTimeGroup.includes('0')){
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = true
+          }        
+          this.$data.formFilter.filterTimeGroup = []
+          this.$data.formFilter.filterTimeGroup.push('0')            
+        }else if(this.$data.formFilter.filterTimeGroup.includes('All')){
           for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
             this.$data.taskGroups[i].group_dis = true
-          }
+          }        
           this.$data.formFilter.filterTimeGroup = []
-          this.$data.formFilter.filterTimeGroup.push(this.$data.taskGroups[this.$data.taskGroups.length-1].group_name)
+          this.$data.formFilter.filterTimeGroup.push('All') 
         }
       }else{
-        for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
-          this.$data.taskGroups[i].group_dis = false
-        }         
-      }
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = false
+          }         
+        }
     },
     async changeGroup(){
       this.$refs.fuzzySearch.$refs.input.blur = () => {
-        console.log("~~~")
         this.$data.isChange = false
         if(Number(this.$data.formFilter.filterTaskLevel) === 1||Number(this.$data.formFilter.filterTaskLevel) === 2){
           this.openTaskTab(this.TaskLv2Id, 1, 20)
@@ -1916,6 +1929,7 @@ export default {
         for(var i = 0 ; i < this.$data.taskGroupArray.length ; i++){
           console.log('debug')   
           this.$data.formFilter.filterTimeGroup.push(this.$data.taskGroupArray[i])  
+          this.$data.defaultTimeGroup.push(this.$data.taskGroupArray[i])
         }            
       }
       var reqCurrentTimeGroup = ''
