@@ -33,7 +33,7 @@
           <el-col :span="9">
             <div class="tl-bar-item">
               <span style="margin-right:10px">Task Level</span>
-              <el-radio-group v-model="formFilter.filterTaskLevel" @change="filterTask()" >
+              <el-radio-group v-model="formFilter.filterTaskLevel" @change="changeLevel()" >
                 <el-radio-button label="1"></el-radio-button>
                 <el-radio-button label="2"></el-radio-button>
                 <el-radio-button label="3"></el-radio-button>
@@ -1599,7 +1599,8 @@ export default {
       noDataLoading: false,
       isEx : false,
       currentTablePage: 1,
-      isChange : true
+      isChange : true,
+      defaultTimeGroup:[]
     }
   },
   methods: {
@@ -1676,6 +1677,10 @@ export default {
         this.filterTask()
       }
     },
+    changeLevel () {
+      this.$data.pathSelection = false
+      this.filterTask()
+    },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     async filterTask () {
       this.$data.taskGroupArray = []
@@ -1689,6 +1694,7 @@ export default {
         this.$data.showTaskPath = false
         this.$data.isFullSelectionLv3 = false
         this.$data.isPathSelectionLv3 = false
+        console.log(this.$data.showForLv1AndLv2)
         this.getTaskList(1, 20)
       }else if((Number(this.$data.formFilter.filterTaskLevel) === 1 || Number(this.$data.formFilter.filterTaskLevel) === 2) && this.$data.pathSelection === true ){
         this.$data.formFilter.filterShowRefPool = false
@@ -1747,7 +1753,7 @@ export default {
         filterIssueDateRange: [],
         filterShowRefPool: false,
         filterLeadingBy: '',
-        filterTimeGroup:''
+        filterTimeGroup:this.$data.defaultTimeGroup
       }
       this.$data.isChange = false
       this.filterTask()
@@ -1859,37 +1865,49 @@ export default {
     },
     selectCheck (){
       if(this.$data.selectTaskGroup.length != 0){
-        if(this.$data.selectTaskGroup.includes('0')||this.$data.selectTaskGroup.includes('All')){
+        if(this.$data.selectTaskGroup.includes('0')){
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = true
+          }
+          this.$data.selectTaskGroup = []
+          this.$data.selectTaskGroup.push('0')
+        }else if(this.$data.selectTaskGroup.includes('All')){
           for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
             this.$data.taskGroups[i].group_dis = true
           }
           this.$data.selectTaskGroup = []
-          this.$data.selectTaskGroup.push(this.$data.taskGroups[this.$data.taskGroups.length-1].group_name)
+          this.$data.selectTaskGroup.push('All')
         }
       }else{
-        for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
-          this.$data.taskGroups[i].group_dis = false
-        }         
-      }      
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = false
+          }         
+       }      
     },
     formSelectCheck () {
       if(this.$data.formFilter.filterTimeGroup.length != 0&&this.$data.isChange){
-        if(this.$data.formFilter.filterTimeGroup.includes('0')||this.$data.formFilter.filterTimeGroup.includes('All')){
+        console.log(this.$data.formFilter.filterTimeGroup)
+        if(this.$data.formFilter.filterTimeGroup.includes('0')){
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = true
+          }        
+          this.$data.formFilter.filterTimeGroup = []
+          this.$data.formFilter.filterTimeGroup.push('0')            
+        }else if(this.$data.formFilter.filterTimeGroup.includes('All')){
           for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
             this.$data.taskGroups[i].group_dis = true
-          }
+          }        
           this.$data.formFilter.filterTimeGroup = []
-          this.$data.formFilter.filterTimeGroup.push(this.$data.taskGroups[this.$data.taskGroups.length-1].group_name)
+          this.$data.formFilter.filterTimeGroup.push('All') 
         }
       }else{
-        for(var i = 0 ; i < this.$data.taskGroups.length-1 ; i ++){
-          this.$data.taskGroups[i].group_dis = false
-        }         
-      }
+          for(var i = 0 ; i < this.$data.taskGroups.length ; i ++){
+            this.$data.taskGroups[i].group_dis = false
+          }         
+        }
     },
     async changeGroup(){
       this.$refs.fuzzySearch.$refs.input.blur = () => {
-        console.log("~~~")
         this.$data.isChange = false
         if(Number(this.$data.formFilter.filterTaskLevel) === 1||Number(this.$data.formFilter.filterTaskLevel) === 2){
           this.openTaskTab(this.TaskLv2Id, 1, 20)
@@ -1904,17 +1922,14 @@ export default {
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqCurrentTimeGroup = []
-      var reqTaskLevel
-      if(this.$data.formFilter.filterTaskLevel === 'EX'){
-        reqTaskLevel = 3
-      }else{
-        reqTaskLevel = Number(this.$data.formFilter.filterTaskLevel)
-      }
+      var reqTaskLevel = this.$data.formFilter.filterTaskLevel
       this.ruleShowListColumn(reqTaskLevel)
+      console.log(reqTaskLevel)
       if(this.$data.isChange&&this.$data.formFilter.filterTimeGroup.length<1){
         for(var i = 0 ; i < this.$data.taskGroupArray.length ; i++){
           console.log('debug')   
           this.$data.formFilter.filterTimeGroup.push(this.$data.taskGroupArray[i])  
+          this.$data.defaultTimeGroup.push(this.$data.taskGroupArray[i])
         }            
       }
       var reqCurrentTimeGroup = ''
@@ -1923,6 +1938,12 @@ export default {
       }else{
         reqCurrentTimeGroup = this.$data.formFilter.filterTimeGroup
       }
+      if(this.$data.formFilter.filterTaskLevel === 'EX'){
+        reqTaskLevel = 3
+        reqCurrentTimeGroup = ''
+      }else{
+        reqTaskLevel = Number(this.$data.formFilter.filterTaskLevel)
+      }      
       var sizeCriteria = {
         reqTaskLevel: reqTaskLevel,
         reqTaskKeyword: this.$data.searchVal,
@@ -1978,6 +1999,7 @@ export default {
         }        
       }else{
         if(Boolean(this.$data.formFilter.filterShowRefPool) === false){
+          this.$data.subTaskListLoading = true
           this.$data.showForLv1AndLv2 = false
           const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
           console.log(res1)
@@ -2007,15 +2029,18 @@ export default {
             this.$data.tasksTotalSize = 0
             this.$data.noDataLoading = true
           }
+          this.$data.subTaskListLoading = false
           const res3 =  await http.post('/tasks/getSkillFromReference')
           this.$data.SkillTypeOps = res3.data.data         
         }else{
           this.ruleShowListColumn(3)
           this.$data.showForLv1AndLv2 = true
           const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
+          console.log(res1)
           if (res1.data.status === 0) {
             this.$data.tasksTotalSize = res1.data.data.task_list_total_size
             const res2 = await http.get('/tasks/getTaskList', listCriteria)
+            console.log(res2)
             if (res2.data.status === 0) {
               this.$data.taskslistData = res2.data.data
             } else {
@@ -2050,12 +2075,13 @@ export default {
       this.handleCurrentChangeOfEachTable (this.$data.currentPage1, this.$data.currentTask[0].task_name, 0)
     },
     ruleShowListColumn (iTaskLevel) {
-      if (iTaskLevel === 1) {
+      if (Number(iTaskLevel) === 1) {
+        console.log("~~~~")
         this.$data.taskListRule.showColForLv1 = true
         this.$data.taskListRule.showColForLv2 = false
         this.$data.taskListRule.showColForLv3 = false
         this.$data.taskListRule.showColRef = false
-      } else if (iTaskLevel === 2) {
+      } else if (Number(iTaskLevel) === 2) {
         this.$data.taskListRule.showColForLv1 = false
         this.$data.taskListRule.showColForLv2 = true
         this.$data.taskListRule.showColForLv3 = false
@@ -3875,6 +3901,7 @@ export default {
   },
   created () {
     this.$data.isChange = false
+    this.$data.pathSelection = false
     this.$data.pageSize = 20
     this.$data.currentPage = 1
     this.$data.pageSize1 = 20
