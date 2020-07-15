@@ -2146,8 +2146,8 @@ export default {
     },
     async getTaskGroup (iGroupId,isShowRelate,isShowCurrent) {
       console.log('getTaskGroup')
-      //var today = this.getNowFormatDate()
-      var today = '2020-06-22'
+      var today = this.getNowFormatDate()
+      console.log(today)
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
         //tGroupRelatedTask: iGroupRelatedTask,
