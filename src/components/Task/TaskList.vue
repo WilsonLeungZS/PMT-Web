@@ -166,16 +166,16 @@
 <!------- 2. End of Search Bar -->
 <!------- 3. Task Path----->
         <el-row class="path-bar" v-if="showTaskPath">
-        <el-col></el-col>
-
-          <el-button @click.native="backToLv1()" type="text">{{lv1TaskPath}} </el-button> 
-          <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
-          <el-button @click.native="backToLv2()" v-if="!showForLv1AndLv2" type="text">{{lv2TaskPath}} </el-button> 
-          <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
-          <el-select collapse-tags @keyup.enter.native="changeGroup()" @change="selectCheck" v-if="!showForLv1AndLv2" ref="fuzzySearch" @remove-tag="removeTag()" @focus="changeGroup()" v-model="selectTaskGroup" multiple filterable allow-create default-first-option style="width: 300px" size="small">
-            <el-option label=" " value="0"></el-option>
-            <el-option :disabled="group.group_dis == true" v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
-          </el-select>
+          <el-col >
+            <el-button @click.native="backToLv1()" type="text">{{lv1TaskPath}} </el-button> 
+            <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
+            <el-button @click.native="backToLv2()" v-if="!showForLv1AndLv2" type="text">{{lv2TaskPath}} </el-button> 
+            <i v-if="!showForLv1AndLv2" class="el-icon-arrow-right"></i>
+            <el-select collapse-tags @keyup.enter.native="changeGroup()" @change="selectCheck" v-if="!showForLv1AndLv2" ref="fuzzySearch" @remove-tag="removeTag()" @focus="changeGroup()" v-model="selectTaskGroup" multiple filterable allow-create default-first-option style="width: 300px" size="small">
+              <el-option label=" " value="0"></el-option>
+              <el-option :disabled="group.group_dis == true" v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
+            </el-select>          
+          </el-col>
         </el-row>
         <el-divider class="el-divider--horizontal"></el-divider>
 <!------- 3. End of Task Path------>
@@ -1649,6 +1649,7 @@ export default {
           this.$data.TaskLv2Id = iTaskId
           this.$data.selectTaskGroup = []
         if(Number(this.$data.formFilter.filterTaskLevel) === 1 || Number(this.$data.formFilter.filterTaskLevel) === 2){
+          this.$data.lv2TaskList = []
           this.$data.pathSelection = true    
           this.$data.showTaskPath = true
             if(iTaskLevel===1){
@@ -2111,11 +2112,14 @@ export default {
       this.getTaskList(val, pageSize)
     },
     handleCurrentChange1 (val) {
+      console.log('~~~~~')
       this.$data.currentPage1 = val
+      console.log(this.$data.currentPage1)
     },
     getTaskIndex (task) {
       var iTask = []
       this.$data.currentTask = task
+      console.log(task)
       this.handleCurrentChangeOfEachTable (this.$data.currentPage1, this.$data.currentTask[0].task_name, 0)
     },
     ruleShowListColumn (iTaskLevel) {
@@ -2263,6 +2267,12 @@ export default {
         response = []
       }
       this.$data.lv2TaskList.push(response)
+      if(this.$data.lv2TaskList.length > 1){
+        var rtnResult = []
+        rtnResult.push(this.$data.lv2TaskList.slice(0,1))
+        this.$data.lv2TaskList = rtnResult
+        
+      }
       this.$data.subTaskListLoading = false
       this.$data.isChange = true
     },
@@ -3881,6 +3891,7 @@ export default {
       var response = []
       this.ruleShowListColumn(reqTaskLevel)
       var reqCurrentTimeGroup = []
+      this.$data.tasksTotalSize = this.$data.lv2TaskList[Index].length
       if(Number(this.$data.formFilter.filterTaskLevel)===1 || Number(this.$data.formFilter.filterTaskLevel)=== 2){
         reqCurrentTimeGroup = this.$data.selectTaskGroup
       }else{
@@ -3923,6 +3934,7 @@ export default {
             this.$data.lv2TaskList[Index] = []
             this.$data.lv2TaskList[Index] = res2.data.data
             this.$data.lv2TaskList[Index][0].task_length = res1.data.data.task_list_total_size
+            this.$data.lv2TaskList[Index].length = this.$data.tasksTotalSize
             // //update singel table after pagination 
             // this.$forceUpdate(); 
           }
@@ -3993,9 +4005,10 @@ export default {
   margin-top: 10px;
 }
 .path-bar {
-  margin-top: 10px;
-  float:left;
-  background-color:#D5D5D5
+  margin-top: 10px ;
+  padding:5px 0;
+  /* float:left; */
+  background-color:#F7F7F7
 }
 .tl-bar-item {
   height: 50px;
@@ -4164,7 +4177,7 @@ export default {
 <style>
 
 .el-divider--horizontal {
-  margin-top: 55px;
+  margin-top: 0px;
 }
 .el-dialog__body {
   padding: 10px 20px;
@@ -4277,7 +4290,7 @@ input[type="number"]{
 }
 
 .row-height-line {
-  background-color: #D5D5D5;
+  background-color: #F7F7F7 !important;
 }
 
 .mouseClick {
