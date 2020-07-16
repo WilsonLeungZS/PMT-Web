@@ -2363,6 +2363,7 @@ export default {
       console.log(res)
       if (res.data.status === 0) {
         var rtnTask = res.data.data
+        console.log(rtnTask)
         if (rtnTask.task_level === 1) {
           this.getActiveUserList()
           this.getTaskType(null)
@@ -2491,7 +2492,7 @@ export default {
           // Clear existing data
           console.log('Start to show level 4 task')
           this.getActiveUserList()
-          this.getTaskStatus(this.$data.taskLv3Form.task_status)
+          this.getTaskStatus(rtnTask.task_status)
           this.getTaskType(null)
           this.$data.taskLv4Form = {}
           this.$data.taskLv4Form = res.data.data
