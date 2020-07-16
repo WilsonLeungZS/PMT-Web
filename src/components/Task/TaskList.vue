@@ -277,7 +277,7 @@
                 <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="250px" key="3"></el-table-column>
                 <el-table-column prop="task_group" label="Time Group" align="center" min-width="180px" key="6">
                   <template slot-scope="scope">
-                    <el-select v-if="scope.row.task_level===3"  @change="((val)=>{changeTaskGroup(val, scope.row.task_id, scope.row.task_parent_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
+                    <el-select v-if="scope.row.task_level===3" :disabled="(scope.row.task_status==='Running'||scope.row.task_status==='Done')" @change="((val)=>{changeTaskGroup(val, scope.row.task_id, scope.row.task_parent_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
                       <el-option label=" " value="0"></el-option>
                       <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id"></el-option>
                     </el-select>
@@ -813,7 +813,7 @@
             <el-row>
               <el-col :span="11" v-if="lv3TaskItemRule.showTypeTag">
                 <el-form-item label="Type Tag" prop="task_TypeTag">
-                  <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%" :disabled = "lv3TaskItemRule.disableTypeTag">
+                  <el-select @change="TypeTagChange" v-model="taskLv3Form.task_TypeTag" style="width: 100%" :disabled="lv3TaskItemRule.disableTypeTag">
                     <el-option
                       v-for="item in typeTagOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
@@ -2055,6 +2055,7 @@ export default {
           this.$data.subTaskListLoading = true
           this.$data.showForLv1AndLv2 = false
           const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
+          console.log(res1)
           if (res1.data.status === 0) {
             this.$data.tasksTotalSize = res1.data.data.task_list_total_size
             const res2 = await http.get('/tasks/getLv3TaskList', listCriteria)
@@ -2085,6 +2086,7 @@ export default {
           this.ruleShowListColumn(3)
           this.$data.showForLv1AndLv2 = true
           const res1 = await http.get('/tasks/getTaskListTotalSize', sizeCriteria)
+          console.log(res1)
           if (res1.data.status === 0) {
             this.$data.tasksTotalSize = res1.data.data.task_list_total_size
             const res2 = await http.get('/tasks/getTaskList', listCriteria)
@@ -2215,8 +2217,8 @@ export default {
       const res2 = await http.post('/tasks/getTaskByName',{
         reqTaskName : iTaskName
       })
-      this.$data.pageSize = iSize
-      this.$data.currentPage = iPage
+      this.$data.pageSize1 = iSize
+      this.$data.currentPage1 = iPage
       if(this.$data.selectTaskGroup.length === 0){
         this.$data.selectTaskGroup = []
       }
@@ -2248,11 +2250,13 @@ export default {
       console.log(listCriteria)
       console.log('Path mode: Start to get task list size')
       const res = await http.get('/tasks/getPlanTaskSizeByParentTask', sizeCriteria)
+      console.log(res)
       if (res.data.status === 0) {
           res2.data.data.task_page_number = iPage
           res2.data.data.task_page_size = iSize  
           console.log('Path mode: Start to get task list data') 
           const res11 =  await http.get('/tasks/getPlanTaskListByParentTask', listCriteria)
+          console.log(res11)
           response = res11.data.data
           if (res11.data.status === 0) { 
             if(response.length > 20){
@@ -2699,7 +2703,6 @@ export default {
         this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
         this.$data.taskLv4Form.task_progress_nosymbol = 0
         // Show or hide column
-
         this.ruleControlLv4TaskItem('Create', true)
         this.$data.taskLv4DialogVisible = true
       }
@@ -3216,6 +3219,7 @@ export default {
         this.$data.taskLv3DialogTitle = '3 - Executive Task'
         this.$data.activeTabForLv3 = 'tab_basic_info'
         this.$data.lv3TaskItemRule.showProgress = true
+        this.$data.lv3TaskItemRule.disableTypeTag = true
         // this.$nextTick(() => {
         //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
         //   this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = '' // Show worklog history tab
@@ -3267,7 +3271,6 @@ export default {
           this.$data.lv3TaskItemRule.showTaskGroup = true
           this.$data.lv3TaskItemRule.disableParentNameInput = this.$data.statusCollection[statusIndex]['status_disable_change_parent']
         }
-        
         if(this.$data.taskLv3Form.task_TypeTag ==='Regular Task'){
           this.$data.taskLv3WorklogShow = false
           this.$data.lv3TaskItemRule.showProgress = false
@@ -3276,7 +3279,7 @@ export default {
           this.$data.lv3TaskItemRule.disableTypeTag = true
           this.$data.lv3TaskItemRule.showDeliverableTag = false
         }else{
-          this.$data.lv3TaskItemRule.disableTypeTag = false
+          //this.$data.lv3TaskItemRule.disableTypeTag = false
         }
       }
       if (iAction === 'Create') {
@@ -3297,7 +3300,8 @@ export default {
         this.$data.MonthlyOps = ''
         this.$data.Scheduletime = {}
         this.$data.week = ''
-        this.$data.num =''               
+        this.$data.num =''         
+        this.$data.lv3TaskItemRule.disableTypeTag = false      
         this.$data.lv3TaskItemRule.disableTaskEst = false
         this.$data.lv3TaskItemRule.disableDesc = false
         this.$data.lv3TaskItemRule.disableStatus = false
@@ -3920,6 +3924,9 @@ export default {
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
         reqOpportunity :this.$data.formFilter.filterOpportunity,
         reqSkill : this.$data.formFilter.filterSkill,
+        reqEffort: this.$data.lv2TaskList[Index][0].task_effort,
+        reqSubTasksEst: this.$data.lv2TaskList[Index][0].task_subtasks_estimation,
+        reqEst: this.$data.lv2TaskList[Index][0].task_estimation,
       }
       console.log(sizeCriteria)
       console.log(listCriteria)
