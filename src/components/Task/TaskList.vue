@@ -873,7 +873,7 @@
             <el-row>
               <el-col :span="11">
                 <el-form-item label="Status">
-                  <el-select :disabled="lv3TaskItemRule.disableStatus" v-model="taskLv3Form.task_status" style="width: 100%">
+                  <el-select :disabled="lv3TaskItemRule.disableStatus" v-model="taskLv3Form.task_status" @change = "statusChange" style="width: 100%">
                     <el-option v-for="(status, index) in statusArray" :key="index" :label="status.status_name" :value="status.status_name"></el-option>
                   </el-select>
                 </el-form-item>
@@ -1214,7 +1214,7 @@
             <el-row>
               <el-col :span="11">
                 <el-form-item label="Status">
-                  <el-select :disabled="lv4TaskItemRule.disableStatus" v-model="taskLv4Form.task_status" style="width: 100%">
+                  <el-select :disabled="lv4TaskItemRule.disableStatus" v-model="taskLv4Form.task_status" @change = "statusChange" style="width: 100%">
                     <el-option v-for="(status, index) in statusArray" :key="index" :label="status.status_name" :value="status.status_name"></el-option>
                   </el-select>
                 </el-form-item>
@@ -2347,6 +2347,15 @@ export default {
         this.$data.lv4TaskItemRule.showActualComplete = true
         this.$data.taskLv4WorklogShow = true
         this.$data.RegularTaskTimeVisible = false  
+      }
+    },
+    //george
+    statusChange(){
+      if(this.$data.taskLv3Form.task_status === 'Done'){
+        this.$data.taskLv3Form.task_actual_complete = this.dateForYMD(new Date());
+      }
+      if(this.$data.taskLv4Form.task_status === 'Done'){
+        this.$data.taskLv4Form.task_actual_complete = this.dateForYMD(new Date());
       }
     },
      async getTask (iUrl, iCriteria) {
@@ -3833,6 +3842,16 @@ export default {
         var changeDateMinutes = this.stringAddZero(iDate.getMinutes())
         var changeDateSeconds = this.stringAddZero(iDate.getHours())
         return changeDateYear + '-' + changeDateMonth + '-' + changeDateDay + ' ' + changeDateHours + ':' + changeDateMinutes + ':' + changeDateSeconds
+      } else {
+        return null
+      }
+    },
+    dateForYMD (iDate) {
+      if (iDate !== null && iDate !== '' && iDate !== 'Invalid Date') {
+        var changeDateYear = iDate.getFullYear()
+        var changeDateMonth = this.stringAddZero(iDate.getMonth() + 1)
+        var changeDateDay = this.stringAddZero(iDate.getDate())
+        return changeDateYear + '-' + changeDateMonth + '-' + changeDateDay
       } else {
         return null
       }
