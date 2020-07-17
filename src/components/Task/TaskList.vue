@@ -1897,6 +1897,7 @@ export default {
         this.$data.taskLv4Form.task_parent_name = iTaskObj.task_name
         this.$data.taskLv4Form.task_TypeTag = iTaskObj.task_TypeTag
         this.$data.taskLv4Form.task_type_id = iTaskObj.task_type_id
+        this.$data.taskLv4Form.task_group_id
         if(iTaskObj.task_deliverableTag!=null){
           this.$data.taskLv4Form.task_deliverableTag = iTaskObj.task_deliverableTag.split(',')
         }
@@ -3364,7 +3365,7 @@ export default {
     // 6. Level 4 task dialog
     async saveLv4Task () {
       var reqTask = this.$data.taskLv4Form    
-      console.log(reqTask)   
+      console.log(reqTask)
       if(this.$data.taskLv4Form.task_deliverableTag!=null&&typeof(this.$data.taskLv4Form.task_deliverableTag)==='object'){
           reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
       }
