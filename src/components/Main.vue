@@ -75,20 +75,6 @@
                       <div v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item" class="nameInfo" >{{item}}</div>
                     </el-col>
                   </el-row>
-                  <!-- <div>
-                    <div>
-                      <span></span>
-                      <span style="text-decoration: underline"></span>                      
-                    </div>
-                    <div>
-                      <span></span>
-                      <span style="text-decoration: underline"></span>
-                    </div>
-                    <div>
-                      <span></span>
-                      <span style="text-decoration: underline"></span>
-                    </div>
-                  </div> -->
                   <el-button slot="reference" :style="{'background-color': btnColor}" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>    
                 </el-popover>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
@@ -152,7 +138,19 @@
               </el-col>-->
             </el-row>
           </div>
-          <span style="font-size: 13px;color: #909399; margin-top: 5px;">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
+          <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
+          <div class="card-Count">
+            <div class="card-Test">Level 3 Task Count: </div>
+            <el-divider class="el-divider--horizontal1"></el-divider>
+            <el-row>
+              <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.Count.draftingC}}</el-col> 
+              <el-col :span="12" class="card-Test" >Planning : {{taskGroup.Count.planningC}}</el-col> 
+            </el-row>
+            <el-row>
+              <el-col :span="12" class="card-Test" >Running : {{taskGroup.Count.runningC}}</el-col>
+              <el-col :span="12" class="card-Test" >Done : {{taskGroup.Count.doneC}}</el-col>             
+            </el-row>
+          </div>
         </el-card>
       </div>
     </el-drawer>
@@ -207,7 +205,6 @@ export default {
       groupDrawerDirection: 'ltr',
       activeTabArray: [],
       taskGroups: [],
-      taskGroupArray: [],
       currentTaskGroupFlag: 0,
       currentTaskGroupId: 0,
       currentTaskGroup: 'All Time Group',
@@ -342,18 +339,22 @@ export default {
       this.getTaskList()
     },
     async getTaskGroup (iGroupId, isShowCurrent) {
-      console.log(isShowCurrent)
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
         isShowCurrent : isShowCurrent
       })
-      console.log(res)
       if (res.data.status === 0) {
         if (iGroupId === 0) {
           this.$data.taskGroups = []
-          this.$data.taskGroupArray = []
-          var taskGroupArr = res.data.data
-          this.$data.taskGroups = taskGroupArr
+          for(var i = 0 ; i < res.data.data .length  ; i++){
+           const res1 = await http.get('/tasks/countByTaskGroup', {
+              reqTaskGroupId: res.data.data [i].group_id,
+            })
+            res.data.data[i].Count = res1.data.data
+          } 
+          var taskGroupArr = res.data.data 
+          this.$data.taskGroups = taskGroupArr 
+          console.log(this.$data.taskGroups)             
           var resResult = []
           for (var i = 0; i < taskGroupArr.length; i++) {
             var resJson = {}
@@ -361,7 +362,6 @@ export default {
             resJson.group_id = taskGroupArr[i].group_id
             resResult.push(resJson)
           }
-          this.$data.taskGroupArray = resResult
         } else {
           this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
@@ -579,5 +579,26 @@ export default {
   display: flex;
   flex-direction: column;
   font-size: 17px;
+}
+
+.card-Test {
+  font-size: 13px;
+  color: #909399; 
+  margin-top: 5px;
+}
+
+.card-blog {
+  margin: 35px;
+  text-align: center;
+}
+
+.card-Count {
+  border:1px solid #d2d5db;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.el-divider--horizontal1{
+  margin-bottom: 5px;
 }
 </style>
