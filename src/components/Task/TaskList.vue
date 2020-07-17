@@ -1114,7 +1114,7 @@
               </el-col>
             </el-row>
           </el-tab-pane>
-          <el-tab-pane v-if="!taskLv3Form.task_TypeTag==='Regular Task'" label="Worklogs List" name="tab_worklog_histories">
+          <el-tab-pane v-if="taskLv3Form.task_TypeTag!='Regular Task'&&taskLv3WorklogShow" label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
               <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv3FormHistories" :key="index" :timestamp="history.timestamp"
@@ -1297,7 +1297,7 @@
               <el-progress class="tl-edit-form-progress" :text-inside="true" :stroke-width="24" :percentage="Number(taskLv4Form.task_progress_nosymbol)" :status="taskLv4FormProgressStatus"></el-progress>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane v-if="!taskLv4Form.task_TypeTag==='Regular Task'" label="Worklogs List" name="tab_worklog_histories">
+          <el-tab-pane v-if="taskLv4Form.task_TypeTag!='Regular Task'&&taskLv4WorklogShow" label="Worklogs List" name="tab_worklog_histories">
             <el-card class="box-card tl-history-box-card">
               <el-timeline v-loading="tasksWorklogHistoriesLoading">
                 <el-timeline-item v-for="(history, index) in taskLv4FormHistories" :key="index" :timestamp="history.timestamp"
@@ -1767,17 +1767,23 @@ export default {
     },
     async refreshLv2Task (iTask,index) {
       console.log('Start to refresh level 2 task')
-      // var reqTaskGroupId = this.$data.currentTaskGroupId
-      // var reqTaskGroupFlag = 1
-      // const res = await http.post('/tasks/refreshLevel2TaskSubEstimation', {
-      //   reqTaskId: iTask[0].task_id,
-      //   reqTaskGroupId: iTask[0].group_id,
-      //   reqTaskGroupFlag: reqTaskGroupFlag
-      // })  
-      // console.log(res)    
-      // if (res.data.status === 0) {
-      //   this.$data.lv2TaskList[index][0].task_subtasks_estimation = res.data.data.task_subtasks_estimation
-      // }
+      var reqTaskGroupId = []
+      if(Number(this.$data.formFilter.filterTaskLevel) === 3){
+        reqTaskGroupId = this.$data.formFilter.filterTimeGroup
+      }else{
+        reqTaskGroupId = this.$data.selectTaskGroup
+      }
+      var reqTaskGroupFlag = 0
+      console.log(reqTaskGroupId)
+      const res = await http.get('/tasks/refreshLevel2TaskSubEstimation', {
+        reqTaskId: iTask[0].task_id,
+        reqTaskGroupId: reqTaskGroupId,
+        reqTaskGroupFlag: reqTaskGroupFlag
+      })  
+      console.log(res)    
+      if (res.data.status === 0) {
+        this.$data.lv2TaskList[index][0].task_subtasks_estimation = res.data.data.task_subtasks_estimation
+      }
       this.handleCurrentChangeOfEachTable(1,iTask[0].task_name,index)    
       this.$data.lv2TaskList[index][0].task_current_page = 1
       this.$data.currentPage1 = 1
@@ -2233,7 +2239,7 @@ export default {
       var sizeCriteria = {
         reqParentTaskName: iTaskName,
         reqCurrentTimeGroup : reqCurrentTimeGroup,
-        reqTaskGroupFlag: reqTaskGroupFlag,
+        reqTaskGroupFlag: 0,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
         reqFilterStatus: this.$data.formFilter.filterStatus,
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
@@ -2243,7 +2249,7 @@ export default {
         reqSize: iSize,
         reqParentTaskName: iTaskName,
         reqCurrentTimeGroup : reqCurrentTimeGroup,
-        reqTaskGroupFlag: reqTaskGroupFlag,
+        reqTaskGroupFlag: 0,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
         reqFilterStatus: this.$data.formFilter.filterStatus,
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
@@ -2262,7 +2268,7 @@ export default {
           response = res11.data.data
           if (res11.data.status === 0) { 
             if(response.length > 20){
-              var task_length = response.length
+              var task_length = response.length+1
                 response = response.slice(0,20)
                 response.length = task_length
             }
@@ -2292,7 +2298,7 @@ export default {
       const res = await http.post('/tasks/getLevel2TaskListByParentTask', {
         reqParentTaskName: reqParentTaskName,
         reqTaskGroupId: reqTaskGroupId,
-        reqTaskGroupFlag: reqTaskGroupFlag,
+        reqTaskGroupFlag: 0,
         reqPage: iPage,
         reqSize: iSize
       })
@@ -2341,11 +2347,9 @@ export default {
         this.$data.lv3TaskItemRule.showActualComplete = true
         this.$data.lv3TaskItemRule.showProgress = true
         this.$data.lv3TaskItemRule.showEffort = true
-        this.$data.taskLv3WorklogShow = true
         this.$data.lv4TaskItemRule.showEffort = true
         this.$data.lv4TaskItemRule.showProgress = true
         this.$data.lv4TaskItemRule.showActualComplete = true
-        this.$data.taskLv4WorklogShow = true
         this.$data.RegularTaskTimeVisible = false  
       }
     },
@@ -3201,16 +3205,16 @@ export default {
         }
         if (res.data.status === 0) {
           this.$message({message: 'Task created successfully!', type: 'success'})
+          this.openTaskById(res.data.data.Id)
+          await this.getTaskGroup(0,false,true)          
         } else {
           this.$message({message: 'Task updated successfully!', type: 'success'})
         }
         this.$data.lv3TaskItemRule.showSubTaskList = true
         this.$data.taskLv3SaveBtnDisabled = false
-        this.openTaskById(res.data.data.Id)
-        await this.getTaskGroup(0,false,true)
         for(var i = 0 ; i < this.$data.lv2TaskList.length ; i++){
           if(this.$data.lv2TaskList[i][0].task_name === reqTask.task_parent_name ){
-            this.handleCurrentChangeOfEachTable(1,reqTask.task_parent_name,i)
+            await this.handleCurrentChangeOfEachTable(1,reqTask.task_parent_name,i)
             break
           }
         }
@@ -3601,7 +3605,6 @@ export default {
     async confirmRemoveTask () {
       var taskId = this.$data.removeTaskId
       var taskName = this.$data.removeTaskName
-      this.$data.subTaskListLoading = true
       var tUpdatedDate = this.getDay(-3)
       const res = await http.post('/tasks/removeTaskIfNoSubTaskAndWorklog', {
         tTaskId: taskId,
@@ -3614,7 +3617,7 @@ export default {
           type: 'success'
         })
         this.closeRemoveTask()
-        this.$forceUpdate()
+        //this.refreshLv2Task()
       } else {
         this.$message.error(res.data.message)
       }
@@ -3933,9 +3936,6 @@ export default {
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
         reqOpportunity :this.$data.formFilter.filterOpportunity,
         reqSkill : this.$data.formFilter.filterSkill,
-        reqEffort: this.$data.lv2TaskList[Index][0].task_effort,
-        reqSubTasksEst: this.$data.lv2TaskList[Index][0].task_subtasks_estimation,
-        reqEst: this.$data.lv2TaskList[Index][0].task_estimation,
       }
       console.log(sizeCriteria)
       console.log(listCriteria)
@@ -3949,8 +3949,8 @@ export default {
             console.log(res2.data.data)
             this.$data.lv2TaskList[Index] = []
             this.$data.lv2TaskList[Index] = res2.data.data
-            this.$data.lv2TaskList[Index][0].task_length = res1.data.data.task_list_total_size
-            this.$data.lv2TaskList[Index].length = this.$data.tasksTotalSize
+            this.$data.lv2TaskList[Index][0].task_length = res1.data.data.task_list_total_size+1
+            this.$data.lv2TaskList[Index].length = res1.data.data.task_list_total_size+1
             // //update singel table after pagination 
             // this.$forceUpdate(); 
           }
