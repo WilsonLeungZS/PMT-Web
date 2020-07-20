@@ -139,17 +139,17 @@
             </el-row>
           </div>
           <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
-          <!-- <el-row :gutter="60">
-            <el-col class="card-Test" >Planning : {{taskGroup.Count.planningC}}</el-col> 
-            <el-col class="card-Test" >Running : {{taskGroup.Count.runningC}}</el-col>
-            <el-col class="card-Test" >Done : {{taskGroup.Count.doneC}}</el-col>        
-          </el-row> -->
           <div class="card-Count">
-            <div class="card-Test">Task Counting: </div>
+            <div class="card-Test">Level 3 Task Count: </div>
             <el-divider class="el-divider--horizontal1"></el-divider>
-            <span class="card-Test" >Planning : {{taskGroup.Count.planningC}}</span>&nbsp;&nbsp;&nbsp;
-            <span class="card-Test" >Running : {{taskGroup.Count.runningC}}</span>&nbsp;&nbsp;&nbsp;
-            <span class="card-Test" >Done : {{taskGroup.Count.doneC}}</span>
+            <el-row>
+              <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.Count.draftingC}}</el-col> 
+              <el-col :span="12" class="card-Test" >Planning : {{taskGroup.Count.planningC}}</el-col> 
+            </el-row>
+            <el-row>
+              <el-col :span="12" class="card-Test" >Running : {{taskGroup.Count.runningC}}</el-col>
+              <el-col :span="12" class="card-Test" >Done : {{taskGroup.Count.doneC}}</el-col>             
+            </el-row>
           </div>
         </el-card>
       </div>
@@ -585,6 +585,11 @@ export default {
   font-size: 13px;
   color: #909399; 
   margin-top: 5px;
+}
+
+.card-blog {
+  margin: 35px;
+  text-align: center;
 }
 
 .card-Count {
