@@ -1974,19 +1974,18 @@ export default {
       };
     },
     async getTaskList (iPage, iSize) {
+      this.$data.lv2TaskList = []
       this.$data.formFilterdisable = true
       this.$data.taskslistLoading = true
       this.$data.noDataLoading = false
       this.$data.taskslistData = []
-      this.$data.lv2TaskList = []
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqCurrentTimeGroup = []
       var reqTaskLevel = this.$data.formFilter.filterTaskLevel
       this.ruleShowListColumn(reqTaskLevel)
-      console.log(this.$data.isChange)
-      console.log(this.$data.formFilter.filterTimeGroup)
       if(this.$data.isChange&&this.$data.formFilter.filterTimeGroup.length<1){
+        console.log(this.$data.taskGroupArray)
         for(var i = 0 ; i < this.$data.taskGroupArray.length ; i++){
           console.log('debug')   
           this.$data.formFilter.filterTimeGroup.push(this.$data.taskGroupArray[i])  
@@ -3985,6 +3984,7 @@ export default {
     }
   },
   created () {
+    this.$data.taskGroupArray = []
     this.$data.isChange = false
     this.$data.pathSelection = false
     this.$data.pageSize = 20
