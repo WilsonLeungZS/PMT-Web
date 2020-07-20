@@ -120,22 +120,13 @@
           <el-col :span="16" :offset="4">
             <el-button @click.stop="createNewTaskGroup" type="primary" size="small" style="width: 100%">Add New Group</el-button>
           </el-col>
-          <!-- <el-col :span="8">
-            <el-button @click.stop="selectTaskByUnassign" type="warning" size="small" style="width: 100%">Show Unassign</el-button>
-          </el-col>
-          <el-col :span="8">
-            <el-button @click.stop="selectTaskByAllTaskGroup" type="info" size="small" style="width: 100%">Show All</el-button>
-          </el-col> -->
         </el-row>
-        <el-card @click.native="editTaskGroup(taskGroup.group_id)" class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index">
+        <el-card :loading="taskGroupLoading" @click.native="editTaskGroup(taskGroup.group_id)" class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index">
           <div slot="header" class="clearfix">
             <el-row :gutter="20">
               <el-col :span="22">
                 <div @click.stop="editTaskGroup(taskGroup.group_id)" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;text-decoration:underline;color:#409EFF;cursor:pointer">{{taskGroup.group_name}}</div>
               </el-col>
-              <!--<el-col :span="2">
-                <el-button @click.stop="selectTaskByNewTaskGroup(taskGroup)" style="float:right; padding:3px 0;" type="text">Plan Task</el-button>
-              </el-col>-->
             </el-row>
           </div>
           <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
@@ -218,6 +209,7 @@ export default {
         formGroupTimeRange: null,
         formGroupRelatedTask: null
       },
+      taskGroupLoading: false
     }
   },
   methods: {
@@ -289,7 +281,7 @@ export default {
     },
     openTaskGroupDrawer () {
       this.getTaskGroup(0, false)
-      console.log('openTaskGroupDrawer')
+      console.log('Start to get time group')
       this.$data.groupDrawerVisible = true
     },
     selectTaskByTaskGroupId (iTaskGroup) {
@@ -339,13 +331,15 @@ export default {
       this.getTaskList()
     },
     async getTaskGroup (iGroupId, isShowCurrent) {
+      this.$data.taskGroups = []
+      this.$data.taskGroupLoading = true 
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
         isShowCurrent : isShowCurrent
       })
       if (res.data.status === 0) {
+        console.log(res.data)
         if (iGroupId === 0) {
-          this.$data.taskGroups = []
           for(var i = 0 ; i < res.data.data .length  ; i++){
            const res1 = await http.get('/tasks/countByTaskGroup', {
               reqTaskGroupId: res.data.data [i].group_id,
@@ -368,6 +362,7 @@ export default {
           this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
         }
       }
+      this.$data.taskGroupLoading = false
     },
     async submitTaskGroup () {
       var tGroupId = this.$data.taskGroupForm.formGroupId
@@ -600,5 +595,14 @@ export default {
 
 .el-divider--horizontal1{
   margin-bottom: 5px;
+}
+</style>
+<style>
+.el-drawer__header span:focus {
+  outline: 0!important;
+}
+.el-drawer__header {
+  margin-bottom: 0px;
+  font-size: 23px;
 }
 </style>
