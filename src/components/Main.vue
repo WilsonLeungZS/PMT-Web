@@ -132,14 +132,14 @@
           <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
           <div class="card-Count">
             <div class="card-Test">Level 3 Task Count: </div>
-            <el-divider class="el-divider--horizontal1"></el-divider>
+            <div style="border-bottom:1px solid #CCC"></div>
             <el-row>
-              <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.Count.draftingC}}</el-col> 
-              <el-col :span="12" class="card-Test" >Planning : {{taskGroup.Count.planningC}}</el-col> 
+              <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.draftingC}}</el-col> 
+              <el-col :span="12" class="card-Test" >Planning : {{taskGroup.planningC}}</el-col> 
             </el-row>
             <el-row>
-              <el-col :span="12" class="card-Test" >Running : {{taskGroup.Count.runningC}}</el-col>
-              <el-col :span="12" class="card-Test" >Done : {{taskGroup.Count.doneC}}</el-col>             
+              <el-col :span="12" class="card-Test" >Running : {{taskGroup.runningC}}</el-col>
+              <el-col :span="12" class="card-Test" >Done : {{taskGroup.doneC}}</el-col>             
             </el-row>
           </div>
         </el-card>
@@ -337,15 +337,10 @@ export default {
         tGroupId: iGroupId,
         isShowCurrent : isShowCurrent
       })
+      console.log(res)
       if (res.data.status === 0) {
         console.log(res.data)
         if (iGroupId === 0) {
-          for(var i = 0 ; i < res.data.data .length  ; i++){
-           const res1 = await http.get('/tasks/countByTaskGroup', {
-              reqTaskGroupId: res.data.data [i].group_id,
-            })
-            res.data.data[i].Count = res1.data.data
-          } 
           var taskGroupArr = res.data.data 
           this.$data.taskGroups = taskGroupArr 
           console.log(this.$data.taskGroups)             
@@ -593,8 +588,9 @@ export default {
   border-radius: 5px;
 }
 
-.el-divider--horizontal1{
-  margin-bottom: 5px;
+
+.el-drawer__header1{
+  margin-bottom: 0px !important;
 }
 </style>
 <style>
