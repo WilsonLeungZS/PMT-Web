@@ -44,6 +44,7 @@
           <el-col :span="1" :offset="2">
             <div class="tl-bar-item">
               <el-popover
+                :disabled="formFilterdisable"
                 placement="bottom"
                 title="Filter"
                 width="300"
@@ -1615,6 +1616,7 @@ export default {
       defaultTimeGroup:[],
       timeGroupConfirm : false,
       currentLevel : '',
+      formFilterdisable:false
     }
   },
   methods: {
@@ -1636,6 +1638,7 @@ export default {
     },
     async onRowClick (row,event,column) {
       if(row!=null){
+          this.$data.formFilterdisable = true
           this.$data.selection = row
           var iTaskId = this.$data.selection.task_name
           var iTaskLevel = this.$data.selection.task_level
@@ -1674,10 +1677,10 @@ export default {
               }
               await this.openTaskTab(iTaskId, 1, 20)  
               this.getTaskGroup(0,true,true)
-              
               this.$data.subTaskListLoading = false
            }  
           }
+         this.$data.formFilterdisable = false
       }
     },
     rowKey (row) {
@@ -1971,18 +1974,18 @@ export default {
       };
     },
     async getTaskList (iPage, iSize) {
+      this.$data.lv2TaskList = []
+      this.$data.formFilterdisable = true
       this.$data.taskslistLoading = true
       this.$data.noDataLoading = false
       this.$data.taskslistData = []
-      this.$data.lv2TaskList = []
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqCurrentTimeGroup = []
       var reqTaskLevel = this.$data.formFilter.filterTaskLevel
       this.ruleShowListColumn(reqTaskLevel)
-      console.log(this.$data.isChange)
-      console.log(this.$data.formFilter.filterTimeGroup)
       if(this.$data.isChange&&this.$data.formFilter.filterTimeGroup.length<1){
+        console.log(this.$data.taskGroupArray)
         for(var i = 0 ; i < this.$data.taskGroupArray.length ; i++){
           console.log('debug')   
           this.$data.formFilter.filterTimeGroup.push(this.$data.taskGroupArray[i])  
@@ -2068,6 +2071,7 @@ export default {
           if (res1.data.status === 0) {
             this.$data.tasksTotalSize = res1.data.data.task_list_total_size
             const res2 = await http.get('/tasks/getLv3TaskList', listCriteria)
+            console.log(res2)
             if (res2.data.status === 0) {
             for(var i = 0; i < res2.data.data.length ; i ++){
                 if(res2.data.data[i].length > 20){
@@ -2111,6 +2115,7 @@ export default {
       this.$data.SkillTypeOps = res3.data.data    
       this.$data.isChange = true
       this.$data.taskslistLoading = false
+      this.$data.formFilterdisable = false
     },
     handleSizeChange (val) {
       this.$data.currentPage = 1
@@ -2157,6 +2162,7 @@ export default {
     },
     async getTaskGroup (iGroupId,isShowRelate,isShowCurrent) {
       console.log('getTaskGroup')
+      this.$data.taskGroups = []
       var today = this.getNowFormatDate()
       console.log(today)
       const res = await http.get('/tasks/getTaskGroup', {
@@ -2168,7 +2174,6 @@ export default {
       })
       if (res.data.status === 0) {
         if (iGroupId === 0) {
-          this.$data.taskGroups = []
           this.$data.taskGroupArray = []
           var taskGroupArr = res.data.data
           this.$data.taskGroups = taskGroupArr
@@ -3979,6 +3984,7 @@ export default {
     }
   },
   created () {
+    this.$data.taskGroupArray = []
     this.$data.isChange = false
     this.$data.pathSelection = false
     this.$data.pageSize = 20
@@ -4331,5 +4337,9 @@ input[type="number"]{
 
 .mouseClick {
   cursor:pointer
+}
+
+.not-allow {
+  cursor:not-allowed;
 }
 </style>
