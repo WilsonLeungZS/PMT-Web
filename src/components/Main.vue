@@ -284,26 +284,6 @@ export default {
       console.log('Start to get time group')
       this.$data.groupDrawerVisible = true
     },
-    selectTaskByTaskGroupId (iTaskGroup) {
-      console.log('Selected Group')
-      var taskGroupId = iTaskGroup.group_id
-      var taskGroupName = iTaskGroup.group_name
-      var taskGroupTimeStart = iTaskGroup.group_start_time
-      var taskGroupTimeEnd = iTaskGroup.group_end_time
-      this.$data.currentTaskGroupFlag = 0
-      this.$data.currentTaskGroupId = taskGroupId
-      this.$data.currentTaskGroup = taskGroupName + ' ' + taskGroupTimeStart + ' ~ ' + taskGroupTimeEnd
-      this.$data.groupDrawerVisible = false
-      this.getTaskList()
-    },
-    selectTaskByAllTaskGroup () {
-      console.log('All Group')
-      this.$data.currentTaskGroupFlag = 0
-      this.$data.currentTaskGroupId = 0
-      this.$data.currentTaskGroup = 'All Time Group'
-      this.$data.groupDrawerVisible = false
-      this.getTaskList()
-    },
     resetTaskGroupForm () {
       this.$data.taskGroupForm.formGroupId = 0
       this.$data.taskGroupForm.formGroupName = ''
@@ -321,14 +301,6 @@ export default {
       this.resetTaskGroupForm()
       this.$data.taskGroupForm.formGroupRelatedTask = this.$data.selectedLv1TaskName
       this.$data.groupDialogVisible = true
-    },
-    selectTaskByUnassign () {
-      console.log('Unassign Group')
-      this.$data.currentTaskGroupFlag = 0
-      this.$data.currentTaskGroupId = -1
-      this.$data.currentTaskGroup = 'Unassign Task'
-      this.$data.groupDrawerVisible = false
-      this.getTaskList()
     },
     async getTaskGroup (iGroupId, isShowCurrent) {
       this.$data.taskGroupLoading = true 
