@@ -239,6 +239,7 @@
       <el-row class="tp-main" v-if="!showForLv1AndLv2">
         <el-col :span="24">
           <div v-if="subTaskListLoading"><i class="el-icon-loading"></i></div>
+          <div class="form_list_task_desc" v-if="subTaskListLoading">There may be a lot of data,please wait...</div>
           <div class="form_list_task_desc" v-if="noDataLoading">No data</div>               
             <div style="margin-bottom:20px"  v-for="(task,index) in lv2TaskList" :key="index" :name="index">
               <el-table  v-loading="tableLoading == index" :data="task" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
@@ -1718,7 +1719,10 @@ export default {
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
     async filterTask () {
       this.$data.taskGroupArray = []
+      this.$data.taskslistData = []
+      this.$data.lv2TaskList = []
       this.$data.isEx = false
+      this.getActiveUserList()
       if((Number(this.$data.formFilter.filterTaskLevel) === 1 || Number(this.$data.formFilter.filterTaskLevel) === 2) && this.$data.pathSelection === false ){
         this.$data.formFilter.filterShowRefPool = false
         if(this.$data.formFilter.filterTimeGroup!=[]){
@@ -1807,7 +1811,8 @@ export default {
         var currentdate = year + '-' + month + '-' + strDate 
         return currentdate;
     },
-    async searchTask () {
+    searchTask () {
+      this.$data.isChange = false
       this.getTaskList(1, 20)
     },
     changeDaily () {
@@ -1960,22 +1965,24 @@ export default {
       };
     },
     async getTaskList (iPage, iSize) {
+      this.$data.taskslistData = []
       this.$data.lv2TaskList = []
       this.$data.formFilterdisable = true
       this.$data.taskslistLoading = true
       this.$data.noDataLoading = false
-      this.$data.taskslistData = []
       this.$data.pageSize = iSize
       this.$data.currentPage = iPage
       var reqCurrentTimeGroup = []
       var reqTaskLevel = this.$data.formFilter.filterTaskLevel
       this.ruleShowListColumn(reqTaskLevel)
+      console.log(this.$data.isChange)
       if(this.$data.isChange&&this.$data.formFilter.filterTimeGroup.length<1){
         for(var i = 0 ; i < this.$data.taskGroupArray.length ; i++){
           this.$data.formFilter.filterTimeGroup.push(this.$data.taskGroupArray[i])  
           this.$data.defaultTimeGroup.push(this.$data.taskGroupArray[i])
         }            
       }
+      console.log(this.$data.formFilter.filterTimeGroup)
       var reqCurrentTimeGroup = ''
       if(this.$data.formFilter.filterTimeGroup.length == 0||this.$data.formFilter.filterTimeGroup == null){
         reqCurrentTimeGroup = 'null'
@@ -2167,7 +2174,7 @@ export default {
             resResult.push(resJson)
           }
           var all = {group_id: "All",group_name: "All",group_dis: false}
-          this.$data.taskGroups.push(all)           
+          this.$data.taskGroups.push(all)        
         } else {
           this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
@@ -3576,8 +3583,14 @@ export default {
         userList = []
         userList = JSON.parse(userListString)
         this.$data.activeUserListForLv1RespLeader = []
+        var user_level = 0
+        if(Number(this.$data.formFilter.filterTaskLevel === 1)){
+          user_level = 9
+        }else{
+          user_level = 10
+        }
         for (var a = 0; a < userList.length; a++) {
-          if (userList[a].user_level > 0 && userList[a].user_level <= 9) {
+          if (userList[a].user_level > 0 && userList[a].user_level <= user_level) {
             if (userList[a].user_nickname !== null && userList[a].user_nickname !== '') {
               userList[a].user_eid = userList[a].user_eid + ' (' + userList[a].user_nickname + ')'
             }
@@ -3878,7 +3891,7 @@ export default {
   },
   created () {
     this.$data.taskGroupArray = []
-    this.$data.isChange = false
+    this.$data.isChange = true
     this.$data.pathSelection = false
     this.$data.pageSize = 20
     this.$data.currentPage = 1

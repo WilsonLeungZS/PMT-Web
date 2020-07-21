@@ -331,7 +331,6 @@ export default {
       this.getTaskList()
     },
     async getTaskGroup (iGroupId, isShowCurrent) {
-      this.$data.taskGroups = []
       this.$data.taskGroupLoading = true 
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
@@ -341,6 +340,7 @@ export default {
       if (res.data.status === 0) {
         console.log(res.data)
         if (iGroupId === 0) {
+          this.$data.taskGroups = []
           var taskGroupArr = res.data.data 
           this.$data.taskGroups = taskGroupArr 
           console.log(this.$data.taskGroups)             
