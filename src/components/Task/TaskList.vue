@@ -1706,11 +1706,12 @@ export default {
       var row = {}
       row.task_name = this.$data.lv1TaskPath
       row.task_level =1
-      if(Number(this.$data.formFilter.filterTaskLevel) === 1){
-        this.onRowClick(row)
-      }else{
-        this.filterTask()
-      }
+      // if(Number(this.$data.formFilter.filterTaskLevel) === 1){
+      //   this.onRowClick(row)
+      // }else{
+      //   this.filterTask()
+      // }
+      this.onRowClick(row)
     },
     changeLevel () {
       this.$data.pathSelection = false
