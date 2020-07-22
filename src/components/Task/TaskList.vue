@@ -1616,6 +1616,7 @@ export default {
       isEx : false,
       currentTablePage: 1,
       currentLevel : '',
+      failToCreateL4 : false
     }
   },
   methods: {
@@ -2263,7 +2264,7 @@ export default {
           response = res11.data.data
           if (res11.data.status === 0) { 
             if(response.length > 20){
-              var task_length = response.length+1
+              var task_length = response.length
                 response = response.slice(0,20)
                 response.length = task_length
             }
@@ -2478,7 +2479,13 @@ export default {
             }      
           }else{
             this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)  
-            this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+            await this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+            if(this.$data.taskLv3FormHistories.length == 0){         
+                this.$data.failToCreateL4 = false    
+            }else{
+              this.$data.failToCreateL4 = true 
+            }
+            console.log(this.$data.failToCreateL4)
             this.$data.lv3TaskItemRule.disableTypeTag = false
             this.$data.taskLv3WorklogShow = true
           }
@@ -2545,7 +2552,7 @@ export default {
       if (this[iSubTaskListItem].length > 0) {
         if (iLevel === 3) {
           console.log('Sub task > 0')
-          //this.$data.taskLv3WorklogShow = false
+          this.$data.taskLv3WorklogShow = false
           this.$data.lv3TaskItemRule.disableTaskEst = true
         }
       }
@@ -2769,33 +2776,42 @@ export default {
       if (Number(iSubTaskLevel) === 4) {
         console.log('Number(iSubTaskLevel) === 4')
         this.$data.taskLv4Form = {}
-        // Set dialog value
-        this.getActiveUserList()
-        this.getTaskStatus('Planning')
-        // Set data default value
-        const res  = await http.post('/tasks/getTaskByName',{
-          reqTaskName : this[iParentObj].task_name
-        })
-        if(res.data.status ===0 && res.data.data != null ){
-          this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
+        console.log(this.$data.failToCreateL4)
+        if(this.$data.failToCreateL4 == false){
+          // Set dialog value
+          this.getActiveUserList()
+          this.getTaskStatus('Planning')
+          // Set data default value
+          const res  = await http.post('/tasks/getTaskByName',{
+            reqTaskName : this[iParentObj].task_name
+          })
+          if(res.data.status ===0 && res.data.data != null ){
+            this.$data.taskLv4Form.task_TypeTag = res.data.data.task_TypeTag
+          }
+          this.$data.taskLv4Form.task_status = res.data.data.task_status
+          this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
+          this.$data.taskLv4Form.task_level = 4
+          this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+          this.$data.taskLv4Form.task_progress_nosymbol = 0
+          // Set parent data of sub task
+          this.$data.taskLv4Form.task_deliverableTag = this[iParentObj].task_deliverableTag
+          this.$data.taskLv4Form.task_parent_name = this[iParentObj].task_name
+          this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
+          this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
+          this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
+          this.$data.taskLv4Form.task_group_id = this[iParentObj].task_group_id
+          this.$data.taskLv4Form.task_reference = this[iParentObj].task_reference
+          this.$data.taskLv4Form.task_reference_desc = this[iParentObj].task_reference_desc
+          // Show or hide column
+          this.ruleControlLv4TaskItem('Create', false)
+          this.$data.taskLv4DialogVisible = true          
+        }else{
+          this.$message({
+            showClose: true,
+            message: 'Failed to create sub task!',
+            type: 'error'
+          });             
         }
-        this.$data.taskLv4Form.task_status = res.data.data.task_status
-        this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
-        this.$data.taskLv4Form.task_level = 4
-        this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
-        this.$data.taskLv4Form.task_progress_nosymbol = 0
-        // Set parent data of sub task
-        this.$data.taskLv4Form.task_deliverableTag = this[iParentObj].task_deliverableTag
-        this.$data.taskLv4Form.task_parent_name = this[iParentObj].task_name
-        this.$data.taskLv4Form.task_parent_desc = this[iParentObj].task_desc
-        this.$data.taskLv4Form.task_type_id = this[iParentObj].task_type_id
-        this.$data.taskLv4Form.task_responsible_leader = this[iParentObj].task_responsible_leader
-        this.$data.taskLv4Form.task_group_id = this[iParentObj].task_group_id
-        this.$data.taskLv4Form.task_reference = this[iParentObj].task_reference
-        this.$data.taskLv4Form.task_reference_desc = this[iParentObj].task_reference_desc
-        // Show or hide column
-        this.ruleControlLv4TaskItem('Create', false)
-        this.$data.taskLv4DialogVisible = true
       }
     },
     async createRegularTask (iSubTaskLevel, iParentObj) {
@@ -3136,18 +3152,23 @@ export default {
             reqSchedule : reqTask.task_scheduletime,
           })      
         }
+        console.log(res)
         if (res.data.status === 0) {
-          this.$message({message: 'Task created successfully!', type: 'success'})
-          this.openTaskById(res.data.data.Id)
-          await this.getTaskGroup(0,false,true)          
+          this.$message({message: 'Task created successfully!', type: 'success'})  
         } else {
           this.$message({message: 'Task updated successfully!', type: 'success'})
         }
+          this.openTaskById(res.data.data.Id)
+          await this.getTaskGroup(0,false,true)        
         this.$data.lv3TaskItemRule.showSubTaskList = true
         this.$data.taskLv3SaveBtnDisabled = false
         for(var i = 0 ; i < this.$data.lv2TaskList.length ; i++){
           if(this.$data.lv2TaskList[i][0].task_name === reqTask.task_parent_name ){
-            await this.handleCurrentChangeOfEachTable(1,reqTask.task_parent_name,i)
+            if(Number(this.$data.formFilter.filterTaskLevel) == 3){
+              await this.handleCurrentChangeOfEachTable(this.$data.lv2TaskList[i][0].task_current_page,reqTask.task_parent_name,i)              
+            }else{
+              await this.handleCurrentChangeOfEachTable(this.$data.currentPage1,reqTask.task_parent_name,i)  
+            }
             break
           }
         }
@@ -3169,6 +3190,11 @@ export default {
         this.$data.lv3TaskItemRule.showCreator = true
         // Default value
         this.$data.lv3TaskItemRule.disableTaskEst = false
+        if(this.$data.taskLv3Form.task_status == 'Running'||this.$data.taskLv3Form.task_status == 'Done'){
+          this.$data.taskLv3TimeGroupDisabled = true
+        }else{
+          this.$data.taskLv3TimeGroupDisabled = false
+        }
         // Common Rule for estimation and worklog button
         // Common Rule 1
         var statusIndex = this.getIndexOfValueInArr(this.$data.statusCollection, 'status_name', this.$data.taskLv3Form.task_status)
@@ -3227,6 +3253,7 @@ export default {
         }
       }else if (iAction === 'Create') {
         // Set Dialog Default Value
+        this.$data.taskLv3TimeGroupDisabled = false
         this.$data.taskLv3DialogTitle = '3 - New Executive Task'      
         this.$data.activeTabForLv3 = 'tab_basic_info'
         // this.$nextTick(() => {
@@ -3498,6 +3525,7 @@ export default {
         wEffort: reqWorklogEffort,
         wRemark: reqRemark
       })
+      this.$data.failToCreateL4 = true
       if (res.data.status === 0) {
         this.$data.worklogDialogVisible = false
         this.$message({message: 'Add worklog successfully!', type: 'success'})
@@ -3812,10 +3840,10 @@ export default {
       }
     },
     async handleCurrentChangeOfEachTable (iPage, iTaskName, Index) {
+      console.log(iPage)
       this.$data.tableLoading = Index
       this.$data.currentTablePage = iPage
       var pageSize = this.$data.lv2TaskList[Index][0].task_page_size
-      this.$data.lv2TaskList[Index].task_current_page = iPage 
       if((this.$data.formFilter.filterTimeGroup!=null&&this.$data.formFilter.filterTimeGroup!='')||(this.$data.selectTaskGroup!=null&&this.$data.selectTaskGroup!='')){
         await this.getTaskListForEachTable(iPage, pageSize, iTaskName, Index)
         this.$data.tableLoading = null
@@ -3826,9 +3854,9 @@ export default {
         this.$data.tableLoading = null
         this.getTaskGroup(0,true,true)
       }
+      this.$data.lv2TaskList[Index][0].task_current_page = iPage 
     },
     async handleSizeChangeOfEachTable (iSize, iTaskName, Index) {
-      this.$data.lv2TaskList[Index].task_current_page = 1
       this.$data.lv2TaskList[Index].task_page_size = iSize
       await this.getTaskListForEachTable(1, iSize, iTaskName, Index)
       this.$data.tableLoading = null
