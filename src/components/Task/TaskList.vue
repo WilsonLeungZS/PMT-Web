@@ -1846,6 +1846,7 @@ export default {
       }
     },
     async createTaskInPlanMode (iSubTaskLevel, iTaskObj) {
+      console.log(iTaskObj)
       console.log("createTaskInPlanMode")
       this.$data.currentLevel = iSubTaskLevel
       if (Number(iSubTaskLevel) === 3) {
@@ -1879,34 +1880,42 @@ export default {
         this.$data.taskLv3DialogVisible = true
       }
       if (Number(iSubTaskLevel) === 4) {
-        this.$data.taskLv4Form = {}
-        // Set dialog value
-        this.getActiveUserList()
-        this.getTaskStatus('Drafting')
-        // this.changeParentName(iTaskObj)
-        // Set data default value
-        this.$data.taskLv4Form.task_status = 'Drafting'
-        this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
-        this.$data.taskLv4Form.task_level = 4
-        this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
-        this.$data.taskLv4Form.task_progress_nosymbol = 0
-        // Set parent data of sub task
-        this.$data.taskLv4Form.task_parent_name = iTaskObj.task_name
-        this.$data.taskLv4Form.task_TypeTag = iTaskObj.task_TypeTag
-        this.$data.taskLv4Form.task_type_id = iTaskObj.task_type_id
-        this.$data.taskLv4Form.task_group_id
-        if(iTaskObj.task_deliverableTag!=null){
-          this.$data.taskLv4Form.task_deliverableTag = iTaskObj.task_deliverableTag.split(',')
+        if(iTaskObj.task_sub_tasks.length == 0 ){
+          this.$data.taskLv4Form = {}
+          // Set dialog value
+          this.getActiveUserList()
+          this.getTaskStatus('Drafting')
+          // this.changeParentName(iTaskObj)
+          // Set data default value
+          this.$data.taskLv4Form.task_status = 'Drafting'
+          this.$data.taskLv4Form.task_issue_date = this.dateToString(new Date())
+          this.$data.taskLv4Form.task_level = 4
+          this.$data.taskLv4Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+          this.$data.taskLv4Form.task_progress_nosymbol = 0
+          // Set parent data of sub task
+          this.$data.taskLv4Form.task_parent_name = iTaskObj.task_name
+          this.$data.taskLv4Form.task_TypeTag = iTaskObj.task_TypeTag
+          this.$data.taskLv4Form.task_type_id = iTaskObj.task_type_id
+          this.$data.taskLv4Form.task_group_id
+          if(iTaskObj.task_deliverableTag!=null){
+            this.$data.taskLv4Form.task_deliverableTag = iTaskObj.task_deliverableTag.split(',')
+          }
+          this.$data.taskLv4Form.task_parent_desc = iTaskObj.task_desc
+          this.$data.taskLv4Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
+          this.$data.taskLv4Form.task_group_id = iTaskObj.group_id
+          this.$data.taskLv4Form.task_reference = iTaskObj.task_reference
+          this.$data.taskLv4Form.task_reference_desc = iTaskObj.task_reference_desc
+          // Show or hide column
+          this.ruleControlLv4TaskItem('Create', false)
+          this.$data.lv4TaskItemRule.disableTaskType = true
+          this.$data.taskLv4DialogVisible = true          
+        }else{
+          this.$message({
+            showClose: true,
+            message: 'Failed to create sub task!',
+            type: 'error'
+          });       
         }
-        this.$data.taskLv4Form.task_parent_desc = iTaskObj.task_desc
-        this.$data.taskLv4Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
-        this.$data.taskLv4Form.task_group_id = iTaskObj.group_id
-        this.$data.taskLv4Form.task_reference = iTaskObj.task_reference
-        this.$data.taskLv4Form.task_reference_desc = iTaskObj.task_reference_desc
-        // Show or hide column
-        this.ruleControlLv4TaskItem('Create', false)
-        this.$data.lv4TaskItemRule.disableTaskType = true
-        this.$data.taskLv4DialogVisible = true
       }
     },
     //For Time Group select check
@@ -2481,11 +2490,10 @@ export default {
             this.getSubTaskList(rtnTask.task_name, 'taskLv3FormSubTasks', 3)  
             await this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
             if(this.$data.taskLv3FormHistories.length == 0){         
-                this.$data.failToCreateL4 = false    
+                this.$data.failToCreateL4 = false  
             }else{
               this.$data.failToCreateL4 = true 
             }
-            console.log(this.$data.failToCreateL4)
             this.$data.lv3TaskItemRule.disableTypeTag = false
             this.$data.taskLv3WorklogShow = true
           }
@@ -2555,6 +2563,8 @@ export default {
           this.$data.taskLv3WorklogShow = false
           this.$data.lv3TaskItemRule.disableTaskEst = true
         }
+      }else{
+        this.$data.taskLv3WorklogShow = true
       }
       this.$data.tasksSubTaskLoading = false
     },
@@ -3118,7 +3128,7 @@ export default {
             this.$data.lv3TaskItemRule.showActualComplete = false
           }else{
             this.$data.lv3TaskItemRule.showActualComplete = true
-            this.$data.taskLv3WorklogShow = true
+            //this.$data.taskLv3WorklogShow = true
             this.$data.lv3TaskItemRule.showEffort = true
             console.log("reqTask.task_TypeTag != 'Regular Task'")
             if (this.isFieldEmpty(reqTask.task_target_complete, 'Target complete date could not be empty!')) {
@@ -3158,8 +3168,8 @@ export default {
         } else {
           this.$message({message: 'Task updated successfully!', type: 'success'})
         }
-          this.openTaskById(res.data.data.Id)
-          await this.getTaskGroup(0,false,true)        
+        this.openTaskById(res.data.data.Id)
+        await this.getTaskGroup(0,false,true)        
         this.$data.lv3TaskItemRule.showSubTaskList = true
         this.$data.taskLv3SaveBtnDisabled = false
         for(var i = 0 ; i < this.$data.lv2TaskList.length ; i++){
@@ -3362,6 +3372,7 @@ export default {
           this.$message({message: 'Task updated successfully!', type: 'success'})
         }
         this.$data.taskLv4SaveBtnDisabled = false
+        this.$data.taskLv3WorklogShow = false
         this.openTaskById(res.data.data.Id)
         const res2 = await http.post('/tasks/getTaskByName',{
           reqTaskName: reqTask.task_parent_name

@@ -153,7 +153,7 @@
           <el-input v-model="taskGroupForm.formGroupName" style="width: 100%"></el-input>
         </el-form-item>
         <el-form-item label="Time Range">
-          <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange"
+          <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange" :picker-options="pickerOptions" 
             start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width:100%">
           </el-date-picker>
         </el-form-item>
@@ -175,6 +175,7 @@ import utils from '../utils/utils'
 export default {
   name: 'Main',
   data () {
+    var vm = this
     return {
       logo: 'Project Management Timesheet',
       msgValue: 3,
@@ -207,9 +208,19 @@ export default {
         formGroupId: 0,
         formGroupName: null,
         formGroupTimeRange: null,
-        formGroupRelatedTask: null
+        formGroupRelatedTask: null,
+        setNowDate : null
       },
-      taskGroupLoading: false
+      taskGroupLoading: false,
+      pickerOptions: {
+				disabledDate(time) {
+        let pre = new Date();
+        let oneMonth = pre.setMonth(pre.getMonth() + 1);
+        let pre1 = new Date();
+        let fiveDays = pre1.setDate(pre1.getDate() -5);
+				return time.getTime() < fiveDays || time.getTime() > oneMonth;
+		   }
+     } 
     }
   },
   methods: {
