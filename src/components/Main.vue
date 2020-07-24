@@ -132,14 +132,14 @@
           <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
           <div class="card-Count">
             <div class="card-Test">Level 3 Task Count: </div>
-            <el-divider class="el-divider--horizontal1"></el-divider>
+            <div style="border-bottom:1px solid #CCC"></div>
             <el-row>
-              <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.Count.draftingC}}</el-col> 
-              <el-col :span="12" class="card-Test" >Planning : {{taskGroup.Count.planningC}}</el-col> 
+              <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.draftingC}}</el-col> 
+              <el-col :span="12" class="card-Test" >Planning : {{taskGroup.planningC}}</el-col> 
             </el-row>
             <el-row>
-              <el-col :span="12" class="card-Test" >Running : {{taskGroup.Count.runningC}}</el-col>
-              <el-col :span="12" class="card-Test" >Done : {{taskGroup.Count.doneC}}</el-col>             
+              <el-col :span="12" class="card-Test" >Running : {{taskGroup.runningC}}</el-col>
+              <el-col :span="12" class="card-Test" >Done : {{taskGroup.doneC}}</el-col>             
             </el-row>
           </div>
         </el-card>
@@ -153,7 +153,7 @@
           <el-input v-model="taskGroupForm.formGroupName" style="width: 100%"></el-input>
         </el-form-item>
         <el-form-item label="Time Range">
-          <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange"
+          <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange" :picker-options="pickerOptions" 
             start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width:100%">
           </el-date-picker>
         </el-form-item>
@@ -175,6 +175,7 @@ import utils from '../utils/utils'
 export default {
   name: 'Main',
   data () {
+    var vm = this
     return {
       logo: 'Project Management Timesheet',
       msgValue: 3,
@@ -207,9 +208,19 @@ export default {
         formGroupId: 0,
         formGroupName: null,
         formGroupTimeRange: null,
-        formGroupRelatedTask: null
+        formGroupRelatedTask: null,
+        setNowDate : null
       },
-      taskGroupLoading: false
+      taskGroupLoading: false,
+      pickerOptions: {
+				disabledDate(time) {
+        let pre = new Date();
+        let oneMonth = pre.setMonth(pre.getMonth() + 1);
+        let pre1 = new Date();
+        let fiveDays = pre1.setDate(pre1.getDate() -5);
+				return time.getTime() < fiveDays || time.getTime() > oneMonth;
+		   }
+     } 
     }
   },
   methods: {
@@ -284,26 +295,6 @@ export default {
       console.log('Start to get time group')
       this.$data.groupDrawerVisible = true
     },
-    selectTaskByTaskGroupId (iTaskGroup) {
-      console.log('Selected Group')
-      var taskGroupId = iTaskGroup.group_id
-      var taskGroupName = iTaskGroup.group_name
-      var taskGroupTimeStart = iTaskGroup.group_start_time
-      var taskGroupTimeEnd = iTaskGroup.group_end_time
-      this.$data.currentTaskGroupFlag = 0
-      this.$data.currentTaskGroupId = taskGroupId
-      this.$data.currentTaskGroup = taskGroupName + ' ' + taskGroupTimeStart + ' ~ ' + taskGroupTimeEnd
-      this.$data.groupDrawerVisible = false
-      this.getTaskList()
-    },
-    selectTaskByAllTaskGroup () {
-      console.log('All Group')
-      this.$data.currentTaskGroupFlag = 0
-      this.$data.currentTaskGroupId = 0
-      this.$data.currentTaskGroup = 'All Time Group'
-      this.$data.groupDrawerVisible = false
-      this.getTaskList()
-    },
     resetTaskGroupForm () {
       this.$data.taskGroupForm.formGroupId = 0
       this.$data.taskGroupForm.formGroupName = ''
@@ -322,30 +313,17 @@ export default {
       this.$data.taskGroupForm.formGroupRelatedTask = this.$data.selectedLv1TaskName
       this.$data.groupDialogVisible = true
     },
-    selectTaskByUnassign () {
-      console.log('Unassign Group')
-      this.$data.currentTaskGroupFlag = 0
-      this.$data.currentTaskGroupId = -1
-      this.$data.currentTaskGroup = 'Unassign Task'
-      this.$data.groupDrawerVisible = false
-      this.getTaskList()
-    },
     async getTaskGroup (iGroupId, isShowCurrent) {
-      this.$data.taskGroups = []
       this.$data.taskGroupLoading = true 
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
         isShowCurrent : isShowCurrent
       })
+      console.log(res)
       if (res.data.status === 0) {
         console.log(res.data)
         if (iGroupId === 0) {
-          for(var i = 0 ; i < res.data.data .length  ; i++){
-           const res1 = await http.get('/tasks/countByTaskGroup', {
-              reqTaskGroupId: res.data.data [i].group_id,
-            })
-            res.data.data[i].Count = res1.data.data
-          } 
+          this.$data.taskGroups = []
           var taskGroupArr = res.data.data 
           this.$data.taskGroups = taskGroupArr 
           console.log(this.$data.taskGroups)             
@@ -593,8 +571,9 @@ export default {
   border-radius: 5px;
 }
 
-.el-divider--horizontal1{
-  margin-bottom: 5px;
+
+.el-drawer__header1{
+  margin-bottom: 0px !important;
 }
 </style>
 <style>
