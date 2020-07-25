@@ -183,7 +183,7 @@
 <!------- 4. Task List -->
         <el-row class="tl-main" v-if="showForLv1AndLv2">
           <el-col :span="24">
-            <el-table :row-class-name="mouseClick" @row-click="onRowClick" :row-key="rowKey" v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data">
+            <el-table :row-class-name="mouseClick" @row-click="onRowClick" :row-key="rowKey" v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data" :header-cell-style="{'background-color': headerColor, color:'white'}">
               <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
               <el-table-column  prop="task_parent_name" label="Parent Task" width="150px" v-if="!taskListRule.showColForLv1" key="2">
                 <template slot-scope="scope">
@@ -242,7 +242,7 @@
           <div class="form_list_task_desc" v-if="subTaskListLoading">There may be a lot of data,please wait...</div>
           <div class="form_list_task_desc" v-if="noDataLoading">No data</div>               
             <div style="margin-bottom:20px"  v-for="(task,index) in lv2TaskList" :key="index" :name="index">
-              <el-table  v-loading="tableLoading == index" :data="task" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data">
+              <el-table  v-loading="tableLoading == index" :data="task" :row-class-name="getSubTaskRowClassName" :row-key="rowKey" :expand-row-keys="expandRowArray" size="small" class="tp-main-table tp-table-border" fit empty-text="No Data" :header-cell-style="{'background-color': headerColor, color:'white'}">
                 <el-table-column type="expand">
                 <template slot-scope="props">
                     <el-row>
@@ -1387,6 +1387,7 @@ export default {
       isActive: true,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      headerColor: '#87CEFA',
       // Task List Value
       searchVal: '',
       formFilter: {
@@ -1880,7 +1881,8 @@ export default {
         this.$data.taskLv3DialogVisible = true
       }
       if (Number(iSubTaskLevel) === 4) {
-        if(iTaskObj.task_sub_tasks.length == 0 ){
+        //if(iTaskObj.task_sub_tasks.length == 0 ){
+        if(!this.$data.failToCreateL4){
           this.$data.taskLv4Form = {}
           // Set dialog value
           this.getActiveUserList()
@@ -2271,7 +2273,7 @@ export default {
           const res11 =  await http.get('/tasks/getPlanTaskListByParentTask', listCriteria)
           console.log(res11)
           response = res11.data.data
-          if (res11.data.status === 0) { 
+          if (res11.data.status === 0) {
             if(response.length > 20){
               var task_length = response.length
                 response = response.slice(0,20)
@@ -3120,6 +3122,12 @@ export default {
         if (Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           return
+        }
+        if(reqTask.task_group_id == null | reqTask.task_group_id == ''){
+          if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
+            this.$message.error('Cannot update the task status to Running/Done for no time group task!');
+            return;
+          }
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
           if(reqTask.task_TypeTag === 'Regular Task'){

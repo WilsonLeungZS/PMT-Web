@@ -152,8 +152,8 @@
         <el-form-item label="Group Name" >
           <el-input v-model="taskGroupForm.formGroupName" style="width: 100%"></el-input>
         </el-form-item>
-        <el-form-item label="Time Range">
-          <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange" :picker-options="pickerOptions" 
+        <el-form-item label="Time Range"><!--@change="dateLimit" :picker-options="pickerOptions"-->
+          <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange"
             start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width:100%">
           </el-date-picker>
         </el-form-item>
@@ -212,18 +212,24 @@ export default {
         setNowDate : null
       },
       taskGroupLoading: false,
-      pickerOptions: {
+      /*pickerOptions: {
 				disabledDate(time) {
-        let pre = new Date();
-        let oneMonth = pre.setMonth(pre.getMonth() + 1);
-        let pre1 = new Date();
-        let fiveDays = pre1.setDate(pre1.getDate() -5);
-				return time.getTime() < fiveDays || time.getTime() > oneMonth;
+          let pre = new Date();
+          let oneMonth = pre.setMonth(pre.getMonth() + 1);
+          let pre1 = new Date();
+          let fiveDays = pre1.setDate(pre1.getDate() -5);
+				  return time.getTime() < fiveDays || time.getTime() > oneMonth;
 		   }
-     } 
+     }*/
     }
   },
   methods: {
+    /*dateLimit(time){
+      this.startTime = time[0];
+      this.endTime = time[1];
+      console.log("george: " + this.startTime);
+      console.log("george: " + this.endTime);
+    },*/
     setCurrent (row) {
       console.log(this.$refs)
       this.$nextTick(() => {
@@ -355,22 +361,33 @@ export default {
         this.$message.error('Task Group Time Range Invalid!')
         return
       }
-      var tGroupStartTime = tGroupTimeRange[0]
-      var tGroupEndTime = tGroupTimeRange[1]
-      this.$data.disabledGroupSubmit = true
-      const res = await http.post('/tasks/addOrUpdateTaskGroup', {
-        tGroupId: tGroupId,
-        tGroupName: tGroupName,
-        tGroupStartTime: tGroupStartTime,
-        tGroupEndTime: tGroupEndTime,
-        tGroupRelatedTask: tGroupRelatedTask
-      })
-      if (res.data.status === 0) {
-        this.$message({message: 'Task group created/updated successfully!', type: 'success'})
-        this.getTaskGroup(0, tGroupRelatedTask)
-        this.$data.groupDialogVisible = false
-      } else {
-        this.$message.error('Task group created/updated fail!')
+      var tGroupStartTime = tGroupTimeRange[0];
+      var tGroupEndTime = tGroupTimeRange[1];
+      var startTime = tGroupStartTime.split("-");
+      var endTime = tGroupEndTime.split("-");
+      var checkStartDate = new Date();
+      var checkEndDate = new Date();
+      checkStartDate.setFullYear(startTime[0],startTime[1],startTime[2]);
+      checkEndDate.setFullYear(endTime[0], endTime[1], endTime[2]);
+      var checkDate = (checkEndDate.getTime() - checkStartDate.getTime())/ 3600000 / 24;
+      if(checkDate < 5 | checkDate> 30){
+        this.$message.error('The time range should be between start day + 5 and start + day + 30');
+      }else{
+        this.$data.disabledGroupSubmit = true
+        const res = await http.post('/tasks/addOrUpdateTaskGroup', {
+          tGroupId: tGroupId,
+          tGroupName: tGroupName,
+          tGroupStartTime: tGroupStartTime,
+          tGroupEndTime: tGroupEndTime,
+          tGroupRelatedTask: tGroupRelatedTask
+        })
+        if (res.data.status === 0) {
+          this.$message({message: 'Task group created/updated successfully!', type: 'success'})
+          this.getTaskGroup(0, tGroupRelatedTask)
+          this.$data.groupDialogVisible = false
+        } else {
+          this.$message.error('Task group created/updated fail!')
+        }
       }
     },
   }
