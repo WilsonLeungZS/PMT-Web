@@ -1590,20 +1590,31 @@ export default {
       }
       var tGroupStartTime = tGroupTimeRange[0]
       var tGroupEndTime = tGroupTimeRange[1]
-      this.$data.disabledGroupSubmit = true
-      const res = await http.post('/tasks/addOrUpdateTaskGroup', {
-        tGroupId: tGroupId,
-        tGroupName: tGroupName,
-        tGroupStartTime: tGroupStartTime,
-        tGroupEndTime: tGroupEndTime,
-        tGroupRelatedTask: tGroupRelatedTask
-      })
-      if (res.data.status === 0) {
-        this.$message({message: 'Task group created/updated successfully!', type: 'success'})
-        this.getTaskGroup(0, tGroupRelatedTask)
-        this.$data.groupDialogVisible = false
-      } else {
-        this.$message.error('Task group created/updated fail!')
+      var startTime = tGroupStartTime.split("-");
+      var endTime = tGroupEndTime.split("-");
+      var checkStartDate = new Date();
+      var checkEndDate = new Date();
+      checkStartDate.setFullYear(startTime[0],startTime[1],startTime[2]);
+      checkEndDate.setFullYear(endTime[0], endTime[1], endTime[2]);
+      var checkDate = (checkEndDate.getTime() - checkStartDate.getTime())/ 3600000 / 24;
+      if(checkDate < 5 | checkDate> 30){
+        this.$message.error('The time range should be between start day + 5 and start + day + 30');
+      }else{
+        this.$data.disabledGroupSubmit = true
+        const res = await http.post('/tasks/addOrUpdateTaskGroup', {
+          tGroupId: tGroupId,
+          tGroupName: tGroupName,
+          tGroupStartTime: tGroupStartTime,
+          tGroupEndTime: tGroupEndTime,
+          tGroupRelatedTask: tGroupRelatedTask
+        })
+        if (res.data.status === 0) {
+          this.$message({message: 'Task group created/updated successfully!', type: 'success'})
+          this.getTaskGroup(0, tGroupRelatedTask)
+          this.$data.groupDialogVisible = false
+        } else {
+          this.$message.error('Task group created/updated fail!')
+        }
       }
     },
     async changeTaskGroup (iNewGroupId, iTaskId, iParentTaskName, iParentTaskIndex) {
