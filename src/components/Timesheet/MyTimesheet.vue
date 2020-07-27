@@ -260,6 +260,17 @@ export default {
       var reqTaskId = scope.row.task_id
       var reqWorklogMonth = this.$data.timesheetMonth
       var reqWorklogDay = scope.column.label
+
+      const result = await http.post('/worklogs/getTaskStatusAndLevel', {
+        TaskId: reqTaskId
+      })
+      var taskLevel = Number(result.data.data.task_level);
+      var taskStatus = result.data.data.task_status;
+      if((taskLevel === 3 && taskStatus === 'Drafting') || (taskLevel === 4 && taskStatus === 'Drafting')){
+        this.$message.error('The task status is Drafting!!!');
+        return
+      }
+
       const res = await http.post('/worklogs/getWorklogForWeb', {
         wUserId: reqUserId,
         wTaskId: reqTaskId,
