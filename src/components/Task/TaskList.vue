@@ -1258,7 +1258,7 @@
               </el-col>
               <el-col :span="12" :offset="1" v-if="lv4TaskItemRule.showDeliverableTag">
                 <el-form-item label="Assignee">
-                  <el-select filterable v-model="taskLv4Form.task_assignee" style="width: 100%">
+                  <el-select :disabled="lv4TaskItemRule.disableAssignee" filterable v-model="taskLv4Form.task_assignee" style="width: 100%">
                     <el-option
                       v-for="(activeUser, index) in activeUserListForAll"
                       :key="index"
@@ -1494,6 +1494,7 @@ export default {
         showRegularTaskList: false,
         showSubTaskList : false,
         showTaskGroup: true,
+        disableAssignee: false
       },
       taskLv3FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1509,7 +1510,8 @@ export default {
         disableTaskEst: false,
         showProgress: true,
         showCreator: true,
-        showDeliverableTag:true
+        showDeliverableTag:true,
+        disableAssignee: false
       },
       taskLv4FormRules: {
         task_parent_name: [{required: true, message: 'Could not be empty', trigger: 'blur'}],
@@ -1882,7 +1884,8 @@ export default {
       }
       if (Number(iSubTaskLevel) === 4) {
         //if(iTaskObj.task_sub_tasks.length == 0 ){
-        if(!this.$data.failToCreateL4){
+        await this.getTaskWorklogHistory(iTaskObj.task_id, 'taskLv3FormHistories')
+        if(this.$data.taskLv3FormHistories.length == 0){
           this.$data.taskLv4Form = {}
           // Set dialog value
           this.getActiveUserList()
@@ -2359,7 +2362,7 @@ export default {
         this.$data.RegularTaskTimeVisible = false  
       }
     },
-    //george
+    
     statusChange(){
       if(this.$data.taskLv3Form.task_status === 'Done'){
         this.$data.taskLv3Form.task_actual_complete = this.dateForYMD(new Date());
@@ -2499,6 +2502,15 @@ export default {
             this.$data.lv3TaskItemRule.disableTypeTag = false
             this.$data.taskLv3WorklogShow = true
           }
+          
+          //george
+          await this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
+          if(!this.$data.taskLv3FormHistories.length == 0){
+            this.$data.lv3TaskItemRule.disableAssignee = true
+          }else{
+            this.$data.lv3TaskItemRule.disableAssignee = false
+          }
+
           this.ruleControlLv3TaskItem('Edit', null)
           this.$data.taskLv3DialogVisible = true
         }
@@ -2542,6 +2554,13 @@ export default {
               this.$data.taskLv4Form.task_endTime = res1.data.data.task_endTime             
             }  
             this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
+          }
+          //george
+          await this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
+          if(!this.$data.taskLv4FormHistories.length == 0){
+            this.$data.lv4TaskItemRule.disableAssignee = true
+          }else{
+            this.$data.lv4TaskItemRule.disableAssignee = false
           }
           this.ruleControlLv4TaskItem('Edit', null)
           this.$data.taskLv4DialogVisible = true
@@ -3410,6 +3429,7 @@ export default {
         this.$data.lv4TaskItemRule.disableTaskEst = this.$data.statusCollection[statusIndex]['status_disable_est']
         // Common Rule 2
         this.$data.taskLv4WorklogShow = this.$data.statusCollection[statusIndex]['status_allow_worklog']
+        
         if(this.$data.taskLv4Form.task_TypeTag ==='Regular Task'){
           this.$data.taskLv4WorklogShow = false
         }
@@ -3516,6 +3536,17 @@ export default {
       var reqRemark = this.$data.worklogForm.worklog_remark
       var reqWorklogEffort = Number(this.$data.worklogForm.worklog_effort)
       var reqWorklogDate = this.$data.worklogForm.worklog_date
+
+      const result = await http.post('/worklogs/getTaskStatusAndLevel', {
+        TaskId: reqTaskId
+      })
+      var taskLevel = Number(result.data.data.task_level);
+      var taskStatus = result.data.data.task_status;
+      if((taskLevel === 3 && (taskStatus === 'Drafting' | taskStatus === 'Planning')) || (taskLevel === 4 && taskStatus === 'Drafting' | taskStatus === 'Planning')){
+        this.$message.error('The task status is Drafting/Planning!!!');
+        return
+      }
+      
       if (reqTaskId === 0) {
         this.$message.error('Invalid Task!')
         return
@@ -3632,7 +3663,7 @@ export default {
         userList = JSON.parse(userListString)
         this.$data.activeUserListForLv1RespLeader = []
         var user_level = 0
-        if(Number(this.$data.formFilter.filterTaskLevel === 1)){
+        if(Number(this.$data.formFilter.filterTaskLevel) === 1){
           user_level = 9
         }else{
           user_level = 10
@@ -3817,7 +3848,7 @@ export default {
         return null
       }
     },
-    //george
+    
     dateForYMD (iDate) {
       if (iDate !== null && iDate !== '' && iDate !== 'Invalid Date') {
         var changeDateYear = iDate.getFullYear()
