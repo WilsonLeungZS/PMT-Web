@@ -249,8 +249,7 @@ export default {
     },
     // Edit worklog when click the day
     async editTimesheetByTask (scope) {
-      console.log(scope)
-      this.$data.worklogFormVisible = true
+      console.log('Edit worklog by task')
       this.$data.showDeleteBtn = false
       this.$data.form.worklog_taskid = 0
       this.$data.form.worklog_task = ''
@@ -261,6 +260,17 @@ export default {
       var reqTaskId = scope.row.task_id
       var reqWorklogMonth = this.$data.timesheetMonth
       var reqWorklogDay = scope.column.label
+
+      const result = await http.post('/worklogs/getTaskStatusAndLevel', {
+        TaskId: reqTaskId
+      })
+      var taskLevel = Number(result.data.data.task_level);
+      var taskStatus = result.data.data.task_status;
+      if((taskLevel === 3 && taskStatus === 'Drafting') || (taskLevel === 4 && taskStatus === 'Drafting')){
+        this.$message.error('The task status is Drafting!!!');
+        return
+      }
+
       const res = await http.post('/worklogs/getWorklogForWeb', {
         wUserId: reqUserId,
         wTaskId: reqTaskId,
@@ -281,6 +291,12 @@ export default {
         this.$data.form.worklog_effort = 0
         this.$data.form.worklog_remark = ''
       }
+      var taskName = this.$data.form.worklog_task
+      if (taskName.startsWith('Dummy - ')) {
+        this.$message.error('Dummy task only for effort adjustment usage, CANNOT input/change effort')
+        return
+      }
+      this.$data.worklogFormVisible = true
     },
     clearTask () {
       this.$data.form.worklog_taskid = 0
