@@ -2023,6 +2023,7 @@ export default {
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
         reqOpportunity :this.$data.formFilter.filterOpportunity,
         reqSkill : this.$data.formFilter.filterSkill,
+        reqFilterTaskLevel: this.$data.formFilter.filterTaskLevel
       }
       var listCriteria = {
         reqPage: iPage,
@@ -2039,6 +2040,7 @@ export default {
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
         reqOpportunity :this.$data.formFilter.filterOpportunity,
         reqSkill : this.$data.formFilter.filterSkill,
+        reqFilterTaskLevel: this.$data.formFilter.filterTaskLevel
       }
       console.log(sizeCriteria)
       console.log(listCriteria)
