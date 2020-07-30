@@ -3145,9 +3145,11 @@ export default {
           return
         }
         if(reqTask.task_group_id == null | reqTask.task_group_id == ''){
-          if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
-            this.$message.error('Cannot update the task status to Running/Done for no time group task!');
-            return;
+          if(!(reqTask.task_TypeTag === 'Regular Task')){
+            if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
+              this.$message.error('Cannot update the task status to Running/Done for no time group task!');
+              return;
+            }
           }
         }
         if (reqTask.task_status === 'Running' || reqTask.task_status === 'Done') {
