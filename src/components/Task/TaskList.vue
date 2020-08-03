@@ -197,8 +197,9 @@
               </el-table-column>
               <el-table-column prop="task_top_opp_name" label="Opportunity Name" show-overflow-tooltip align="left" min-width="230px" v-if="taskListRule.showColForLv1" key="4"></el-table-column>
               <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="230px" v-if="!taskListRule.showColForLv1" key="5"></el-table-column>
-              <el-table-column prop="task_status" label="Status" align="center" width="130px" key="6"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
+              <el-table-column prop="task_top_type_of_work" label="Type Of Work" align="center" width="130px" v-if="showForLv1" key="6"></el-table-column>
+              <el-table-column prop="task_status" label="Status" align="center" width="130px" v-if="(currentLevel) === 2" key="6"></el-table-column>
               <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="280px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
               <!--<el-table-column prop="task_top_resp_leader" label="Leading By" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="9"></el-table-column>-->
               <el-table-column prop="task_top_target_start" label="Target Start" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
@@ -255,7 +256,7 @@
                             </template>
                           </el-table-column>
                           <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>   
-                          <el-table-column label="Status" prop="sub_task_status" align="center" width="100"></el-table-column>
+                          <el-table-column label="Status" prop="sub_task_status" align="center" width="120"></el-table-column>
                           <el-table-column label="Effort" prop="sub_task_effort" align="center" width="100px"></el-table-column>
                           <el-table-column label="Est" prop="sub_task_estimation" align="center" width="100px"></el-table-column>
                           <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px"></el-table-column>
@@ -1602,6 +1603,7 @@ export default {
       defaultTimeGroup:[],
       timeGroupConfirm : false,      
       showForLv1AndLv2 : true,
+      showForLv1 : true,
       selection : {},
       // Task Group
       currentTaskGroupId : '',
@@ -1644,8 +1646,8 @@ export default {
           var iTaskId = this.$data.selection.task_name
           var iTaskLevel = this.$data.selection.task_level
           if(Number(this.$data.formFilter.filterTaskLevel) === 2){
-            this.$data.lv1TaskPath = this.$data.selection.task_parent_name
-            this.$data.lv2TaskPath = this.$data.selection.task_name
+            this.$data.lv1TaskPath = await this.getTaskTOPDesc(this.$data.selection.task_parent_name);
+            this.$data.lv2TaskPath = await this.getTaskTOPDesc(this.$data.selection.task_name);
           }
           this.$data.isPathSelectionLv3 = false
           this.$data.TaskLv2Id = iTaskId
@@ -1655,8 +1657,9 @@ export default {
           this.$data.pathSelection = true    
           this.$data.showTaskPath = true
             if(iTaskLevel===1){
+              this.$data.showForLv1 = false
               this.$data.currentLevel = 2
-              this.$data.lv1TaskPath = iTaskId
+              this.$data.lv1TaskPath = await this.getTaskTOPDesc(iTaskId);
               this.getLevel2TaskListByParentTask(iTaskId,1,20)
               this.$data.showForLv1AndLv2 = true
             }else if(iTaskLevel===2){
@@ -1664,7 +1667,7 @@ export default {
               this.$data.subTaskListLoading = true
               this.$data.isChange = true
               this.$data.lv2TaskList = []
-              this.$data.lv2TaskPath = iTaskId
+              this.$data.lv2TaskPath = await this.getTaskTOPDesc(iTaskId);
               this.ruleShowListColumn(3)
               this.$data.showForLv1AndLv2 = false
               this.$data.isPathSelectionLv3 = true
@@ -1708,7 +1711,7 @@ export default {
     backToLv2 () {
       this.$data.showForLv1AndLv2 = true
       var row = {}
-      row.task_name = this.$data.lv1TaskPath
+      row.task_name = this.$data.taskLv1Form.task_name;
       row.task_level =1
       // if(Number(this.$data.formFilter.filterTaskLevel) === 1){
       //   this.onRowClick(row)
@@ -1732,6 +1735,14 @@ export default {
         this.$data.formFilter.filterShowRefPool = false
         if(this.$data.formFilter.filterTimeGroup!=[]){
           this.$data.formFilter.filterTimeGroup = []
+        }
+        if(Number(this.$data.formFilter.filterTaskLevel) === 2){
+          console.log("george")
+          this.$data.showForLv1 = false
+          this.$data.currentLevel = 2
+        }else{
+          this.$data.showForLv1 = true
+          this.$data.currentLevel = 1
         }
         this.$data.showTaskPath = false
         this.$data.isFullSelectionLv3 = false
@@ -2300,6 +2311,17 @@ export default {
       this.$data.subTaskListLoading = false
       this.$data.isChange = true
     },
+    async getTaskTOPDesc(taskName){
+      const res = await http.post('/tasks/getTaskTOPDesc', {
+        reqTaskName: taskName
+      })
+      if(res.data.data != null){
+        var taskReferenceDesc = res.data.data.task_reference_desc;
+        return taskReferenceDesc;
+      }else{
+        return null;
+      }
+    },
     async getLevel2TaskListByParentTask (iTaskId,iPage,iSize) {
       console.log('Start to get level 2 task list')
       this.$data.taskslistLoading = true
@@ -2731,6 +2753,7 @@ export default {
         
         // Set data default value
         this.$data.taskLv3Form.task_status = 'Drafting'
+        this.$data.taskLv3Form.task_TypeTag = 'One-Off Task'
         this.$data.taskLv3Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv3Form.task_level = 3
         this.$data.taskLv3Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
