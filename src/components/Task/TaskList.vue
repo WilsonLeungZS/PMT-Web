@@ -264,7 +264,7 @@
                           <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px">
                             <template slot-scope="scope">
                               <el-tooltip :content="scope.row.sub_task_assignee_full_name" placement="top" effect="dark">
-                                <div slot>{{scope.row.sub_task_assignee_full_name}}</div>
+                                <div slot>{{scope.row.sub_task_assignee}}</div>
                               </el-tooltip>
                             </template>
                           </el-table-column>
@@ -281,7 +281,8 @@
                 <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
                 <el-table-column prop="task_name" label="Number" width="150px" key="2">
                   <template slot-scope="scope">
-                    <el-button type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
+                    <span v-if="scope.row.task_level === 2? true: false" disabled>{{scope.row.task_name}}</span>
+                    <el-button v-if="scope.row.task_level === 2? false: true" type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
                   </template>
                 </el-table-column>
                 <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="270px" key="3"></el-table-column>
@@ -312,7 +313,7 @@
                 <el-table-column prop="task_assignee" label="Leading By/Assignee" align="center" width="180px" key="10">
                   <template slot-scope="scope">
                     <el-tooltip :content="scope.row.task_assignee_full_name" placement="top" effect="dark">
-                      <div slot>{{scope.row.task_assignee_full_name}}</div>
+                      <div slot>{{scope.row.task_assignee}}</div>
                     </el-tooltip>
                   </template>
                 </el-table-column>
