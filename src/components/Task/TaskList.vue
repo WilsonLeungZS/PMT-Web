@@ -61,7 +61,7 @@
                       </el-select>
                     </el-col>
                   </el-row>
-                  <el-row style="margin: 5px;">
+                  <el-row style="margin: 5px;" v-if="!taskListRule.showColForEx">
                     <el-col :span="8">Leading By</el-col>
                     <el-col :span="16">
                       <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
@@ -169,12 +169,12 @@
           <el-col :span="24">
             <el-table :row-class-name="mouseClick" @row-click="onRowClick" :row-key="rowKey" v-loading="taskslistLoading" :data="taskslistData" class="tl-main-table" fit empty-text="No Data" :header-cell-style="{'background-color': headerColor, color:'white'}">
               <el-table-column prop="task_id" label="Id" v-if="false" key="1"></el-table-column>
-              <el-table-column  prop="task_parent_name" label="Parent Task" width="110px" v-if="!taskListRule.showColForLv1" key="2">
+              <el-table-column  prop="task_parent_name" label="Parent Id" width="105px" v-if="taskListRule.showColForLv2" key="2">
                 <template slot-scope="scope">
                    <el-button type="text" @click.stop="openTaskByName(scope.row.task_parent_name)">{{scope.row.task_parent_name}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_name" label="Number" width="100px" key="3">
+              <el-table-column prop="task_name" label="Number" width="127px" key="3">
                 <template slot-scope="scope">
                    <el-button type="text" @click.stop="openTaskById(scope.row.task_id,scope.row.task_level)">{{scope.row.task_name}}</el-button>
                 </template>
@@ -184,7 +184,7 @@
               <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="230px" v-if="!taskListRule.showColForLv1" key="6"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
               <el-table-column prop="task_top_type_of_work" label="Type Of Work" align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
-              <el-table-column prop="task_status" label="Status" align="center" width="100px" v-if="(currentLevel) === 2" key="9">
+              <el-table-column prop="task_status" label="Status" align="center" width="100px" v-if="taskListRule.showColForEx" key="9">
                 <template slot-scope="scope">
                   <el-tag type="warning" effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.task_status == 'Drafting'">{{scope.row.task_status}}</el-tag>
                   <el-tag effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.task_status == 'Planning'">{{scope.row.task_status}}</el-tag>
@@ -192,25 +192,19 @@
                   <el-tag type="info" effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.task_status == 'Done'">{{scope.row.task_status}}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="110px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
-              <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="left" width="150px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
-              <el-table-column prop="task_reference" label="Ref Pool" width="110px" v-if="taskListRule.showColForLv3&&taskListRule.showColRef" key="12">
-                <template slot-scope="scope">
-                   <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column prop="task_effort" label="Effort" align="center" width="90px" v-if="!taskListRule.showColForLv1" key="13"></el-table-column>
-              <el-table-column prop="task_estimation" label="Estimation" align="center" width="120px" v-if="!taskListRule.showColForLv1" key="14"></el-table-column>
-              <el-table-column prop="task_responsible_leader" label="Leading By" show-overflow-tooltip align="center" width="180px" key="15">
+              <el-table-column prop="task_top_team_sizing" label="Team Sizing" show-overflow-tooltip align="center" width="120px" v-if="taskListRule.showColForLv1" key="10"></el-table-column>
+              <el-table-column prop="task_scope" label="Scope(Baseline)" show-overflow-tooltip align="center" width="190px" v-if="taskListRule.showColForLv2" key="11"></el-table-column>
+              <el-table-column prop="task_effort" label="Effort" align="center" width="90px" v-if="!taskListRule.showColForLv1" key="12"></el-table-column>
+              <el-table-column prop="task_estimation" label="Estimation" align="center" width="120px" v-if="!taskListRule.showColForLv1" key="13"></el-table-column>
+              <el-table-column prop="task_responsible_leader" label="Leading By" show-overflow-tooltip align="center" width="160px" v-if="!taskListRule.showColForEx" key="14">
                 <template slot-scope="scope">
                   <el-tooltip :content="scope.row.task_responsible_leader_full_name" placement="top" effect="dark">
                     <div slot>{{scope.row.task_responsible_leader}}</div>
                   </el-tooltip>
                 </template>
               </el-table-column>
-              <el-table-column prop="task_assignee" label="Assignee" align="center" width="180px" v-if="!taskListRule.showColForLv1&&!taskListRule.showColForLv2" key="16"></el-table-column>
-              <el-table-column prop="task_skill" label="Related Skills" show-overflow-tooltip align="center" width="180px" v-if="!taskListRule.showColForLv1" key="18"></el-table-column>
-              <el-table-column fixed="right" label="Edit" align="center" width="120px">
+              <el-table-column prop="task_skill" label="Related Skills" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv2" key="15"></el-table-column>
+              <el-table-column fixed="right" label="Edit" align="center" v-if="!taskListRule.showColForEx" width="70px">
                 <template slot-scope="scope">
                   <el-button v-if="scope.row.task_level===3" @click.stop="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-plus"></el-button>
                   <el-button @click.stop="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
@@ -1475,7 +1469,8 @@ export default {
         showColForLv1: false,
         showColForLv2: false,
         showColForLv3: false,
-        showColForPool: false
+        showColForPool: false,
+        showColForEx: false
       },
       lv1TaskItemRule: {
         showTaskNameInput: true,
@@ -2193,22 +2188,21 @@ export default {
         this.$data.taskListRule.showColForLv1 = true
         this.$data.taskListRule.showColForLv2 = false
         this.$data.taskListRule.showColForLv3 = false
+        this.$data.taskListRule.showColForEx = false
         this.$data.taskListRule.showColRef = false
       } else if (Number(iTaskLevel) === 2) {
         this.$data.taskListRule.showColForLv1 = false
         this.$data.taskListRule.showColForLv2 = true
         this.$data.taskListRule.showColForLv3 = false
+        this.$data.taskListRule.showColForEx = false
         this.$data.taskListRule.showColRef = false
-      } else{
+      } else if (iTaskLevel === 'EX') {
         this.$data.taskListRule.showColForLv1 = false
         this.$data.taskListRule.showColForLv2 = false
-        this.$data.taskListRule.showColForLv3 = true
-        if (this.$data.formFilter.filterShowRefPool) {
-          this.$data.taskListRule.showColRef = true
-        } else {
-          this.$data.taskListRule.showColRef = false
-        }
-       }
+        this.$data.taskListRule.showColForLv3 = false
+        this.$data.taskListRule.showColForEx = true
+        this.$data.taskListRule.showColRef = false
+      }
     },
     async getTaskGroup (iGroupId,isShowRelate,isShowCurrent) {
       console.log('start to get getTaskGroup')
