@@ -121,28 +121,30 @@
             <el-button @click.stop="createNewTaskGroup" type="primary" size="small" style="width: 100%">Add New Group</el-button>
           </el-col>
         </el-row>
-        <el-card :loading="taskGroupLoading" @click.native="editTaskGroup(taskGroup.group_id)" class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index">
-          <div slot="header" class="clearfix">
-            <el-row :gutter="20">
-              <el-col :span="22">
-                <div @click.stop="editTaskGroup(taskGroup.group_id)" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;text-decoration:underline;color:#409EFF;cursor:pointer">{{taskGroup.group_name}}</div>
-              </el-col>
-            </el-row>
-          </div>
-          <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
-          <div class="card-Count">
-            <div class="card-Test">Level 3 Task Count: </div>
-            <div style="border-bottom:1px solid #CCC"></div>
-            <el-row>
-              <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.draftingC}}</el-col> 
-              <el-col :span="12" class="card-Test" >Planning : {{taskGroup.planningC}}</el-col> 
-            </el-row>
-            <el-row>
-              <el-col :span="12" class="card-Test" >Running : {{taskGroup.runningC}}</el-col>
-              <el-col :span="12" class="card-Test" >Done : {{taskGroup.doneC}}</el-col>             
-            </el-row>
-          </div>
-        </el-card>
+        <el-row v-loading="taskGroupLoading" element-loading-text="Time Group Loading..." class="tl-task-group-content">
+          <el-card @click.native="editTaskGroup(taskGroup.group_id)" class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index">
+            <div slot="header" class="clearfix">
+              <el-row :gutter="20">
+                <el-col :span="22">
+                  <div @click.stop="editTaskGroup(taskGroup.group_id)" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;text-decoration:underline;color:#409EFF;cursor:pointer">{{taskGroup.group_name}}</div>
+                </el-col>
+              </el-row>
+            </div>
+            <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
+            <div class="card-Count">
+              <div class="card-Test">Level 3 Task Count: </div>
+              <div style="border-bottom:1px solid #CCC"></div>
+              <el-row>
+                <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.draftingC}}</el-col> 
+                <el-col :span="12" class="card-Test" >Planning : {{taskGroup.planningC}}</el-col> 
+              </el-row>
+              <el-row>
+                <el-col :span="12" class="card-Test" >Running : {{taskGroup.runningC}}</el-col>
+                <el-col :span="12" class="card-Test" >Done : {{taskGroup.doneC}}</el-col>             
+              </el-row>
+            </div>
+          </el-card>
+        </el-row>
       </div>
     </el-drawer>
 <!------- 5. End Task Group Drawer -->
@@ -558,6 +560,10 @@ export default {
   display: flex;
   flex-direction: column;
 }
+.tl-task-group-content {
+  min-height: 150px;
+  width: 100%;
+}
 .tl-task-group-card {
   height: auto;
   margin-bottom: 10px;
@@ -570,25 +576,20 @@ export default {
   flex-direction: column;
   font-size: 17px;
 }
-
 .card-Test {
   font-size: 13px;
   color: #909399; 
   margin-top: 5px;
 }
-
 .card-blog {
   margin: 35px;
   text-align: center;
 }
-
 .card-Count {
   border:1px solid #d2d5db;
   width: 100%;
   border-radius: 5px;
 }
-
-
 .el-drawer__header1{
   margin-bottom: 0px !important;
 }
@@ -600,5 +601,9 @@ export default {
 .el-drawer__header {
   margin-bottom: 0px;
   font-size: 23px;
+}
+.tl-task-group .el-loading-spinner {
+  top: 0;
+  margin-top: 20px;
 }
 </style>
