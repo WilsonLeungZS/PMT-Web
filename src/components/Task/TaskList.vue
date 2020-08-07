@@ -309,7 +309,7 @@
                 </el-table-column>
                 <el-table-column prop="task_effort" label="Effort" align="center" width="80px" key="7"></el-table-column>
                 <el-table-column prop="task_estimation" label="Est" align="center" width="80px" key="8"></el-table-column>
-                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="110px" key="9"></el-table-column>
+                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="125px" key="9"></el-table-column>
                 <el-table-column prop="task_assignee" label="Leading By/Assignee" align="center" width="180px" key="10">
                   <template slot-scope="scope">
                     <el-tooltip :content="scope.row.task_assignee_full_name" placement="top" effect="dark">
