@@ -185,7 +185,7 @@
                           <span>Emial Groups</span>
                         </el-col>
                         <el-col :span="9" class="pm-table-expand-item">
-                          <el-select  v-model="props.row.user_email_groups" multiple filterable allow-create default-first-option style="width: 100%">
+                          <el-select  v-model="props.row.user_email_groups" multiple filterable default-first-option size="small" style="width: 100%">
                             <el-option v-for="item in EmailGroupsOps" :key="item.value" :label="item.label" :value="item.value"></el-option>
                           </el-select> 
                         </el-col>
@@ -201,7 +201,7 @@
                           <span>Skill Type</span>
                         </el-col>
                         <el-col :span="8" class="pm-table-expand-item">
-                          <el-select  v-model="props.row.user_skill_type" multiple filterable allow-create default-first-option style="width: 100%">
+                          <el-select  v-model="props.row.user_skill_type" multiple filterable default-first-option size="small" style="width: 100%">
                             <el-option v-for="item in SkillTypeOps" :key="item.value" :label="item.label" :value="item.value"></el-option>
                           </el-select> 
                         </el-col>
@@ -357,10 +357,12 @@ export default {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
       SkillTypeOps:  [
-        {value: 'SAP related', label: 'SAP related'},
-        {value: 'Java/.net related', label: 'Java/.net related'}, 
-        {value: 'Infra related', label: 'Infra related'},
-        {value: 'Others', label: 'Others'}
+        {value: 'BD (Sales)', label: 'BD (Sales)'},
+        {value: 'PM (Management)', label: 'PM (Management)'}, 
+        {value: 'Apps (SAP)', label: 'Apps (SAP)'},
+        {value: 'Apps (Custom build)', label: 'Apps (Custom build)'},
+        {value: 'ServiceDesk', label: 'ServiceDesk'},
+        {value: 'Infra', label: 'Infra'}
       ],
       EmailGroupsOps : []
     }
