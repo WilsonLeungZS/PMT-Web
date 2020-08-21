@@ -136,12 +136,14 @@ export default {
       this.$data.timesheetDatas = []
       var ptYear = iDateVal.getFullYear()
       var ptMonth = iDateVal.getMonth() + 1
+      console.log(ptYear, ptMonth)
       if (ptMonth < 10) {
         ptMonth = '0' + ptMonth
       } else {
         ptMonth = '' + ptMonth
       }
       var ptDay = iDateVal.getDay()
+      console.log(ptDay)
       var resetArray = []
       var days = 31
       if (ptMonth === '04' || ptMonth === '06' || ptMonth === '09' || ptMonth === '11') {
@@ -155,6 +157,7 @@ export default {
           days = 28
         }
       }
+      console.log(days)
       for (var i = 1; i <= days; i++) {
         var resetJson = {}
         var val = ''
@@ -241,11 +244,25 @@ export default {
     },
     clearUserList() {
       this.$data.timesheetDatas = []
+    },
+    getCurrentMonthFirst () {
+      var date = new Date()
+      date.setDate(1)
+      var month = parseInt(date.getMonth() + 1)
+      var day = date.getDate()
+      if (month < 10) {
+        month = '0' + month
+      }
+      if (day < 10) {
+        day = '0' + day
+      }
+      var firstDate = new Date(date.getFullYear(), month - 1, day)
+      return firstDate
     }
   },
   created () {
     console.log('Created Project Timesheet')
-    this.$data.monthSelect = new Date()
+    this.$data.monthSelect = this.getCurrentMonthFirst()
     this.getActiveUserList()
   }
 }
