@@ -111,7 +111,7 @@
                   <el-row v-if="isFullSelectionLv3" style="margin: 5px;">
                     <el-col :span="8">Skill</el-col>
                     <el-col :span="16">
-                      <el-select clearable v-model="formFilter.filterSkill" size="small" style="width:auto" filterable allow-create default-first-option>
+                      <el-select clearable v-model="formFilter.filterSkill" size="small" style="width:auto" filterable default-first-option>
                         <el-option v-for="item in SkillTypeOps" :key="item" :label="item" :value="item"></el-option>
                       </el-select> 
                     </el-col>
@@ -254,7 +254,7 @@
                           </el-table-column>
                           <el-table-column label="Effort" prop="sub_task_effort" align="center" width="80px"></el-table-column>
                           <el-table-column label="Est" prop="sub_task_estimation" align="center" width="80px"></el-table-column>
-                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="110px"></el-table-column>
+                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="125px"></el-table-column>
                           <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px">
                             <template slot-scope="scope">
                               <el-tooltip :content="scope.row.sub_task_assignee_full_name" placement="top" effect="dark">
@@ -280,7 +280,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="270px" key="3"></el-table-column>
-                <el-table-column prop="task_group" label="Time Group" align="center" min-width="90px" key="6">
+                <el-table-column prop="task_group" label="Time Group" align="center" width="155px" key="6">
                   <template slot-scope="scope">
                     <el-select v-if="scope.row.task_level===3" :disabled="(scope.row.task_status==='Running'||scope.row.task_status==='Done')" @change="((val)=>{changeTaskGroup(val, scope.row.task_id, scope.row.task_parent_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
                       <el-option label=" " value="0"></el-option>
@@ -581,7 +581,7 @@
               </el-col>
             </el-row>
             <el-form-item label="Skills">
-              <el-select  v-model="taskLv2Form.task_skill" multiple filterable allow-create default-first-option style="width: 100%">
+              <el-select  v-model="taskLv2Form.task_skill" multiple filterable default-first-option style="width: 100%">
                 <el-option v-for="item in SkillTypeOps" :key="item" :label="item" :value="item"></el-option>
               </el-select>  
             </el-form-item>
