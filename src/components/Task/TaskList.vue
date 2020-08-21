@@ -43,12 +43,7 @@
           </el-col>
           <el-col :span="1" :offset="2">
             <div class="tl-bar-item">
-              <el-popover
-                :disabled="formFilterdisable"
-                placement="bottom"
-                title="Filter"
-                width="300"
-                trigger="click">
+              <el-popover :disabled="formFilterdisable" placement="bottom" title="Filter" width="300" trigger="click">
                   <el-row style="margin: 5px;">
                     <el-col :span="8">Status</el-col>
                     <el-col class="nameInfo" :span="16">
@@ -66,14 +61,10 @@
                     <el-col :span="16">
                       <el-select v-model="formFilter.filterLeadingBy" filterable size="small" style="width:100%">
                         <el-option label="" value=""></el-option>
-                        <el-option
-                            v-for="(activeUser, index) in activeUserListForLv1RespLeader"
-                            :key="index"
-                            :label="activeUser.user_eid"
-                            :value="activeUser.user_id">
-                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
-                          </el-option>
+                        <el-option v-for="(activeUser, index) in activeUserListForLv1RespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id">
+                          <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                          <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                        </el-option>
                       </el-select>
                     </el-col>
                   </el-row>
@@ -82,14 +73,10 @@
                     <el-col :span="16">
                       <el-select v-model="formFilter.filterAssignTo" filterable size="small" style="width:100%">
                         <el-option label="" value=""></el-option>
-                        <el-option
-                            v-for="(activeUser, index) in activeUserListForAll"
-                            :key="index"
-                            :label="activeUser.user_eid"
-                            :value="activeUser.user_id">
-                            <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
-                            <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
-                          </el-option>
+                        <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id">
+                          <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
+                          <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
+                        </el-option>
                       </el-select>
                     </el-col>
                   </el-row>
@@ -99,12 +86,7 @@
                     <el-col :span="16">
                       <el-select clearable v-model="formFilter.filterOpportunity" filterable size="small" style="width:100%">
                         <el-option label="" value=""></el-option>
-                        <el-option
-                            v-for="(opportunity, index) in OpportunityNameOps"
-                            :key="index"
-                            :label="opportunity.task_opp_name"
-                            :value="opportunity.task_name">
-                          </el-option>
+                        <el-option v-for="(opportunity, index) in OpportunityNameOps" :key="index" :label="opportunity.task_opp_name" :value="opportunity.task_name"></el-option>
                       </el-select>
                     </el-col>
                   </el-row>
@@ -138,10 +120,7 @@
             </div>
           </el-col>
         </el-row>
-        <el-dialog
-          title="Warning"
-          :visible.sync="timeGroupConfirm"
-          width="30%">
+        <el-dialog title="Warning" :visible.sync="timeGroupConfirm" width="30%">
           <span>You haven't selected TimeGroup, which may lead to bad performance due to excessive query data.</span>
           <span slot="footer" class="dialog-footer">
             <el-button @click="timeGroupConfirm = false">Cancel</el-button>

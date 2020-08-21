@@ -56,7 +56,7 @@
                 </el-dropdown-menu>
               </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
-                <el-popover style="width:auto" placement="top-start" trigger="hover" @show="getEmailGroupsAndSkillType">
+                <el-popover class="info-content" placement="top-start" trigger="hover" @show="getEmailGroupsAndSkillType">
                   <el-row class="info-text">
                     <el-col :span="7">Team:</el-col>
                     <el-col class="nameInfo" :span="17">{{userInfo.user_team}}</el-col>
@@ -545,6 +545,10 @@ export default {
   justify-content: center;
   align-items: flex-start;
 }
+.info-content {
+  height: auto;
+  width: 100%;
+}
 .info-text {
   margin: 5px;
 }
@@ -605,5 +609,8 @@ export default {
 .tl-task-group .el-loading-spinner {
   top: 0;
   margin-top: 20px;
+}
+.el-popover {
+  word-break: normal;
 }
 </style>
