@@ -1382,7 +1382,7 @@ export default {
       isActive: true,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
-      headerColor: '#87CEFA',
+      headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
       // Task List Value
       searchVal: '',
       formFilter: {

@@ -56,7 +56,7 @@
                 </el-dropdown-menu>
               </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
-                <el-popover class="info-content" placement="top-start" trigger="hover" @show="getEmailGroupsAndSkillType">
+                <el-popover class="info-content" placement="left-start" trigger="hover">
                   <el-row class="info-text">
                     <el-col :span="7">Team:</el-col>
                     <el-col class="nameInfo" :span="17">{{userInfo.user_team}}</el-col>
@@ -392,6 +392,9 @@ export default {
         }
       }
     },
+  },
+  mounted () {
+    this.getEmailGroupsAndSkillType()
   }
 }
 </script>

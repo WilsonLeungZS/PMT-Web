@@ -31,8 +31,8 @@
                   <el-date-picker v-model="monthSelect" type="month" placeholder="Select"
                     @change="changePtMonth"></el-date-picker>
                 </el-col>
-                <el-col :span="1" class="pt-title-item">
-                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-arrow-right" circle @click="showTeamTimesheet"></el-button>
+                <el-col :span="2" class="pt-title-item">
+                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-arrow-right" @click="showTeamTimesheet"></el-button>
                 </el-col>
               </el-row>
             </el-card>
@@ -53,7 +53,7 @@
                 </template>
               </el-table-column>
               <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
-                align="center" min-width="40" :class-name="changeCol(timesheetHeader.is_weekday)">
+                align="center" min-width="40" :class-name="changeCol(timesheetHeader.is_weekday, timesheetHeader.is_today)">
                 <template slot="header" slot-scope="scope">
                   <span style="font-size:16px; cursor:default;">{{scope.column.label}}</span>
                 </template>
@@ -105,6 +105,10 @@ export default {
       if (columnIndex === 0) {
         return 'pt-table-header-cell-weekday'
       } else {
+        var isToday = this.$data.timesheetHeaders[columnIndex - 1].is_today
+        if (isToday) {
+          return 'pt-table-header-cell-today'
+        }
         var isWeekday = this.$data.timesheetHeaders[columnIndex - 1].is_weekday
         if (isWeekday) {
           return 'pt-table-header-cell-weekday'
@@ -116,11 +120,15 @@ export default {
     ptTableHeaderRowStyle ({row, rowIndex}) {
       return 'pt-table-header-row'
     },
-    changeCol (isWeekday) {
-      if (!isWeekday) {
-        return 'pt-table-col-weekday'
+    changeCol (isWeekday, isToday) {
+      if(isToday) {
+        return 'pt-table-col-today'
       } else {
-        return 'pt-table-col-nonweekday'
+        if (!isWeekday) {
+          return 'pt-table-col-weekday'
+        } else {
+          return 'pt-table-col-nonweekday'
+        }
       }
     },
     changePtMonth (iDate) {
@@ -158,6 +166,10 @@ export default {
         }
       }
       console.log(days)
+      // Get today
+      var currentDay = new Date().getDate()
+      var currentMonth = new Date().getMonth() + 1
+      // End get today
       for (var i = 1; i <= days; i++) {
         var resetJson = {}
         var val = ''
@@ -172,6 +184,11 @@ export default {
           resetJson.is_weekday = false
         } else {
           resetJson.is_weekday = true
+        }
+        if ((Number(currentMonth) === Number(ptMonth)) && (Number(currentDay) === Number(i))) {
+          resetJson.is_today = true
+        } else {
+          resetJson.is_today = false
         }
         resetArray.push(resetJson)
         ptDay++
@@ -345,6 +362,12 @@ export default {
   padding: 0 !important;
   color: white;
 }
+.pt-table-header-cell-today {
+  font-size: 13px;
+  border-top: 1px solid #f1f2f6;
+  padding: 0 !important;
+  color: #DCE775;
+}
 .pt-table-header-cell {
   font-size: 13px;
   border-top: 1px solid #f1f2f6;
@@ -361,6 +384,9 @@ export default {
 }
 .pt-table-col-weekday {
   background-color: #ced6e0;
+}
+.pt-table-col-today {
+  background-color: #DCE775;
 }
 .pt-table-col-nonweekday {
   background-color: white;
