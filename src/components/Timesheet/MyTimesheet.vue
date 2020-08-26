@@ -47,10 +47,20 @@
           <el-autocomplete style="width:100%" :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true"
             v-model="form.worklog_task" :fetch-suggestions="queryTaskAsync" @select="handleTaskSelect" @clear="clearTask">
           <template slot-scope="{ item }">
-            <div class="form_list_task_name">{{ item.value }}</div>
-            <span class="form_list_task_desc">{{ item.description }}</span>
+            <div class="form-list-task-name">{{ item.value }}</div>
+            <span class="form-list-task-desc">{{ item.description }}</span>
           </template>
           </el-autocomplete>
+        </el-form-item>
+        <el-form-item label="Progress">
+          <el-row class="mt-worklog-form-row">
+            <el-col :span="18" class="mt-worklog-form-item">
+              <el-progress :text-inside="true" :stroke-width="24" :percentage="worklogTaskPercentage" :status="worklogTaskStatus" style="width: 100%"></el-progress>
+            </el-col>
+            <el-col :span="6" class="mt-worklog-form-item">
+              <span style="width: 100%"> {{worklogTaskEffort}} / {{worklogTaskEst}} hrs</span>
+            </el-col>
+          </el-row>
         </el-form-item>
         <el-form-item label="Date">
           <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate" style="width: 50%"></el-date-picker>
@@ -100,6 +110,10 @@ export default {
         worklog_effort: 0,
         worklog_remark: ''
       },
+      worklogTaskEffort: 0,
+      worklogTaskEst: 0,
+      worklogTaskPercentage: 0,
+      worklogTaskStatus: 'success',
       headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
@@ -260,17 +274,6 @@ export default {
       var reqTaskId = scope.row.task_id
       var reqWorklogMonth = this.$data.timesheetMonth
       var reqWorklogDay = scope.column.label
-
-      const result = await http.post('/worklogs/getTaskStatusAndLevel', {
-        TaskId: reqTaskId
-      })
-      var taskLevel = Number(result.data.data.task_level);
-      var taskStatus = result.data.data.task_status;
-      if((taskLevel === 3 && taskStatus === 'Drafting') || (taskLevel === 4 && taskStatus === 'Drafting')){
-        this.$message.error('The task status is Drafting!!!');
-        return
-      }
-
       const res = await http.post('/worklogs/getWorklogForWeb', {
         wUserId: reqUserId,
         wTaskId: reqTaskId,
@@ -291,6 +294,21 @@ export default {
         this.$data.form.worklog_effort = 0
         this.$data.form.worklog_remark = ''
       }
+      if (res.data.data[0] != null) {
+        this.$data.worklogTaskEffort = res.data.data[0].worklog_task_effort
+        this.$data.worklogTaskEst = res.data.data[0].worklog_task_estimation
+        this.$data.worklogTaskPercentage = Number(res.data.data[0].worklog_task_progress_nosymbol)
+        if (Number(res.data.data[0].worklog_task_progress_nosymbol) >= 100) {
+          this.$data.worklogTaskStatus = 'exception'
+        } else {
+          this.$data.worklogTaskStatus = 'success'
+        }
+      } else {
+        this.$data.worklogTaskEffort = 0
+        this.$data.worklogTaskEst = 0
+        this.$data.worklogTaskPercentage = 0
+        this.$data.worklogTaskStatus = 'success'
+      }
       var taskName = this.$data.form.worklog_task
       if (taskName.startsWith('Dummy - ')) {
         this.$message.error('Dummy task only for effort adjustment usage, CANNOT input/change effort')
@@ -301,6 +319,10 @@ export default {
     clearTask () {
       this.$data.form.worklog_taskid = 0
       this.$data.form.worklog_task = ''
+      this.$data.worklogTaskEffort = 0
+      this.$data.worklogTaskEst = 0
+      this.$data.worklogTaskPercentage = 0
+      this.$data.worklogTaskStatus = 'success'
     },
     showWarnMessage (iTitle, iMsg) {
       this.$notify.error({
@@ -335,6 +357,9 @@ export default {
           returnJson.value = queryResult[i].task_name
           returnJson.description = queryResult[i].task_desc
           returnJson.id = queryResult[i].task_id
+          returnJson.effort = queryResult[i].task_effort
+          returnJson.estimation = queryResult[i].task_estimation
+          returnJson.progress = queryResult[i].task_progress_nosymbol
           returnArr.push(returnJson)
         }
       }
@@ -343,10 +368,22 @@ export default {
     handleTaskSelect (item) {
       this.$data.form.worklog_taskid = item.id
       this.$data.form.worklog_task = item.value
+      this.$data.worklogTaskEffort = item.effort
+      this.$data.worklogTaskEst = item.estimation
+      this.$data.worklogTaskPercentage = Number(item.progress)
+      if (Number(item.progress) >= 100) {
+        this.$data.worklogTaskStatus = 'exception'
+      } else {
+        this.$data.worklogTaskStatus = 'success'
+      }
     },
     async submitWorklog () {
       var reqUserId = this.$store.getters.getUserId
       var reqTaskId = this.$data.form.worklog_taskid
+      if (reqTaskId <= 0) {
+        this.$message.error('Invalid task, please check if you had select the correct task!')
+        return
+      }
       var reqRemark = this.form.worklog_remark
       var reqWorklogEffort = Number(this.$data.form.worklog_effort)
       var reqWorklogDate = this.$data.form.worklog_date
@@ -511,15 +548,24 @@ export default {
   margin: 0 5px;
   width: auto;
 }
-.form_list_task_name {
+.form-list-task-name {
   font-size: 16px;
   color: #57606f;
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.form_list_task_desc {
+.form-list-task-desc {
   font-size: 14px;
   color: #bdc3c7;
+}
+.mt-worklog-form-row {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.mt-worklog-form-item {
+  text-align: right;
 }
 .content-task-col {
   margin-top:40px;
