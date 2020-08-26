@@ -260,6 +260,10 @@ export default {
       this.$data.form.worklog_effort = 0
       this.$data.form.worklog_remark = ''
       this.$data.form.worklog_date = this.$data.timesheetMonth + '-' + scope.column.label
+      this.$data.worklogTaskEffort = 0
+      this.$data.worklogTaskEst = 0
+      this.$data.worklogTaskPercentage = 0
+      this.$data.worklogTaskStatus = 'success'
     },
     // Edit worklog when click the day
     async editTimesheetByTask (scope) {
