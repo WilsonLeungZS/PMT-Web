@@ -57,24 +57,26 @@
               </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
                 <el-popover class="info-content" placement="left-start" trigger="hover">
-                  <el-row class="info-text">
-                    <el-col :span="7">Team:</el-col>
-                    <el-col class="nameInfo" :span="17">{{userInfo.user_team}}</el-col>
-                  </el-row>
-                  <el-row class="info-text">
-                    <el-col :span="7">Skill:</el-col>
-                    <el-col :span="17">
-                      <div v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item" class="nameInfo" >{{item}}</div>
-                    </el-col>
-                  </el-row>
-                  <el-row class="info-text">
-                    <el-col :span="24">My Email Groups:</el-col>
-                  </el-row>
-                  <el-row class="info-text">
-                    <el-col :span="24">
-                      <div v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item" class="nameInfo" >{{item}}</div>
-                    </el-col>
-                  </el-row>
+                  <el-form class="info-form" ref="form" :model="userInfo" label-position="left" label-width="50px" size="mini">
+                    <el-form-item label="Team:">
+                      <span class="highlight-info">{{userInfo.user_team}}</span>
+                    </el-form-item>
+                    <el-form-item label="Skill:">
+                      <el-row class="info-text" v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item">
+                        <el-col :span="24">
+                          <span class="highlight-info">{{item}}</span>
+                        </el-col>
+                      </el-row>
+                    </el-form-item>
+                  </el-form>
+                  <el-form class="info-form" ref="form" :model="userInfo" label-position="left" label-width="100px" size="mini">
+                    <el-form-item label="Email Groups:"></el-form-item>
+                    <el-row class="info-text" v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item">
+                      <el-col :span="24">
+                        <span class="highlight-info">{{item}}</span>
+                      </el-col>
+                    </el-row>
+                  </el-form>
                   <el-button slot="reference" :style="{'background-color': btnColor}" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>    
                 </el-popover>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
@@ -550,12 +552,16 @@ export default {
 }
 .info-content {
   height: auto;
-  width: 100%;
+  width: auto;
+}
+.info-content-body {
+  height: auto;
+  width: auto;
 }
 .info-text {
-  margin: 5px;
+  width: auto;
 }
-.nameInfo {
+.highlight-info {
   text-decoration: underline ;
 }
 
@@ -615,5 +621,12 @@ export default {
 }
 .el-popover {
   word-break: normal;
+  min-width: auto;
+}
+ .el-form-item {
+  margin-bottom: 0;
+}
+.info-form .el-form-item--mini {
+  margin-bottom: 0;
 }
 </style>
