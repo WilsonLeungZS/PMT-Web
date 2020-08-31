@@ -185,7 +185,7 @@
                           <span>Emial Groups</span>
                         </el-col>
                         <el-col :span="9" class="pm-table-expand-item">
-                          <el-select  v-model="props.row.user_email_groups" multiple filterable default-first-option size="small" style="width: 100%">
+                          <el-select  v-model="props.row.user_email_groups" multiple filterable default-first-option allow-create size="small" style="width: 100%">
                             <el-option v-for="item in EmailGroupsOps" :key="item.value" :label="item.label" :value="item.value"></el-option>
                           </el-select> 
                         </el-col>

@@ -927,11 +927,8 @@
               <el-col :span="12" v-if="!lv3TaskItemRule.showRespLeader&&lv3TaskItemRule.showDeliverableTag">
                 <el-form-item label="Assignee">
                   <el-select  filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
-                    <el-option
-                      v-for="(activeUser, index) in activeUserListForAll"
-                      :key="index"
-                      :label="activeUser.user_eid"
-                      :value="activeUser.user_id">
+                    <el-option label=" " value=""></el-option>
+                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id">
                       <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
                       <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
@@ -1240,11 +1237,7 @@
               <el-col :span="11">
                 <el-form-item label="Responsible Leader">
                   <el-select v-model="taskLv4Form.task_responsible_leader" style="width: 100%" disabled>
-                    <el-option
-                      v-for="(activeUser, index) in activeUserListForOthRespLeader"
-                      :key="index"
-                      :label="activeUser.user_eid"
-                      :value="activeUser.user_id">
+                    <el-option v-for="(activeUser, index) in activeUserListForOthRespLeader" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id">
                       <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
                       <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
@@ -1254,11 +1247,8 @@
               <el-col :span="12" :offset="1" v-if="lv4TaskItemRule.showDeliverableTag">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv4TaskItemRule.disableAssignee" filterable v-model="taskLv4Form.task_assignee" style="width: 100%">
-                    <el-option
-                      v-for="(activeUser, index) in activeUserListForAll"
-                      :key="index"
-                      :label="activeUser.user_eid"
-                      :value="activeUser.user_id">
+                    <el-option label=" " value=""></el-option>
+                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id">
                       <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
                       <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
@@ -2860,7 +2850,7 @@ export default {
           // Show or hide column
           this.ruleControlLv4TaskItem('Create', false)
           this.$data.taskLv4DialogVisible = true          
-        }else{
+        } else {
           this.$message({
             showClose: true,
             message: 'Failed to create sub task!',
@@ -3367,10 +3357,10 @@ export default {
     async saveLv4Task () {
       var reqTask = this.$data.taskLv4Form    
       console.log(reqTask)
-      if(this.$data.taskLv4Form.task_deliverableTag!=null&&typeof(this.$data.taskLv4Form.task_deliverableTag)==='object'){
+      if (this.$data.taskLv4Form.task_deliverableTag !=null && typeof(this.$data.taskLv4Form.task_deliverableTag)==='object') {
           reqTask.task_deliverableTag = reqTask.task_deliverableTag.toString();             
       }
-      if(reqTask.task_deliverableTag!=null&&typeof(reqTask.task_deliverableTag)==='string'){
+      if (reqTask.task_deliverableTag != null && typeof(reqTask.task_deliverableTag)==='string') {
         this.$data.taskLv4Form.task_deliverableTag = this.$data.taskLv4Form.task_deliverableTag.split(',')
       }      
       if (reqTask != null) {
@@ -3606,13 +3596,19 @@ export default {
     },
     // Remove Task Dialog
     removeTask (iTaskId, iTaskName, iObj) {
+      console.log(iTaskId, iTaskName, iObj)
       this.$data.removeTaskId = iTaskId
       this.$data.removeTaskName = iTaskName
       this.$data.removeTaskParentName = iObj.task_parent_name
       if (iObj.task_level === 1) {
         this.$data.removeTaskDesc = iObj.task_top_opp_name
-      } else {
+      } 
+      else if (iObj.task_level === 2 || iObj.task_level === 3) {
         this.$data.removeTaskDesc = iObj.task_desc
+      }
+      else {
+        this.$data.removeTaskDesc = iObj.sub_task_desc
+        this.$data.removeTaskParentName = iObj.sub_task_lv2_parent_name
       }
       this.$data.removeTaskDialogVisible = true
     },
@@ -3633,7 +3629,8 @@ export default {
       var taskId = this.$data.removeTaskId
       var taskName = this.$data.removeTaskName
       var taskParentName = this.$data.removeTaskParentName
-      var tUpdatedDate = this.getDay(-3)
+      // If worklog removed, the task can be removed
+      var tUpdatedDate = this.getDay(0)
       const res = await http.post('/tasks/removeTaskIfNoSubTaskAndWorklog', {
         tTaskId: taskId,
         tTaskName: taskName,
