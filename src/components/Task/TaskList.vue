@@ -16,7 +16,7 @@
         <el-row class="tl-bar">
           <el-col :span="10">
             <div class="tl-bar-item">
-              <el-input placeholder="Search task..." v-model="searchVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
+              <el-input placeholder="Search task (only effect on full task selection mode)..." v-model="searchVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
                 <el-button slot="append" icon="el-icon-search" @click="searchTask"></el-button>
               </el-input>
             </div>
@@ -1379,9 +1379,11 @@ export default {
         filterTaskLevel: 1,
         filterAssignTo: '',
         filterStatus: '',
-        filterIssueDateRange: [],
+        filterLeadingBy: '',
         filterShowRefPool: false,
-        filterTimeGroup : []
+        filterTimeGroup : [],
+        filterOpportunity: '',
+        filterSkill: ''
       },
       currentPage: 1,
       pageSize: 20,
@@ -1628,6 +1630,11 @@ export default {
     },
     async onRowClick (row, event, column) {
       console.log('Click to open row')
+      this.$data.formFilter.filterStatus = ''
+      this.$data.formFilter.filterLeadingBy = ''
+      this.$data.formFilter.filterAssignTo = ''
+      this.$data.formFilter.filterOpportunity = ''
+      this.$data.formFilter.filterSkill = ''
       if(row != null){
           this.$data.formFilterdisable = true
           this.$data.selection = row
@@ -1700,6 +1707,11 @@ export default {
       this.$data.showForLv1AndLv2 = true
       this.$data.showTaskPath = false
       this.$data.pathSelection = false
+      this.$data.formFilter.filterStatus = ''
+      this.$data.formFilter.filterLeadingBy = ''
+      this.$data.formFilter.filterAssignTo = ''
+      this.$data.formFilter.filterOpportunity = ''
+      this.$data.formFilter.filterSkill = ''
       this.filterTask()
     },
     backToLv2 () {
@@ -1709,10 +1721,20 @@ export default {
       row.task_name = this.$data.lv1TaskNamePath
       row.task_level = 1
       console.log(row)
+      this.$data.formFilter.filterStatus = ''
+      this.$data.formFilter.filterLeadingBy = ''
+      this.$data.formFilter.filterAssignTo = ''
+      this.$data.formFilter.filterOpportunity = ''
+      this.$data.formFilter.filterSkill = ''
       this.onRowClick(row)
     },
     changeLevel () {
       this.$data.pathSelection = false
+      this.$data.formFilter.filterStatus = ''
+      this.$data.formFilter.filterLeadingBy = ''
+      this.$data.formFilter.filterAssignTo = ''
+      this.$data.formFilter.filterOpportunity = ''
+      this.$data.formFilter.filterSkill = ''
       this.filterTask()
     },
     // 1. Task List Function (Filter Critera/Search Task/Get Task List)
@@ -1744,7 +1766,8 @@ export default {
         this.$data.isFullSelectionLv3 = false
         this.$data.isPathSelectionLv3 = true
         this.$data.showTaskPath = true
-        await this.openTaskTab(this.$data.lv2TaskPath, 1, 20)  
+        console.log('Lv 2 task name', this.$data.lv2TaskNamePath)
+        await this.openTaskTab(this.$data.lv2TaskNamePath, 1, 20)  
         this.getTaskGroup(0,true,true)
       }else if(Number(this.$data.formFilter.filterTaskLevel)===3){
         this.$data.pathSelection = false
@@ -1794,10 +1817,9 @@ export default {
         filterTaskLevel: this.$data.formFilter.filterTaskLevel,
         filterAssignTo: '',
         filterStatus: '',
-        filterIssueDateRange: [],
         filterShowRefPool: false,
         filterLeadingBy: '',
-        filterTimeGroup:this.$data.defaultTimeGroup
+        filterTimeGroup: this.$data.defaultTimeGroup
       }
       this.$data.isChange = false
     },
@@ -2024,8 +2046,6 @@ export default {
         reqTaskKeyword: this.$data.searchVal,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
         reqFilterStatus: this.$data.formFilter.filterStatus,
-        reqFilterIssueDateStart: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[0] : null,
-        reqFilterIssueDateEnd: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[1] : null,
         reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool,
         reqCurrentTimeGroup : reqCurrentTimeGroup,
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
@@ -2041,8 +2061,6 @@ export default {
         reqTaskKeyword: this.$data.searchVal,
         reqFilterAssignee: this.$data.formFilter.filterAssignTo,
         reqFilterStatus: this.$data.formFilter.filterStatus,
-        reqFilterIssueDateStart: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[0] : null,
-        reqFilterIssueDateEnd: this.$data.formFilter.filterIssueDateRange !== null ? this.$data.formFilter.filterIssueDateRange[1] : null,
         reqFilterShowRefPool: this.$data.formFilter.filterShowRefPool,
         reqCurrentTimeGroup : reqCurrentTimeGroup,
         reqLeadingBy : this.$data.formFilter.filterLeadingBy,
@@ -2215,13 +2233,19 @@ export default {
         reqTaskGroupId: reqTaskGroupId
       })
       if (res.data.status === 0) {
-        this.$message({message: 'Task\' time group updated successfully!', type: 'success'})
-        for(var i = 0 ; i < this.$data.lv2TaskList[iParentTaskIndex].length ; i++){
-          if(this.$data.lv2TaskList[iParentTaskIndex][i].task_id === iTaskId){
-            this.$data.lv2TaskList[iParentTaskIndex].splice(i,i)
-            break;
+        for(var i = 0 ; i < this.$data.lv2TaskList.length ; i++){
+          console.log(iParentTaskName)
+          console.log(this.$data.lv2TaskList[i][0].task_name)
+          if(this.$data.lv2TaskList[i][0].task_name === iParentTaskName ){
+            if(Number(this.$data.formFilter.filterTaskLevel) == 3){
+              await this.handleCurrentChangeOfEachTable(this.$data.lv2TaskList[i][0].task_current_page, iParentTaskName, i)              
+            }else{
+              await this.handleCurrentChangeOfEachTable(this.$data.currentPage1, iParentTaskName, i)  
+            }
+            break
           }
         }
+        this.$message({message: 'Task\' time group updated successfully!', type: 'success'})
       } else {
         this.$message.error('Task\' time group updated fail!')
       }
@@ -2244,6 +2268,7 @@ export default {
       const res2 = await http.post('/tasks/getTaskByName',{
         reqTaskName : iTaskName
       })
+      console.log('Get task by name', res2)
       this.$data.pageSize1 = iSize
       this.$data.currentPage1 = iPage
       if(this.$data.selectTaskGroup.length === 0){
@@ -2733,7 +2758,7 @@ export default {
         if(!this.$data.showForLv1AndLv2  && this.$data.pathSelection == true){
           this.$data.taskLv3Form.task_parent_name = this.$data.lv2TaskNamePath
           const res = await http.post('/tasks/getTaskTypeByName',{
-            reqTaskName:this.$data.lv2TaskPath
+            reqTaskName: this.$data.lv2TaskNamePath
           })
           if(res.data.status === 0){
             this.$data.taskLv3Form.task_type_id = res.data.data
