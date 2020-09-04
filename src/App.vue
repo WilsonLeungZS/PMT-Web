@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import utils from './utils/utils'
 export default {
   name: 'App'
 }
