@@ -1933,6 +1933,7 @@ export default {
         this.$data.taskLv3Form.task_type_id = iTaskObj.task_type_id
         this.$data.taskLv3Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
         this.$data.taskLv3Form.task_group_id = this.$data.selectTaskGroup.length == 0 ? this.$data.formFilter.filterTimeGroup[0]: this.$data.selectTaskGroup[0]
+        this.$data.taskLv3Form.task_TypeTag = 'One-Off Task'
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', false)
         this.$data.lv3TaskItemRule.disableTaskType = true
