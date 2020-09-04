@@ -719,7 +719,7 @@
             </el-row>
           </el-tab-pane>
           <!-- Regular Task List -->
-          <el-tab-pane label="Regular Tasks List" name="tab_regular_tasks_list">
+          <el-tab-pane label="Regular-Tasks List" name="tab_regular_tasks_list">
             <el-row>
               <el-col :span="24">
                 <el-button @click="createRegularTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Regular Task</el-button>
@@ -1066,7 +1066,7 @@
               </el-row>                    
           </el-tab-pane>
           <!-- Regular Task List -->
-          <el-tab-pane v-if="taskLv3Form.task_TypeTag==='Regular Task'&&lv3TaskItemRule.showRegularTaskList" label="Sub-Tasks List" name="tab_regular_tasks_list">
+          <el-tab-pane v-if="taskLv3Form.task_TypeTag==='Regular Task' && lv3TaskItemRule.showRegularTaskList" label="Sub-Tasks List" name="tab_regular_tasks_list">
             <el-row>
               <el-col :span="24">
                 <el-button @click="createRegularTask(4, 'taskLv3Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Sub-Task</el-button>
@@ -1724,6 +1724,7 @@ export default {
       this.$data.formFilter.filterAssignTo = ''
       this.$data.formFilter.filterOpportunity = ''
       this.$data.formFilter.filterSkill = ''
+      this.$data.formFilter.filterTimeGroup = []
       this.$data.lv1TaskNamePath = ''
       this.$data.lv1TaskPath = ''
       this.$data.lv2TaskNamePath = ''
@@ -1742,6 +1743,7 @@ export default {
       this.$data.formFilter.filterAssignTo = ''
       this.$data.formFilter.filterOpportunity = ''
       this.$data.formFilter.filterSkill = ''
+      this.$data.formFilter.filterTimeGroup = []
       this.$data.lv2TaskNamePath = ''
       this.$data.lv2TaskPath = ''
       this.onRowClick(row)
@@ -1753,6 +1755,7 @@ export default {
       this.$data.formFilter.filterAssignTo = ''
       this.$data.formFilter.filterOpportunity = ''
       this.$data.formFilter.filterSkill = ''
+      this.$data.formFilter.filterTimeGroup = []
       this.$data.lv1TaskNamePath = ''
       this.$data.lv1TaskPath = ''
       this.$data.lv2TaskNamePath = ''
@@ -1910,7 +1913,7 @@ export default {
         });
       this.$data.currentLevel = iSubTaskLevel
       if (Number(iSubTaskLevel) === 3) {
-        await this.getTaskGroup(0,true,true)
+        this.getTaskGroup(0, true, true)
         this.$data.taskLv3Form = {}
         this.$data.lv3TaskItemRule.showSubTaskList = false
         this.$data.lv3TaskItemRule.showRegularTaskList = false
@@ -1929,12 +1932,7 @@ export default {
         this.$data.taskLv3Form.task_parent_desc = iTaskObj.task_desc
         this.$data.taskLv3Form.task_type_id = iTaskObj.task_type_id
         this.$data.taskLv3Form.task_responsible_leader = iTaskObj.task_responsible_leader_id
-        console.log('Time Group', this.$data.currentTaskGroupId)
-        if (this.$data.currentTaskGroupId > 0) {
-          this.$data.taskLv3Form.task_group_id = this.$data.currentTaskGroupId
-        } else {
-          this.$data.taskLv3Form.task_group_id = null
-        }
+        this.$data.taskLv3Form.task_group_id = this.$data.selectTaskGroup.length == 0 ? this.$data.formFilter.filterTimeGroup[0]: this.$data.selectTaskGroup[0]
         // Show or hide column
         this.ruleControlLv3TaskItem('Create', false)
         this.$data.lv3TaskItemRule.disableTaskType = true
@@ -1974,7 +1972,7 @@ export default {
         } else {
           this.$message({
             showClose: true,
-            message: 'Failed to create sub task!',
+            message: 'Task has worklog, cannot create sub task!',
             type: 'error'
           });       
         }
@@ -3358,10 +3356,6 @@ export default {
         this.$data.taskLv3TimeGroupDisabled = false
         this.$data.taskLv3DialogTitle = '3 - New Executive Task'      
         this.$data.activeTabForLv3 = 'tab_basic_info'
-        this.$nextTick(() => {
-          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
-          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide worklog history tab
-        })
         if (iNeedInputParent) {
           this.$data.lv3TaskItemRule.disableParentNameInput = false
         } else {
@@ -3390,6 +3384,10 @@ export default {
         if (this.$data.taskLv3Form.task_TypeTag ==='Regular Task') {
           this.$data.lv3TaskItemRule.showActualComplete = false
         }
+        this.$nextTick(() => {
+          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+          this.$refs.taskLv3Tabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide worklog history tab
+        })
       }
     },
     closeLv3TaskDialog (done) {
