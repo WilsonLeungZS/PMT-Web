@@ -57,24 +57,26 @@
               </el-dropdown> -->
               <el-dropdown trigger="click" style="padding: 0" @command="handleCommand">
                 <el-popover class="info-content" placement="left-start" trigger="hover">
-                  <el-row class="info-text">
-                    <el-col :span="7">Team:</el-col>
-                    <el-col class="nameInfo" :span="17">{{userInfo.user_team}}</el-col>
-                  </el-row>
-                  <el-row class="info-text">
-                    <el-col :span="7">Skill:</el-col>
-                    <el-col :span="17">
-                      <div v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item" class="nameInfo" >{{item}}</div>
-                    </el-col>
-                  </el-row>
-                  <el-row class="info-text">
-                    <el-col :span="24">My Email Groups:</el-col>
-                  </el-row>
-                  <el-row class="info-text">
-                    <el-col :span="24">
-                      <div v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item" class="nameInfo" >{{item}}</div>
-                    </el-col>
-                  </el-row>
+                  <el-form class="info-form" ref="form" :model="userInfo" label-position="left" label-width="50px" size="mini">
+                    <el-form-item label="Team:">
+                      <span class="highlight-info">{{userInfo.user_team}}</span>
+                    </el-form-item>
+                    <el-form-item label="Skill:">
+                      <el-row class="info-text" v-for="(item,i) in userInfo.user_skill_type" :key="i" :value="item">
+                        <el-col :span="24">
+                          <span class="highlight-info">{{item}}</span>
+                        </el-col>
+                      </el-row>
+                    </el-form-item>
+                  </el-form>
+                  <el-form class="info-form" ref="form" :model="userInfo" label-position="left" label-width="100px" size="mini">
+                    <el-form-item label="Email Groups:"></el-form-item>
+                    <el-row class="info-text" v-for="(item,i) in userInfo.user_email_groups" :key="i" :value="item">
+                      <el-col :span="24">
+                        <span class="highlight-info">{{item}}</span>
+                      </el-col>
+                    </el-row>
+                  </el-form>
                   <el-button slot="reference" :style="{'background-color': btnColor}" size="small" icon="el-icon-user-solid" class="main-user-info-btn" round>{{this.$store.getters.getUserEid}}</el-button>    
                 </el-popover>
                 <el-dropdown-menu slot="dropdown" class="main-user-info-panel">
@@ -95,8 +97,7 @@
       </el-main>
     </el-container>
     <el-dialog title="Theme Style" :visible.sync="centerDialogVisible" width="360px" center>
-      <el-table ref="themeTable" :data="themeData" highlight-current-row @current-change="selectTheme"
-      style="width: 100%">
+      <el-table ref="themeTable" :data="themeData" highlight-current-row @current-change="selectTheme" style="width: 100%">
         <el-table-column property="themeValue" width="20" v-if="false"></el-table-column>
         <el-table-column property="themeName" label="Theme Name" align="center"></el-table-column>
         <el-table-column property="mainColor" label="Color" width="120" align="center">
@@ -124,23 +125,30 @@
         <el-row v-loading="taskGroupLoading" element-loading-text="Time Group Loading..." class="tl-task-group-content">
           <el-card @click.native="editTaskGroup(taskGroup.group_id)" class="box-card tl-task-group-card" shadow="hover" v-for="(taskGroup, index) in taskGroups" :key="index">
             <div slot="header" class="clearfix">
-              <el-row :gutter="20">
-                <el-col :span="22">
+              <el-row>
+                <el-col :span="20">
                   <div @click.stop="editTaskGroup(taskGroup.group_id)" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;text-decoration:underline;color:#409EFF;cursor:pointer">{{taskGroup.group_name}}</div>
                 </el-col>
+                <!--<el-col :span="4">
+                  <el-button v-show="taskGroup.showArchiveBtn" style="float: right; padding: 3px 0; font-size: 12px; padding: 2px" size="small" type="info">Archive</el-button>
+                </el-col>-->
               </el-row>
             </div>
             <span class="card-Test">Range: &nbsp;{{taskGroup.group_start_time}} ~ {{taskGroup.group_end_time}}</span>
             <div class="card-Count">
               <div class="card-Test">Level 3 Task Count: </div>
-              <div style="border-bottom:1px solid #CCC"></div>
+              <div style="border-bottom:1px solid #CCC; margin: 4px 0 2px 0"></div>
               <el-row>
-                <el-col :span="12" class="card-Test" >Drafting : {{taskGroup.draftingC}}</el-col> 
-                <el-col :span="12" class="card-Test" >Planning : {{taskGroup.planningC}}</el-col> 
+                <el-col :span="5" class="card-Test" >Drafting</el-col> 
+                <el-col :span="7" class="card-Test" >：{{taskGroup.draftingC}}</el-col> 
+                <el-col :span="5" class="card-Test" >Planning</el-col>
+                <el-col :span="7" class="card-Test" >：{{taskGroup.planningC}}</el-col>  
               </el-row>
               <el-row>
-                <el-col :span="12" class="card-Test" >Running : {{taskGroup.runningC}}</el-col>
-                <el-col :span="12" class="card-Test" >Done : {{taskGroup.doneC}}</el-col>             
+                <el-col :span="5" class="card-Test" >Running</el-col>
+                <el-col :span="7" class="card-Test" >：{{taskGroup.runningC}}</el-col>
+                <el-col :span="5" class="card-Test" >Done</el-col>        
+                <el-col :span="7" class="card-Test" >：{{taskGroup.doneC}}</el-col>      
               </el-row>
             </div>
           </el-card>
@@ -150,9 +158,9 @@
 <!------- 5. End Task Group Drawer -->
 <!------- 6. Task Group Dialog -->
     <el-dialog title="Time Group" :visible.sync="groupDialogVisible" width="35%" :close-on-click-modal="false" top="15%">
-      <el-form :model="taskGroupForm" label-width="100px" class="tl-edit-form">
+      <el-form :model="taskGroupForm" label-width="100px" class="tg-edit-form">
         <el-form-item label="Group Name" >
-          <el-input v-model="taskGroupForm.formGroupName" style="width: 100%"></el-input>
+          <el-input v-model="taskGroupForm.formGroupName" style="width: 100%; text-align: center"></el-input>
         </el-form-item>
         <el-form-item label="Time Range"><!--@change="dateLimit" :picker-options="pickerOptions"-->
           <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange"
@@ -333,15 +341,20 @@ export default {
         if (iGroupId === 0) {
           this.$data.taskGroups = []
           var taskGroupArr = res.data.data 
-          this.$data.taskGroups = taskGroupArr 
-          console.log(this.$data.taskGroups)             
-          var resResult = []
+          console.log(this.$data.taskGroups)
           for (var i = 0; i < taskGroupArr.length; i++) {
-            var resJson = {}
-            resJson.group_long_name = taskGroupArr[i].group_name + ' ' + taskGroupArr[i].group_start_time + ' ~ ' + taskGroupArr[i].group_end_time
-            resJson.group_id = taskGroupArr[i].group_id
-            resResult.push(resJson)
+            var draftingTaskCount = Number(taskGroupArr[i].draftingC)
+            var planningTaskCount = Number(taskGroupArr[i].planningC)
+            var runningTaskCount = Number(taskGroupArr[i].runningC)
+            var doneTaskCount = Number(taskGroupArr[i].doneC)
+            taskGroupArr[i].showArchiveBtn = false
+            if (doneTaskCount > 0) {
+              if ( draftingTaskCount === 0 && planningTaskCount === 0 && doneTaskCount === 0) {
+                taskGroupArr[i].showArchiveBtn = true
+              }
+            }
           }
+          this.$data.taskGroups = taskGroupArr 
         } else {
           this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
@@ -550,12 +563,16 @@ export default {
 }
 .info-content {
   height: auto;
-  width: 100%;
+  width: auto;
+}
+.info-content-body {
+  height: auto;
+  width: auto;
 }
 .info-text {
-  margin: 5px;
+  width: auto;
 }
-.nameInfo {
+.highlight-info {
   text-decoration: underline ;
 }
 
@@ -593,9 +610,8 @@ export default {
   text-align: center;
 }
 .card-Count {
-  border:1px solid #d2d5db;
   width: 100%;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 .el-drawer__header1{
   margin-bottom: 0px !important;
@@ -615,5 +631,15 @@ export default {
 }
 .el-popover {
   word-break: normal;
+  min-width: auto;
+}
+ .el-form-item {
+  margin-bottom: 0;
+}
+.info-form .el-form-item--mini {
+  margin-bottom: 0;
+}
+.tg-edit-form .el-input__inner {
+  text-align: center;
 }
 </style>
