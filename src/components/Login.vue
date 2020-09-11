@@ -1,4 +1,5 @@
 <template>
+<div>
   <div class="login-content">
     <el-form ref="form" label-width="80px" size="medium" @submit.native.prevent>
       <el-form-item label="EID">
@@ -12,6 +13,14 @@
       </el-form-item>
     </el-form>
   </div>
+  <div class="footer-content">
+    <el-row >
+      <el-col :span="24">
+        <a target="_blank" href="http://beian.miit.gov.cn/">粤ICP备20049027</a>
+      </el-col>
+    </el-row>
+  </div>
+</div>
 </template>
 
 <script>
@@ -78,5 +87,24 @@ export default {
 .login-content-errormsg {
   font-size: 20px;
   color:red;
+}
+.footer-content {
+  height: auto;
+  width: 100%;
+  position: absolute;
+  bottom: 1%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  color: #666;
+}
+.footer-content a{
+  color: #666;
+  text-decoration: none;
+}
+.footer-content a:hover {
+  color: #ba2636;
+  text-decoration: underline;
 }
 </style>
