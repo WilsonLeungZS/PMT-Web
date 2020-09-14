@@ -28,8 +28,7 @@
                   </el-select>
                 </el-col>
                 <el-col :span="3" class="pt-title-item">
-                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select"
-                    @change="changePtMonth"></el-date-picker>
+                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select" @change="changePtMonth"></el-date-picker>
                 </el-col>
                 <el-col :span="2" class="pt-title-item">
                   <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-arrow-right" @click="showTeamTimesheet"></el-button>
@@ -53,6 +52,36 @@
                 </template>
               </el-table-column>
               <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
+                align="center" min-width="42" :class-name="changeCol(timesheetHeader.is_weekday, timesheetHeader.is_today)">
+                <template slot="header" slot-scope="scope">
+                  <span style="font-size:16px; cursor:default;">{{scope.column.label}}</span>
+                </template>
+                <template slot-scope="scope">
+                  <span style="font-size:16px">{{scope.row[scope.column.property] || '--'}}</span>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
+        <!-- Only show past 15 days worklogs -->
+        <el-row>
+          <el-col :span="24" class="content-main-col" v-for="(timesheet, tIndex) in timesheetPastDaysDatas" :key="tIndex" >
+            <el-table max-height="408" :data="timesheet.timesheetData" fit empty-text="No worklog" class="pt-table" show-summary :summary-method="getSummaries" :header-cell-style="{'background-color': headerColor}"
+              :row-class-name="ptTableRowStyle" :cell-class-name="ptTableCellStyle"
+              :header-row-class-name="ptTableHeaderRowStyle" :header-cell-class-name="ptTablePastDaysHeaderCellStyle" >
+              <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
+              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
+                <template slot="header" slot-scope="scope">
+                  <div class="pt-table-user">
+                    <span><b>Timesheet</b> for </span>
+                    <el-tag style="margin-left: 10px; color: #2980b9">{{timesheet.user}}</el-tag>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="task_status" label="Status" align="left" width="100"></el-table-column>
+              <el-table-column prop="task_progress" label="Progress" align="left" width="130"></el-table-column>
+              <el-table-column prop="task_time_group" label="Time Group" align="left" width="150"></el-table-column>
+              <el-table-column v-for="(timesheetHeader, index) in timesheetPastDaysHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
                 align="center" min-width="40" :class-name="changeCol(timesheetHeader.is_weekday, timesheetHeader.is_today)">
                 <template slot="header" slot-scope="scope">
                   <span style="font-size:16px; cursor:default;">{{scope.column.label}}</span>
@@ -64,6 +93,7 @@
             </el-table>
           </el-col>
         </el-row>
+        <!-- End Only show past 15 days worklogs -->
       </el-main>
     </el-container>
   </div>
@@ -86,6 +116,8 @@ export default {
       timesheetMonth: '',
       sumHoursArray: [],
       timesheetDatas: [],
+      timesheetPastDaysDatas: [],
+      timesheetPastDaysHeaders: [],
       headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor
     }
@@ -110,6 +142,23 @@ export default {
           return 'pt-table-header-cell-today'
         }
         var isWeekday = this.$data.timesheetHeaders[columnIndex - 1].is_weekday
+        if (isWeekday) {
+          return 'pt-table-header-cell-weekday'
+        } else {
+          return 'pt-table-header-cell'
+        }
+      }
+    },
+    ptTablePastDaysHeaderCellStyle ({row, column, rowIndex, columnIndex}) {
+      var ignoreColList = [0, 1, 2, 3]
+      if (ignoreColList.indexOf(columnIndex) != -1) {
+        return 'pt-table-header-cell-weekday'
+      } else {
+        var isToday = this.$data.timesheetPastDaysHeaders[columnIndex - ignoreColList.length].is_today
+        if (isToday) {
+          return 'pt-table-header-cell-today'
+        }
+        var isWeekday = this.$data.timesheetPastDaysHeaders[columnIndex - ignoreColList.length].is_weekday
         if (isWeekday) {
           return 'pt-table-header-cell-weekday'
         } else {
@@ -185,10 +234,17 @@ export default {
         } else {
           resetJson.is_weekday = true
         }
+        // Check which day is today
         if ((Number(currentMonth) === Number(ptMonth)) && (Number(currentDay) === Number(i))) {
           resetJson.is_today = true
         } else {
           resetJson.is_today = false
+        }
+        // Check which day is before today
+        if ((Number(currentMonth) >= Number(ptMonth)) && (Number(currentDay) > Number(i))) {
+          resetJson.is_beofre_today = true
+        } else {
+          resetJson.is_beofre_today = false
         }
         resetArray.push(resetJson)
         ptDay++
@@ -197,9 +253,10 @@ export default {
         }
       }
       this.$data.timesheetHeaders = resetArray
+      console.log('Header', this.$data.timesheetHeaders)
       var reqMonth = ptYear + '-' + ptMonth
       this.$data.monthSelect = reqMonth
-      const res = await http.post('/worklogs/getWorklogByTeamAndMonthForWeb', {
+      const res = await http.post('/worklogs/getWorklogByUserListAndMonthForWeb', {
         wUserList: iUserList + '',
         wWorklogMonth: reqMonth
       })
@@ -208,6 +265,78 @@ export default {
       } else {
         this.$data.timesheetDatas = [{user: 'Empty', timesheetData: []}]
       }
+    },
+    async resetTimesheetForPastDays (iUserList) {
+      console.log('Selected User: ' + iUserList)
+      if(iUserList.length == 0){
+        this.$message.error('Please select user!')
+        return
+      }
+      // Get today
+      var pastDay = 11
+      var date = new Date()
+      // Test cross month case - start
+      date.setDate(date.getDate() - 10) 
+      // Test cross month case - end
+      var currentMonth = date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0')
+      console.log(date, 'Current Month: ' + currentMonth)
+      var reqWorklogMonth = []
+      var worklogDays = []
+      var worklogIsWeekday = []
+      // start to loop generate tomorrow, today and last 9 days
+      date.setDate(date.getDate() + 1)
+      for (let i = 0; i < pastDay; i++) {
+        var ptYear = date.getFullYear()
+        var ptMonth = date.getMonth() + 1
+        var reqMonth = ptYear + '-' + ptMonth.toString().padStart(2, '0')
+        if (reqWorklogMonth != null) {
+          reqWorklogMonth.push(reqMonth)
+        }
+        worklogDays.push(date.getDate().toString().padStart(2, '0'))
+        if (date.getDay() == 6 || date.getDay() == 0 ){
+          worklogIsWeekday.push(false)
+        } else {
+          worklogIsWeekday.push(true)
+        }
+        date.setDate(date.getDate() - 1)
+      }
+      reqWorklogMonth = reqWorklogMonth.reverse()
+      console.log('Worklogs month array: ', reqWorklogMonth)
+      worklogDays = worklogDays.reverse()
+      console.log('Worklogs dates array: ', worklogDays)
+      worklogIsWeekday = worklogIsWeekday.reverse()
+      console.log('Worklogs dates is weekday: ', worklogIsWeekday)
+      this.$data.timesheetPastDaysDatas = []
+      var resetArray = []
+      // End get today
+      for (let i = 0; i < worklogDays.length; i++) {
+        var resetJson = {}
+        resetJson.label = worklogDays[i]
+        resetJson.prop = 'day' + worklogDays[i]
+        resetJson.is_weekday = worklogIsWeekday[i]
+        if (i == (worklogDays.length - 2)) {
+          resetJson.is_today = true
+        } else {
+          resetJson.is_today = false
+        }
+        resetArray.push(resetJson)
+      }
+      this.$data.timesheetPastDaysHeaders = resetArray
+      // Start to get each month record (if cross 11 days, only max 2 months)
+      var currentMonthDate = []
+      var otherMonth = ''
+      var otherMonthDate = []
+      for(let i = 0; i<reqWorklogMonth.length; i++) {
+        if(reqWorklogMonth[i] == currentMonth) {
+          currentMonthDate.push(worklogDays[i])
+        } else {
+          otherMonth = reqWorklogMonth[i]
+          otherMonthDate.push(worklogDays[i])
+        }
+      }
+      console.log(currentMonth, currentMonthDate)
+      console.log(otherMonth, otherMonthDate)
+      this.$data.timesheetPastDaysDatas = [{user: 'Empty', timesheetData: []}]
     },
     getSummaries (param) {
       const { columns, data } = param
@@ -227,11 +356,21 @@ export default {
               return prev
             }
           }, 0)
-          /* if (sums[index] < 10) {
-            sums[index] = '0' + sums[index]
-          } */
+          if (sums[index] < 8) {
+            sums[index] = sums[index] + '-'
+          }
+          if (sums[index] > 9) {
+            sums[index] = sums[index] + '+'
+          }
         } else {
           sums[index] = '0'
+        }
+        if(sums[index] == '0') {
+          let isWeekday = this.$data.timesheetHeaders[index - 1].is_weekday
+          let isBeforeToday = this.$data.timesheetHeaders[index - 1].is_beofre_today
+          if(isWeekday && isBeforeToday) {
+            sums[index] = '0-'
+          }
         }
       })
       this.$data.sumHoursArray = sums
@@ -241,6 +380,7 @@ export default {
       var date = new Date(this.$data.monthSelect)
       var userList = this.$data.userSelect
       this.resetTimesheet(date, userList)
+      //this.resetTimesheetForPastDays(userList)
     },
     async getActiveUserList () {
       const res1 = await http.get('/users/getUserListOrderByLevelDesc', {
