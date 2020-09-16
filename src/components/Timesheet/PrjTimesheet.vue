@@ -19,8 +19,8 @@
           <el-col :span="24" class="content-main-col" style="margin-bottom:0 !important">
             <el-card class="box-card" shadow="hover">
               <el-row :gutter="10" justify="center" align="middle">
-                <el-col :offset="8" :span="4">
-                  <el-select v-model="userSelect" placeholder="Select" multiple collapse-tags filterable clearable @clear="clearUserList" style="width: 100%">
+                <el-col :offset="7" :span="6">
+                  <el-select v-model="userSelect" placeholder="Select" multiple collapse-tags filterable clearable @clear="clearUserList" style="width: 100%; float: right;">
                     <el-option v-for="user in users" :key="user.user_eid" :label="user.user_eid" :value="user.user_id">
                       <span style="float: left; margin-right:20px">{{ user.user_eid }}</span>
                       <span style="float: right; color: #8492a6; margin-right:25px; font-size: 12px">Level - {{ user.user_level }}</span>
@@ -43,7 +43,7 @@
               :row-class-name="ptTableRowStyle" :cell-class-name="ptTableCellStyle"
               :header-row-class-name="ptTableHeaderRowStyle" :header-cell-class-name="ptTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
-              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
+              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="280">
                 <template slot="header" slot-scope="scope">
                   <div class="pt-table-user">
                     <span><b>Timesheet</b> for </span>
@@ -365,7 +365,7 @@ export default {
         } else {
           sums[index] = '0'
         }
-        if(sums[index] == '0' && this.$data.timesheetHeaders != null && this.$data.timesheetHeaders.length > 0) {
+        if(sums[index] == '0') {
           let isWeekday = this.$data.timesheetHeaders[index - 1].is_weekday
           let isBeforeToday = this.$data.timesheetHeaders[index - 1].is_beofre_today
           if(isWeekday && isBeforeToday) {
@@ -379,8 +379,8 @@ export default {
     showTeamTimesheet () {
       var date = new Date(this.$data.monthSelect)
       var userList = this.$data.userSelect
-      //this.resetTimesheet(date, userList)
-      this.resetTimesheetForPastDays(userList)
+      this.resetTimesheet(date, userList)
+      //this.resetTimesheetForPastDays(userList)
     },
     async getActiveUserList () {
       const res1 = await http.get('/users/getUserListOrderByLevelDesc', {
