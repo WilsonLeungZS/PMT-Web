@@ -2,7 +2,7 @@
   <div class="main-body">
     <el-container>
       <el-header>
-        <el-row class="main-el-row" :style="{'background': mainColor}">
+        <el-row class="main-el-row" :style="{'background': mainColor}" justify="center" align="middle">
           <el-col :span="1" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
             <div class="main-grid-content">
               <el-dropdown @command="handleMenuCommand">
@@ -17,7 +17,7 @@
             </div>
           </el-col>
           <el-col :span="5" :class="this.$store.getters.getIsShowMainBar == false?'hide-view':''">
-            <div class="main-grid-content" style="justify-content: flex-start;">
+            <div class="main-grid-content" style="justify-content: flex-start; margin-left: 13px">
               <el-tooltip class="item" effect="dark" content="Timesheet" placement="bottom">
                 <el-button icon="el-icon-date" circle @click="handleMenuCommand('timesheet')"></el-button>
               </el-tooltip>
@@ -434,7 +434,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  width:100%;
+  width: 100%;
   height: 50px;
 }
 .main-menu-btn {
