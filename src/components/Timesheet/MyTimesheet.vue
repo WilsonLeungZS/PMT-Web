@@ -32,7 +32,7 @@
                   <span @click="editTimesheetByDate(scope)" style="font-size:16px; text-decoration:underline; cursor:pointer;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <el-button @click="editTimesheetByTask(scope)" type="text" style="font-size: 12px">{{scope.row[scope.column.property] || '--'}}</el-button>
+                  <el-button @click="editTimesheetByTask(scope)" type="text" style="font-size: 12px">{{scope.row[scope.column.property] || '-'}}</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -546,7 +546,7 @@ export default {
   height:40px;
   padding-left: 5px;
   padding-right: 5px;
-  line-height: 40px;
+  line-height: 46px;
   font-size: 16px;
 }
 .form-list-task-name {
