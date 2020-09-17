@@ -21,19 +21,18 @@
               :row-class-name="mtTableRowStyle" :cell-class-name="mtTableCellStyle"
               :header-row-class-name="mtTableHeaderRowStyle" :header-cell-class-name="mtTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
-              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
+              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="240">
                 <template slot="header" slot-scope="scope">
-                   <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM" :clearable="false"
-                    class="mt-table-month-picker" @change="changeMTMonth"></el-date-picker>
+                   <el-date-picker v-model="timesheetMonth" type="month" size="small" format="yyyy-MM" :clearable="false" class="mt-table-month-picker" @change="changeMTMonth"></el-date-picker>
                 </template>
               </el-table-column>
               <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
-                align="center" min-width="40" :class-name="changeCol(timesheetHeader.is_weekday)">
+                align="center" min-width="48" :class-name="changeCol(timesheetHeader.is_weekday)">
                 <template slot="header" slot-scope="scope">
                   <span @click="editTimesheetByDate(scope)" style="font-size:16px; text-decoration:underline; cursor:pointer;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <el-button style="font-size:16px" type="text" @click="editTimesheetByTask(scope)">{{scope.row[scope.column.property] || '--'}}</el-button>
+                  <el-button @click="editTimesheetByTask(scope)" type="text" style="font-size: 12px">{{scope.row[scope.column.property] || '--'}}</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -547,10 +546,8 @@ export default {
   height:40px;
   padding-left: 5px;
   padding-right: 5px;
-  line-height: 46px;
+  line-height: 40px;
   font-size: 16px;
-  margin: 0 5px;
-  width: auto;
 }
 .form-list-task-name {
   font-size: 16px;
@@ -650,5 +647,8 @@ input::-webkit-inner-spin-button {
 }
 input[type="number"]{
   -moz-appearance: textfield;
+}
+.mt-table .el-table__footer-wrapper tbody td {
+  font-size: 12px;
 }
 </style>

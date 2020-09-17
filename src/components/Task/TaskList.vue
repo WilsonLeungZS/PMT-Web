@@ -13,27 +13,25 @@
         </el-row>
 <!------- 1. End of Header -->
 <!------- 2. Search Bar -->
-        <el-row class="tl-bar" :gutter="10">
-          <el-col :span="4">
+        <el-row class="tl-bar">
+          <el-col :span="4" style="height: 100%">
             <div class="tl-bar-item">
-              <el-input :disabled="disabledSearch" placeholder="Search task..." v-model="searchVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
-                <el-button :disabled="disabledSearch" slot="append" icon="el-icon-search" @click="searchTask"></el-button>
+              <el-input size="small" :disabled="disabledSearch" placeholder="Search..." v-model="searchVal" class="tl-bar-item-input" clearable @keyup.enter.native="searchTask">
+                <el-button size="small" :disabled="disabledSearch" slot="append" icon="el-icon-search" @click="searchTask"></el-button>
               </el-input>
             </div>
           </el-col>
-          <el-col :span="1">
+          <el-col :span="1" style="height: 100%">
             <div class="tl-bar-item">
-              <el-button-group>
-                <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
-                  <el-button :disabled="isEx" @click="createNewTask(formFilter.filterTaskLevel)" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" size="small" class="tl-bar-item-btn"></el-button>
-                </el-tooltip>
-              </el-button-group>
+              <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
+                <el-button size="mini" :disabled="isEx" @click="createNewTask(formFilter.filterTaskLevel)" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" class="tl-bar-item-btn"></el-button>
+              </el-tooltip>
             </div>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="6" style="height: 100%">
             <div class="tl-bar-item">
-              <span style="margin-right:10px">Full Task List Level</span>
-              <el-radio-group v-model="formFilter.filterTaskLevel" @change="changeLevel()" >
+              <span style="margin-right:15px; font-size: 14px">Full Task List Level</span>
+              <el-radio-group size="small" v-model="formFilter.filterTaskLevel" @change="changeLevel()" >
                 <el-radio-button label="1"></el-radio-button>
                 <el-radio-button label="2"></el-radio-button>
                 <el-radio-button label="3"></el-radio-button>
@@ -41,9 +39,9 @@
               </el-radio-group>              
             </div>
           </el-col>
-          <el-col :span="10">
+          <el-col :span="10" style="height: 100%">
             <div class="tl-bar-item">
-              <el-form :inline="true" :model="formFilter" label-width="100px" class="tl-bar-item">
+              <el-form size="small" :inline="true" :model="formFilter" label-width="100px" class="tl-bar-item">
                 <el-form-item label="Assignee to" v-show="isPathSelectionLv3 || isFullSelectionLv3">
                   <el-select v-model="formFilter.filterAssignTo" filterable style="width:100%">
                     <el-option label="" value=""></el-option>
@@ -61,7 +59,7 @@
               </el-form>
             </div>
           </el-col>
-          <el-col :span="1" :offset="isPathSelectionLv3 || isFullSelectionLv3 ? 0: 10">
+          <el-col :span="1" style="height: 100%">
             <div class="tl-bar-item">
               <el-popover :disabled="formFilterdisable" placement="bottom" title="More Filter" width="300" trigger="click">
                   <el-row style="margin: 5px;">
@@ -107,14 +105,14 @@
                     </el-select>
                     </el-col>
                   </el-row>
-                <el-button slot="reference" icon="el-icon-more-outline" size="small" style="font-size: 20px"></el-button>
+                <el-button slot="reference" icon="el-icon-more-outline" size="mini" class="tl-bar-item-btn" style="border: 1px solid #DCDFE6"></el-button>
               </el-popover>
             </div>
           </el-col>
-          <el-col :span="2">
+          <el-col :span="2" style="height: 100%">
             <div class="tl-bar-item">
-              <el-button type="primary" @click="confirmFilterTask" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-circle-check" size="small" class="tl-bar-item-btn"></el-button>
-              <el-button type="info" @click="clearFilterTask" icon="el-icon-circle-close" size="small" class="tl-bar-item-btn"></el-button>
+              <el-button type="primary" @click="confirmFilterTask" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-circle-check" size="mini" class="tl-bar-item-btn"></el-button>
+              <el-button type="info" @click="clearFilterTask" icon="el-icon-circle-close" size="mini" class="tl-bar-item-btn"></el-button>
             </div>
           </el-col>
         </el-row>
@@ -160,7 +158,7 @@
               <el-table-column prop="task_top_target_start" label="Target Start" show-overflow-tooltip align="center" width="150px" v-if="taskListRule.showColForLv1" key="5"></el-table-column>
               <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="230px" v-if="!taskListRule.showColForLv1" key="6"></el-table-column>
               <el-table-column prop="task_top_customer" label="Customer" show-overflow-tooltip align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="7"></el-table-column>
-              <el-table-column prop="task_top_type_of_work" label="Type Of Work" align="center" min-width="100px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
+              <el-table-column prop="task_top_type_of_work" label="Type Of Work" align="center" min-width="110px" v-if="taskListRule.showColForLv1" key="8"></el-table-column>
               <el-table-column prop="task_status" label="Status" align="center" width="100px" v-if="taskListRule.showColForEx" key="9">
                 <template slot-scope="scope">
                   <el-tag type="warning" effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.task_status == 'Drafting'">{{scope.row.task_status}}</el-tag>
@@ -3199,8 +3197,8 @@ export default {
             return
           }
         }
-        if (Number(reqTask.task_estimation) > 18) {
-          this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
+        if (Number(reqTask.task_estimation) > 24) {
+          this.$message.error('Task estimation could not be over 24 hours. If more effort required, please consider breaking down the task further!')
           return
         }
         if (reqTask.task_group_id == null || reqTask.task_group_id == '') {
@@ -3229,7 +3227,7 @@ export default {
             }            
           }
         }
-        if (reqTask.task_status === 'Done') {
+        if (reqTask.task_status === 'Done' && reqTask.task_name != '' && reqTask.task_name != null) {
           var result = await this.ifAllSubTasksDone(reqTask.task_name)
           if (!result) {
             this.$message.error('Exist sub task not Done!')
@@ -4141,12 +4139,13 @@ export default {
 }
 .tl-bar-item {
   width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
 }
 .tl-bar-item-btn {
-  font-size: 20px;
+  font-size: 1rem;
   border: 1px solid white;
 }
 .tl-bar-item-input {
@@ -4309,7 +4308,7 @@ export default {
 </style>
 <style>
 .el-divider--horizontal1 {
-  margin-top: 0px;
+  margin-top: 10px;
 }
 .el-dialog__body {
   padding: 10px 20px;
@@ -4428,5 +4427,11 @@ input[type="number"]{
 }
 .tl-bar-item .el-form-item {
   margin-bottom: 0;
+}
+.tl-bar-item .el-button--mini {
+  padding: 7px 11px;
+}
+.tl-bar-item .el-radio-button--small .el-radio-button__inner {
+  padding: 8px 11px;
 }
 </style>
