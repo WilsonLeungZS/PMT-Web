@@ -18,20 +18,20 @@
         <el-row>
           <el-col :span="24" class="content-main-col" style="margin-bottom:0 !important">
             <el-card class="box-card" shadow="hover">
-              <el-row :gutter="10">
-                <el-col :offset="8" :span="4" class="pt-title-item">
-                  <el-select v-model="userSelect" placeholder="Select" multiple collapse-tags filterable clearable @clear="clearUserList" style="width: 100%">
+              <el-row :gutter="10" justify="center" align="middle">
+                <el-col :offset="7" :span="6">
+                  <el-select v-model="userSelect" placeholder="Select" multiple collapse-tags filterable clearable @clear="clearUserList" style="width: 100%; float: right;">
                     <el-option v-for="user in users" :key="user.user_eid" :label="user.user_eid" :value="user.user_id">
                       <span style="float: left; margin-right:20px">{{ user.user_eid }}</span>
                       <span style="float: right; color: #8492a6; margin-right:25px; font-size: 12px">Level - {{ user.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-col>
-                <el-col :span="3" class="pt-title-item">
-                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select" @change="changePtMonth"></el-date-picker>
+                <el-col :span="3">
+                  <el-date-picker v-model="monthSelect" type="month" placeholder="Select" @change="changePtMonth" style="width: 100%"></el-date-picker>
                 </el-col>
-                <el-col :span="2" class="pt-title-item">
-                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-arrow-right" @click="showTeamTimesheet"></el-button>
+                <el-col :span="1">
+                  <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white', 'width': '100%'}" icon="el-icon-arrow-right" @click="showTeamTimesheet"></el-button>
                 </el-col>
               </el-row>
             </el-card>
@@ -43,21 +43,21 @@
               :row-class-name="ptTableRowStyle" :cell-class-name="ptTableCellStyle"
               :header-row-class-name="ptTableHeaderRowStyle" :header-cell-class-name="ptTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
-              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="260">
+              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="240">
                 <template slot="header" slot-scope="scope">
                   <div class="pt-table-user">
-                    <span><b>Timesheet</b> for </span>
-                    <el-tag style="margin-left: 10px; color: #2980b9">{{timesheet.user}}</el-tag>
+                    <el-tag style="margin-right: 10px; color: #2980b9">{{timesheet.user}}</el-tag>
+                    <span><b>Timesheet</b></span>
                   </div>
                 </template>
               </el-table-column>
               <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
-                align="center" min-width="42" :class-name="changeCol(timesheetHeader.is_weekday, timesheetHeader.is_today)">
+                align="center" min-width="45" :class-name="changeCol(timesheetHeader.is_weekday, timesheetHeader.is_today)">
                 <template slot="header" slot-scope="scope">
                   <span style="font-size:16px; cursor:default;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <span style="font-size:16px">{{scope.row[scope.column.property] || '--'}}</span>
+                  <span style="font-size: 12px">{{scope.row[scope.column.property] || '-'}}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -551,5 +551,8 @@ export default {
   border: 1px solid #f1f2f6;
   padding: 10px 0;
   font-weight: bold;
+}
+.pt-table .el-table__footer-wrapper tbody td {
+  font-size: 12px;
 }
 </style>
