@@ -43,21 +43,21 @@
               :row-class-name="ptTableRowStyle" :cell-class-name="ptTableCellStyle"
               :header-row-class-name="ptTableHeaderRowStyle" :header-cell-class-name="ptTableHeaderCellStyle" >
               <el-table-column prop="task_id" label="Id" v-if="false"></el-table-column>
-              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="280">
+              <el-table-column prop="task" align="left" :show-overflow-tooltip="true" min-width="240">
                 <template slot="header" slot-scope="scope">
                   <div class="pt-table-user">
-                    <span><b>Timesheet</b> for </span>
-                    <el-tag style="margin-left: 10px; color: #2980b9">{{timesheet.user}}</el-tag>
+                    <el-tag style="margin-right: 10px; color: #2980b9">{{timesheet.user}}</el-tag>
+                    <span><b>Timesheet</b></span>
                   </div>
                 </template>
               </el-table-column>
               <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label"
-                align="center" min-width="42" :class-name="changeCol(timesheetHeader.is_weekday, timesheetHeader.is_today)">
+                align="center" min-width="45" :class-name="changeCol(timesheetHeader.is_weekday, timesheetHeader.is_today)">
                 <template slot="header" slot-scope="scope">
                   <span style="font-size:16px; cursor:default;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <span style="font-size:16px">{{scope.row[scope.column.property] || '--'}}</span>
+                  <span style="font-size: 12px">{{scope.row[scope.column.property] || '--'}}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -551,5 +551,8 @@ export default {
   border: 1px solid #f1f2f6;
   padding: 10px 0;
   font-weight: bold;
+}
+.pt-table .el-table__footer-wrapper tbody td {
+  font-size: 12px;
 }
 </style>
