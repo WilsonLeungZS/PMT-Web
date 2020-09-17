@@ -57,7 +57,7 @@
                   <span style="font-size:16px; cursor:default;">{{scope.column.label}}</span>
                 </template>
                 <template slot-scope="scope">
-                  <span style="font-size: 12px">{{scope.row[scope.column.property] || '--'}}</span>
+                  <span style="font-size: 12px">{{scope.row[scope.column.property] || '-'}}</span>
                 </template>
               </el-table-column>
             </el-table>
