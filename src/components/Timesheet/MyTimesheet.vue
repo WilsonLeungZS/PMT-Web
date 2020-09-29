@@ -40,7 +40,7 @@
         </el-row>
       </el-main>
     </el-container>
-    <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="35%" :close-on-click-modal="false">
+    <el-dialog title="Edit Worklog" :visible.sync="worklogFormVisible" width="28%" :close-on-click-modal="false">
       <el-form :model="form" label-width="70px" class="mt-worklog-form">
         <el-form-item label="Task" >
           <el-autocomplete style="width:100%" :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true"
@@ -62,15 +62,12 @@
           </el-row>
         </el-form-item>
         <el-form-item label="Date">
-          <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate" style="width: 50%"></el-date-picker>
+          <el-date-picker v-model="form.worklog_date" type="date" @change="changeWorklogDate" style="width: 100%"></el-date-picker>
         </el-form-item>
         <el-form-item label="Effort" >
-          <el-col :span="5">
-            <el-input v-model="form.worklog_effort" type="number"></el-input>
-          </el-col>
-          <el-col :span="5">
-            <span style="text-align:center; font-size:16px; margin-left:10px">Hrs</span>
-          </el-col>
+          <el-input v-model="form.worklog_effort" type="number">
+            <template slot="append" style="font-size:16px; width:100%">hrs</template>
+          </el-input>
         </el-form-item>
         <el-form-item label="Remark" >
           <el-input type="textarea" :rows="6" v-model="form.worklog_remark"></el-input>
