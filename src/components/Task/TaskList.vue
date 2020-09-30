@@ -3058,11 +3058,13 @@ export default {
           }
         }
         if (reqTask.task_status === 'Done' && reqTask.task_name != '' && reqTask.task_name != null) {
-          var result = await this.ifAllSubTasksDone(reqTask.task_name)
-          if (!result) {
-            this.$message.error('Exist sub task not Done!')
-            this.$data.taskLv3SaveBtnDisabled = false
-            return
+          if (reqTask.task_type_tag != 'Regular Task') {
+            var result = await this.ifAllSubTasksDone(reqTask.task_name)
+            if (!result) {
+              this.$message.error('Exist sub task not Done!')
+              this.$data.taskLv3SaveBtnDisabled = false
+              return
+            }
           }
         }
         if(this.$data.taskLv3Form.task_deliverable_tag != null && typeof(this.$data.taskLv3Form.task_deliverable_tag) === 'object'){
@@ -3105,7 +3107,8 @@ export default {
             reqStartTime: reqTask.task_recurrence_sch_start_time,
             reqEndTime: reqTask.task_recurrence_sch_end_time,
             reqSchedule: reqTask.task_recurrence_schedule,
-          })      
+            reqStatus: reqTask.task_status
+          })
         }
         if (res.data.status === 0) {
           this.$message({message: 'Task created successfully!', type: 'success'})  
