@@ -739,7 +739,6 @@
                         <el-tag type="success" style="font-weight:bold" v-if="scope.row.task_status != 'Done'">{{scope.row.task_status}}</el-tag>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="task_assignee" align="left" width="160"></el-table-column>
                     <el-table-column show-overflow-tooltip fixed="right" align="center" width="30">
                       <template slot-scope="scope">
                         <el-row style="cursor: pointer;" @click.native="openTaskById(scope.row.task_id)">
@@ -1070,7 +1069,6 @@
                         <el-tag type="success" style="font-weight:bold" v-if="scope.row.task_status != 'Done'">{{scope.row.task_status}}</el-tag>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="task_assignee" align="left" width="160"></el-table-column>
                     <el-table-column show-overflow-tooltip fixed="right" align="center" width="30">
                       <template slot-scope="scope">
                         <el-row style="cursor: pointer;" @click.native="openTaskById(scope.row.task_id)">
@@ -3244,6 +3242,7 @@ export default {
         this.$data.lv3TaskItemRule.disableTaskEst = false
         this.$data.lv3TaskItemRule.disableDesc = false
         this.$data.lv3TaskItemRule.disableStatus = false
+        this.$data.lv3TaskItemRule.disableRecurrence = false
         this.$data.lv3TaskItemRule.showRefPoolInput = true
         this.$data.lv3TaskItemRule.showTypeTag = true
         this.$data.lv3TaskItemRule.showRespLeader = true
