@@ -162,10 +162,18 @@
         <el-form-item label="Group Name" >
           <el-input v-model="taskGroupForm.formGroupName" style="width: 100%; text-align: center"></el-input>
         </el-form-item>
-        <el-form-item label="Time Range"><!--@change="dateLimit" :picker-options="pickerOptions"-->
+        <el-form-item label="Time Range">
           <el-date-picker v-model="taskGroupForm.formGroupTimeRange" type="daterange"
             start-placeholder="Start Date" end-placeholder="End Date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width:100%">
           </el-date-picker>
+        </el-form-item>
+        <el-form-item label="Type">
+          <el-select v-model="taskGroupForm.formGroupTimeType" placeholder="Please select..." style="width:100%">
+            <el-option label="Sprintly" value="Sprintly"></el-option>
+            <el-option label="Weekly" value="Weekly"></el-option>
+            <el-option label="Monthly" value="Monthly"></el-option>
+            <el-option label="Others" value="Others"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -218,28 +226,13 @@ export default {
         formGroupId: 0,
         formGroupName: null,
         formGroupTimeRange: null,
-        formGroupRelatedTask: null,
+        formGroupTimeType: 'Sprintly',
         setNowDate : null
       },
       taskGroupLoading: false,
-      /*pickerOptions: {
-				disabledDate(time) {
-          let pre = new Date();
-          let oneMonth = pre.setMonth(pre.getMonth() + 1);
-          let pre1 = new Date();
-          let fiveDays = pre1.setDate(pre1.getDate() -5);
-				  return time.getTime() < fiveDays || time.getTime() > oneMonth;
-		   }
-     }*/
     }
   },
   methods: {
-    /*dateLimit(time){
-      this.startTime = time[0];
-      this.endTime = time[1];
-      console.log("george: " + this.startTime);
-      console.log("george: " + this.endTime);
-    },*/
     setCurrent (row) {
       console.log(this.$refs)
       this.$nextTick(() => {
@@ -315,18 +308,16 @@ export default {
       this.$data.taskGroupForm.formGroupId = 0
       this.$data.taskGroupForm.formGroupName = ''
       this.$data.taskGroupForm.formGroupTimeRange = null
-      this.$data.taskGroupForm.formGroupRelatedTask = null
+      this.$data.taskGroupForm.formGroupTimeType = 'Sprintly'
     },
     async editTaskGroup (iGroupId) {
       console.log(iGroupId)
       this.resetTaskGroupForm()
-      this.$data.taskGroupForm.formGroupRelatedTask = this.$data.selectedLv1TaskName
       await this.getTaskGroup(iGroupId, false)
       this.$data.groupDialogVisible = true
     },
     createNewTaskGroup () {
       this.resetTaskGroupForm()
-      this.$data.taskGroupForm.formGroupRelatedTask = this.$data.selectedLv1TaskName
       this.$data.groupDialogVisible = true
     },
     async getTaskGroup (iGroupId, isShowCurrent) {
@@ -359,6 +350,7 @@ export default {
           this.$data.taskGroupForm.formGroupId = res.data.data[0].group_id
           this.$data.taskGroupForm.formGroupName = res.data.data[0].group_name
           this.$data.taskGroupForm.formGroupTimeRange = [res.data.data[0].group_start_time, res.data.data[0].group_end_time]
+          this.$data.taskGroupForm.formGroupTimeType = res.data.data[0].group_type
         }
       }
       this.$data.taskGroupLoading = false
@@ -367,7 +359,7 @@ export default {
       var tGroupId = this.$data.taskGroupForm.formGroupId
       var tGroupName = this.$data.taskGroupForm.formGroupName
       var tGroupTimeRange = this.$data.taskGroupForm.formGroupTimeRange
-      var tGroupRelatedTask = this.$data.taskGroupForm.formGroupRelatedTask
+      var tGroupTimeType = this.$data.taskGroupForm.formGroupTimeType
       if (tGroupName === '' || tGroupName === null) {
         this.$message.error('Task Group Could not be empty!')
         return
@@ -394,11 +386,11 @@ export default {
           tGroupName: tGroupName,
           tGroupStartTime: tGroupStartTime,
           tGroupEndTime: tGroupEndTime,
-          tGroupRelatedTask: tGroupRelatedTask
+          tGroupTimeType: tGroupTimeType
         })
         if (res.data.status === 0) {
           this.$message({message: 'Task group created/updated successfully!', type: 'success'})
-          this.getTaskGroup(0, tGroupRelatedTask)
+          this.getTaskGroup(0, false)
           this.$data.groupDialogVisible = false
         } else {
           this.$message.error('Task group created/updated fail!')
