@@ -419,6 +419,7 @@ export default {
         wRemark: reqRemark
       })
       if (res.data.status === 0) {
+        this.confirmTaskdone(res.data.data.TaskId)
         var firstDate = this.$data.timesheetMonth + '-01 00:00:00'
         var dateConvert = new Date(Date.parse(firstDate))
         let _this = this
@@ -429,6 +430,33 @@ export default {
       } else {
         this.showWarnMessage('Warning', 'Fail to add/update worklog!')
       }
+    },
+    async confirmTaskdone(iTaskId) {
+      var res = await http.post('/tasks/getTaskById', {
+        reqTaskId: iTaskId
+      })
+      if (res.data.status === 0) {
+        var task = res.data.data
+        if (task.task_creator.startsWith('PMT:') && task.task_status != 'Done' && (task.task_effort >= task.task_estimation)) {
+          this.$confirm('[' + task.task_name + '] task\'s effort is fully charged and still not done, need to change the task status to "Done"?', 'Notice', {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }).then(async () => {
+            var res1 = await http.post('/worklogs/updateTaskdone', {
+              reqTaskId: task.task_id
+            })
+            if(res1.data.status == 0){
+              this.$message({
+                type: 'success',
+                message: 'Change task status to \'Done\' successfully!'
+              });
+            }
+          }).catch(() => {
+            console.log('Not change task status to done')
+          });
+        }
+      } 
     },
     async deleteWorklog () {
       var reqUserId = this.$store.getters.getUserId
