@@ -228,7 +228,7 @@
                           </el-table-column>
                           <el-table-column label="Effort" prop="sub_task_effort" align="center" width="70px" key="5"></el-table-column>
                           <el-table-column label="Est" prop="sub_task_estimation" align="center" width="70px" key="6"></el-table-column>
-                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="120px" key="7"></el-table-column>
+                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px" key="7"></el-table-column>
                           <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px" key="8">
                             <template slot-scope="scope">
                               <el-tooltip :content="scope.row.sub_task_assignee_full_name" placement="top" effect="dark">
@@ -277,7 +277,7 @@
                 </el-table-column>
                 <el-table-column prop="task_effort" label="Effort" align="center" width="70px" key="7"></el-table-column>
                 <el-table-column prop="task_estimation" label="Est" align="center" width="70px" key="8"></el-table-column>
-                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="120px" key="9"></el-table-column>
+                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
                 <el-table-column prop="task_assignee" label="Leading By/Assignee" align="center" width="180px" key="10">
                   <template slot-scope="scope">
                     <el-tooltip :content="scope.row.task_assignee_full_name" placement="top" effect="dark">
@@ -3038,7 +3038,7 @@ export default {
           this.$data.taskLv3SaveBtnDisabled = false
           return
         }
-        if (Number(reqTask.task_estimation) > 24) {
+        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 24) {
           this.$message.error('Task estimation could not be over 24 hours. If more effort required, please consider break down the task further!')
           this.$data.taskLv3SaveBtnDisabled = false
           return
@@ -3318,7 +3318,7 @@ export default {
           this.$data.taskLv4SaveBtnDisabled = false
           return
         }
-        if (Number(reqTask.task_estimation) > 18) {
+        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           this.$data.taskLv4SaveBtnDisabled = false
           return
