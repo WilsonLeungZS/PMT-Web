@@ -42,7 +42,7 @@
           <el-col :span="10" style="height: 100%">
             <div class="tl-bar-item">
               <el-form size="small" :inline="true" :model="formFilter" label-width="100px" class="tl-bar-item">
-                <el-form-item label="Assignee to" v-show="isPathSelectionLv3 || isFullSelectionLv3">
+                <el-form-item label="Assign to" v-show="isPathSelectionLv3 || isFullSelectionLv3">
                   <el-select v-model="formFilter.filterAssignTo" filterable style="width:100%">
                     <el-option label="" value=""></el-option>
                     <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id">
@@ -181,8 +181,7 @@
               <el-table-column prop="task_skill" label="Related Skills" show-overflow-tooltip align="center" width="180px" v-if="taskListRule.showColForLv2" key="15"></el-table-column>
               <el-table-column fixed="right" label="Edit" align="center" v-if="!taskListRule.showColForEx" width="70px">
                 <template slot-scope="scope">
-                  <el-button v-if="scope.row.task_level===3" @click.stop="openTaskById(scope.row.task_id)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small" icon="el-icon-plus"></el-button>
-                  <el-button @click.stop="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                  <el-button @click.stop="removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
                   </template>
               </el-table-column>
             </el-table>
@@ -213,13 +212,13 @@
                       <el-col :span="23" :offset="1">
                         <el-table :data="props.row.task_sub_tasks" size="small" style="width: 100%;" class="sub-task-table tl-plan-task-sub-task-table">
                           <el-table-column label="Id" prop="sub_task_id" v-if="false" key="1"></el-table-column>
-                          <el-table-column label="Number" prop="sub_task_name" align="left" width="150" key="2">
+                          <el-table-column label="Number" prop="sub_task_name" align="left" width="210px" key="2">
                             <template slot-scope="scope">
                               <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.sub_task_id)" type="text" class="sub-tasks-name-btn" size="small">{{scope.row.sub_task_name}}</el-button>
                             </template>
                           </el-table-column>
-                          <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip></el-table-column>   
-                          <el-table-column label="Status" prop="sub_task_status" align="center" width="120">
+                          <el-table-column label="Description" prop="sub_task_desc" align="left" show-overflow-tooltip key="3"></el-table-column>   
+                          <el-table-column label="Status" prop="sub_task_status" align="center" width="110px" key="4">
                             <template slot-scope="scope">
                               <el-tag type="warning" effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.sub_task_status == 'Drafting'">{{scope.row.sub_task_status}}</el-tag>
                               <el-tag effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.sub_task_status == 'Planning'">{{scope.row.sub_task_status}}</el-tag>
@@ -227,10 +226,10 @@
                               <el-tag type="info" effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.sub_task_status == 'Done'">{{scope.row.sub_task_status}}</el-tag>
                             </template>
                           </el-table-column>
-                          <el-table-column label="Effort" prop="sub_task_effort" align="center" width="80px"></el-table-column>
-                          <el-table-column label="Est" prop="sub_task_estimation" align="center" width="80px"></el-table-column>
-                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="125px"></el-table-column>
-                          <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px">
+                          <el-table-column label="Effort" prop="sub_task_effort" align="center" width="70px" key="5"></el-table-column>
+                          <el-table-column label="Est" prop="sub_task_estimation" align="center" width="70px" key="6"></el-table-column>
+                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px" key="7"></el-table-column>
+                          <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px" key="8">
                             <template slot-scope="scope">
                               <el-tooltip :content="scope.row.sub_task_assignee_full_name" placement="top" effect="dark">
                                 <div slot>{{scope.row.sub_task_assignee}}</div>
@@ -251,24 +250,24 @@
                 <el-table-column prop="task_name" label="Number" width="150px" key="2">
                   <template slot-scope="scope">
                     <span v-if="scope.row.task_level === 2? true: false" disabled>{{scope.row.task_name}}</span>
-                    <el-button v-if="scope.row.task_level === 2? false: true" type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
+                    <el-button v-if="scope.row.task_level === 2? false: true" size="mini" type="text" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; openTaskById(scope.row.task_id)">{{scope.row.task_name}}</el-button>
                   </template>
                 </el-table-column>
                 <el-table-column prop="task_desc" label="Title" show-overflow-tooltip align="left" min-width="270px" key="3"></el-table-column>
-                <el-table-column prop="task_group" label="Time Group" align="center" width="155px" key="6">
+                <el-table-column prop="task_group" label="Time Group" align="center" width="137px" key="4">
                   <template slot-scope="scope">
-                    <el-select v-if="scope.row.task_level===3" :disabled="(scope.row.task_status==='Running'||scope.row.task_status==='Done')" @change="((val)=>{changeTaskGroup(val, scope.row.task_id, scope.row.task_parent_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="small">
+                    <el-select v-if="scope.row.task_level===3" :disabled="(scope.row.task_status==='Running'||scope.row.task_status==='Done')" @change="((val)=>{changeTaskGroup(val, scope.row.task_id, scope.row.task_parent_name, index)})" v-model="scope.row.task_group_id" style="width: 100%" size="mini">
                       <el-option label=" " value="0"></el-option>
                       <el-option v-for="(group, index) in taskGroups" :key="index" :label="group.group_name" :value="group.group_id" v-if="group.group_name !== 'All'"></el-option>
                     </el-select>
                   </template>
                 </el-table-column>
-                <el-table-column prop="task_reference" label="Ref Pool" align="center" width="130px" key="5">
+                <el-table-column prop="task_reference" label="Ref Pool" align="center" width="110px" key="5">
                   <template slot-scope="scope">
-                    <el-button type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
+                    <el-button size="mini" type="text" @click.stop="openTaskByName(scope.row.task_reference)">{{scope.row.task_reference}}</el-button>
                   </template>
                 </el-table-column>                            
-                <el-table-column prop="task_status" label="Status" align="center" width="120px" key="4">
+                <el-table-column prop="task_status" label="Status" align="center" width="110px" key="6">
                   <template slot-scope="scope">
                     <el-tag type="warning" effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.task_status == 'Drafting'">{{scope.row.task_status}}</el-tag>
                     <el-tag effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.task_status == 'Planning'">{{scope.row.task_status}}</el-tag>
@@ -276,9 +275,9 @@
                     <el-tag type="info" effect="dark" size="mini" style="font-weight:bold" v-if="scope.row.task_status == 'Done'">{{scope.row.task_status}}</el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="task_effort" label="Effort" align="center" width="80px" key="7"></el-table-column>
-                <el-table-column prop="task_estimation" label="Est" align="center" width="80px" key="8"></el-table-column>
-                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="125px" key="9"></el-table-column>
+                <el-table-column prop="task_effort" label="Effort" align="center" width="70px" key="7"></el-table-column>
+                <el-table-column prop="task_estimation" label="Est" align="center" width="70px" key="8"></el-table-column>
+                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
                 <el-table-column prop="task_assignee" label="Leading By/Assignee" align="center" width="180px" key="10">
                   <template slot-scope="scope">
                     <el-tooltip :content="scope.row.task_assignee_full_name" placement="top" effect="dark">
@@ -288,9 +287,9 @@
                 </el-table-column>
                 <el-table-column fixed="right" label="Edit" align="center" width="120">
                   <template slot-scope="scope">
-                    <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(scope.row.task_level+1, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="small" icon="el-icon-plus"></el-button>
+                    <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(scope.row.task_level+1, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="mini" icon="el-icon-plus"></el-button>
                     <el-button v-if="scope.row.task_level===2" @click.stop="refreshLv2Task(task,index)" type="info" size="mini" icon="el-icon-refresh"></el-button>
-                    <el-button v-if="scope.row.task_level===3" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="small" icon="el-icon-delete"></el-button>
+                    <el-button v-if="scope.row.task_level===3" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
                     </template>
                 </el-table-column>
               </el-table> 
@@ -544,7 +543,7 @@
             <el-row>
               <el-col :span="11">
                 <el-form-item label="Number">
-                  <span>{{taskLv2Form.task_name}}</span>
+                  <span>{{ taskLv2Form.task_name }}</span>
                 </el-form-item>
               </el-col>
               <el-col :span="12" :offset="1" >
@@ -555,11 +554,25 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Skills">
-              <el-select  v-model="taskLv2Form.task_skill" multiple filterable default-first-option style="width: 100%">
-                <el-option v-for="item in skillTypeOps" :key="item" :label="item" :value="item"></el-option>
-              </el-select>  
-            </el-form-item>
+            <el-row>
+              <el-col :span="11">
+                <el-form-item label="Skills">
+                  <el-select  v-model="taskLv2Form.task_skill" multiple filterable default-first-option style="width: 100%">
+                    <el-option v-for="item in skillTypeOps" :key="item" :label="item" :value="item"></el-option>
+                  </el-select>  
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" :offset="1" >
+                <el-form-item label="Time Type">
+                    <el-radio-group v-model="taskLv2Form.task_time_type">
+                      <el-radio label="Sprintly">Sprintly</el-radio>
+                      <el-radio label="Weekly">Weekly</el-radio>
+                      <el-radio label="Monthly">Monthly</el-radio>
+                      <el-radio label="Others">Others</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-form-item label="Scope(Baseline)">
                 <el-input v-model="taskLv2Form.task_scope" style="width: 100%"></el-input>
             </el-form-item>
@@ -760,7 +773,7 @@
 <!------- 8. End Level 2 Task Details Dialog -->
 <!------- 9. Level 3 Task Details Dialog -->
     <el-dialog :before-close="closeLv3TaskDialog" :title="taskLv3DialogTitle" :visible.sync="taskLv3DialogVisible" :width="dialogWidth" style="min-width: 500px;" :close-on-click-modal="false" class="tl-taskform">
-      <el-form ref="form" :model="taskLv3Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv3FormRules">
+      <el-form ref="form" :model="taskLv3Form" label-width="140px" label-position="left" class="tl-edit-form" :rules="taskLv3FormRules" :disabled="disableLv3Form">
         <el-tabs v-model="activeTabForLv3" type="card" ref="taskLv3Tabs" @tab-click="((tab, event)=>{changeTab(tab, event, 'taskLv3Form', 'activeTabForLv3')})">
           <el-tab-pane label="Basic Information" name="tab_basic_info">
             <el-row>
@@ -815,7 +828,7 @@
                 </el-form-item>
               </el-col>
             </el-row> 
-            <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
+            <el-form-item label="Ref External Task" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
                   v-model="taskLv3Form.task_reference" :value-key="taskLv3Form.task_reference" :fetch-suggestions="queryTaskAsyncForRefPool" @select="((item)=>{handleSelectForRefPool(item, 'taskLv3Form')})" @clear="clearSelectForRefPool('taskLv3Form')">
@@ -900,21 +913,17 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showRespLeader&&lv3TaskItemRule.showDeliverableTag">
+              <el-col :span="12" :offset="1" v-if="lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
                   <el-select :disabled="lv3TaskItemRule.disableAssignee" filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
-                    <el-option
-                      v-for="(activeUser, index) in activeUserListForAll"
-                      :key="index"
-                      :label="activeUser.user_eid"
-                      :value="activeUser.user_id">
+                    <el-option v-for="(activeUser, index) in activeUserListForAll" :key="index" :label="activeUser.user_eid" :value="activeUser.user_id">
                       <span style="float: left; margin-right:20px">{{ activeUser.user_eid }}</span>
                       <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ activeUser.user_level }}</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" v-if="!lv3TaskItemRule.showRespLeader&&lv3TaskItemRule.showDeliverableTag">
+              <el-col :span="11" v-if="!lv3TaskItemRule.showRespLeader">
                 <el-form-item label="Assignee">
                   <el-select  filterable v-model="taskLv3Form.task_assignee" style="width: 100%">
                     <el-option label=" " value=""></el-option>
@@ -1153,7 +1162,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
+            <el-form-item label="Ref External Task" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
               <el-col :span="6">
                 <span>{{taskLv4Form.task_reference}}</span>
               </el-col>
@@ -1384,6 +1393,7 @@ export default {
       taskLv2SaveBtnDisabled: false,
       // Level 3 Task Dialog Value
       taskLv3DialogVisible: false,
+      disableLv3Form: false,
       taskLv3DialogTitle: '3 - Executive Task',
       activeTabForLv3: 'tab_basic_info',
       taskLv3Form: {},
@@ -3028,7 +3038,7 @@ export default {
           this.$data.taskLv3SaveBtnDisabled = false
           return
         }
-        if (Number(reqTask.task_estimation) > 24) {
+        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 24) {
           this.$message.error('Task estimation could not be over 24 hours. If more effort required, please consider break down the task further!')
           this.$data.taskLv3SaveBtnDisabled = false
           return
@@ -3135,6 +3145,7 @@ export default {
         // Set Dialog Default Value
         this.$data.taskLv3DialogTitle = '3 - Executive Task'
         this.$data.activeTabForLv3 = 'tab_basic_info'
+        this.$data.disableLv3Form = false
         this.$data.lv3TaskItemRule.showProgress = true
         this.$data.lv3TaskItemRule.disableTypeTag = true
         this.$data.lv3TaskItemRule.showProgress = true
@@ -3142,9 +3153,11 @@ export default {
         // Default value
         this.$data.lv3TaskItemRule.disableTaskEst = false
         if (this.$data.taskLv3Form.task_status == 'Running' || this.$data.taskLv3Form.task_status == 'Done') {
+          this.$data.lv3TaskItemRule.showActualComplete = true
           this.$data.lv3TaskItemRule.disableRecurrence = true
           this.$data.taskLv3TimeGroupDisabled = true
         } else {
+          this.$data.lv3TaskItemRule.showActualComplete = false
           this.$data.lv3TaskItemRule.disableRecurrence = false
           this.$data.taskLv3TimeGroupDisabled = false
         }
@@ -3162,6 +3175,7 @@ export default {
           this.$data.lv3TaskItemRule.showRefPoolInput = false
           if (this.$data.taskLv3Form.task_type === 'Pool') {
             console.log('Pool Task')
+            this.$data.disableLv3Form = true
             this.$data.taskLv3WorklogShow = false
             this.$data.lv3TaskItemRule.showRespLeader = false
             this.$data.lv3TaskItemRule.showSubTaskEst = false
@@ -3203,7 +3217,6 @@ export default {
             this.$data.taskLv3WorklogShow = false
             this.$data.lv3TaskItemRule.showProgress = false
             this.$data.lv3TaskItemRule.showEffort = false
-            this.$data.lv3TaskItemRule.showActualComplete = false
             this.$data.lv3TaskItemRule.disableTypeTag = true
             this.$data.lv3TaskItemRule.showDeliverableTag = false
             this.$nextTick(() => {
@@ -3233,6 +3246,7 @@ export default {
         this.$data.taskLv3TimeGroupDisabled = false
         this.$data.taskLv3DialogTitle = '3 - New Executive Task'      
         this.$data.activeTabForLv3 = 'tab_basic_info'
+        this.$data.disableLv3Form = false
         if (iNeedInputParent) {
           this.$data.lv3TaskItemRule.disableParentNameInput = false
         } else {
@@ -3248,13 +3262,13 @@ export default {
         this.$data.lv3TaskItemRule.showRespLeader = true
         this.$data.lv3TaskItemRule.showSubTaskEst = false
         this.$data.lv3TaskItemRule.showProgress = false
-        this.$data.taskLv3WorklogShow = false
         this.$data.lv3TaskItemRule.showCreator = false
         this.$data.lv3TaskItemRule.showRegularTaskList = false
         this.$data.lv3TaskItemRule.showSubTaskList = false
         this.$data.lv3TaskItemRule.showTaskGroup = true
+        this.$data.lv3TaskItemRule.showActualComplete = false 
+        this.$data.taskLv3WorklogShow = false
         if (this.$data.taskLv3Form.task_type_tag === 'Regular Task') {
-          this.$data.lv3TaskItemRule.showActualComplete = false
           this.$nextTick(() => {
             this.$refs.taskLv3Tabs.$children[0].$refs.tabs[2].style.display = '' // Show "Recurrence" Tab
           })
@@ -3304,7 +3318,7 @@ export default {
           this.$data.taskLv4SaveBtnDisabled = false
           return
         }
-        if (Number(reqTask.task_estimation) > 18) {
+        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 18) {
           this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
           this.$data.taskLv4SaveBtnDisabled = false
           return
