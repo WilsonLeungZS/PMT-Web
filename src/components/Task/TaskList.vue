@@ -228,7 +228,7 @@
                           </el-table-column>
                           <el-table-column label="Effort" prop="sub_task_effort" align="center" width="70px" key="5"></el-table-column>
                           <el-table-column label="Est" prop="sub_task_estimation" align="center" width="70px" key="6"></el-table-column>
-                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="140px" key="7"></el-table-column>
+                          <el-table-column label="Sub-Tasks Est" prop="sub_task_none_estimation" align="center" width="130px" key="7"></el-table-column>
                           <el-table-column label="Leading By/Assignee" prop="sub_task_assignee" align="center" width="180px" key="8">
                             <template slot-scope="scope">
                               <el-tooltip :content="scope.row.sub_task_assignee_full_name" placement="top" effect="dark">
@@ -277,7 +277,7 @@
                 </el-table-column>
                 <el-table-column prop="task_effort" label="Effort" align="center" width="70px" key="7"></el-table-column>
                 <el-table-column prop="task_estimation" label="Est" align="center" width="70px" key="8"></el-table-column>
-                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="140px" key="9"></el-table-column>
+                <el-table-column prop="task_subtasks_estimation" label="Sub-Tasks Est" align="center" width="130px" key="9"></el-table-column>
                 <el-table-column prop="task_assignee" label="Leading By/Assignee" align="center" width="180px" key="10">
                   <template slot-scope="scope">
                     <el-tooltip :content="scope.row.task_assignee_full_name" placement="top" effect="dark">
@@ -828,7 +828,7 @@
                 </el-form-item>
               </el-col>
             </el-row> 
-            <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
+            <el-form-item label="Ref External Task" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
                   v-model="taskLv3Form.task_reference" :value-key="taskLv3Form.task_reference" :fetch-suggestions="queryTaskAsyncForRefPool" @select="((item)=>{handleSelectForRefPool(item, 'taskLv3Form')})" @clear="clearSelectForRefPool('taskLv3Form')">
@@ -1162,7 +1162,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
+            <el-form-item label="Ref External Task" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
               <el-col :span="6">
                 <span>{{taskLv4Form.task_reference}}</span>
               </el-col>
