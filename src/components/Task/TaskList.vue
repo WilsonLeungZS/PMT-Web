@@ -828,7 +828,7 @@
                 </el-form-item>
               </el-col>
             </el-row> 
-            <el-form-item label="Ref Pool" v-if="lv3TaskItemRule.showRefPoolInput">
+            <el-form-item label="Ref External Task" v-if="lv3TaskItemRule.showRefPoolInput">
               <el-col :span="6">
                 <el-autocomplete placeholder="Search Reference Pool..." :trigger-on-focus="false" popper-class="task-autocomplete" :clearable="true" style="width: 100%" :debounce=0
                   v-model="taskLv3Form.task_reference" :value-key="taskLv3Form.task_reference" :fetch-suggestions="queryTaskAsyncForRefPool" @select="((item)=>{handleSelectForRefPool(item, 'taskLv3Form')})" @clear="clearSelectForRefPool('taskLv3Form')">
@@ -1162,7 +1162,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="Ref Pool" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
+            <el-form-item label="Ref External Task" v-if="taskLv4Form.task_reference != null && taskLv4Form.task_reference != ''">
               <el-col :span="6">
                 <span>{{taskLv4Form.task_reference}}</span>
               </el-col>
