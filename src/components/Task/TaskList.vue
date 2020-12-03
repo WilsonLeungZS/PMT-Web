@@ -2139,14 +2139,18 @@ export default {
         this.$data.taskListRule.showColRef = false
       }
     },
-    async getTaskGroup (iGroupId,isShowRelate,isShowCurrent) {
+    async getTaskGroup (iGroupId, isShowRelate, isShowCurrent) {
       console.log('start to get getTaskGroup')
       this.$data.taskGroups = []
       var today = this.dateForYMD(new Date())
       console.log('Current date is ' + today)
+      var lv2Task = null
+      if (this.$data.lv2TaskNamePath != null && this.$data.lv2TaskNamePath != '' && this.$data.formFilter.filterTaskLevel != 3) {
+        lv2Task = this.$data.lv2TaskNamePath
+      }
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
-        //tGroupRelatedTask: iGroupRelatedTask,
+        tLv2Task: lv2Task,
         tToday : today,
         isShowCurrent : isShowCurrent,
         isShowRelate : isShowRelate
