@@ -2652,6 +2652,7 @@ export default {
         this.$data.taskLv2Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv2Form.task_level = 2
         this.$data.taskLv2Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv2Form.task_time_type = 'Monthly'
         this.$data.taskLv2Form.task_progress_nosymbol = 0
         // Show or hide column
         this.ruleControlLv2TaskItem('Create', true)
@@ -2722,6 +2723,7 @@ export default {
         this.$data.taskLv2Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv2Form.task_level = 2
         this.$data.taskLv2Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv2Form.task_time_type = 'Monthly'
         this.$data.taskLv2Form.task_progress_nosymbol = 0
         // Set parent data of sub task
         this.$data.taskLv2Form.task_parent_name = this[iParentObj].task_name
