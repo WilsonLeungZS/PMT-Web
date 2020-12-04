@@ -2139,14 +2139,18 @@ export default {
         this.$data.taskListRule.showColRef = false
       }
     },
-    async getTaskGroup (iGroupId,isShowRelate,isShowCurrent) {
+    async getTaskGroup (iGroupId, isShowRelate, isShowCurrent) {
       console.log('start to get getTaskGroup')
       this.$data.taskGroups = []
       var today = this.dateForYMD(new Date())
       console.log('Current date is ' + today)
+      var lv2Task = null
+      if (this.$data.lv2TaskNamePath != null && this.$data.lv2TaskNamePath != '' && this.$data.formFilter.filterTaskLevel != 3) {
+        lv2Task = this.$data.lv2TaskNamePath
+      }
       const res = await http.get('/tasks/getTaskGroup', {
         tGroupId: iGroupId,
-        //tGroupRelatedTask: iGroupRelatedTask,
+        tLv2Task: lv2Task,
         tToday : today,
         isShowCurrent : isShowCurrent,
         isShowRelate : isShowRelate
@@ -2648,6 +2652,7 @@ export default {
         this.$data.taskLv2Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv2Form.task_level = 2
         this.$data.taskLv2Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv2Form.task_time_type = 'Monthly'
         this.$data.taskLv2Form.task_progress_nosymbol = 0
         // Show or hide column
         this.ruleControlLv2TaskItem('Create', true)
@@ -2718,6 +2723,7 @@ export default {
         this.$data.taskLv2Form.task_issue_date = this.dateToString(new Date())
         this.$data.taskLv2Form.task_level = 2
         this.$data.taskLv2Form.task_creator = 'PMT:' + this.$data.userEmployeeNumber
+        this.$data.taskLv2Form.task_time_type = 'Monthly'
         this.$data.taskLv2Form.task_progress_nosymbol = 0
         // Set parent data of sub task
         this.$data.taskLv2Form.task_parent_name = this[iParentObj].task_name
