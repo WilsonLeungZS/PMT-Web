@@ -437,7 +437,7 @@ export default {
       })
       if (res.data.status === 0) {
         var task = res.data.data
-        if (task.task_creator.startsWith('PMT:') && task.task_status != 'Done' && (task.task_effort >= task.task_estimation)) {
+        if (task.task_creator.startsWith('PMT:') && task.task_status != 'Done' && (task.task_effort >= task.task_estimation) && task.task_type_tag != 'Public Task') {
           this.$confirm('[' + task.task_name + '] task\'s effort is fully charged and still not done, need to change the task status to "Done"?', 'Notice', {
             confirmButtonText: 'OK',
             cancelButtonText: 'Cancel',
