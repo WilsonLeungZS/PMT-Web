@@ -285,9 +285,9 @@
                     </el-tooltip>
                   </template>
                 </el-table-column>
-                <el-table-column fixed="right" label="Edit" align="center" width="120">
+                <el-table-column fixed="right" align="right" width="120">
                   <template slot-scope="scope">
-                    <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(scope.row.task_level+1, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="mini" icon="el-icon-plus"></el-button>
+                    <el-button @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; createTaskInPlanMode(scope.row.task_level+1, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="success" size="mini" icon="el-icon-plus" v-show="scope.row.task_status != 'Done'"></el-button>
                     <el-button v-if="scope.row.task_level===2" @click.stop="refreshLv2Task(task,index)" type="info" size="mini" icon="el-icon-refresh"></el-button>
                     <el-button v-if="scope.row.task_level===3" @click.stop="refreshTaskId = task.task_id; refreshTaskName = task.task_name;  refreshTaskIndex = index; removeTask(scope.row.task_id, scope.row.task_name, scope.row)" :style="{'border': 'none', 'color': 'white'}" type="danger" size="mini" icon="el-icon-delete"></el-button>
                     </template>
@@ -432,7 +432,7 @@
                <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
-                    <el-date-picker v-model="taskLv1Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                    <el-date-picker disabled v-model="taskLv1Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
                   </el-col>
                 </el-form-item>
               </el-col>
@@ -470,7 +470,7 @@
           <el-tab-pane label="Sub-Tasks List" name="tab_subtasks_list">
             <el-row>
               <el-col :span="24">
-                <el-button @click="createNewSubTask(2, 'taskLv1Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Sub-Task</el-button>
+                <el-button @click="createNewSubTask(2, 'taskLv1Form')" size="medium" style="width:100%" icon="el-icon-plus" v-show="taskLv1Form.task_status != 'Done'">Create Sub-Task</el-button>
               </el-col>
             </el-row>
             <el-row>
@@ -603,7 +603,7 @@
                <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
-                    <el-date-picker v-model="taskLv2Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                    <el-date-picker disabled v-model="taskLv2Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
                   </el-col>
                 </el-form-item>
               </el-col>
@@ -687,7 +687,7 @@
           <el-tab-pane label="Sub-Tasks List" name="tab_subtasks_list">
             <el-row>
               <el-col :span="24">
-                <el-button @click="createNewSubTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Sub-Task</el-button>
+                <el-button @click="createNewSubTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus" v-show="taskLv2Form.task_status != 'Done'">Create Sub-Task</el-button>
               </el-col>
             </el-row>
             <el-row>
@@ -728,7 +728,7 @@
           <el-tab-pane label="Regular-Tasks List" name="tab_regular_tasks_list">
             <el-row>
               <el-col :span="24">
-                <el-button @click="createRegularTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Regular Task</el-button>
+                <el-button @click="createRegularTask(3, 'taskLv2Form')" size="medium" style="width:100%" icon="el-icon-plus" v-show="taskLv2Form.task_status != 'Done'">Create Regular Task</el-button>
               </el-col>
             </el-row>
             <el-row>
@@ -881,7 +881,7 @@
                <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
-                    <el-date-picker v-model="taskLv3Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                    <el-date-picker disabled v-model="taskLv3Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
                   </el-col>
                 </el-form-item>
               </el-col>
@@ -1013,7 +1013,7 @@
           <el-tab-pane label="Sub-Tasks List" name="tab_subtasks_list">
             <el-row>
               <el-col :span="24">
-                <el-button @click="createNewSubTask(4, 'taskLv3Form')" size="medium" style="width:100%" icon="el-icon-plus">Create Sub-Task</el-button>
+                <el-button @click="createNewSubTask(4, 'taskLv3Form')" size="medium" style="width:100%" icon="el-icon-plus" v-show="taskLv3Form.task_status != 'Done'">Create Sub-Task</el-button>
               </el-col>
             </el-row>
             <el-row>
@@ -1199,7 +1199,7 @@
                <el-col :span="12" :offset="1">
                 <el-form-item label="Issue Date">
                   <el-col :span="24">
-                    <el-date-picker v-model="taskLv4Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+                    <el-date-picker disabled v-model="taskLv4Form.task_issue_date" type="datetime" style="width: 100%" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
                   </el-col>
                 </el-form-item>
               </el-col>
@@ -1526,7 +1526,7 @@ export default {
         {'status_name': 'Drafting', 'status_sequence': 1, 'status_disable_est': false, 'status_allow_worklog': false, 'status_disable_change_parent': false},
         {'status_name': 'Planning', 'status_sequence': 2, 'status_disable_est': false, 'status_allow_worklog': false, 'status_disable_change_parent': false},
         {'status_name': 'Running', 'status_sequence': 3, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true},
-        {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': true, 'status_disable_change_parent': true}
+        {'status_name': 'Done', 'status_sequence': 4, 'status_disable_est': true, 'status_allow_worklog': false, 'status_disable_change_parent': true}
       ],
       statusArray: [],
       //Regular Task
@@ -2470,6 +2470,7 @@ export default {
           // Load return data
           // this.getSubTaskList(rtnTask.task_name, 'taskLv1FormSubTasks', 1)
           this.ruleControlLv1TaskItem('Edit')
+          this.$data.currentLevel = 1
           this.$data.taskLv1DialogVisible = true
         }
         if (rtnTask.task_level === 2) {
@@ -2496,6 +2497,7 @@ export default {
           // this.getSubTaskList(rtnTask.task_name, 'taskLv2FormSubTasks', 2)
           this.getRegularTaskList(rtnTask.task_name, 'taskLv2FormRegularTasks', 2)
           this.ruleControlLv2TaskItem('Edit', null)
+          this.$data.currentLevel = 2
           this.$data.taskLv2DialogVisible = true
         }
         if (rtnTask.task_level === 3) {
@@ -2534,6 +2536,7 @@ export default {
             await this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv3FormHistories')
           }
           this.ruleControlLv3TaskItem('Edit', null)
+          this.$data.currentLevel = 3
           this.$data.taskLv3DialogVisible = true
         }
         if (rtnTask.task_level === 4) {
@@ -2554,6 +2557,7 @@ export default {
           }
           await this.getTaskWorklogHistory(rtnTask.task_id, 'taskLv4FormHistories')
           this.ruleControlLv4TaskItem('Edit', null)
+          this.$data.currentLevel = 4
           this.$data.taskLv4DialogVisible = true
         }
       }
@@ -3044,8 +3048,8 @@ export default {
           this.$data.taskLv3SaveBtnDisabled = false
           return
         }
-        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 24) {
-          this.$message.error('Task estimation could not be over 24 hours. If more effort required, please consider break down the task further!')
+        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 32) {
+          this.$message.error('Task estimation could not be over 32 hours. If more effort required, please consider break down the task further!')
           this.$data.taskLv3SaveBtnDisabled = false
           return
         }
@@ -3324,8 +3328,8 @@ export default {
           this.$data.taskLv4SaveBtnDisabled = false
           return
         }
-        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 18) {
-          this.$message.error('Task estimation could not be over 18 hours. If more effort required, please consider breaking down the task further!')
+        if (reqTask.task_type_tag != 'Public Task' && Number(reqTask.task_estimation) > 24) {
+          this.$message.error('Task estimation could not be over 24 hours. If more effort required, please consider create another task!')
           this.$data.taskLv4SaveBtnDisabled = false
           return
         }
@@ -3708,7 +3712,7 @@ export default {
       console.log('Parent Task Query String: ' + queryString)
       var returnArr = []
       //var reqTaskLevel = Number(this.$data.formFilter.filterTaskLevel) - 1
-      var reqTaskLevel = Number(this.$data.currentLevel)-1
+      var reqTaskLevel = Number(this.$data.currentLevel) - 1
       const res = await http.post('/tasks/getTaskByNameForParentTask', {
         reqTaskKeyword: queryString,
         reqTaskLevel: reqTaskLevel
