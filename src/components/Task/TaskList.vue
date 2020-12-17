@@ -3075,6 +3075,15 @@ export default {
             }         
           }
         }
+        if (reqTask.task_status === 'Running' && reqTask.task_type_tag != 'Public Task') {
+          if (Number(reqTask.task_estimation) === 0) {
+            if (this.$data.taskLv3FormSubTasks.length === 0 && this.$data.taskLv3FormRegularTasks.length === 0) {
+              this.$message.error('Running task estimation could not be 0!')
+              this.$data.taskLv3SaveBtnDisabled = false
+              return
+            }
+          }
+        }
         if (reqTask.task_status === 'Done' && reqTask.task_name != '' && reqTask.task_name != null) {
           if (reqTask.task_type_tag != 'Regular Task') {
             var result = await this.ifAllSubTasksDone(reqTask.task_name)
@@ -3343,6 +3352,15 @@ export default {
               this.$data.taskLv4SaveBtnDisabled = false
               return
             }
+          }
+        }
+        if (reqTask.task_status === 'Running' && reqTask.task_type_tag != 'Public Task') {
+          console.log('task status -> ' + reqTask.task_status)
+          console.log('task estimation -> ' + reqTask.task_estimation)
+          if (Number(reqTask.task_estimation) === 0) {
+            this.$message.error('Running task estimation could not be 0!')
+            this.$data.taskLv4SaveBtnDisabled = false
+            return
           }
         }
         if(this.$data.taskLv4Form.task_deliverable_tag != null && typeof(this.$data.taskLv4Form.task_deliverable_tag) === 'object'){
