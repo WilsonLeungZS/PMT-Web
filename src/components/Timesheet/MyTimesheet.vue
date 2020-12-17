@@ -303,6 +303,12 @@ export default {
         } else {
           this.$data.worklogTaskStatus = 'success'
         }
+        var taskStatus = res.data.data[0].worklog_task_status
+        console.log('Task status: ' + taskStatus)
+        if (taskStatus == 'Done') {
+          this.$message.error('Task done, CANNOT input/change effort')
+          return
+        }
       } else {
         this.$data.worklogTaskEffort = 0
         this.$data.worklogTaskEst = 0
