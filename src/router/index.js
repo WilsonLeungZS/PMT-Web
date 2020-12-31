@@ -8,6 +8,7 @@ import TaskList from '@/components/Task/TaskList'
 import PrjManagement from '@/components/Management/PrjManagement'
 import PmtManagement from '@/components/Management/PmtManagement'
 import Charts from '@/components/Others/Charts'
+import TasksList from '@/components/TaskList/TasksList'
 import Error from '@/components/Error'
 
 Vue.use(Router)
@@ -87,6 +88,15 @@ export default new Router({
           meta: {
             needAdmin: true,
             needLogin: false
+          }
+        },
+        {
+          path: 'TaskList/TasksList',
+          name: 'TasksList',
+          component: TasksList,
+          meta: {
+            needAdmin: false,
+            needLogin: true
           }
         }
       ]
