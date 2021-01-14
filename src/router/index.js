@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Main from '@/components/Main'
+import MainHeader from '@/components/MainHeader'
 import Login from '@/components/Login'
+import SprintView from '@/components/Sprint/SprintView'
 import MyTimesheet from '@/components/Timesheet/MyTimesheet'
 import PrjTimesheet from '@/components/Timesheet/PrjTimesheet'
 import TaskList from '@/components/Task/TaskList'
@@ -17,14 +18,15 @@ export default new Router({
   mode: 'history',
   routes: [
     {path: '/', redirect: '/Login'},
+    {path: '/Sprint', redirect: '/Sprint/SprintView'},
     {path: '/Timesheet', redirect: '/Timesheet/MyTimesheet'},
     {path: '/Task', redirect: '/Task/TaskList'},
     {path: '/Management', redirect: '/Management/PrjManagement'},
     {path: '/Others', redirect: '/Others/Charts'},
     {
       path: '/',
-      name: 'Main',
-      component: Main,
+      name: 'MainHeader',
+      component: MainHeader,
       children: [
         {
           path: 'Login',
@@ -34,6 +36,15 @@ export default new Router({
             needAdmin: false,
             needLogin: false,
             page: 'Login'
+          }
+        },
+        {
+          path: 'Sprint/SprintView',
+          name: 'SprintView',
+          component: SprintView,
+          meta: {
+            needAdmin: false,
+            needLogin: true
           }
         },
         {

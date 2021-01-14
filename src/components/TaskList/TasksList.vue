@@ -39,9 +39,8 @@
       }
     },
     methods: {
-      // Get data from child componets
+      // Get data from child componets - filter
       getTaskFilter (iTaskFilter) {
-        this.$data.taskListFilter = '{"taskLevel": "0"}'
         console.log('getTaskFilter', iTaskFilter)
         this.$data.taskListFilter = JSON.stringify(iTaskFilter)
       },

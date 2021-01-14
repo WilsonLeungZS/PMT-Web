@@ -37,33 +37,32 @@ export default {
   methods: {
     async onLogin () {
       this.$data.showErrorMsg = false
-      var reqUserEid = this.$data.inputUserEid
-      if (reqUserEid === '') {
+      var reqUserName = this.$data.inputUserEid
+      if (reqUserName === '') {
         this.$data.errorMsg = 'EID could not be empty!'
         this.$data.showErrorMsg = true
         return
       }
       const res = await http.get('/users/login', {
-        userEid: reqUserEid
+        reqUserName: reqUserName
       })
-      console.log(res.data.status)
+      console.log(res.data)
       if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
-        var resUserEid = res.data.user.Name
-        var resUserId = res.data.user.Id
+        var userId = res.data.user.Id
+        var userName = res.data.user.Name
         localStorage.setItem('Flag', 'isLogin')
-        localStorage.setItem('UserEid', resUserEid)
-        this.$store.dispatch('setNewUserEid', resUserEid)
-        this.$store.dispatch('setNewUserId', resUserId)
+        this.$store.dispatch('setNewUserId', userId)
+        localStorage.setItem('UserEid', userName)
+        this.$store.dispatch('setNewUserEid', userName)
         this.$store.dispatch('setShowMainBar')
-        this.$router.replace({path: '/Timesheet' + '/MyTimesheet'})
+        this.$router.replace({path: '/Management' + '/PrjManagement'})
       } else {
-        this.$data.errorMsg = 'Cannot find EID [' + reqUserEid + ']!'
+        this.$data.errorMsg = 'Cannot find EID [' + userId + ']!'
         this.$data.showErrorMsg = true
       }
     }
   },
   async created () {
-    console.log('Created Login')
     this.$store.dispatch('setHideMainBar')
   }
 }

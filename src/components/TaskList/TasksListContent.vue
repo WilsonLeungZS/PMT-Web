@@ -216,10 +216,10 @@ Remark:
     },
     watch: {
       taskPathArray: {
-        handler (val, oldVal) {
-          if (val.length > 0) {
+        handler (taskPathArray, oldTaskPathArray) {
+          if (taskPathArray.length > 0) {
             this.$data.showTaskPath = true
-            var taskPathArray = val
+            // Get latestTask as parent task to get sub tasks list
             var latestTask = taskPathArray[taskPathArray.length - 1]
             var nextTaskListParent = latestTask.taskShortName
             var nextTaskListLevel = Number(latestTask.taskLevel) + 1 + ''
@@ -229,8 +229,9 @@ Remark:
             }
             this.getTaskListData(nextTaskListParent, taskFilter, 1, 20)
           } else {
-            this.$data.taskPathLatestTask = null
+            // When taskPathArray has no task, return level 1 task list
             this.$data.showTaskPath = false
+            this.$data.taskPathLatestTask = null
             var taskFilter = {
               taskLevel: '1'
             }
@@ -242,7 +243,7 @@ Remark:
       },
       filter: {
         handler (val, oldVal) {
-          console.log('New Filter ',val, 'Old Filter',oldVal)
+          // console.log('New Filter ',val, 'Old Filter',oldVal)
           if(val == '' || val == null || val == undefined) {
             return
           }

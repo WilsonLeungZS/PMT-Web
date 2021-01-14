@@ -16,25 +16,24 @@ Vue.config.productionTip = false
 
 router.beforeEach(async (to, from, next) => {
   let getFlag = localStorage.getItem('Flag')
-  let reqUserEid = localStorage.getItem('UserEid')
+  let reqUserName = localStorage.getItem('UserEid')
   var needAdmin = to.meta.needAdmin
-  console.log(to)
   if (to.meta.page != null && to.meta.page === 'Login') {
     if (getFlag === 'isLogin') {
       const res = await http.get('/users/login', {
-        userEid: reqUserEid
+        reqUserName: reqUserName
       })
       if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
-        var resUserEid = res.data.user.Name
-        var resUserId = res.data.user.Id
-        var resUserLevel = res.data.user.Level
-        var resUserEmployeeNumber = res.data.user.EmployeeNumber
-        var resUserRole = res.data.user.Role
-        store.dispatch('setNewUserEid', resUserEid)
-        store.dispatch('setNewUserId', resUserId)
-        store.dispatch('setNewUserLevel', resUserLevel)
-        store.dispatch('setNewUserEmployeeNumber', resUserEmployeeNumber)
-        store.dispatch('setNewUserRole', resUserRole)
+        var userId = res.data.user.Id
+        var userName = res.data.user.Name
+        var userLevel = res.data.user.Level
+        var userEmployeeNbr = res.data.user.EmployeeNumber
+        var userRole = res.data.user.Role
+        store.dispatch('setNewUserId', userId)
+        store.dispatch('setNewUserEid', userName)
+        store.dispatch('setNewUserLevel', userLevel)
+        store.dispatch('setNewUserEmployeeNumber', userEmployeeNbr)
+        store.dispatch('setNewUserRole', userRole)
         store.dispatch('setShowMainBar')
         next('/Timesheet')
       } else {
@@ -50,24 +49,24 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.needLogin) {
     if (getFlag === 'isLogin') {
       const res = await http.get('/users/login', {
-        userEid: reqUserEid
+        reqUserName: reqUserName
       })
       if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
-        var resUserEid = res.data.user.Name
-        var resUserId = res.data.user.Id
-        var resUserLevel = res.data.user.Level
-        var resUserEmployeeNumber = res.data.user.EmployeeNumber
-        var resUserRole = res.data.user.Role
-        var resUserThemeStyle = Number(res.data.user.ThemeStyle)
-        store.dispatch('setNewUserEid', resUserEid)
-        store.dispatch('setNewUserId', resUserId)
-        store.dispatch('setNewUserLevel', resUserLevel)
-        store.dispatch('setNewUserEmployeeNumber', resUserEmployeeNumber)
-        store.dispatch('setNewUserRole', resUserRole)
-        store.dispatch('setNewThemeStyle', resUserThemeStyle)
+        var userId = res.data.user.Id
+        var userName = res.data.user.Name
+        var userLevel = res.data.user.Level
+        var userEmployeeNbr = res.data.user.EmployeeNumber
+        var userRole = res.data.user.Role
+        var userThemeStyle = Number(res.data.user.ThemeStyle)
+        store.dispatch('setNewUserId', userId)
+        store.dispatch('setNewUserEid', userName)
+        store.dispatch('setNewUserLevel', userLevel)
+        store.dispatch('setNewUserEmployeeNumber', userEmployeeNbr)
+        store.dispatch('setNewUserRole', userRole)
+        store.dispatch('setNewThemeStyle', userThemeStyle)
         store.dispatch('setShowMainBar')
         if (needAdmin) {
-          if (resUserRole === 'Admin') {
+          if (userRole === 'Admin') {
             next()
           } else {
             alert('You can not access these pages as you are not admin user!')

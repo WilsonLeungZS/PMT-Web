@@ -91,6 +91,7 @@ Remark:
     data() {
       return {
         btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
+        isRequest: false,
         taskFilter: {
           taskSearchValue: '',
           taskLevel: '1',
@@ -100,7 +101,9 @@ Remark:
           taskLeadingBy: '',
           taskOpportunity: '',
           taskTimeGroup: null,
-          isClear: false
+          isChangeLevel: false,
+          isClear: false,
+          isSubmit: false
         },
         disabledState: {
           disabledSearch: false,
@@ -141,9 +144,10 @@ Remark:
       },
       returnTaskFilter (iAction) {
         console.log('Method returnTaskFilter start - ' + iAction)
-        var taskFilter = this.$data.taskFilter
+        var isRequestFlag = !this.$data.isRequest
+        // If clear filter, clear all filter criteria
         if (iAction == 'ClearFilter') {
-          taskFilter = {
+          this.$data.taskFilter = {
             taskSearchValue: '',
             taskLevel: '1',
             taskAssignTo: '',
@@ -152,14 +156,24 @@ Remark:
             taskLeadingBy: '',
             taskOpportunity: '',
             taskTimeGroup: null,
-            isClear: true
+            isClear: true,
+            isSubmit: isRequestFlag
           }
-          this.$data.taskFilter = taskFilter
         } else {
-          taskFilter.isClear = false
+          this.$data.taskFilter.isClear = false
+          this.$data.taskFilter.isSubmit = isRequestFlag
         }
-        console.log('Method returnTaskFilter end ', taskFilter)
+        // If change level, mark isChangeLevel is true
+        if (iAction == 'ChangeLevel') {
+          this.$data.taskFilter.isChangeLevel = true
+        } else {
+          this.$data.taskFilter.isChangeLevel = false
+        }
+        var taskFilter = this.$data.taskFilter
         this.$emit('getTaskFilter', taskFilter)
+        // After emit the filter to parent, reset isRequest flag for next trigger
+        this.$data.isRequest = isRequestFlag
+        console.log('Method returnTaskFilter end ', taskFilter)
       },
       returnDisabledState () {
         var disabledState = this.$data.disabledState
