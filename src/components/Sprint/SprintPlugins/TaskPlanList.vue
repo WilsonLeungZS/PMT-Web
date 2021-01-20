@@ -1,12 +1,51 @@
 <template>
-  <div class="sv-content">
-    
+  <div class="sv-content-task-plan-list">
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <span>Task Backlog</span>
+      </div>
+      <div>
+        <el-row :gutter="10">
+          <el-col :span="18">
+            <el-input v-model="taskKeyword" placeholder="Search Task..." size="small">
+              <el-button slot="append" icon="el-icon-search"></el-button>
+            </el-input>
+          </el-col>
+          <el-col :span="6">
+            <el-button type="success" icon="el-icon-plus" size="small" style="width: 100%">New Task</el-button>
+          </el-col>
+        </el-row>
+        <el-row class="task-plan-list-table">
+          <el-col :span="24">
+            <el-table :data="taskList" width="100%" size="mini">
+              <el-table-column prop="taskName" label="Name" align="left" width="150">
+                <template slot-scope="scope">
+                  <el-button @click="editTask(scope.row.taskId, scope.row.taskCategory)" type="text">{{scope.row.taskName}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="taskTitle" label="Title" align="left" min-width="200" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="taskEffort" label="Effort" align="center" width="55"></el-table-column>
+              <el-table-column prop="taskEstimation" label="Est" align="center" width="55"></el-table-column>
+              <el-table-column align="right" fixed="right" width="50" >
+                <template slot-scope="scope">
+                  <el-tooltip class="item" effect="dark" content="Create PMT Task" placement="top">
+                    <el-button @click="createRefTask(scope.row.taskName, scope.row.taskTitle)" type="primary" icon="el-icon-document-add" class="task-plan-list-table-btn"></el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-pagination @current-change="handlePageChange" :current-page="taskListPage" :total="taskListTotal" :page-size="50" layout="total, prev, pager, next" style="float: right; margin-top: 5px">
+            </el-pagination>
+          </el-col>
+        </el-row>
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script>
-import http from '../../utils/http'
-import utils from '../../utils/utils'
+import http from '../../../utils/http'
+import utils from '../../../utils/utils'
 export default {
   name: 'TaskPlanList',
   components: {
@@ -14,10 +53,32 @@ export default {
   data () {
     return {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
-      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      taskList: [
+        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL',  taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
+        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
+        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
+        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
+        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32}
+      ],
+      taskKeyword: '',
+      taskListPage: 1,
+      taskListTotal: 100
     }
   },
   methods: {
+    handlePageChange(val) {
+      console.log(`Current Page: ${val}`);
+    },
+    createTask () {
+
+    },
+    createRefTask (iRefTaskName, iRefTaskTitle) {
+      this.$emit('createRefTask', iRefTaskName, iRefTaskTitle)
+    },
+    editTask (iTaskId, iTaskCategory) {
+      this.$emit('editTask', iTaskId, iTaskCategory)
+    }
   },
   created () {
   }
@@ -25,8 +86,27 @@ export default {
 </script>
 
 <style scoped>
-.sv-content {
+.sv-content-task-plan-list {
   width: 100%;
   height: auto;
+}
+.sv-content-task-plan-list>>>.el-card__body {
+  padding: 5px;
+}
+.task-plan-list-table {
+  width: 100%;
+  margin-top: 10px;
+}
+.task-plan-list-table>>>.el-table td {
+  padding: 5px 0;
+}
+.task-plan-list-table>>>.el-table th {
+  padding: 5px 0;
+}
+.task-plan-list-table>>>.el-button {
+  padding: 3px 4px;
+}
+.task-plan-list-table>>>.el-button--primary {
+  font-size: 16px;
 }
 </style>
