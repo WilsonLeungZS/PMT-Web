@@ -8,8 +8,8 @@
         <el-table :data="peopleList" width="100%" size="small">
           <el-table-column prop="userName" label="Name" align="left" width="150"></el-table-column>
           <el-table-column prop="userSkills" label="Skills" align="left" min-width="200" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="userLevel" label="Level" align="center" width="55"></el-table-column>
-          <el-table-column prop="userWorkingHrs" label="WHrs" align="center" width="55"></el-table-column>
+          <el-table-column prop="userLevel" label="Level" align="center" width="60"></el-table-column>
+          <el-table-column prop="userWorkingHrs" label="WHrs" align="center" width="60"></el-table-column>
           <el-table-column prop="userCapacity" label="Capacity" align="center" width="100">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.userCapacity" :step="scope.row.userWorkingHrs" step-strictly :min="0" :max="scope.row.userMaxCapacity" controls-position="right" size="mini"></el-input-number>

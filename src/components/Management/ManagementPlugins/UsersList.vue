@@ -110,7 +110,7 @@
       <el-table-column label="Name" prop="userName" align="left" width="170" :key="2"></el-table-column>
       <el-table-column label="Nickname" prop="userNickname" align="left" width="170" :key="3"></el-table-column>
       <el-table-column label="Level" prop="userLevel" align="center" width="100" sortable :key="4"></el-table-column>
-      <el-table-column label="Working Hours" prop="userWorkingHrs" align="center" width="150" sortable :key="5"></el-table-column>
+      <el-table-column label="Working Hours" prop="userWorkingHrs" align="center" width="180" sortable :key="5"></el-table-column>
       <el-table-column label="Skills" prop="userSkillsStr" align="center" min-width="200" show-overflow-tooltip :key="6"></el-table-column>
       <el-table-column label="Role" prop="userRole" align="center" width="100" :filters="roleFilter" :filter-method="rolefilterHandler" :key="7">
         <template slot-scope="scope">
@@ -342,6 +342,9 @@ export default {
   height: 32px;
   line-height: 32px;
   margin-bottom: 10px;
+}
+.pm-content>>>.el-divider {
+  background-color: #e0e0e0;
 }
 /*Common Style*/
 .bg-color {

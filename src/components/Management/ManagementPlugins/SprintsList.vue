@@ -1,38 +1,38 @@
 <template>
-<div class="pm-content">
+<div class="sm-content">
   <el-card class="box-card">
     <div slot="header" class="clearfix">
-      <span class="pm-content-header">
+      <span class="sm-content-header">
         <span>Sprints List</span>
-        <el-button @click="createSprint" class="pm-content-header-btn" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini">Create New Sprint</el-button>
+        <el-button @click="createSprint" class="sm-content-header-btn" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini">Create New Sprint</el-button>
       </span>
     </div>
     <el-table v-loading="sprintLoading" :data="sprintData" fit>
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-row :gutter="15">
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Name</span>
             </el-col>
-            <el-col :span="8" :lg="6" class="pm-table-expand-item">
+            <el-col :span="8" :lg="6" class="sm-table-expand-item">
               <el-input v-model="props.row.sprintName" size="small" style="width: 100%"></el-input>
             </el-col>
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Start Time</span>
             </el-col>
-            <el-col :span="8" :lg="3" class="pm-table-expand-item">
+            <el-col :span="8" :lg="3" class="sm-table-expand-item">
               <el-date-picker @change="changeSprintTime(props)" v-model="props.row.sprintStartTime" size="small" type="date" value-format="yyyy-MM-dd" placeholder="Select Date..." style="width: 100%" clearable></el-date-picker>
             </el-col>
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>End Time</span>
             </el-col>
-            <el-col :span="8" :lg="3" class="pm-table-expand-item">
+            <el-col :span="8" :lg="3" class="sm-table-expand-item">
               <el-date-picker @change="changeSprintTime(props)" v-model="props.row.sprintEndTime" size="small" type="date" value-format="yyyy-MM-dd" placeholder="Select Date..." style="width: 100%" clearable></el-date-picker>
             </el-col>
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Leader</span>
             </el-col>
-            <el-col :span="8" :lg="4" class="pm-table-expand-item">
+            <el-col :span="8" :lg="4" class="sm-table-expand-item">
               <el-select v-model="props.row.sprintLeaderId" size="small" style="width: 100%">
                 <el-option label="" value=""></el-option>
                 <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userName" :value="leader.userId">
@@ -44,31 +44,31 @@
           </el-row>
           <el-divider></el-divider>
           <el-row :gutter="15">
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Baseline</span>
             </el-col>
-            <el-col :span="20" :lg="14" class="pm-table-expand-item">
+            <el-col :span="20" :lg="14" class="sm-table-expand-item">
               <el-input v-model="props.row.sprintBaseline" size="small" style="width: 100%"></el-input>
             </el-col>
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Working Days</span>
             </el-col>
-            <el-col :span="8" :lg="2" class="pm-table-expand-item">
+            <el-col :span="8" :lg="2" class="sm-table-expand-item">
               <span><b style="text-decoration:underline">{{props.row.sprintWorkingDays}}</b> days</span> 
             </el-col> 
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Base Capacity</span>
             </el-col>
-            <el-col :span="8" :lg="2" class="pm-table-expand-item">
+            <el-col :span="8" :lg="2" class="sm-table-expand-item">
               <el-input v-model="props.row.sprintBaseCapacity" size="small" style="width: 100%"></el-input>
             </el-col>
           </el-row>
           <el-divider></el-divider>
           <el-row :gutter="15">
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Required Skills</span>
             </el-col>
-            <el-col :span="20" :lg="14" class="pm-table-expand-item">
+            <el-col :span="20" :lg="14" class="sm-table-expand-item">
               <el-select v-model="props.row.sprintRequiredSkills" size="small" style="width: 100%" multiple>
                 <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
                   <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
@@ -78,13 +78,13 @@
                 </el-option-group>
               </el-select>
             </el-col>
-            <el-col :span="8" :lg="2" class="pm-table-expand-item">
+            <el-col :span="8" :lg="2" class="sm-table-expand-item">
               <el-button type="danger" size="small" style="width:100%" >Obsolete</el-button>
             </el-col>
-            <el-col :span="8" :lg="2" class="pm-table-expand-item">
+            <el-col :span="8" :lg="2" class="sm-table-expand-item">
               <el-button @click="cancelSprint(props)" type="info" size="small" style="width:100%" >Cancel</el-button>
             </el-col>
-            <el-col :span="8" :lg="4" class="pm-table-expand-item">
+            <el-col :span="8" :lg="4" class="sm-table-expand-item">
               <el-button @click="saveSprint(props)" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small" style="width:100%">Save</el-button>
             </el-col>
           </el-row>
@@ -192,9 +192,16 @@ export default {
       }
       // Get Working Days
       if (sprint.sprintStartTime != null && sprint.sprintEndTime != null) {
-        var workingDays = 11
+        var res = await http.get('https://sitipo.gzatc.mtl/api/others/workdays', {
+          start_date: sprint.sprintStartTime,
+          end_date: sprint.sprintEndTime,
+        })
+        var workingDays = 0
+        if (res != null && res.data != null) {
+          workingDays = Number(res.data.workday_count)
+        }
         sprint.sprintWorkingDays = workingDays
-      }
+      } 
       if (sprint.sprintStartTime == null && sprint.sprintEndTime == null) {
         sprint.sprintWorkingDays = 0
       }
@@ -301,13 +308,13 @@ export default {
 
 <style scoped>
 /* Content Style */
-.pm-content {
+.sm-content {
   width: auto;
   height: auto;
   padding: 20px 5px 0px 5px;
   text-align: left;
 }
-.pm-content-header {
+.sm-content-header {
   font-size: 24px;
   margin-left: 10px;
   color: #747d8c;
@@ -316,11 +323,11 @@ export default {
   align-items: center;
   flex-direction: row;
 }
-.pm-content-header-btn {
+.sm-content-header-btn {
   font-size: 14px;
   margin-left: 30px;
 }
-.pm-table-expand-label {
+.sm-table-expand-label {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -330,13 +337,16 @@ export default {
   color: #99a9bf;
   margin-bottom: 10px;
 }
-.pm-table-expand-item {
+.sm-table-expand-item {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   height: 32px;
   line-height: 32px;
   margin-bottom: 10px;
+}
+.sm-content>>>.el-divider {
+  background-color: #e0e0e0;
 }
 /*Common Style*/
 .bg-color {
@@ -355,7 +365,7 @@ export default {
 .el-table td, .el-table th {
   padding: 8px 0;
 }
-.pm-content .el-divider--horizontal {
+.sm-content .el-divider--horizontal {
   margin: 2px 0 10px 0;
 }
 /* google、safari */

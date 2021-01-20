@@ -29,7 +29,30 @@
             </el-tabs>
           </el-col>
           <el-col :span="sprintLength" :lg="sprintLengthlg" class="sv-content-sprint-card">
-            <el-card class="box-card">
+            <!-- Show for not select sprint -->
+            <el-card v-if="sprintSelect == ''? true: false" class="box-card">
+              <div slot="header" class="clearfix sprint-card-header">
+                <el-divider content-position="left">Sprint (Please select sprint first)</el-divider>
+                <el-row>
+                  <el-col :span="16" :lg="14" class="sprint-card-header-col">
+                    <span><i class="el-icon-data-line"></i> Sprint</span>
+                    <el-select v-model="sprintSelect" size="small" style="width: 72%;">
+                      <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
+                        <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
+                        <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
+                      </el-option>
+                    </el-select>
+                  </el-col>
+                </el-row>
+              </div>
+              <el-row>
+                <el-col :span="24" style="margin: 10px 0">
+                  <b>No Task</b>
+                </el-col>
+              </el-row>
+            </el-card>
+            <!-- Show for selected sprint -->
+            <el-card v-if="sprintSelect != ''? true: false" class="box-card">
               <!-- Card Header -->
               <div slot="header" class="clearfix sprint-card-header">
                  <!-- Sprint Info -->
@@ -44,12 +67,12 @@
                       </el-option>
                     </el-select>
                   </el-col>
-                  <el-col :span="8" :lg="8" class="sprint-card-header-col">
+                  <el-col :span="8" :lg="6" class="sprint-card-header-col">
                     <span><i class="el-icon-s-flag"></i> Leader: <b>{{sprintLeader}}</b></span>
                   </el-col>
-                  <el-col :span="4" :lg="2" class="sprint-card-header-col">
-                    <el-tag v-if="sprintStatus == 'Active'? true: false" type="primary" style="width: 100%; text-align: center"><b>{{sprintStatus}}</b></el-tag>
-                    <el-tag v-if="sprintStatus == 'Running'? true: false" type="success" style="width: 100%; text-align: center"><b>{{sprintStatus}}</b></el-tag>
+                  <el-col :span="4" :lg="4" class="sprint-card-header-col">
+                    <el-tag v-if="sprintStatus == 'Active'? true: false" type="primary" style="width: 100%; text-align: center"><b>Status: {{sprintStatus}}</b></el-tag>
+                    <el-tag v-if="sprintStatus == 'Running'? true: false" type="success" style="width: 100%; text-align: center"><b>Status: {{sprintStatus}}</b></el-tag>
                   </el-col>
                   <el-col :span="20" :lg="24" class="sprint-card-header-col">
                     <el-scrollbar style="height: 100%">
@@ -215,7 +238,7 @@ export default {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
       tabPosition: 'left',
-      tabActive: 'tab_people_resource',
+      tabActive: 'tab_hide',
       // Value to validate if the plan list hide and item length
       planListHide: false,
       planListLength: 11,
@@ -384,6 +407,7 @@ export default {
     }
   },
   created () {
+    this.$data.planListHide = true
   }
 }
 </script>
@@ -437,6 +461,9 @@ export default {
   border: 1px solid #DCDFE6;
   padding: 10px 0px;
   margin-top: 10px;
+}
+.sv-content>>>.el-tabs--left .el-tabs__item.is-left {
+  text-align: left;
 }
 .sv-content-plan-list {
   width: 100%; 

@@ -6,8 +6,9 @@ import SprintView from '@/components/Sprint/SprintView'
 import MyTimesheet from '@/components/Timesheet/MyTimesheet'
 import PrjTimesheet from '@/components/Timesheet/PrjTimesheet'
 import TaskList from '@/components/Task/TaskList'
+import SptManagement from '@/components/Management/SptManagement'
 import PrjManagement from '@/components/Management/PrjManagement'
-import PmtManagement from '@/components/Management/PmtManagement'
+import RptManagement from '@/components/Management/RptManagement'
 import Charts from '@/components/Others/Charts'
 import TasksList from '@/components/TaskList/TasksList'
 import Error from '@/components/Error'
@@ -21,7 +22,7 @@ export default new Router({
     {path: '/Sprint', redirect: '/Sprint/SprintView'},
     {path: '/Timesheet', redirect: '/Timesheet/MyTimesheet'},
     {path: '/Task', redirect: '/Task/TaskList'},
-    {path: '/Management', redirect: '/Management/PrjManagement'},
+    {path: '/Management', redirect: '/Management/SptManagement'},
     {path: '/Others', redirect: '/Others/Charts'},
     {
       path: '/',
@@ -75,6 +76,15 @@ export default new Router({
           }
         },
         {
+          path: 'Management/SptManagement',
+          name: 'SptManagement',
+          component: SptManagement,
+          meta: {
+            needAdmin: true,
+            needLogin: true
+          }
+        },
+        {
           path: 'Management/PrjManagement',
           name: 'PrjManagement',
           component: PrjManagement,
@@ -84,9 +94,9 @@ export default new Router({
           }
         },
         {
-          path: 'Management/PmtManagement',
-          name: 'PmtManagement',
-          component: PmtManagement,
+          path: 'Management/RptManagement',
+          name: 'RptManagement',
+          component: RptManagement,
           meta: {
             needAdmin: true,
             needLogin: true
