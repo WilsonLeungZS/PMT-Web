@@ -21,7 +21,7 @@
               </el-tab-pane>
               <el-tab-pane name="tab_task_backlog">
                 <span slot="label"><i class="el-icon-s-order"></i> Task List</span>
-                <task-plan-list @createRefTask="createRefTask" @editTask="editTask"></task-plan-list>
+                <task-plan-list @createTask="createTask" @createRefTask="createRefTask" @editTask="editTask"></task-plan-list>
               </el-tab-pane>
               <el-tab-pane name="tab_hide">
                 <span slot="label" style="color: #bdbdbd"><i class="el-icon-arrow-left"></i> Hide</span>
@@ -302,11 +302,22 @@ export default {
     },
     // Task Dialog Method
     createTask () {
-      var date = new Date()
-      console.log(date)
+      console.log('Create PMT Task ')
+      this.$data.pmtTaskDialogAction = {
+        action: 'CREATE-NEW',
+        datetime: new Date()
+      }
     },
     createRefTask (iRefTaskName, iRefTaskTitle) {
       console.log('Create Reference Task ', iRefTaskName, iRefTaskTitle)
+      this.$data.pmtTaskDialogAction = {
+        action: 'CREATE-REF',
+        taskReferenceTask: iRefTaskName,
+        taskReferenceTaskTitle: iRefTaskTitle,
+        taskSprintId: this.$data.sprintSelect,
+        taskLeader: this.$data.sprintLeader,
+        datetime: new Date()
+      }
     },
     createSubTask (iTask) {
       this.$data.pmtTaskDialogAction = {

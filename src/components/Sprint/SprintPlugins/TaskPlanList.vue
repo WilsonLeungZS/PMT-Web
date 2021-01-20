@@ -12,7 +12,7 @@
             </el-input>
           </el-col>
           <el-col :span="6">
-            <el-button type="success" icon="el-icon-plus" size="small" style="width: 100%">New Task</el-button>
+            <el-button @click="createTask" type="success" icon="el-icon-plus" size="small" style="width: 100%">New Task</el-button>
           </el-col>
         </el-row>
         <el-row class="task-plan-list-table">
@@ -71,7 +71,7 @@ export default {
       console.log(`Current Page: ${val}`);
     },
     createTask () {
-
+      this.$emit('createTask')
     },
     createRefTask (iRefTaskName, iRefTaskTitle) {
       this.$emit('createRefTask', iRefTaskName, iRefTaskTitle)

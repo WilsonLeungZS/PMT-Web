@@ -423,6 +423,16 @@ Remark:
         this.$data.disabledState.disabledSprint = true
         this.$data.PMTTaskDialogVisible = true
       },
+      createRefTask (iObj) {
+        console.log('Create PMT Ref task')
+        this.initTaskForm('New PMT Task', 'tab_basic_info')
+        // Set new Task default value
+        this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
+        this.$data.PMTTask.taskReferenceTaskTitle = iObj.taskReferenceTaskTitle
+        // Set new Task default state
+        this.$data.disabledState.disabledReferenceTask = true
+        this.$data.PMTTaskDialogVisible = true
+      },
       editTask (iTaskId) {
         console.log('Edit PMT task')
         this.initTaskForm('PMT Task Details', 'tab_basic_info')
