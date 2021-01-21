@@ -36,7 +36,8 @@
                 <el-row>
                   <el-col :span="16" :lg="14" class="sprint-card-header-col">
                     <span><i class="el-icon-data-line"></i> Sprint</span>
-                    <el-select v-model="sprintSelect" size="small" style="width: 72%;">
+                    <el-select @change="getSprintInfo" v-model="sprintSelect" size="small" style="width: 72%;">
+                      <el-option label=" " value=""></el-option>
                       <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
                         <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
                         <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
@@ -60,7 +61,8 @@
                 <el-row>
                   <el-col :span="16" :lg="14" class="sprint-card-header-col">
                     <span><i class="el-icon-data-line"></i> Sprint</span>
-                    <el-select v-model="sprintSelect" size="small" style="width: 72%;">
+                    <el-select @change="getSprintInfo" v-model="sprintSelect" size="small" style="width: 72%;">
+                      <el-option label=" " value=""></el-option>
                       <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
                         <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
                         <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
@@ -244,10 +246,7 @@ export default {
       planListLength: 11,
       planListLengthlg: 11,
       // Sprint Value
-      sprintsList: [
-        {sprintId: 1, sprintName: 'TOS 2021 JAN 1~15', sprintLeader: 'Leo.Li'},
-        {sprintId: 2, sprintName: 'BSS 2021 JAN 1~15', sprintLeader: 'Charline.Feng'}
-      ],
+      sprintsList: [],
       sprintSelect: '',
       sprintStartTime: '2021-01-01',
       sprintEndTime: '2021-01-15',
@@ -313,7 +312,6 @@ export default {
       },
       immediate: true
     }
-        
   },
   methods: {
     changeTab (tab, event) {
@@ -321,6 +319,35 @@ export default {
         this.$data.planListHide = true
       } else {
         this.$data.planListHide = false
+      }
+    },
+    // Sprint Method
+    async getActiveSprintsList () {
+      var res = await http.get('/sprints/getActiveSprintsList')
+      if (res != null && res.data.status == 0) {
+        this.$data.sprintsList = res.data.data
+      } else {
+        this.$data.sprintsList = []
+      }
+    },
+    async getSprintInfo () {
+      var requestSprintId = this.$data.sprintSelect
+      var res = await http.get('/sprints/getSprintById', {
+        reqSprintId: requestSprintId
+      })
+      if (res != null && res.data.status == 0) {
+        var sprint = res.data.data
+        this.$data.sprintStartTime = sprint.sprintStartTime
+        this.$data.sprintEndTime = sprint.sprintStartTime
+        /*this.$data.sprintLeader: 'Charline.Feng',
+        this.$data.sprintWorkingDays: 10,
+        this.$data.sprintPeopleCount: 101,
+        this.$data.sprintBaseline: '<=62 Inc/month; Resolve <=4 hrs;<=62 Inc/month; ',
+        this.$data.sprintEffort: 200,
+        this.$data.sprintEstimation: 200,
+        this.$data.sprintBaseCapacity: 500,
+        this.$data.sprintActualCapacity: 200,
+        this.$data.sprintStatus: 'Active',*/
       }
     },
     // Task Dialog Method
@@ -408,6 +435,7 @@ export default {
   },
   created () {
     this.$data.planListHide = true
+    this.getActiveSprintsList()
   }
 }
 </script>

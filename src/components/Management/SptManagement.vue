@@ -43,7 +43,7 @@ export default {
   data () {
     return {
       header1: 'Sprint',
-      header2: 'Project',
+      header2: 'User',
       header3: 'Report',
       isActive: true,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
