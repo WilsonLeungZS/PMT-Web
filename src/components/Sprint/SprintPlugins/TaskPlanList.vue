@@ -17,7 +17,7 @@
         </el-row>
         <el-row class="task-plan-list-table">
           <el-col :span="24">
-            <el-table :data="taskList" width="100%" size="mini">
+            <el-table :data="taskPlanList" width="100%" size="mini">
               <el-table-column prop="taskName" label="Name" align="left" width="150">
                 <template slot-scope="scope">
                   <el-button @click="editTask(scope.row.taskId, scope.row.taskCategory)" type="text">{{scope.row.taskName}}</el-button>
@@ -26,7 +26,7 @@
               <el-table-column prop="taskTitle" label="Title" align="left" min-width="200" show-overflow-tooltip></el-table-column>
               <el-table-column prop="taskEffort" label="Effort" align="center" width="55"></el-table-column>
               <el-table-column prop="taskEstimation" label="Est" align="center" width="55"></el-table-column>
-              <el-table-column align="right" fixed="right" width="50" >
+              <el-table-column align="right" width="50" >
                 <template slot-scope="scope">
                   <el-tooltip class="item" effect="dark" content="Create PMT Task" placement="top">
                     <el-button @click="createRefTask(scope.row.taskName, scope.row.taskTitle)" type="primary" icon="el-icon-document-add" class="task-plan-list-table-btn"></el-button>
@@ -34,8 +34,7 @@
                 </template>
               </el-table-column>
             </el-table>
-            <el-pagination @current-change="handlePageChange" :current-page="taskListPage" :total="taskListTotal" :page-size="50" layout="total, prev, pager, next" style="float: right; margin-top: 5px">
-            </el-pagination>
+            <el-pagination @current-change="handlePageChange" :current-page="taskPlanListPage" :total="taskPlanListTotal" :page-size="taskPlanListSize" layout="total, prev, pager, next" style="float: right; margin-top: 5px"></el-pagination>
           </el-col>
         </el-row>
       </div>
@@ -54,21 +53,56 @@ export default {
     return {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
-      taskList: [
-        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL',  taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
-        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
-        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
-        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32},
-        {taskId: 1, taskName: 'CGM210001', taskCategory: 'EXTERNAL', taskTitle: 'Setup EDI invoice to RCL', taskEffort: 10, taskEstimation: 32}
-      ],
+      taskPlanList: [],
       taskKeyword: '',
-      taskListPage: 1,
-      taskListTotal: 100
+      taskPlanListSize: 50,
+      taskPlanListPage: 1,
+      taskPlanListTotal: 0
+    }
+  },
+  props: {
+      'sprint': Object
+    },
+  watch: {
+    sprint: {
+      handler (val, oldVal) {
+        var sprintObj = val
+        if (sprintObj != null && sprintObj != '') {
+          this.getTaskPlanListBySkills(sprintObj)
+        } else {
+          this.taskPlanList = []
+        }
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
+    async getTaskPlanListBySkills (iSprintObj) {
+      this.$data.taskPlanList = []
+      this.$data.taskPlanListTotal = 0
+      if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
+        var skillsArray = iSprintObj.sprintRequiredSkills.toString()
+        var resCount = await http.post('/tasks/getTasksListCountBySkill', {
+          reqSkillsArray: skillsArray
+        })
+        if (resCount != null && resCount.data.status == 0) {
+          this.$data.taskPlanListTotal = resCount.data.data
+        }
+        var resData = await http.post('/tasks/getTasksListBySkill', {
+          reqSkillsArray: skillsArray,
+          reqPage: this.$data.taskPlanListPage,
+          reqSize: this.$data.taskPlanListSize
+        })
+        if (resData != null && resData.data.status == 0) {
+          var taskList = resData.data.data
+          this.$data.taskPlanList = taskList
+        }
+      }
+    },
     handlePageChange(val) {
-      console.log(`Current Page: ${val}`);
+      console.log(`Current Page: ${val}`)
+      this.$data.taskPlanListPage = val
     },
     createTask () {
       this.$emit('createTask')
@@ -81,6 +115,7 @@ export default {
     }
   },
   created () {
+    this.$data.taskPlanListPage = 1
   }
 }
 </script>

@@ -17,11 +17,11 @@
             <el-tabs @tab-click="changeTab" v-model="tabActive" :tab-position="tabPosition" class="sv-content-plan-list">
               <el-tab-pane name="tab_people_resource">
                 <span slot="label"><i class="el-icon-user-solid"></i> People Res</span>
-                <people-plan-list></people-plan-list>
+                <people-plan-list :sprint="sprintObj"></people-plan-list>
               </el-tab-pane>
               <el-tab-pane name="tab_task_backlog">
                 <span slot="label"><i class="el-icon-s-order"></i> Task List</span>
-                <task-plan-list @createTask="createTask" @createRefTask="createRefTask" @editTask="editTask"></task-plan-list>
+                <task-plan-list :sprint="sprintObj" @createTask="createTask" @createRefTask="createRefTask" @editTask="editTask"></task-plan-list>
               </el-tab-pane>
               <el-tab-pane name="tab_hide">
                 <span slot="label" style="color: #bdbdbd"><i class="el-icon-arrow-left"></i> Hide</span>
@@ -69,12 +69,12 @@
                       </el-option>
                     </el-select>
                   </el-col>
-                  <el-col :span="8" :lg="6" class="sprint-card-header-col">
+                  <el-col :span="8" :lg="8" class="sprint-card-header-col">
                     <span><i class="el-icon-s-flag"></i> Leader: <b>{{sprintLeader}}</b></span>
                   </el-col>
-                  <el-col :span="4" :lg="4" class="sprint-card-header-col">
-                    <el-tag v-if="sprintStatus == 'Active'? true: false" type="primary" style="width: 100%; text-align: center"><b>Status: {{sprintStatus}}</b></el-tag>
-                    <el-tag v-if="sprintStatus == 'Running'? true: false" type="success" style="width: 100%; text-align: center"><b>Status: {{sprintStatus}}</b></el-tag>
+                  <el-col :span="4" :lg="2" class="sprint-card-header-col">
+                    <el-tag v-if="sprintStatus == 'Active'? true: false" type="primary" style="width: 100%; text-align: center"><b>{{sprintStatus}}</b></el-tag>
+                    <el-tag v-if="sprintStatus == 'Running'? true: false" type="success" style="width: 100%; text-align: center"><b>{{sprintStatus}}</b></el-tag>
                   </el-col>
                   <el-col :span="20" :lg="24" class="sprint-card-header-col">
                     <el-scrollbar style="height: 100%">
@@ -102,34 +102,42 @@
               </div>
               <!-- Card Content -->
               <div class="sprint-card-content">
+                <el-row v-if="sprintTasksList.length == 0? true: false">
+                  <el-col :span="24" style="margin: 10px 0">
+                    <b>No Task</b>
+                  </el-col>
+                </el-row>
                 <el-card v-for="(sprintTask, index) in sprintTasksList" :key="index" class="box-card" style="margin-bottom: 2px;">
                   <el-collapse>
-                    <el-collapse-item :disabled="!sprintTask.sprintTaskHasSubtask" :class="{'sprint-card-content-task-hide-icon': !sprintTask.sprintTaskHasSubtask}">
+                    <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}">
                       <!-- Sprint Task Header -->
                       <template slot="title">
                         <el-row class="sprint-card-content-task" align="middle">
                           <el-col :span="5" :lg="3">
-                            <el-button @click.stop="editTask(sprintTask.sprintTaskId, sprintTask.sprintTaskCategory)" type="text">{{sprintTask.sprintTaskName}}</el-button>
+                            <el-button @click.stop="editTask(sprintTask.taskId, sprintTask.taskCategory)" type="text">{{sprintTask.taskName}}</el-button>
                           </el-col>
                           <el-col :span="19" :lg="11">
-                            <span>{{sprintTask.sprintTaskTitle}}</span>
+                            <span>{{sprintTask.taskTitle}}</span>
                           </el-col>
                           <el-col :span="5" :lg="2">
-                            <el-tag effect="dark" type="warning" size="mini" v-if="sprintTask.sprintTaskStatus == 'Drafting'">{{sprintTask.sprintTaskStatus}}</el-tag>
-                            <el-tag effect="dark" type="primary" size="mini" v-if="sprintTask.sprintTaskStatus == 'Planning'">{{sprintTask.sprintTaskStatus}}</el-tag>
-                            <el-tag effect="dark" type="success" size="mini" v-if="sprintTask.sprintTaskStatus == 'Running'" >{{sprintTask.sprintTaskStatus}}</el-tag>
-                            <el-tag effect="dark" type="info"    size="mini" v-if="sprintTask.sprintTaskStatus == 'Done'"    >{{sprintTask.sprintTaskStatus}}</el-tag>
+                            <el-tag effect="dark" type="warning" size="mini" v-if="sprintTask.taskStatus == 'Drafting'">{{sprintTask.taskStatus}}</el-tag>
+                            <el-tag effect="dark" type="primary" size="mini" v-if="sprintTask.taskStatus == 'Planning'">{{sprintTask.taskStatus}}</el-tag>
+                            <el-tag effect="dark" type="success" size="mini" v-if="sprintTask.taskStatus == 'Running'" >{{sprintTask.taskStatus}}</el-tag>
+                            <el-tag effect="dark" type="info"    size="mini" v-if="sprintTask.taskStatus == 'Done'"    >{{sprintTask.taskStatus}}</el-tag>
                           </el-col>
                           <el-col :span="15" :lg="6">
                             <span class="sprint-card-content-task-info">
-                              <span>{{sprintTask.sprintTaskEffort}}</span>
+                              <span>{{sprintTask.taskEffort}}</span>
                               <el-divider direction="vertical"></el-divider>
-                              <span>{{sprintTask.sprintTaskEstimation}}</span>
+                              <span>{{sprintTask.taskEstimation}}</span>
                               <el-divider direction="vertical"></el-divider>
-                              <span v-if="!planListHide">{{sprintTask.sprintTaskAssignee}}</span>
-                              <el-select v-if="planListHide" v-model="sprintTask.sprintTaskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 75%;">
+                              <span v-if="!planListHide">{{sprintTask.taskAssignee}}</span>
+                              <el-select v-if="planListHide" v-model="sprintTask.taskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 75%;" filterable clearable>
                                 <el-option label="" value=""></el-option>
-                                <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userNickname" :value="assignee.userId"></el-option>
+                                <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
+                                  <span style="float: left; margin-right:20px">{{ assignee.userFullName }}</span>
+                                  <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ assignee.userLevel }}</span>
+                                </el-option>
                               </el-select>
                             </span>
                           </el-col>
@@ -163,9 +171,12 @@
                           <el-table-column v-if="!planListHide" width="80px" align="center" prop="sprintSubtaskAssignee" label="Assignee" show-overflow-tooltip key="6"></el-table-column>
                           <el-table-column v-if="planListHide" width="180px" align="center" prop="sprintSubtaskAssignee" label="Assignee" show-overflow-tooltip key="6">
                             <template slot-scope="scope">
-                              <el-select v-if="planListHide" v-model="scope.row.sprintSubtaskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 100%;">
+                              <el-select v-if="planListHide" v-model="scope.row.sprintSubtaskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 100%;" filterable clearable>
                                 <el-option label="" value=""></el-option>
-                                <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userNickname" :value="assignee.userId"></el-option>
+                                <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
+                                  <span style="float: left; margin-right:20px">{{ assignee.userFullName }}</span>
+                                  <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ assignee.userLevel }}</span>
+                                </el-option>
                               </el-select>
                             </template>
                           </el-table-column>
@@ -195,10 +206,12 @@
           </el-col>
           <el-col :span="24">
             <el-table :data="plannedPeopleList" :summary-method="getSummaries" show-summary width="100%">
-              <el-table-column prop="userName" label="Name" align="center"></el-table-column>
-              <el-table-column prop="userPlannedCapacity" label="Planned Capacity" align="center" width="180">
+              <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
+              <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
+              <el-table-column prop="sprintUserName" label="Name" align="center"></el-table-column>
+              <el-table-column prop="sprintUserCapacity" label="Planned Capacity" align="center" width="180">
                 <template slot-scope="scope">
-                  <el-input-number v-model="scope.row.userPlannedCapacity" :step="scope.row.userWorkingHrs" step-strictly :min="0" :max="scope.row.userMaxCapacity" controls-position="right" size="mini"></el-input-number>
+                  <el-input-number v-model="scope.row.sprintUserCapacity" :step="scope.row.sprintUserWorkingHrs" step-strictly :min="0" :max="scope.row.sprintUserMaxCapacity" controls-position="right" size="mini"></el-input-number>
                 </template>
               </el-table-column>
               <el-table-column align="right" fixed="right" width="80">
@@ -248,42 +261,26 @@ export default {
       // Sprint Value
       sprintsList: [],
       sprintSelect: '',
-      sprintStartTime: '2021-01-01',
-      sprintEndTime: '2021-01-15',
-      sprintLeader: 'Charline.Feng',
-      sprintWorkingDays: 10,
-      sprintPeopleCount: 101,
-      sprintBaseline: '<=62 Inc/month; Resolve <=4 hrs;<=62 Inc/month; ',
-      sprintEffort: 200,
-      sprintEstimation: 200,
-      sprintBaseCapacity: 500,
-      sprintActualCapacity: 200,
+      sprintStartTime: '',
+      sprintEndTime: '',
+      sprintWorkingDays: 0,
+      sprintLeader: '',
       sprintStatus: 'Active',
+      sprintBaseline: '',
+      sprintEffort: 0,
+      sprintEstimation: 0,
+      sprintActualCapacity: 0,
+      sprintBaseCapacity: 0,
+      sprintPeopleCount: 0,
+      sprintRequiredSkills: [],
+      sprintObj: {},
       // Sprint Task Value
-      sprintTasksList: [
-        {sprintTaskId: 1, sprintTaskCategory: 'PMT', sprintTaskName: 'CGM210001-12', sprintTaskTitle: 'It is not required Document Reference when rectify OB', sprintTaskStatus: 'Drafting', sprintTaskEffort: 12, sprintTaskEstimation: 32, sprintTaskAssignee: 'Wilson.Liang', sprintTaskAssigneeId: 1, sprintTaskHasSubtask: false, sprintTaskSubtasksList: []},
-        {sprintTaskId: 1, sprintTaskCategory: 'PMT', sprintTaskName: 'CGM210001-12', sprintTaskTitle: 'It is not required Document Reference when rectify OB', sprintTaskStatus: 'Drafting', sprintTaskEffort: 12, sprintTaskEstimation: 32, sprintTaskAssignee: 'Wilson.Liang', sprintTaskAssigneeId: 1, sprintTaskHasSubtask: false, sprintTaskSubtasksList: []},
-        {sprintTaskId: 1, sprintTaskCategory: 'PMT', sprintTaskName: 'CGM210001-12', sprintTaskTitle: 'It is not required Document Reference when rectify OB', sprintTaskStatus: 'Drafting', sprintTaskEffort: 12, sprintTaskEstimation: 32, sprintTaskAssignee: 'Wilson.Liang', sprintTaskAssigneeId: 1, sprintTaskHasSubtask: false, sprintTaskSubtasksList: []},
-        {sprintTaskId: 1, sprintTaskCategory: 'PMT', sprintTaskName: 'CGM210001-12', sprintTaskTitle: 'It is not required Document Reference when rectify OB', sprintTaskStatus: 'Drafting', sprintTaskEffort: 12, sprintTaskEstimation: 32, sprintTaskAssignee: 'Wilson.Liang', sprintTaskAssigneeId: 1, sprintTaskHasSubtask: true, sprintTaskSubtasksList: [
-          {sprintSubtaskId: 1, sprintSubtaskCategory: 'PMT', sprintSubtaskName: 'CGM210001-12-1', sprintSubtaskTitle: 'SIT Testing of EDI', sprintSubtaskStatus: 'Running', sprintSubtaskEffort: 50, sprintSubtaskEstimation: 80, sprintSubtaskAssignee: 'Vicky.Zeng', sprintSubtaskAssigneeId: 2},
-          {sprintSubtaskId: 1, sprintSubtaskCategory: 'PMT', sprintSubtaskName: 'CGM210001-12-1', sprintSubtaskTitle: 'SIT Testing of EDI', sprintSubtaskStatus: 'Running', sprintSubtaskEffort: 5, sprintSubtaskEstimation: 8, sprintSubtaskAssignee: 'Vicky.Zeng', sprintSubtaskAssigneeId: 2},
-          {sprintSubtaskId: 1, sprintSubtaskCategory: 'PMT', sprintSubtaskName: 'CGM210001-12-1', sprintSubtaskTitle: 'SIT Testing of EDI', sprintSubtaskStatus: 'Running', sprintSubtaskEffort: 5, sprintSubtaskEstimation: 8, sprintSubtaskAssignee: 'Vicky.Zeng', sprintSubtaskAssigneeId: 2}
-        ]}
-      ],
-      assigneeList: [
-        {userId: 1, userNickname: 'Wilson.Liang', userLevel: 10},
-        {userId: 2, userNickname: 'Leo.Li', userLevel: 8}
-      ],
+      sprintTasksList: [],
+      assigneeList: [],
       // Sprint Planned Drawer Value
       direction: 'rtl',
       peopleResVisible: false,
-      plannedPeopleList: [
-        {userName: 'zhongshu.liang', userPlannedCapacity: 45, userWorkingHrs: 9, userMaxCapacity: 90},
-        {userName: 'zhongshu.liang', userPlannedCapacity: 90, userWorkingHrs: 9, userMaxCapacity: 90},
-        {userName: 'zhongshu.liang', userPlannedCapacity: 90, userWorkingHrs: 9, userMaxCapacity: 90},
-        {userName: 'zhongshu.liang', userPlannedCapacity: 72, userWorkingHrs: 8, userMaxCapacity: 80},
-        {userName: 'zhongshu.liang', userPlannedCapacity: 63, userWorkingHrs: 9, userMaxCapacity: 90}
-      ],
+      plannedPeopleList: [],
       // Task Dialog handling value
       pmtTaskDialogAction: null,
       externalTaskDialogAction: null
@@ -322,6 +319,27 @@ export default {
       }
     },
     // Sprint Method
+    initSprintInfo () {
+      this.$data.sprintStartTime = ''
+      this.$data.sprintEndTime = ''
+      this.$data.sprintWorkingDays = 0
+      this.$data.sprintLeader = ''
+      this.$data.sprintStatus = 'Active'
+      this.$data.sprintBaseline = ''
+      this.$data.sprintBaseCapacity = 0
+      this.$data.sprintRequiredSkills = []
+      this.$data.sprintObj = {}
+    },
+    initSprintTask () {
+      this.$data.sprintEffort = 0
+      this.$data.sprintEstimation = 0
+      this.$data.sprintTasksList = []
+    },
+    initSprintUser () {
+      this.$data.sprintActualCapacity = 0
+      this.$data.sprintPeopleCount = 0
+      this.$data.plannedPeopleList = []
+    },
     async getActiveSprintsList () {
       var res = await http.get('/sprints/getActiveSprintsList')
       if (res != null && res.data.status == 0) {
@@ -331,6 +349,7 @@ export default {
       }
     },
     async getSprintInfo () {
+      this.initSprintInfo()
       var requestSprintId = this.$data.sprintSelect
       var res = await http.get('/sprints/getSprintById', {
         reqSprintId: requestSprintId
@@ -338,16 +357,49 @@ export default {
       if (res != null && res.data.status == 0) {
         var sprint = res.data.data
         this.$data.sprintStartTime = sprint.sprintStartTime
-        this.$data.sprintEndTime = sprint.sprintStartTime
-        /*this.$data.sprintLeader: 'Charline.Feng',
-        this.$data.sprintWorkingDays: 10,
-        this.$data.sprintPeopleCount: 101,
-        this.$data.sprintBaseline: '<=62 Inc/month; Resolve <=4 hrs;<=62 Inc/month; ',
-        this.$data.sprintEffort: 200,
-        this.$data.sprintEstimation: 200,
-        this.$data.sprintBaseCapacity: 500,
-        this.$data.sprintActualCapacity: 200,
-        this.$data.sprintStatus: 'Active',*/
+        this.$data.sprintEndTime = sprint.sprintEndTime
+        this.$data.sprintWorkingDays = sprint.sprintWorkingDays
+        this.$data.sprintLeader = sprint.sprintLeader
+        this.$data.sprintStatus = sprint.sprintStatus
+        this.$data.sprintBaseline = sprint.sprintBaseline
+        this.$data.sprintBaseCapacity = sprint.sprintBaseCapacity
+        this.$data.sprintRequiredSkills = sprint.sprintRequiredSkills
+        this.$data.sprintObj = {
+          sprintId: sprint.sprintId,
+          sprintRequiredSkills: sprint.sprintRequiredSkills,
+          sprintWorkingDays: sprint.sprintWorkingDays,
+          datetime: new Date()
+        }
+        this.getSprintTasks()
+        this.getSprintUsers()
+        this.getAssigneeList()
+      }
+    },
+    async getSprintTasks () {
+      this.initSprintTask()
+      var requestSprintId = this.$data.sprintSelect
+      var res = await http.get('/sprints/getSprintTasksById', {
+        reqSprintId: requestSprintId
+      })
+      if (res != null && res.data.status == 0) {
+        var sprintTasksData = res.data.data
+        this.$data.sprintEffort = sprintTasksData.sprintEffortAndEstSum[0].EffortSum
+        this.$data.sprintEstimation = sprintTasksData.sprintEffortAndEstSum[0].EstimationSum
+        this.$data.sprintTasksList = sprintTasksData.sprintTasks
+      }
+    },
+    async getSprintUsers () {
+      this.initSprintUser()
+      var requestSprintId = this.$data.sprintSelect
+      var res = await http.get('/sprints/getSprintUsersById', {
+        reqSprintId: requestSprintId
+      })
+      if (res != null && res.data.status == 0) {
+        var sprintUsersData = res.data.data
+        console.log(sprintUsersData)
+        this.$data.sprintActualCapacity = sprintUsersData.sprintUsersCapacitySum[0].CapacitySum
+        this.$data.sprintPeopleCount = sprintUsersData.sprintUsers.length
+        this.$data.plannedPeopleList = sprintUsersData.sprintUsers
       }
     },
     // Task Dialog Method
@@ -431,11 +483,25 @@ export default {
         }
       });
       return sums;
+    },
+    // Common Method
+    async getAssigneeList () {
+      this.$data.assigneeList = []
+      const res = await http.get('/users/getActiveUsersListByLevelLimit', {reqUserLevelLimit: 13})
+      if (res.data.status === 0) {
+        this.$data.assigneeList = res.data.data
+      } else {
+        this.$data.assigneeList = []
+      }
     }
   },
   created () {
     this.$data.planListHide = true
     this.getActiveSprintsList()
+    this.initSprintInfo()
+    this.initSprintTask()
+    this.initSprintUser()
+    this.getAssigneeList()
   }
 }
 </script>

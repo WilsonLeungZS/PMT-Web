@@ -5,9 +5,10 @@
         <span>People Resource</span>
       </div>
       <div class="people-plan-list-table">
-        <el-table :data="peopleList" width="100%" size="small">
-          <el-table-column prop="userName" label="Name" align="left" width="150"></el-table-column>
-          <el-table-column prop="userSkills" label="Skills" align="left" min-width="200" show-overflow-tooltip></el-table-column>
+        <el-table :data="userPlanList" width="100%" size="small">
+          <el-table-column v-if="false" prop="userId" label="Id"></el-table-column>
+          <el-table-column prop="userFullName" label="Name" align="left" width="150"></el-table-column>
+          <el-table-column prop="userSkillsStr" label="Skills" align="left" min-width="190" show-overflow-tooltip></el-table-column>
           <el-table-column prop="userLevel" label="Level" align="center" width="60"></el-table-column>
           <el-table-column prop="userWorkingHrs" label="WHrs" align="center" width="60"></el-table-column>
           <el-table-column prop="userCapacity" label="Capacity" align="center" width="100">
@@ -15,7 +16,7 @@
               <el-input-number v-model="scope.row.userCapacity" :step="scope.row.userWorkingHrs" step-strictly :min="0" :max="scope.row.userMaxCapacity" controls-position="right" size="mini"></el-input-number>
             </template>
           </el-table-column>
-          <el-table-column align="right" fixed="right" width="50">
+          <el-table-column align="right" width="50">
             <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" content="Assigen to Sprint" placement="top">
                 <el-button type="primary" icon="el-icon-d-arrow-right"></el-button>
@@ -39,15 +40,47 @@ export default {
     return {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
-      peopleList: [
-        {userName: 'zhongshu.liang(Wilson)', userLevel: '10', userWorkingHrs: 9, userSkills: 'PMO,Custom-Build,PMO,Custom-Build,PMO,Custom-Build', userCapacity: 90, userMaxCapacity: 90},
-        {userName: 'zhongshu.liang', userLevel: '10', userWorkingHrs: 9, userSkills: 'PMO,Custom-Build', userCapacity: 90, userMaxCapacity: 90},
-        {userName: 'zhongshu.liang', userLevel: '10', userWorkingHrs: 8, userSkills: 'PMO,Custom-Build', userCapacity: 80, userMaxCapacity: 80},
-        {userName: 'zhongshu.liang', userLevel: '10', userWorkingHrs: 8, userSkills: 'PMO,Custom-Build', userCapacity: 80, userMaxCapacity: 80}
-      ]
+      userPlanList: []
+    }
+  },
+  props: {
+      'sprint': Object
+    },
+  watch: {
+    sprint: {
+      handler (val, oldVal) {
+        var sprintObj = val
+        if (sprintObj != null && sprintObj != '') {
+          this.getUserListBySkills(sprintObj)
+        } else {
+          this.userPlanList = []
+        }
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
+    async getUserListBySkills (iSprintObj) {
+      this.$data.userPlanList = []
+      if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
+        var skillsArray = iSprintObj.sprintRequiredSkills.toString()
+        console.log('Skills Array: ', skillsArray)
+        var res = await http.post('/users/getActiveUsersListBySkill', {
+          reqSkillsArray: skillsArray
+        })
+        if (res != null && res.data.status == 0) {
+          var userList = res.data.data
+          var sprintWorkingDays = Number(iSprintObj.sprintWorkingDays)
+          for (var j=0; j<userList.length; j++) {
+            var capacity = Number(userList[j].userWorkingHrs) * sprintWorkingDays
+            userList[j].userCapacity = capacity
+            userList[j].userMaxCapacity = capacity
+          }
+          this.$data.userPlanList = userList
+        }
+      }
+    }
   },
   created () {
   }

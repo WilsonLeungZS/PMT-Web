@@ -241,6 +241,11 @@ export default {
     async saveSprint (props) {
       var sprint = props.row
       if(this.isEmptyField(sprint.sprintName, 'Name') || this.isEmptyField(sprint.sprintStartTime, 'Start Time') || this.isEmptyField(sprint.sprintEndTime, 'End Time')) return
+      if (sprint.sprintRequiredSkills.length > 0) {
+        for (var i=0; i<sprint.sprintRequiredSkills.length; i++) {
+          sprint.sprintRequiredSkills[i] = '#' + sprint.sprintRequiredSkills[i] + '#'
+        }
+      }
       const res = await http.post('/sprints/updateSprint', {
         reqSprintName: sprint.sprintName,
         reqSprintStartTime : sprint.sprintStartTime,

@@ -6,14 +6,14 @@ Remark:
 <template>
   <el-dialog :before-close="closeTask" :visible.sync="PMTTaskDialogVisible" :title="PMTTaskDialogTitle" :width="dialogWidth" top="5%" :close-on-click-modal="false" class="pmt-task-dialog">
     <el-form :model="PMTTask" :rules="PMTTaskFormRules" ref="form" label-width="140px" label-position="left" class="pmt-task-dialog-form">
-      <el-tabs v-model="activeTab" ref="PMTTaskDialogTabs" type="card">
+      <el-tabs @tab-click="changeTab" v-model="activeTab" ref="PMTTaskDialogTabs" type="card">
         <!-- Basic Information Tab -->
         <el-tab-pane label="Basic Information" name="tab_basic_info">
           <el-row>
             <el-col :span="24">
               <el-form-item v-show="showState.showParent" label="Parent Task" prop="taskParentName">
                 <el-col :span="12" :lg="6">
-                  <el-autocomplete :disabled="disabledState.disabledParent" v-model="PMTTask.taskParentName" popper-class="task-autocomplete" :trigger-on-focus="false"  :clearable="true" style="width: 100%" :debounce=0>
+                  <el-autocomplete disabled v-model="PMTTask.taskParentName" popper-class="task-autocomplete" :trigger-on-focus="false"  :clearable="true" style="width: 100%" :debounce=0>
                     <template slot-scope="{ item }">
                       <div class="pmt-task-dialog-form-list-name">{{ item.value }}</div>
                       <span class="pmt-task-dialog-form-list-desc">{{ item.description }}</span>
@@ -21,8 +21,8 @@ Remark:
                   </el-autocomplete>
                 </el-col>
                 <el-col :span="24" :lg="{span: 17, offset: 1}">
-                  <el-tooltip :content="PMTTask.taskParentTitle" class="item" effect="dark" placement="top-start">
-                    <div v-show="showState.showParentTitle" class="pmt-task-dialog-form-desc">{{PMTTask.taskParentTitle}}</div>
+                  <el-tooltip :content="PMTTaskParentTaskTitle" class="item" effect="dark" placement="top-start">
+                    <div v-show="showState.showParentTitle" class="pmt-task-dialog-form-desc">{{PMTTaskParentTaskTitle}}</div>
                   </el-tooltip>
                 </el-col>
               </el-form-item>
@@ -62,12 +62,31 @@ Remark:
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item v-show="showState.showSprint" label="Sprint" prop="taskSprintId">
-            <el-select :disabled="disabledState.disabledSprint" v-model="PMTTask.taskSprintId" style="width: 100%">
-              <el-option label="" value=""></el-option>
-              <el-option v-for="item in sprintsList" :key="item.value" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
+          <el-row>
+            <el-col :span="24" :lg="11">
+              <el-form-item v-show="showState.showSprint" label="Sprint">
+                <el-select :disabled="disabledState.disabledSprint" v-model="PMTTask.taskSprintId" style="width: 100%" clearable>
+                  <el-option label=" " value=""></el-option>
+                  <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
+                    <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
+                    <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24" :lg="{span: 12, offset: 1}">
+              <el-form-item v-show="showState.showRequiredSkills" label="Required Skills">
+                <el-select :disabled="disabledState.disabledRequiredSkills" v-model="PMTTask.taskRequiredSkills" style="width: 100%" multiple clearable>
+                  <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
+                    <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
+                      <span style="float: left;">{{ skill.skillName }}</span>
+                      <span style="float: left; margin-left:10px; color: #8492a6; font-size: 12px">{{ skill.skillDesc }}</span>
+                    </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
           <el-row>
             <el-col :span="24">
               <el-form-item v-show="showState.showReferenceTask" label="Ref Task" prop="taskReferenceTask">
@@ -80,8 +99,8 @@ Remark:
                   </el-autocomplete>
                 </el-col>
                 <el-col :span="24" :lg="{span: 17, offset: 1}">
-                  <el-tooltip :content="PMTTask.taskReferenceTaskTitle" class="item" effect="dark" placement="top-start">
-                    <div v-show="showState.showReferenceTaskTitle" class="pmt-task-dialog-form-desc">{{PMTTask.taskReferenceTaskTitle}}</div>
+                  <el-tooltip :content="PMTTaskReferenceTaskTitle" class="item" effect="dark" placement="top-start">
+                    <div v-show="showState.showReferenceTaskTitle" class="pmt-task-dialog-form-desc">{{PMTTaskReferenceTaskTitle}}</div>
                   </el-tooltip>
                 </el-col>
               </el-form-item>
@@ -135,15 +154,22 @@ Remark:
           <el-row>
             <el-col :span="24" :lg="11">
               <el-form-item v-show="showState.showRespLeader" label="Responsible Leader">
-                <span>{{PMTTask.taskRespLeader}}</span>
+                <el-select disabled v-model="PMTTask.taskRespLeaderId" style="width: 100%">
+                  <el-option label=" " value=""></el-option>
+                  <el-option v-for="(user, index) in usersList" :key="index" :label="user.userName" :value="user.userId">
+                    <span style="float: left; margin-right:20px">{{ user.userName }}</span>
+                    <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ user.userLevel }}</span>
+                  </el-option>
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="24" :lg="{span: 12, offset: 1}">
               <el-form-item v-show="showState.showAssignee" label="Assign To">
                 <el-select :disabled="disabledState.disabledAssignee" v-model="PMTTask.taskAssignee" filterable style="width: 100%">
-                  <el-option label="1" value="1">
-                    <span style="font-size: 14px; float: left ; margin-right: 20px">zhongshu.liang</span>
-                    <span style="font-size: 14px; float: right; color: #8492a6; ">Level - 10</span>
+                  <el-option label=" " value=""></el-option>
+                  <el-option v-for="(user, index) in usersList" :key="index" :label="user.userFullName" :value="user.userId">
+                    <span style="float: left; margin-right:20px">{{ user.userFullName }}</span>
+                    <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ user.userLevel }}</span>
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -205,9 +231,9 @@ Remark:
         <el-tab-pane label="Worklog Histories" name="tab_worklog_histories">
             <el-card class="box-card pmt-task-dialog-history-tab">
               <el-timeline>
-                <el-timeline-item v-for="(history, index) in taskWorklogHistories" :key="index" :timestamp="history.timestamp"
+                <el-timeline-item v-for="(history, index) in PMTTaskWorklogHistories" :key="index" :timestamp="history.worklogTimestamp"
                   icon="el-icon-star-on" size="large" placement="top" type="primary" class="tl-history">
-                  {{history.content}}
+                  {{history.worklogContent}}
                 </el-timeline-item>
               </el-timeline>
             </el-card>
@@ -235,6 +261,9 @@ Remark:
         PMTTaskDialogTitle: 'PMT Task Details',
         PMTTaskDialogVisible: false,
         disabledSaveBtn: false,
+        skillsList: [],
+        usersList: [],
+        sprintsList: [],
         PMTTaskFormRules: {
           taskTitle: [{required: true, message: 'Not allow empty', trigger: 'blur'}]
         },
@@ -247,7 +276,6 @@ Remark:
           {value: 'Ready to PROD', label: 'Ready to PROD'}
         ],
         sprintsList: [],
-        taskWorklogHistories: [],
         disabledState: {
           disabledParent: false,
           disabledParentTitle: false,
@@ -256,6 +284,7 @@ Remark:
           disabledTypeTag: false,
           disabledDeliverableTag: false,
           disabledSprint: false,
+          disabledRequiredSkills: false,
           disabledReferenceTask: false,
           disabledReferenceTaskTitle: false,
           disabledTitle: false,
@@ -274,6 +303,7 @@ Remark:
           showTypeTag: true,
           showDeliverableTag: true,
           showSprint: true,
+          showRequiredSkills: true,
           showReferenceTask: true,
           showReferenceTaskTitle: true,
           showTitle: true,
@@ -290,14 +320,13 @@ Remark:
         PMTTask: {
           taskId: 0,
           taskParentName: '',
-          taskParentTitle: 'Testing of task parent task description',
           taskName: '',
           taskType: '',
           taskTypeTag: '',
           taskDeliverableTag: [],
           taskSprintId: null,
+          taskRequiredSkills: [], 
           taskReferenceTask: '',
-          taskReferenceTaskTitle: 'Testing of task reference task description',
           taskTitle: '',
           taskDescription: '',
           taskCreator: '',
@@ -310,12 +339,10 @@ Remark:
           taskEffort: 0,
           taskEstimation: 0,
         },
-        PMTTaskSubtasksList: [
-          {subtaskId: 1, subtaskName: 'MTL19.1-1', subtaskTitle: 'MTL AO TOS - Application Development', subtaskStatus: 'Drafting', subtaskAssignee: 'Leo.Li'},
-          {subtaskId: 2, subtaskName: 'MTL19.1-2', subtaskTitle: 'MTL AO TOS - Application Development', subtaskStatus: 'Planning', subtaskAssignee: 'Leo.Li'},
-          {subtaskId: 3, subtaskName: 'MTL19.1-3', subtaskTitle: 'MTL AO TOS - Application Development', subtaskStatus: 'Running', subtaskAssignee: 'Leo.Li'},
-          {subtaskId: 3, subtaskName: 'MTL19.1-4', subtaskTitle: 'MTL AO TOS - Application Development', subtaskStatus: 'Done', subtaskAssignee: 'Leo.Li'}
-        ]
+        PMTTaskParentTaskTitle: '',
+        PMTTaskReferenceTaskTitle: '',
+        PMTTaskSubtasksList: [],
+        PMTTaskWorklogHistories: []
       }
     },
     props: {
@@ -363,6 +390,16 @@ Remark:
         }
         return pointerObj
       },
+      // Tab Methods
+      changeTab (tab, event) {
+        console.log('Tab ', tab)
+        if (tab.name == 'tab_subtasks_list') {
+          this.setSubtasksListByName(this.$data.PMTTask.taskName)
+        }
+        if (tab.name == 'tab_worklog_histories') {
+          this.setWorklogHistoriesById(this.$data.PMTTask.taskId)
+        }
+      },
       // Functional Methods
       initTaskForm(iTitle, iActiveTab) {
         this.$data.PMTTaskDialogTitle = iTitle
@@ -371,14 +408,13 @@ Remark:
         this.$data.PMTTask = {
           taskId: 0,
           taskParentName: '',
-          taskParentTitle: 'Default',
           taskName: '',
           taskType: '',
           taskTypeTag: '',
           taskDeliverableTag: [],
           taskSprintId: null,
+          taskRequiredSkills: [],
           taskReferenceTask: '',
-          taskReferenceTaskTitle: 'Default',
           taskTitle: '',
           taskDescription: '',
           taskCreator: '',
@@ -391,6 +427,8 @@ Remark:
           taskEffort: 0,
           taskEstimation: 0,
         }
+        this.$data.PMTTaskParentTaskTitle = ''
+        this.$data.PMTTaskReferenceTaskTitle = ''
         for(let key in this.$data.disabledState) {
           this.$data.disabledState[key] = false
         }
@@ -398,6 +436,12 @@ Remark:
           this.$data.showState[key] = true
         }
         this.$data.disabledSaveBtn = false
+        this.$data.skillsList = []
+        this.$data.usersList = []
+        this.$data.sprintsList = []
+        this.getAllSkillsList()
+        this.getActiveUsersList()
+        this.getActiveSprintsList()
       },
       createTask () {
         console.log('Create PMT task')
@@ -409,11 +453,12 @@ Remark:
         this.initTaskForm('New PMT Task', 'tab_basic_info')
         // Set new Task default value
         this.$data.PMTTask.taskParentName = iObj.taskParentTaskName
-        this.$data.PMTTask.taskParentTitle = iObj.taskParentTaskTitle
+        this.$data.PMTTaskParentTaskTitle = iObj.taskParentTaskTitle
         this.$data.PMTTask.taskType = iObj.taskType
         this.$data.PMTTask.taskTypeTag = iObj.taskTypeTag
         this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
         this.$data.PMTTask.taskSprintId = iObj.taskSprintId
+        this.$data.PMTTask.taskRequiredSkills = iObj.taskRequiredSkills
         this.$data.PMTTask.taskRespLeader = iObj.taskLeader 
         // Set new Task default state
         this.$data.disabledState.disabledParent = true
@@ -428,15 +473,25 @@ Remark:
         this.initTaskForm('New PMT Task', 'tab_basic_info')
         // Set new Task default value
         this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
-        this.$data.PMTTask.taskReferenceTaskTitle = iObj.taskReferenceTaskTitle
+        this.$data.PMTTaskReferenceTaskTitle = iObj.taskReferenceTaskTitle
         // Set new Task default state
         this.$data.disabledState.disabledReferenceTask = true
         this.$data.PMTTaskDialogVisible = true
       },
-      editTask (iTaskId) {
-        console.log('Edit PMT task')
+      async editTask (iTaskId) {
+        console.log('Edit PMT task - ', iTaskId)
         this.initTaskForm('PMT Task Details', 'tab_basic_info')
         // Get task information by id
+        const res = await http.get('/tasks/getTaskById', {
+          reqTaskId: iTaskId
+        })
+        if (res.data != null && res.data.status == 0) {
+          this.$nextTick(() => {
+            this.setParentTaskTitleByName(res.data.data.taskParentTaskName)
+            this.setReferenceTaskTitleByName(res.data.data.taskReferenceTask)
+            this.$data.PMTTask = res.data.data
+          })
+        }
         this.$data.PMTTaskDialogVisible = true
       },
       closeTask (done) {
@@ -449,8 +504,118 @@ Remark:
       saveTask () {
         console.log('Save PMT task')
         this.$data.disabledSaveBtn = true
+      },
+      // Rule Contrl Method
+      RuleControl (iRule) {
+        console.log(iRule)
+      },
+      // Data List Method
+      async getAllSkillsList () {
+        this.$data.skillsList = []
+        const res = await http.get('/users/getAllSkillsList')
+        if (res.data != null && res.data.status === 0) {
+          //this.$data.skillsList = res.data.data
+          var skillsList = res.data.data
+          var skillsListGroup = []
+          if (skillsList != null && skillsList.length > 0) {
+            for (var i=0; i<skillsList.length; i++) {
+              var group = skillsList[i].skillGroup.substr(1)
+              var index = this.getIndexOfValueInArr(skillsListGroup, 'Label', group)
+              if (index == -1) {
+                skillsListGroup.push({
+                  Label: group,
+                  Options: [skillsList[i]]
+                })
+              } else {
+                skillsListGroup[index].Options.push(skillsList[i])
+              }
+            }
+            console.log('Skills Group List: ', skillsListGroup)
+          }
+          this.$data.skillsList = skillsListGroup
+        } else {
+          this.$data.skillsList = []
+        }
+      },
+      getIndexOfValueInArr(iArray, iKey, iValue) {
+        for(var i=0; i<iArray.length;i++) {
+          var item = iArray[i];
+          if(iKey != null){
+            if(item[iKey] == iValue){
+              return i;
+            }
+          } 
+          if(iKey == null){
+            if(item == iValue){
+              return i;
+            }
+          }
+        }
+        return -1;
+      },
+      async getActiveUsersList () {
+        this.$data.usersList = []
+        const res = await http.get('/users/getActiveUsersListByLevelLimit', {reqUserLevelLimit: 13})
+        if (res.data.status === 0) {
+          this.$data.usersList = res.data.data
+        } else {
+          this.$data.usersList = []
+        }
+      },
+      async getActiveSprintsList () {
+        var res = await http.get('/sprints/getActiveSprintsList')
+        if (res != null && res.data.status == 0) {
+          this.$data.sprintsList = res.data.data
+        } else {
+          this.$data.sprintsList = []
+        }
+      },
+      // Common Method
+      async setParentTaskTitleByName (iTaskName) {
+        this.$data.PMTTaskParentTaskTitle = ''
+        if (iTaskName != null && iTaskName != '') {
+          const res = await http.get('/tasks/getTaskByName', {
+            reqTaskName: iTaskName
+          })
+          if (res.data != null && res.data.status == 0) {
+            this.$data.PMTTaskParentTaskTitle = res.data.data.taskTitle
+          }
+        }
+      },
+      async setReferenceTaskTitleByName (iTaskName) {
+        this.$data.PMTTaskReferenceTaskTitle = ''
+        if (iTaskName != null && iTaskName != '') {
+          const res = await http.get('/tasks/getTaskByName', {
+            reqTaskName: iTaskName
+          })
+          if (res.data != null && res.data.status == 0) {
+            this.$data.PMTTaskReferenceTaskTitle = res.data.data.taskTitle
+          }
+        }
+      },
+      async setSubtasksListByName (iTaskName) {
+        this.$data.PMTTaskSubtasksList = []
+        if (iTaskName != null && iTaskName != '') {
+          const res = await http.get('/tasks/getSubtasksListByName', {
+            reqTaskName: iTaskName
+          })
+          if (res.data != null && res.data.status == 0) {
+            this.$data.PMTTaskSubtasksList = res.data.data
+          }
+        }
+      },
+      async setWorklogHistoriesById (iTaskId) {
+        this.$data.PMTTaskSubtasksList = []
+        if (iTaskId != null && iTaskId != '') {
+          const res = await http.get('/worklogs/getWorklogHistoriesByTaskId', {
+            reqTaskId: iTaskId
+          })
+          if (res.data != null && res.data.status == 0) {
+            this.$data.PMTTaskWorklogHistories = res.data.data
+          }
+        }
       }
-    }
+    },
   }
 </script>
 

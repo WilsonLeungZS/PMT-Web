@@ -242,6 +242,11 @@ export default {
     async saveUser (props) {
       var user = props.row
       if(this.isEmptyField(user.userName, 'Name')) return
+      if (user.userSkills.length > 0) {
+        for (var i=0; i<user.userSkills.length; i++) {
+          user.userSkills[i] = '#' + user.userSkills[i] + '#'
+        }
+      }
       const res = await http.post('/users/updateUser', {
         reqUserName: user.userName,
         reqUserNickname : user.userNickname,
