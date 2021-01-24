@@ -50,7 +50,7 @@ Remark:
             </el-col>
           </el-row>
           <el-form-item label="Description">
-            <el-input v-model="externalTask.taskDescription" class="highlight-text-format" type="textarea" :rows="6" style="width: 100%" ></el-input>
+            <el-input disabled v-model="externalTask.taskDescription" class="highlight-text-format" type="textarea" :rows="6" style="width: 100%" ></el-input>
           </el-form-item>
           <el-row>
             <el-col :span="24" :lg="11">

@@ -194,11 +194,11 @@ Remark:
         </el-tab-pane>
         <!-- Sub Tasks Tab -->
         <el-tab-pane label="Sub Tasks" name="tab_subtasks_list">
-          <el-row>
+          <!--<el-row>
             <el-col :span="24">
               <el-button icon="el-icon-plus" size="medium" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white', 'width': '100%'}">Create Sub Task</el-button>
             </el-col>
-          </el-row>
+          </el-row>-->
           <el-row>
             <el-col :span="24">
               <el-card class="box-card task-form-tab-subtasks-content" :body-style="{padding: '0px'}" shadow="never">
@@ -446,6 +446,11 @@ Remark:
       createTask () {
         console.log('Create PMT task')
         this.initTaskForm('New PMT Task', 'tab_basic_info')
+        // Hide sub tasks and worklog histories tabs
+        this.$nextTick(() => {
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Worklog Histories" Tab
+        })
         this.$data.PMTTaskDialogVisible = true
       },
       createSubTask (iObj) {
@@ -466,6 +471,11 @@ Remark:
         this.$data.disabledState.disabledTypeTag = true
         this.$data.disabledState.disabledReferenceTask = true
         this.$data.disabledState.disabledSprint = true
+        // Hide sub tasks and worklog histories tabs
+        this.$nextTick(() => {
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Worklog Histories" Tab
+        })
         this.$data.PMTTaskDialogVisible = true
       },
       createRefTask (iObj) {
@@ -476,6 +486,11 @@ Remark:
         this.$data.PMTTaskReferenceTaskTitle = iObj.taskReferenceTaskTitle
         // Set new Task default state
         this.$data.disabledState.disabledReferenceTask = true
+        // Hide sub tasks and worklog histories tabs
+        this.$nextTick(() => {
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Worklog Histories" Tab
+        })
         this.$data.PMTTaskDialogVisible = true
       },
       async editTask (iTaskId) {
@@ -492,6 +507,12 @@ Remark:
             this.$data.PMTTask = res.data.data
           })
         }
+        console.log('Init Dialog: ', this.$refs.PMTTaskDialogTabs)
+        // show all tabs
+        this.$nextTick(() => {
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = '' // Hide "Sub Tasks List" Tab
+          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = '' // Hide "Sub Tasks List" Tab
+        })
         this.$data.PMTTaskDialogVisible = true
       },
       closeTask (done) {
