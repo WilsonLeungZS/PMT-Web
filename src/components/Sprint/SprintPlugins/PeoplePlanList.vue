@@ -19,7 +19,7 @@
           <el-table-column align="right" width="50">
             <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" content="Assigen to Sprint" placement="top">
-                <el-button type="primary" icon="el-icon-d-arrow-right"></el-button>
+                <el-button @click="assignUserToSprint(scope.row)" type="primary" icon="el-icon-d-arrow-right"></el-button>
               </el-tooltip>
             </template>
           </el-table-column>
@@ -40,7 +40,8 @@ export default {
     return {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
-      userPlanList: []
+      userPlanList: [],
+      sprintObj: null
     }
   },
   props: {
@@ -52,8 +53,10 @@ export default {
         var sprintObj = val
         if (sprintObj != null && sprintObj != '') {
           this.getUserListBySkills(sprintObj)
+          this.sprintObj = sprintObj
         } else {
           this.userPlanList = []
+          this.sprintObj = null
         }
       },
       immediate: true,
@@ -79,6 +82,23 @@ export default {
           }
           this.$data.userPlanList = userList
         }
+      }
+    },
+    async assignUserToSprint (iUser) {
+      var reqUserId = iUser.userId
+      var reqUserWorkingHrs = Number(iUser.userWorkingHrs)
+      var reqCapacity = iUser.userCapacity
+      var sprintObj = this.$data.sprintObj
+      if (sprintObj != null) {
+        var reqSprintId = sprintObj.sprintId
+        var reqSprintWorkingDays = Number(sprintObj.sprintWorkingDays)
+        var reqMaxCapacity = reqUserWorkingHrs * reqSprintWorkingDays
+        const res = await http.post('/sprints/assignUserToSprint', {
+          reqSprintId: reqSprintId,
+          reqUserId: reqUserId,
+          reqCapacity: reqCapacity,
+          reqMaxCapacity: reqMaxCapacity
+        })
       }
     }
   },
