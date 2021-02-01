@@ -29,7 +29,7 @@
               <el-table-column align="right" width="50" >
                 <template slot-scope="scope">
                   <el-tooltip class="item" effect="dark" content="Create PMT Task" placement="top">
-                    <el-button @click="createRefTask(scope.row.taskName, scope.row.taskTitle)" type="primary" icon="el-icon-document-add" class="task-plan-list-table-btn"></el-button>
+                    <el-button @click="createRefTask(scope.row)" type="primary" icon="el-icon-document-add" class="task-plan-list-table-btn"></el-button>
                   </el-tooltip>
                 </template>
               </el-table-column>
@@ -107,8 +107,8 @@ export default {
     createTask () {
       this.$emit('createTask')
     },
-    createRefTask (iRefTaskName, iRefTaskTitle) {
-      this.$emit('createRefTask', iRefTaskName, iRefTaskTitle)
+    createRefTask (iTaskObj) {
+      this.$emit('createRefTask', iTaskObj)
     },
     editTask (iTaskId, iTaskCategory) {
       this.$emit('editTask', iTaskId, iTaskCategory)

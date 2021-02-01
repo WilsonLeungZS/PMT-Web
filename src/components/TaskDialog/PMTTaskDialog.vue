@@ -64,18 +64,12 @@ Remark:
           </el-row>
           <el-row>
             <el-col :span="24" :lg="11">
-              <el-form-item v-show="showState.showSprint" label="Sprint">
-                <el-select :disabled="disabledState.disabledSprint" v-model="PMTTask.taskSprintId" style="width: 100%" clearable>
-                  <el-option label=" " value=""></el-option>
-                  <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
-                    <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
-                    <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
-                  </el-option>
-                </el-select>
+              <el-form-item v-show="showState.showCustomer" label="Customer">
+                <el-input :disabled="disabledState.disabledCustomer" v-model="PMTTask.taskCustomer" style="width: 100%" ></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24" :lg="{span: 12, offset: 1}">
-              <el-form-item v-show="showState.showRequiredSkills" label="Required Skills">
+              <el-form-item v-show="showState.showRequiredSkills" label="Required Skills" prop="taskRequiredSkills">
                 <el-select :disabled="disabledState.disabledRequiredSkills" v-model="PMTTask.taskRequiredSkills" style="width: 100%" multiple clearable>
                   <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
                     <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
@@ -106,6 +100,15 @@ Remark:
               </el-form-item>
             </el-col>
           </el-row>
+          <el-form-item v-show="showState.showSprint" label="Sprint">
+            <el-select :disabled="disabledState.disabledSprint" v-model="PMTTask.taskSprintId" style="width: 100%" clearable>
+              <el-option label=" " value=""></el-option>
+              <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
+                <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
+                <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item v-show="showState.showTitle" label="Title" prop="taskTitle">
             <el-input :disabled="disabledState.disabledTitle" v-model="PMTTask.taskTitle" class="highlight-text-format" style="width: 100%" ></el-input>
           </el-form-item>
@@ -165,7 +168,7 @@ Remark:
             </el-col>
             <el-col :span="24" :lg="{span: 12, offset: 1}">
               <el-form-item v-show="showState.showAssignee" label="Assign To">
-                <el-select :disabled="disabledState.disabledAssignee" v-model="PMTTask.taskAssignee" filterable style="width: 100%">
+                <el-select :disabled="disabledState.disabledAssignee" v-model="PMTTask.taskAssigneeId" filterable style="width: 100%">
                   <el-option label=" " value=""></el-option>
                   <el-option v-for="(user, index) in usersList" :key="index" :label="user.userFullName" :value="user.userId">
                     <span style="float: left; margin-right:20px">{{ user.userFullName }}</span>
@@ -256,6 +259,7 @@ Remark:
         btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
         btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
         headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
+        userName: this.$store.getters.getUserEid,
         dialogWidth: '70%',
         activeTab: 'tab_basic_info',
         PMTTaskDialogTitle: 'PMT Task Details',
@@ -265,7 +269,8 @@ Remark:
         usersList: [],
         sprintsList: [],
         PMTTaskFormRules: {
-          taskTitle: [{required: true, message: 'Not allow empty', trigger: 'blur'}]
+          taskTitle: [{required: true, message: 'Not allow empty', trigger: 'blur'}],
+          taskRequiredSkills: [{required: true, message: 'Not allow empty', trigger: 'change'}]
         },
         DeliverableOptions: [
           {value: 'Clarify Requirement', label: 'Clarify Requirement'},
@@ -283,6 +288,7 @@ Remark:
           disabledType: false,
           disabledTypeTag: false,
           disabledDeliverableTag: false,
+          disabledCustomer: false,
           disabledSprint: false,
           disabledRequiredSkills: false,
           disabledReferenceTask: false,
@@ -302,6 +308,7 @@ Remark:
           showType: true,
           showTypeTag: true,
           showDeliverableTag: true,
+          showCustomer: true,
           showSprint: true,
           showRequiredSkills: true,
           showReferenceTask: true,
@@ -318,12 +325,14 @@ Remark:
           showEstimation: true,
         },
         PMTTask: {
-          taskId: 0,
+          taskId: null,
           taskParentName: '',
           taskName: '',
+          taskCategory: '',
           taskType: '',
           taskTypeTag: '',
           taskDeliverableTag: [],
+          taskCustomer: '',
           taskSprintId: null,
           taskRequiredSkills: [], 
           taskReferenceTask: '',
@@ -334,8 +343,8 @@ Remark:
           taskIssueDate: '',
           taskTargetComplete: '',
           taskActualComplete: '',
-          taskRespLeader: '',
-          taskAssignee: '',
+          taskRespLeaderId: '',
+          taskAssigneeId: null,
           taskEffort: 0,
           taskEstimation: 0,
         },
@@ -406,12 +415,14 @@ Remark:
         this.$data.activeTab = iActiveTab
         this.$data.PMTTaskSubtasksList = []
         this.$data.PMTTask = {
-          taskId: 0,
+          taskId: null,
           taskParentName: '',
           taskName: '',
+          taskCategory: '',
           taskType: '',
           taskTypeTag: '',
           taskDeliverableTag: [],
+          taskCustomer: '',
           taskSprintId: null,
           taskRequiredSkills: [],
           taskReferenceTask: '',
@@ -419,11 +430,11 @@ Remark:
           taskDescription: '',
           taskCreator: '',
           taskStatus: 'Drafting',
-          taskIssueDate: new Date(),
+          taskIssueDate: this.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'),
           taskTargetComplete: '',
           taskActualComplete: '',
-          taskRespLeader: '',
-          taskAssignee: '',
+          taskRespLeaderId: '',
+          taskAssigneeId: null,
           taskEffort: 0,
           taskEstimation: 0,
         }
@@ -451,26 +462,41 @@ Remark:
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Worklog Histories" Tab
         })
+        // Set new Task default value
+        this.$data.PMTTask.taskTypeTag = 'One-Off Task'
+        this.$data.PMTTask.taskCategory = 'PMT-TASK'
+        // Set new Task default state(disabled)
+        this.$data.disabledState.disabledTypeTag = true
+        // Set new Task default state(show)
+        this.$data.showState.showParent = false
+        this.$data.showState.showParentTitle = false
+        this.$data.showState.showDeliverableTag = false
+        this.$data.showState.showReferenceTask = false
+        this.$data.showState.showReferenceTaskTitle = false
+        this.$data.showState.showSprint = false
+        this.$data.showState.showCreator = false
+        this.$data.showState.showRespLeader = false
+        this.$data.showState.showAssignee = false
+
         this.$data.PMTTaskDialogVisible = true
       },
-      createSubTask (iObj) {
-        console.log('Create PMT Sub task')
+      createRefTask (iObj) {
+        console.log('Create PMT Ref task ', iObj)
         this.initTaskForm('New PMT Task', 'tab_basic_info')
         // Set new Task default value
-        this.$data.PMTTask.taskParentName = iObj.taskParentTaskName
-        this.$data.PMTTaskParentTaskTitle = iObj.taskParentTaskTitle
-        this.$data.PMTTask.taskType = iObj.taskType
-        this.$data.PMTTask.taskTypeTag = iObj.taskTypeTag
-        this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
+        this.$data.PMTTask.taskTypeTag = 'One-Off Task'
+        this.$data.PMTTask.taskCategory = 'PMT-TASK-REF'
         this.$data.PMTTask.taskSprintId = iObj.taskSprintId
+        this.$data.PMTTask.taskCustomer = iObj.taskCustomer
         this.$data.PMTTask.taskRequiredSkills = iObj.taskRequiredSkills
-        this.$data.PMTTask.taskRespLeader = iObj.taskLeader 
+        this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
+        this.$data.PMTTaskReferenceTaskTitle = iObj.taskReferenceTaskTitle
+        this.$data.PMTTask.taskRespLeaderId = iObj.taskRespLeaderId
         // Set new Task default state
-        this.$data.disabledState.disabledParent = true
-        this.$data.disabledState.disabledType = true
-        this.$data.disabledState.disabledTypeTag = true
         this.$data.disabledState.disabledReferenceTask = true
-        this.$data.disabledState.disabledSprint = true
+        // Set new Task default state(show)
+        this.$data.showState.showParent = false
+        this.$data.showState.showParentTitle = false
         // Hide sub tasks and worklog histories tabs
         this.$nextTick(() => {
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
@@ -478,14 +504,28 @@ Remark:
         })
         this.$data.PMTTaskDialogVisible = true
       },
-      createRefTask (iObj) {
-        console.log('Create PMT Ref task')
+      createSubTask (iObj) {
+        console.log('Create PMT Sub task')
         this.initTaskForm('New PMT Task', 'tab_basic_info')
         // Set new Task default value
+        this.$data.PMTTask.taskCategory = 'PMT-TASK-SUB'
+        this.$data.PMTTask.taskParentName = iObj.taskParentTaskName
+        this.$data.PMTTaskParentTaskTitle = iObj.taskParentTaskTitle
+        this.$data.PMTTask.taskType = iObj.taskType
+        this.$data.PMTTask.taskTypeTag = iObj.taskTypeTag
+        this.$data.PMTTask.taskCustomer = iObj.taskCustomer
         this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
-        this.$data.PMTTaskReferenceTaskTitle = iObj.taskReferenceTaskTitle
+        this.$data.PMTTask.taskSprintId = iObj.taskSprintId
+        this.$data.PMTTask.taskRequiredSkills = iObj.taskRequiredSkills
+        this.$data.PMTTask.taskRespLeaderId = iObj.taskRespLeaderId
+        this.setReferenceTaskTitleByName(iObj.taskReferenceTask)
         // Set new Task default state
+        this.$data.disabledState.disabledParent = true
+        this.$data.disabledState.disabledType = true
+        this.$data.disabledState.disabledTypeTag = true
+        this.$data.disabledState.disabledCustomer = true
         this.$data.disabledState.disabledReferenceTask = true
+        this.$data.disabledState.disabledSprint = true
         // Hide sub tasks and worklog histories tabs
         this.$nextTick(() => {
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
@@ -507,12 +547,13 @@ Remark:
             this.$data.PMTTask = res.data.data
           })
         }
-        console.log('Init Dialog: ', this.$refs.PMTTaskDialogTabs)
         // show all tabs
-        this.$nextTick(() => {
-          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = '' // Hide "Sub Tasks List" Tab
-          this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = '' // Hide "Sub Tasks List" Tab
-        })
+        if (this.$refs.PMTTaskDialogTabs != undefined) {
+          this.$nextTick(() => {
+            this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = '' // Show "Sub Tasks List" Tab
+            this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = '' // Show "Worklog Histories" Tab
+          })
+        }
         this.$data.PMTTaskDialogVisible = true
       },
       closeTask (done) {
@@ -522,13 +563,47 @@ Remark:
         this.$emit('closeTask', '2')
         done()
       },
-      saveTask () {
+      async saveTask () {
         console.log('Save PMT task')
         this.$data.disabledSaveBtn = true
-      },
-      // Rule Contrl Method
-      RuleControl (iRule) {
-        console.log(iRule)
+        var reqTask = this.$data.PMTTask
+        if (reqTask.taskRequiredSkills.length > 0) {
+          for (var i=0; i<reqTask.taskRequiredSkills.length; i++) {
+            reqTask.taskRequiredSkills[i] = '#' + reqTask.taskRequiredSkills[i] + '#'
+          }
+        }
+        const res = await http.post('/tasks/updateTask', {
+          reqTaskId: reqTask.taskId,
+          reqTaskParentTaskName: reqTask.taskParentName,
+          reqTaskName: reqTask.taskName,
+          reqTaskCategory: reqTask.taskCategory,
+          reqTaskType: reqTask.taskType,
+          reqTaskTitle: reqTask.taskTitle,
+          reqTaskDescription: reqTask.taskDescription,
+          reqTaskReferenceTask: reqTask.taskReferenceTask,
+          reqTaskTypeTag: reqTask.taskTypeTag,
+          reqTaskDeliverableTag: reqTask.taskDeliverableTag.toString(),
+          reqTaskCreator: 'PMT:' + this.$data.userName,
+          reqTaskRequiredSkills: reqTask.taskRequiredSkills.toString(),
+          reqTaskCustomer: reqTask.taskCustomer,
+          reqTaskStatus: reqTask.taskStatus,
+          reqTaskEstimation: reqTask.taskEstimation,
+          reqTaskIssueDate: reqTask.taskIssueDate,
+          reqTaskTargetComplete: reqTask.taskTargetComplete,
+          reqTaskActualComplete: reqTask.taskActualComplete,
+          reqTaskRespLeaderId: reqTask.taskRespLeaderId,
+          reqTaskAssigneeId: reqTask.taskAssigneeId,
+          reqTaskSprintId: reqTask.taskSprintId
+        })
+        if (res.data != null && res.data.status == 0) {
+          this.$message({message: 'Task created/updated successfully!', type: 'success'})
+          var rtnTask = res.data.data
+          this.editTask(rtnTask.Id)
+        } else {
+          this.$message({message: 'Task created/updated failed!', type: 'error'})
+        }
+        this.$emit('refreshSprint')
+        this.$data.disabledSaveBtn = false
       },
       // Data List Method
       async getAllSkillsList () {
@@ -635,7 +710,27 @@ Remark:
             this.$data.PMTTaskWorklogHistories = res.data.data
           }
         }
-      }
+      },
+      formatDate (date, fmt) { 
+        var o = { 
+          "M+" : date.getMonth()+1,                 
+          "d+" : date.getDate(),                     
+          "h+" : date.getHours(),                    
+          "m+" : date.getMinutes(),                 
+          "s+" : date.getSeconds(),                  
+          "q+" : Math.floor((date.getMonth()+3)/3),
+          "S"  : date.getMilliseconds()            
+        }; 
+        if(/(y+)/.test(fmt)) {
+              fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+        }
+        for(var k in o) {
+          if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt; 
+      }       
     },
   }
 </script>

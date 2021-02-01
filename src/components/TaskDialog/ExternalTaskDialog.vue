@@ -15,6 +15,18 @@ Remark:
                 <span style="width: 100%; color: black; font-weight: bold; font-size: 17px" >{{externalTask.taskName}}</span>
               </el-form-item>
             </el-col>
+            <el-col :span="24" :lg="{span: 12, offset: 1}">
+              <el-form-item label="Required Skills">
+                <el-select disabled v-model="externalTask.taskRequiredSkills" style="width: 100%" multiple clearable>
+                  <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
+                    <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
+                      <span style="float: left;">{{ skill.skillName }}</span>
+                      <span style="float: left; margin-left:10px; color: #8492a6; font-size: 12px">{{ skill.skillDesc }}</span>
+                    </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
+            </el-col>
           </el-row>
           <el-row>
             <el-col :span="24" :lg="11">
@@ -27,7 +39,7 @@ Remark:
                 </el-select>
               </el-form-item>
             </el-col>
-              <el-col :span="24" :lg="{span: 12, offset: 1}">
+            <el-col :span="24" :lg="{span: 12, offset: 1}">
               <el-form-item label="Issue Date">
                 <el-date-picker disabled v-model="externalTask.taskIssueDate" type="datetime" placeholder="Select Date..." value-format="yyyy-MM-dd HH:mm:ss" style="width: 100%"></el-date-picker>
               </el-form-item>
@@ -92,7 +104,9 @@ Remark:
           taskIssueDate: '',
           taskEffort: 0,
           taskEstimation: 0,
-        }
+          taskRequiredSkills: []
+        },
+        skillsList: []
       }
     },
     props: {
@@ -144,12 +158,22 @@ Remark:
           taskIssueDate: '',
           taskEffort: 0,
           taskEstimation: 0,
+          taskRequiredSkills: []
         }
+        this.$data.skillsList = []
+        this.getAllSkillsList()
         this.$data.disabledSaveBtn = false
       },
-      editTask (iTaskId) {
+      async editTask (iTaskId) {
+        console.log('Edit External task - ', iTaskId)
         this.initTaskForm('External Task Details', 'tab_basic_info')
         // Get task information by id
+        const res = await http.get('/tasks/getTaskById', {
+          reqTaskId: iTaskId
+        })
+        if (res.data != null && res.data.status == 0) {
+          this.$data.externalTask = res.data.data
+        }
         this.$data.externalTaskDialogVisible = true
       },
       closeTask (done) {
@@ -160,7 +184,51 @@ Remark:
       },
       saveTask () {
         this.$data.externalTaskDialogVisible = false
-      }
+      },
+      // Data List Method
+      async getAllSkillsList () {
+        this.$data.skillsList = []
+        const res = await http.get('/users/getAllSkillsList')
+        if (res.data != null && res.data.status === 0) {
+          //this.$data.skillsList = res.data.data
+          var skillsList = res.data.data
+          var skillsListGroup = []
+          if (skillsList != null && skillsList.length > 0) {
+            for (var i=0; i<skillsList.length; i++) {
+              var group = skillsList[i].skillGroup.substr(1)
+              var index = this.getIndexOfValueInArr(skillsListGroup, 'Label', group)
+              if (index == -1) {
+                skillsListGroup.push({
+                  Label: group,
+                  Options: [skillsList[i]]
+                })
+              } else {
+                skillsListGroup[index].Options.push(skillsList[i])
+              }
+            }
+            console.log('Skills Group List: ', skillsListGroup)
+          }
+          this.$data.skillsList = skillsListGroup
+        } else {
+          this.$data.skillsList = []
+        }
+      },
+      getIndexOfValueInArr(iArray, iKey, iValue) {
+        for(var i=0; i<iArray.length;i++) {
+          var item = iArray[i];
+          if(iKey != null){
+            if(item[iKey] == iValue){
+              return i;
+            }
+          } 
+          if(iKey == null){
+            if(item == iValue){
+              return i;
+            }
+          }
+        }
+        return -1;
+      },
     }
   }
 </script>

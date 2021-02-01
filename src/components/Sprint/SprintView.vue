@@ -107,9 +107,9 @@
                     <b>No Task</b>
                   </el-col>
                 </el-row>
-                <el-card v-for="(sprintTask, index) in sprintTasksList" :key="index" class="box-card" style="margin-bottom: 2px;">
-                  <el-collapse>
-                    <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}">
+                <el-card @click.native="getSprintSubtasks(index)" v-for="(sprintTask, index) in sprintTasksList" :key="index" class="box-card" style="margin-bottom: 2px;">
+                  <el-collapse v-model="tabActiveArray">
+                    <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}" :name="index">
                       <!-- Sprint Task Header -->
                       <template slot="title">
                         <el-row class="sprint-card-content-task" align="middle">
@@ -132,7 +132,7 @@
                               <span>{{sprintTask.taskEstimation}}</span>
                               <el-divider direction="vertical"></el-divider>
                               <span v-if="!planListHide">{{sprintTask.taskAssignee}}</span>
-                              <el-select v-if="planListHide" v-model="sprintTask.taskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 75%;" filterable clearable>
+                              <el-select v-if="planListHide" v-model="sprintTask.taskAssigneeId" @change="changeTaskAssignee(sprintTask)" placeholder="Select Assignee..." size="mini" style="width: 75%;" filterable clearable>
                                 <el-option label="" value=""></el-option>
                                 <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
                                   <span style="float: left; margin-right:20px">{{ assignee.userFullName }}</span>
@@ -142,7 +142,7 @@
                             </span>
                           </el-col>
                           <el-col :span="4" :lg="2" class="sprint-card-content-task-btn" style="justify-content: flex-end;">
-                            <el-button @click="createSubTask(sprintTask)" size="mini" type="success" icon="el-icon-plus"></el-button>
+                            <el-button @click.stop="createSubTask(sprintTask)" size="mini" type="success" icon="el-icon-plus"></el-button>
                             <el-button size="mini" type="danger" icon="el-icon-delete" style="margin-left: 3px;"></el-button>
                           </el-col>
                         </el-row>
@@ -151,27 +151,27 @@
                       <div class="sprint-card-content-sub-task">
                         <el-divider content-position="left">Sub-Tasks List</el-divider>
                         <el-table :data="sprintTask.sprintTaskSubtasksList" max-height="300px" size="mini" style="width: 100%;">
-                          <el-table-column v-if="false" prop="sprintSubtaskId" label="Id"></el-table-column>
-                          <el-table-column width="150px" align="left" prop="sprintSubtaskName" label="Name" show-overflow-tooltip key="1">
+                          <el-table-column v-if="false" prop="subtaskId" label="Id"></el-table-column>
+                          <el-table-column width="150px" align="left" prop="subtaskName" label="Name" show-overflow-tooltip key="1">
                             <template slot-scope="scope">
-                              <el-button @click.stop="editTask(scope.row.sprintSubtaskId, scope.row.sprintSubtaskCategory)" type="text">{{scope.row.sprintSubtaskName}}</el-button>
+                              <el-button @click.stop="editTask(scope.row.subtaskId, scope.row.subtaskCategory)" type="text">{{scope.row.subtaskName}}</el-button>
                             </template>
                           </el-table-column>
-                          <el-table-column min-width="200px" align="left" prop="sprintSubtaskTitle" label="Title" show-overflow-tooltip key="2"></el-table-column>
-                          <el-table-column width="80px" align="center" prop="sprintSubtaskStatus" label="Status" show-overflow-tooltip key="3">
+                          <el-table-column min-width="200px" align="left" prop="subtaskTitle" label="Title" show-overflow-tooltip key="2"></el-table-column>
+                          <el-table-column width="80px" align="center" prop="subtaskStatus" label="Status" show-overflow-tooltip key="3">
                             <template slot-scope="scope">
-                              <el-tag effect="dark" type="warning" size="mini" v-if="scope.row.sprintSubtaskStatus == 'Drafting'">{{scope.row.sprintSubtaskStatus}}</el-tag>
-                              <el-tag effect="dark" type="primary" size="mini" v-if="scope.row.sprintSubtaskStatus == 'Planning'">{{scope.row.sprintSubtaskStatus}}</el-tag>
-                              <el-tag effect="dark" type="success" size="mini" v-if="scope.row.sprintSubtaskStatus == 'Running'" >{{scope.row.sprintSubtaskStatus}}</el-tag>
-                              <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.sprintSubtaskStatus == 'Done'"    >{{scope.row.sprintSubtaskStatus}}</el-tag>
+                              <el-tag effect="dark" type="warning" size="mini" v-if="scope.row.subtaskStatus == 'Drafting'">{{scope.row.subtaskStatus}}</el-tag>
+                              <el-tag effect="dark" type="primary" size="mini" v-if="scope.row.subtaskStatus == 'Planning'">{{scope.row.subtaskStatus}}</el-tag>
+                              <el-tag effect="dark" type="success" size="mini" v-if="scope.row.subtaskStatus == 'Running'" >{{scope.row.subtaskStatus}}</el-tag>
+                              <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
                             </template>
                           </el-table-column>
-                          <el-table-column width="60px" align="center" prop="sprintSubtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
-                          <el-table-column width="60px"  align="center" prop="sprintSubtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
-                          <el-table-column v-if="!planListHide" width="80px" align="center" prop="sprintSubtaskAssignee" label="Assignee" show-overflow-tooltip key="6"></el-table-column>
-                          <el-table-column v-if="planListHide" width="180px" align="center" prop="sprintSubtaskAssignee" label="Assignee" show-overflow-tooltip key="6">
+                          <el-table-column width="60px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
+                          <el-table-column width="60px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
+                          <el-table-column v-if="!planListHide" width="80px" align="center" prop="subtaskAssignee" label="Assignee" show-overflow-tooltip key="6"></el-table-column>
+                          <el-table-column v-if="planListHide" width="180px" align="center" prop="subtaskAssigneeId" label="Assignee" show-overflow-tooltip key="6">
                             <template slot-scope="scope">
-                              <el-select v-if="planListHide" v-model="scope.row.sprintSubtaskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 100%;" filterable clearable>
+                              <el-select v-if="planListHide" v-model="scope.row.subtaskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 100%;" filterable clearable>
                                 <el-option label="" value=""></el-option>
                                 <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
                                   <span style="float: left; margin-right:20px">{{ assignee.userFullName }}</span>
@@ -226,7 +226,7 @@
         </el-row>
       </el-drawer>
     </el-container>
-    <pmt-task-dialog :action="pmtTaskDialogAction"></pmt-task-dialog>
+    <pmt-task-dialog @refreshSprint="refreshSprint" :action="pmtTaskDialogAction"></pmt-task-dialog>
     <external-task-dialog :action="externalTaskDialogAction"></external-task-dialog>
   </div>
 </template>
@@ -254,6 +254,7 @@ export default {
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
       tabPosition: 'left',
       tabActive: 'tab_hide',
+      tabActiveArray: [],
       // Value to validate if the plan list hide and item length
       planListHide: false,
       planListLength: 11,
@@ -265,6 +266,7 @@ export default {
       sprintEndTime: '',
       sprintWorkingDays: 0,
       sprintLeader: '',
+      sprintLeaderId: null,
       sprintStatus: 'Active',
       sprintBaseline: '',
       sprintEffort: 0,
@@ -324,6 +326,7 @@ export default {
       this.$data.sprintEndTime = ''
       this.$data.sprintWorkingDays = 0
       this.$data.sprintLeader = ''
+      this.$data.sprintLeaderId = null
       this.$data.sprintStatus = 'Active'
       this.$data.sprintBaseline = ''
       this.$data.sprintBaseCapacity = 0
@@ -360,6 +363,7 @@ export default {
         this.$data.sprintEndTime = sprint.sprintEndTime
         this.$data.sprintWorkingDays = sprint.sprintWorkingDays
         this.$data.sprintLeader = sprint.sprintLeader
+        this.$data.sprintLeaderId = sprint.sprintLeaderId
         this.$data.sprintStatus = sprint.sprintStatus
         this.$data.sprintBaseline = sprint.sprintBaseline
         this.$data.sprintBaseCapacity = sprint.sprintBaseCapacity
@@ -402,6 +406,23 @@ export default {
         this.$data.plannedPeopleList = sprintUsersData.sprintUsers
       }
     },
+    async getSprintSubtasks (index) {
+      var tabActiveArray = this.$data.tabActiveArray
+      this.$data.sprintTasksList[index].sprintTaskSubtasksList = []
+      if (tabActiveArray.indexOf(index) > -1) {
+        var task = this.$data.sprintTasksList[index]
+        var res = await http.get('/tasks/getSubtasksListByName', {
+          reqTaskName: task.taskName
+        })
+        if (res != null && res.data.status == 0) {
+          this.$data.sprintTasksList[index].sprintTaskSubtasksList = res.data.data
+          this.$forceUpdate()
+        }
+      }
+    },
+    refreshSprint () {
+      this.getSprintInfo()
+    },
     // Task Dialog Method
     createTask () {
       console.log('Create PMT Task ')
@@ -410,50 +431,65 @@ export default {
         datetime: new Date()
       }
     },
-    createRefTask (iRefTaskName, iRefTaskTitle) {
-      console.log('Create Reference Task ', iRefTaskName, iRefTaskTitle)
+    createRefTask (iTaskObj) {
+      console.log('Create Reference Task ', iTaskObj)
       this.$data.pmtTaskDialogAction = {
         action: 'CREATE-REF',
-        taskReferenceTask: iRefTaskName,
-        taskReferenceTaskTitle: iRefTaskTitle,
+        taskReferenceTask: iTaskObj.taskName,
+        taskReferenceTaskTitle: iTaskObj.taskTitle,
+        taskCustomer: iTaskObj.taskCustomer,
+        taskRequiredSkills: iTaskObj.taskRequiredSkills,
         taskSprintId: this.$data.sprintSelect,
-        taskLeader: this.$data.sprintLeader,
+        taskRespLeader: this.$data.sprintLeader,
+        taskRespLeaderId: this.$data.sprintLeaderId,
         datetime: new Date()
       }
     },
     createSubTask (iTask) {
+      console.log('Create sub task ', iTask)
       this.$data.pmtTaskDialogAction = {
         action: 'CREATE-SUB',
-        taskParentTaskName: iTask.sprintTaskName,
-        taskParentTaskTitle: iTask.sprintTaskTitle,
-        //taskType: iTask.sprintTaskType
-        //taskTypeTag: iTask.sprintTaskTypeTag
-        //taskReferenceTask: iTask.sprintTaskReferenceTask
-        taskType: 'Development',
-        taskTypeTag: 'One-Off Task',
-        taskReferenceTask: 'CGM210001',
+        taskParentTaskName: iTask.taskName,
+        taskParentTaskTitle: iTask.taskTitle,
+        taskType: iTask.taskType,
+        taskTypeTag: iTask.taskTypeTag,
+        taskCustomer: iTask.taskCustomer,
+        taskRequiredSkills: iTask.taskRequiredSkills,
+        taskReferenceTask: iTask.taskReferenceTask,
         taskSprintId: this.$data.sprintSelect,
-        taskLeader: this.$data.sprintLeader,
+        taskRespLeader: this.$data.sprintLeader,
+        taskRespLeaderId: this.$data.sprintLeaderId,
         datetime: new Date()
       }
     },
     editTask (iTaskId, iTaskCategory) {
       console.log('Edit Task ', iTaskId, iTaskCategory)
-      if (iTaskCategory == 'PMT') {
+      if (iTaskCategory.startsWith('PMT')) {
         this.$data.pmtTaskDialogAction = {
           action: 'EDIT',
           taskId: iTaskId,
           datetime: new Date()
         }
       }
-      if (iTaskCategory == 'EXTERNAL') {
+      if (iTaskCategory.startsWith('EXTERNAL')) {
         this.$data.externalTaskDialogAction = {
           action: 'EDIT',
           taskId: iTaskId,
           datetime: new Date()
         }
       }
-      
+    },
+    async changeTaskAssignee (iTask) {
+      console.log('Change task assignee ', iTask)
+      var res = await http.post('/tasks/updateTaskAssignee', {
+        reqTaskId: iTask.taskId,
+        reqTaskAssigneeId: iTask.taskAssigneeId
+      })
+      if (res != null && res.data.status == 0) {
+        this.$message({message: 'Task assignee updated successfully!', type: 'success'})
+      } else {
+        this.$message({message: 'Task assignee updated fail!', type: 'error'})
+      }
     },
     // Sprint Drawer Method
     showPlannedPeopleRes () {
