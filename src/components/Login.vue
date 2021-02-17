@@ -55,7 +55,7 @@ export default {
         localStorage.setItem('UserEid', userName)
         this.$store.dispatch('setNewUserEid', userName)
         this.$store.dispatch('setShowMainBar')
-        this.$router.replace({path: '/Management' + '/PrjManagement'})
+        this.$router.replace({path: '/Timesheet' + '/MyTimesheet'})
       } else {
         this.$data.errorMsg = 'Cannot find EID [' + userId + ']!'
         this.$data.showErrorMsg = true

@@ -6,9 +6,12 @@
       </div>
       <div>
         <el-row :gutter="10">
-          <el-col :span="18">
-            <el-input v-model="taskKeyword" placeholder="Search Task..." size="small">
-              <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-col :span="6">
+            <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchCustomer" placeholder="Search Customer..." size="small" clearable></el-input>
+          </el-col>
+          <el-col :span="12">
+            <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchKeyword" placeholder="Search Task..." size="small" clearable>
+              <el-button @click="searchTask" slot="append" icon="el-icon-search"></el-button>
             </el-input>
           </el-col>
           <el-col :span="6">
@@ -17,13 +20,15 @@
         </el-row>
         <el-row class="task-plan-list-table">
           <el-col :span="24">
-            <el-table :data="taskPlanList" width="100%" size="mini">
+            <el-table v-loading="taskPlanListLoading" :data="taskPlanList" width="100%" size="mini">
+              <el-table-column prop="taskTypeTag" label="TypeTag" v-if="false"></el-table-column>
               <el-table-column prop="taskName" label="Name" align="left" width="150">
                 <template slot-scope="scope">
                   <el-button @click="editTask(scope.row.taskId, scope.row.taskCategory)" type="text">{{scope.row.taskName}}</el-button>
                 </template>
               </el-table-column>
               <el-table-column prop="taskTitle" label="Title" align="left" min-width="200" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="taskCustomer" label="Customer" align="center" min-width="70" show-overflow-tooltip></el-table-column>
               <el-table-column prop="taskEffort" label="Effort" align="center" width="55"></el-table-column>
               <el-table-column prop="taskEstimation" label="Est" align="center" width="55"></el-table-column>
               <el-table-column align="right" width="50" >
@@ -54,10 +59,15 @@ export default {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
       taskPlanList: [],
-      taskKeyword: '',
-      taskPlanListSize: 50,
+      taskSearchCustomer: '',
+      taskSearchKeyword: '',
+      taskPlanListSize: 30,
       taskPlanListPage: 1,
-      taskPlanListTotal: 0
+      taskPlanListTotal: 0,
+      taskSprintObj: null,
+      taskReqPage: 1,
+      // Loading
+      taskPlanListLoading: false
     }
   },
   props: {
@@ -68,8 +78,10 @@ export default {
       handler (val, oldVal) {
         var sprintObj = val
         if (sprintObj != null && sprintObj != '') {
-          this.getTaskPlanListBySkills(sprintObj)
+          this.$data.taskSprintObj = sprintObj
+          this.getTaskPlanListBySkills(sprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer)
         } else {
+          this.$data.taskSprintObj = null
           this.taskPlanList = []
         }
       },
@@ -78,31 +90,41 @@ export default {
     }
   },
   methods: {
-    async getTaskPlanListBySkills (iSprintObj) {
+    async getTaskPlanListBySkills (iSprintObj, iKeyword, iCustomer) {
+      this.$data.taskPlanListLoading = true
       this.$data.taskPlanList = []
       this.$data.taskPlanListTotal = 0
       if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
         var skillsArray = iSprintObj.sprintRequiredSkills.toString()
         var resCount = await http.post('/tasks/getTasksListCountBySkill', {
-          reqSkillsArray: skillsArray
+          reqSkillsArray: skillsArray,
+          reqTaskKeyword: iKeyword,
+          reqTaskCustomer: iCustomer
         })
         if (resCount != null && resCount.data.status == 0) {
           this.$data.taskPlanListTotal = resCount.data.data
         }
         var resData = await http.post('/tasks/getTasksListBySkill', {
           reqSkillsArray: skillsArray,
-          reqPage: this.$data.taskPlanListPage,
+          reqTaskKeyword: iKeyword,
+          reqTaskCustomer: iCustomer,
+          reqPage: this.$data.taskReqPage,
           reqSize: this.$data.taskPlanListSize
         })
         if (resData != null && resData.data.status == 0) {
           var taskList = resData.data.data
           this.$data.taskPlanList = taskList
         }
+        this.$data.taskPlanListPage = this.$data.taskReqPage
       }
+      this.$data.taskPlanListLoading = false
     },
     handlePageChange(val) {
-      console.log(`Current Page: ${val}`)
-      this.$data.taskPlanListPage = val
+      this.$data.taskReqPage = val
+      this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer)
+    },
+    searchTask () {
+      this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer)
     },
     createTask () {
       this.$emit('createTask')
@@ -115,7 +137,6 @@ export default {
     }
   },
   created () {
-    this.$data.taskPlanListPage = 1
   }
 }
 </script>

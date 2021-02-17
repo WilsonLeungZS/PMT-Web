@@ -7,7 +7,7 @@
             <div class="main-grid-content" style="justify-content: flex-start; margin-left: 13px">
               <el-button @click="handleMenuCommand('sprint')" class="main-menu-btn btn-hover" icon="el-icon-data-line">Sprints</el-button>
               <el-button @click="handleMenuCommand('timesheet')" class="main-menu-btn btn-hover" icon="el-icon-date">Timesheet</el-button>
-              <el-button @click="handleMenuCommand('task')" class="main-menu-btn btn-hover" icon="el-icon-tickets">Tasks</el-button>
+              <el-button v-if="false" @click="handleMenuCommand('task')" class="main-menu-btn btn-hover" icon="el-icon-tickets">Tasks</el-button>
               <el-button @click="handleMenuCommand('management')" class="main-menu-btn btn-hover" icon="el-icon-setting">Management</el-button>
             </div>
           </el-col>

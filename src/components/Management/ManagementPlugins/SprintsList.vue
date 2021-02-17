@@ -47,7 +47,7 @@
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Baseline</span>
             </el-col>
-            <el-col :span="20" :lg="14" class="sm-table-expand-item">
+            <el-col :span="20" :lg="13" class="sm-table-expand-item">
               <el-input v-model="props.row.sprintBaseline" size="small" style="width: 100%"></el-input>
             </el-col>
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
@@ -59,8 +59,10 @@
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Base Capacity</span>
             </el-col>
-            <el-col :span="8" :lg="2" class="sm-table-expand-item">
-              <el-input v-model="props.row.sprintBaseCapacity" size="small" style="width: 100%"></el-input>
+            <el-col :span="8" :lg="3" class="sm-table-expand-item">
+              <el-input v-model="props.row.sprintBaseCapacity" size="small" style="width: 100%">
+                <template slot="append">hrs</template>
+              </el-input>
             </el-col>
           </el-row>
           <el-divider></el-divider>
@@ -68,7 +70,7 @@
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Required Skills</span>
             </el-col>
-            <el-col :span="20" :lg="14" class="sm-table-expand-item">
+            <el-col :span="20" :lg="13" class="sm-table-expand-item">
               <el-select v-model="props.row.sprintRequiredSkills" size="small" style="width: 100%" multiple>
                 <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
                   <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
@@ -81,7 +83,7 @@
             <el-col :span="8" :lg="2" class="sm-table-expand-item">
               <el-button type="danger" size="small" style="width:100%" >Obsolete</el-button>
             </el-col>
-            <el-col :span="8" :lg="2" class="sm-table-expand-item">
+            <el-col :span="8" :lg="3" class="sm-table-expand-item">
               <el-button @click="cancelSprint(props)" type="info" size="small" style="width:100%" >Cancel</el-button>
             </el-col>
             <el-col :span="8" :lg="4" class="sm-table-expand-item">
