@@ -93,12 +93,12 @@
         </template>
       </el-table-column>
       <el-table-column label="Id" prop="sprintId" v-if="false" :key="1"></el-table-column>
-      <el-table-column label="Name" prop="sprintName" align="left" width="250" :key="2"></el-table-column>
+      <el-table-column label="Name" prop="sprintName" align="left" min-width="100" show-overflow-tooltip :key="2"></el-table-column>
       <el-table-column label="Start Time" prop="sprintStartTime" align="center" width="120" :key="3"></el-table-column>
       <el-table-column label="End Time" prop="sprintEndTime" align="center" width="120" :key="4"></el-table-column>
       <el-table-column label="Working Days" prop="sprintWorkingDays" align="center" width="150" :key="5"></el-table-column>
       <el-table-column label="Base Capacity" prop="sprintBaseCapacity" align="center" width="150" :key="6"></el-table-column>
-      <el-table-column label="Baseline" prop="sprintBaseline" align="center" min-width="200" show-overflow-tooltip :key="7"></el-table-column>
+      <el-table-column label="Baseline" prop="sprintBaseline" align="left" min-width="200" show-overflow-tooltip :key="7"></el-table-column>
       <el-table-column label="Leader" prop="sprintLeader" align="center" width="150" sortable :key="8"></el-table-column>
       <el-table-column label="Status" prop="sprintStatus" align="center" width="100" :key="9">
         <template slot-scope="scope">
