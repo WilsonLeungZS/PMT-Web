@@ -39,8 +39,8 @@ Remark:
                 <el-form-item v-show="showState.showType" label="Task Type" prop="taskType">
                   <el-select :disabled="disabledState.disabledType" v-model="PMTTask.taskType" style="width: 100%">
                     <el-option label=" " value=""></el-option>
-                    <el-option label="Development" value="Development"></el-option>
-                    <el-option label="Maintenance" value="Maintenance"></el-option>
+                    <el-option label="Development(Change, Problem)" value="Development(Change, Problem)"></el-option>
+                    <el-option label="Maintenance(Incident, Service Request, ITSR)" value="Maintenance(Incident, Service Request, ITSR)"></el-option>
                     <el-option label="Others" value="Others"></el-option>
                   </el-select>
                 </el-form-item>

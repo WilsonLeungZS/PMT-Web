@@ -558,7 +558,6 @@ export default {
 }
 .el-table th {
   padding: 5px 0;
-  font-size: 15px;
 }
 /* google、safari */
 input::-webkit-outer-spin-button,
