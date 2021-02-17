@@ -952,9 +952,6 @@ export default {
 .sprint-card-header .el-divider--horizontal {
   margin: 10px 0px 15px 0px;
 }
-.sprint-card-header .el-divider--horizontal .el-divider__text{
-  font-size: 15px;
-}
 .sprint-card-header span {
   margin-right: 10px;
 }
