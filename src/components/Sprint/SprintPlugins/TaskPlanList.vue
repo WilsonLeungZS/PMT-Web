@@ -96,6 +96,7 @@ export default {
       this.$data.taskPlanListTotal = 0
       if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
         var skillsArray = iSprintObj.sprintRequiredSkills.toString()
+        console.log(skillsArray)
         var resCount = await http.post('/tasks/getTasksListCountBySkill', {
           reqSkillsArray: skillsArray,
           reqTaskKeyword: iKeyword,
