@@ -88,7 +88,7 @@ Remark:
                     <span v-if="sprintStatus == 'Running'? true: false"><i class="el-icon-table-lamp"></i> Status: <b style="color: #67C23A">{{sprintStatus}}</b></span>
                   </el-col>
                   <el-col :span="24" :lg="12" class="sprint-card-header-col">
-                    <el-scrollbar style="height: 100%">
+                    <el-scrollbar style="height: 100%; margin-right: 20px">
                       <span><i class="el-icon-collection"></i> Baseline: <b>{{sprintBaseline}}</b></span>
                     </el-scrollbar>
                   </el-col>
@@ -413,6 +413,7 @@ export default {
       sprintRequiredSkillsStr: '',
       sprintEffort: 0,
       sprintEstimation: 0,
+      sprintBuffer: 0,
       sprintActualCapacity: 0,
       sprintBaseCapacity: 0,
       sprintPeopleCount: 0,
@@ -448,11 +449,6 @@ export default {
     },
     sprintLengthlg: function () {
       return 24 - this.planListLengthlg
-    },
-    sprintBuffer: function () {
-      console.log('Actual Capacity -> ', this.sprintActualCapacity)
-      console.log('Actual Estimation -> ', this.sprintEstimation)
-      return this.sprintActualCapacity - this.sprintEstimation
     }
   },
   watch: {
@@ -469,6 +465,13 @@ export default {
         }
       },
       immediate: true
+    },
+    sprintEstimation: {
+      handler (newVal, oldVal) {
+        if(newVal) {
+          this.$data.sprintBuffer = this.$data.sprintActualCapacity - this.$data.sprintEstimation
+        }
+      },
     }
   },
   methods: {
@@ -497,6 +500,7 @@ export default {
     initSprintTask () {
       this.$data.sprintEffort = 0
       this.$data.sprintEstimation = 0
+      this.$data.sprintBuffer = 0
       this.$data.sprintTasksList = []
     },
     initSprintUser () {
@@ -585,8 +589,10 @@ export default {
       } else {
         this.$data.sprintEffort = 0
         this.$data.sprintEstimation = 0
+        this.$data.sprintBuffer = 0
         this.$data.sprintTasksList = []
       }
+      this.$forceUpdate()
       this.$data.sprintTasksListLoading = false
       console.log('Active array planned task -> ', this.$data.plannedTaskActiveArray)
       if (this.$data.plannedTaskActiveArray != null && this.$data.plannedTaskActiveArray.length > 0) {
@@ -613,8 +619,10 @@ export default {
       } else {
         this.$data.sprintEffort = 0
         this.$data.sprintEstimation = 0
+        this.$data.sprintBuffer = 0
         this.$data.sprintUnplanTasksList = []
       }
+      this.$forceUpdate()
       this.$data.sprintUnplanTasksListLoading = false
       console.log('Active tabs array -> ', this.$data.unplanTaskActiveArray)
       if (this.$data.unplanTaskActiveArray != null && this.$data.unplanTaskActiveArray.length > 0) {
