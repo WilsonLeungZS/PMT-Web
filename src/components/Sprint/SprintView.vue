@@ -81,7 +81,7 @@ Remark:
                   <el-col :span="12" :lg="5" class="sprint-card-header-col">
                     <span v-if="sprintStatus == 'Active'? true: false">
                       <i class="el-icon-table-lamp"></i> Status: <b style="color: #409EFF">{{sprintStatus}}</b>
-                      <el-popconfirm @confirm="changeSprintStatus" title="Change Sprint status to 'Running'？" >
+                      <el-popconfirm @confirm="changeSprintStatus" title="Change Sprint status to 'Running'？" ref="popconfirmRunning">
                         <el-button slot="reference" type="success" size="mini" icon="el-icon-d-arrow-right"></el-button>
                       </el-popconfirm>
                     </span>
