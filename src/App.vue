@@ -20,7 +20,7 @@ export default {
   margin-top: 0px;
 }
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 7px;
   height: 1px;
 }
 ::-webkit-scrollbar-thumb { 

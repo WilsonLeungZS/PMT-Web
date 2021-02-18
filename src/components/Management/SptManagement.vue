@@ -1,15 +1,15 @@
 <template>
-  <div class="pm-body">
+  <div class="sm-body">
     <el-container>
       <el-main>
         <el-row>
           <el-col :span="24" class="content-title-col">
-            <div class="content-title-item " @click="switchToSprintManagement">
+            <div :class="{'content-title-item':true, 'active':isActive}">
               <i class="el-icon-data-line content-title-item-icon"></i>
               <span class="content-title-item-header">{{header1}}</span>
             </div>
             <el-divider direction="vertical"></el-divider>
-            <div :class="{'content-title-item':true, 'active':isActive}">
+            <div class="content-title-item " @click="switchToProjectManagement">
               <i class="el-icon-user content-title-item-icon"></i>
               <span class="content-title-item-header">{{header2}}</span>
             </div>
@@ -22,7 +22,7 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <users-list></users-list>
+            <sprints-list></sprints-list>
           </el-col>
           <!-- End User list -->
         </el-row>
@@ -34,12 +34,10 @@
 <script>
 import http from '../../utils/http'
 import utils from '../../utils/utils'
-import UsersList from './ManagementPlugins/UsersList'
 import SprintsList from './ManagementPlugins/SprintsList'
 export default {
-  name: 'ProjectManagement',
+  name: 'SprintManagement',
   components: {
-    UsersList,
     SprintsList
   },
   data () {
@@ -53,9 +51,9 @@ export default {
     }
   },
   methods: {
-    switchToSprintManagement () {
+    switchToProjectManagement () {
       this.$data.isActive = false
-      this.$router.push({path: 'SptManagement'})
+      this.$router.push({path: 'PrjManagement'})
     },
     switchToReportManagement () {
       this.$data.isActive = false
@@ -74,7 +72,7 @@ export default {
   border-bottom: 1px solid #ff6348;
   cursor: default;
 }
-.pm-body {
+.sm-body {
   width: 100%;
   height: auto;
 }

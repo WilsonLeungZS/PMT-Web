@@ -1,0 +1,18 @@
+[
+	{
+		"seq": 0,
+        "parentTask": {},
+        "parentTaskShow": false,
+        "listTotalSize": 4,
+		"listCurrentSize": 20,
+		"listCurrentPage": 1,
+		"taskslistData": [
+            {"taskId": "3", "taskLevel": "EX", "taskParent": "", "taskName": "INC200511236", "taskOppName": "", "taskTargetStart": "", "taskCustomer": "", "taskTypeOfWork": "", "taskTeamSizing": "", "taskDescription": "eRO empty validation progress", "taskScope": "", "taskTimeGroup": "", "taskRefTask": "", "taskStatus": "Drafting", "taskEffort": "0", "taskEstimation": "", "taskEst": "0", "taskSubTasksEst": "0", "taskLeadingBy": "", "taskAssignee": "", "taskSkills": "", "subtaskslistData": []},
+            {"taskId": "3", "taskLevel": "EX", "taskParent": "", "taskName": "INC200511236", "taskOppName": "", "taskTargetStart": "", "taskCustomer": "", "taskTypeOfWork": "", "taskTeamSizing": "", "taskDescription": "eRO empty validation progress", "taskScope": "", "taskTimeGroup": "", "taskRefTask": "", "taskStatus": "Running", "taskEffort": "0", "taskEstimation": "", "taskEst": "0", "taskSubTasksEst": "0", "taskLeadingBy": "", "taskAssignee": "", "taskSkills": "", "subtaskslistData": []},
+            {"taskId": "3", "taskLevel": "EX", "taskParent": "", "taskName": "INC200511236", "taskOppName": "", "taskTargetStart": "", "taskCustomer": "", "taskTypeOfWork": "", "taskTeamSizing": "", "taskDescription": "eRO empty validation progress", "taskScope": "", "taskTimeGroup": "", "taskRefTask": "", "taskStatus": "Planning", "taskEffort": "0", "taskEstimation": "", "taskEst": "0", "taskSubTasksEst": "0", "taskLeadingBy": "", "taskAssignee": "", "taskSkills": "", "subtaskslistData": []},
+            {"taskId": "3", "taskLevel": "EX", "taskParent": "", "taskName": "INC200511236", "taskOppName": "", "taskTargetStart": "", "taskCustomer": "", "taskTypeOfWork": "", "taskTeamSizing": "", "taskDescription": "eRO empty validation progress", "taskScope": "", "taskTimeGroup": "", "taskRefTask": "", "taskStatus": "Planning", "taskEffort": "0", "taskEstimation": "", "taskEst": "0", "taskSubTasksEst": "0", "taskLeadingBy": "", "taskAssignee": "", "taskSkills": "", "subtaskslistData": []},
+            {"taskId": "3", "taskLevel": "EX", "taskParent": "", "taskName": "INC200511236", "taskOppName": "", "taskTargetStart": "", "taskCustomer": "", "taskTypeOfWork": "", "taskTeamSizing": "", "taskDescription": "eRO empty validation progress", "taskScope": "", "taskTimeGroup": "", "taskRefTask": "", "taskStatus": "Done", "taskEffort": "0", "taskEstimation": "", "taskEst": "0", "taskSubTasksEst": "0", "taskLeadingBy": "", "taskAssignee": "", "taskSkills": "", "subtaskslistData": []},
+            {"taskId": "3", "taskLevel": "EX", "taskParent": "", "taskName": "INC200511236", "taskOppName": "", "taskTargetStart": "", "taskCustomer": "", "taskTypeOfWork": "", "taskTeamSizing": "", "taskDescription": "eRO empty validation progress", "taskScope": "", "taskTimeGroup": "", "taskRefTask": "", "taskStatus": "Planning", "taskEffort": "0", "taskEstimation": "", "taskEst": "0", "taskSubTasksEst": "0", "taskLeadingBy": "", "taskAssignee": "", "taskSkills": "", "subtaskslistData": []}
+        ]
+    }
+]

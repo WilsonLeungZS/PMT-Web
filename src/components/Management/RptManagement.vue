@@ -4,14 +4,19 @@
       <el-main>
         <el-row>
           <el-col :span="24" class="content-title-col">
-            <div class="content-title-item" @click="switchToPM">
-              <i class="el-icon-user content-title-item-icon"></i>
+            <div class="content-title-item " @click="switchToSprintManagement">
+              <i class="el-icon-data-line content-title-item-icon"></i>
               <span class="content-title-item-header">{{header1}}</span>
+            </div>
+            <el-divider direction="vertical"></el-divider>
+            <div class="content-title-item " @click="switchToProjectManagement">
+              <i class="el-icon-user content-title-item-icon"></i>
+              <span class="content-title-item-header">{{header2}}</span>
             </div>
             <el-divider direction="vertical"></el-divider>
             <div :class="{'content-title-item':true, 'active':isActive}">
               <i class="el-icon-monitor content-title-item-icon"></i>
-              <span class="content-title-item-header">{{header2}}</span>
+              <span class="content-title-item-header">{{header3}}</span>
             </div>
           </el-col>
         </el-row>
@@ -157,11 +162,12 @@
 import http from '../../utils/http'
 import utils from '../../utils/utils'
 export default {
-  name: 'Charts',
+  name: 'ReportManagement',
   data () {
     return {
-      header1: 'Project Management',
-      header2: 'Timesheet Management',
+      header1: 'Sprint',
+      header2: 'User',
+      header3: 'Report',
       isActive: true,
       monthSelect: '',
       monthValue: '',
@@ -213,7 +219,11 @@ export default {
     }
   },
   methods: {
-    switchToPM () {
+    switchToSprintManagement () {
+      this.$data.isActive = false
+      this.$router.push({path: 'SptManagement'})
+    },
+    switchToProjectManagement () {
       this.$data.isActive = false
       this.$router.push({path: 'PrjManagement'})
     },
@@ -548,7 +558,6 @@ export default {
 }
 .el-table th {
   padding: 5px 0;
-  font-size: 15px;
 }
 /* google、safari */
 input::-webkit-outer-spin-button,
