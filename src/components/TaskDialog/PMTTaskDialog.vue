@@ -508,6 +508,7 @@ Remark:
         this.$data.PMTTask.taskRequiredSkills = iObj.taskRequiredSkills
         this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
         this.$data.PMTTaskReferenceTaskTitle = iObj.taskReferenceTaskTitle
+        this.$data.PMTTask.taskTitle = iObj.taskReferenceTaskTitle
         this.$data.PMTTask.taskRespLeaderId = iObj.taskRespLeaderId
         if (iObj.sprintStatus == 'Active') {
           this.$data.PMTTask.taskSprintIndicator = 'PLANNED'

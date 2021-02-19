@@ -14,7 +14,7 @@
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Name</span>
             </el-col>
-            <el-col :span="8" :lg="6" class="sm-table-expand-item">
+            <el-col :span="8" :lg="7" class="sm-table-expand-item">
               <el-input v-model="props.row.sprintName" size="small" style="width: 100%"></el-input>
             </el-col>
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
@@ -32,12 +32,12 @@
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Leader</span>
             </el-col>
-            <el-col :span="8" :lg="4" class="sm-table-expand-item">
-              <el-select v-model="props.row.sprintLeaderId" size="small" style="width: 100%">
+            <el-col :span="8" :lg="3" class="sm-table-expand-item">
+              <el-select v-model="props.row.sprintLeaderId" size="small" style="width: 100%" filterable>
                 <el-option label="" value=""></el-option>
                 <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userName" :value="leader.userId">
-                  <span style="float: left; margin-right:20px">{{ leader.userName }}</span>
-                  <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ leader.userLevel }}</span>
+                  <span style="float: left; margin-right:20px">{{leader.userName}} ({{leader.userNickname}})</span>
+                  <span style="float: right; color: #8492a6; font-size: 12px">Level - {{leader.userLevel}}</span>
                 </el-option>
               </el-select>
             </el-col>                    
@@ -47,14 +47,14 @@
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Baseline</span>
             </el-col>
-            <el-col :span="20" :lg="13" class="sm-table-expand-item">
+            <el-col :span="20" :lg="12" class="sm-table-expand-item">
               <el-input v-model="props.row.sprintBaseline" size="small" style="width: 100%"></el-input>
             </el-col>
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Working Days</span>
             </el-col>
-            <el-col :span="8" :lg="2" class="sm-table-expand-item">
-              <span><b style="text-decoration:underline">{{props.row.sprintWorkingDays}}</b> days</span> 
+            <el-col :span="8" :lg="3" class="sm-table-expand-item">
+              <span>Total <b style="text-decoration:underline; margin: 0 5px; font-size: 16px">{{props.row.sprintWorkingDays}}</b> days</span> 
             </el-col> 
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Base Capacity</span>
@@ -70,7 +70,7 @@
             <el-col :span="4" :lg="2" class="sm-table-expand-label">
               <span>Required Skills</span>
             </el-col>
-            <el-col :span="20" :lg="13" class="sm-table-expand-item">
+            <el-col :span="8" :lg="7" class="sm-table-expand-item">
               <el-select v-model="props.row.sprintRequiredSkills" size="small" style="width: 100%" multiple>
                 <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
                   <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
@@ -78,6 +78,15 @@
                     <span style="float: left; margin-left:10px; color: #8492a6; font-size: 12px">{{ skill.skillDesc }}</span>
                   </el-option>
                 </el-option-group>
+              </el-select>
+            </el-col>
+            <el-col :span="4" :lg="2" class="sm-table-expand-label">
+              <span>Data Source</span>
+            </el-col>
+            <el-col :span="8" :lg="4" class="sm-table-expand-item">
+              <el-select v-model="props.row.sprintDataSource" size="small" style="width: 100%" multiple>
+                <el-option label="Manual" value="Manual"></el-option>
+                <el-option label="Service Now" value="ServiceNow"></el-option>
               </el-select>
             </el-col>
             <el-col :span="8" :lg="2" class="sm-table-expand-item">
@@ -93,9 +102,9 @@
         </template>
       </el-table-column>
       <el-table-column label="Id" prop="sprintId" v-if="false" :key="1"></el-table-column>
-      <el-table-column label="Name" prop="sprintName" align="left" min-width="100" show-overflow-tooltip :key="2"></el-table-column>
-      <el-table-column label="Start Time" prop="sprintStartTime" align="center" width="120" :key="3"></el-table-column>
-      <el-table-column label="End Time" prop="sprintEndTime" align="center" width="120" :key="4"></el-table-column>
+      <el-table-column label="Name" prop="sprintName" align="left" min-width="100" sortable show-overflow-tooltip :key="2"></el-table-column>
+      <el-table-column label="Start Time" prop="sprintStartTime" align="left" width="120" sortable :key="3"></el-table-column>
+      <el-table-column label="End Time" prop="sprintEndTime" align="left" width="120" :key="4"></el-table-column>
       <el-table-column label="Working Days" prop="sprintWorkingDays" align="center" width="150" :key="5"></el-table-column>
       <el-table-column label="Base Capacity" prop="sprintBaseCapacity" align="center" width="150" :key="6"></el-table-column>
       <el-table-column label="Baseline" prop="sprintBaseline" align="left" min-width="200" show-overflow-tooltip :key="7"></el-table-column>
@@ -236,6 +245,7 @@ export default {
         sprintBaseCapacity: '',
         sprintRequiredSkills: [],
         sprintStatus: 'Active',
+        sprintDataSource: ['Manual'],
         sprintLeaderId: null
       }
       this.$data.sprintData.unshift(sprint)
@@ -249,14 +259,16 @@ export default {
         }
       }
       const res = await http.post('/sprints/updateSprint', {
+        reqSprintId: sprint.sprintId,
         reqSprintName: sprint.sprintName,
         reqSprintStartTime : sprint.sprintStartTime,
         reqSprintEndTime: sprint.sprintEndTime,
         reqSprintBaseline: sprint.sprintBaseline,
         reqSprintWorkingDays: sprint.sprintWorkingDays,
         reqSprintBaseCapacity: sprint.sprintBaseCapacity,
-        reqSprintRequiredSkills: sprint.sprintRequiredSkills.toString(),
+        reqSprintRequiredSkills: sprint.sprintRequiredSkills != null? sprint.sprintRequiredSkills.toString(): null,
         reqSprintStatus: sprint.sprintStatus,
+        reqSprintDataSource: sprint.sprintDataSource != null? sprint.sprintDataSource.toString(): null,
         reqSprintLeaderId: sprint.sprintLeaderId
       })
       if (res.data.status === 0) {
@@ -270,16 +282,17 @@ export default {
     },
     cancelSprint (props) {
       var index = props.$index
-      if (props.row.userId > 0) {
-        props.row.sprintName = this.$data.userResetData[index].sprintName
-        props.row.sprintStartTime = this.$data.userResetData[index].sprintStartTime
-        props.row.sprintEndTime = this.$data.userResetData[index].sprintEndTime
-        props.row.sprintBaseline = this.$data.userResetData[index].sprintBaseline
-        props.row.sprintWorkingDays = this.$data.userResetData[index].sprintWorkingDays
-        props.row.sprintBaseCapacity = this.$data.userResetData[index].sprintBaseCapacity
-        props.row.sprintRequiredSkills = this.$data.userResetData[index].sprintRequiredSkills
-        props.row.sprintStatus = this.$data.userResetData[index].sprintStatus
-        props.row.sprintLeaderId = this.$data.userResetData[index].sprintLeaderId
+      if (props.row.sprintId > 0) {
+        props.row.sprintName = this.$data.sprintResetData[index].sprintName
+        props.row.sprintStartTime = this.$data.sprintResetData[index].sprintStartTime
+        props.row.sprintEndTime = this.$data.sprintResetData[index].sprintEndTime
+        props.row.sprintBaseline = this.$data.sprintResetData[index].sprintBaseline
+        props.row.sprintWorkingDays = this.$data.sprintResetData[index].sprintWorkingDays
+        props.row.sprintBaseCapacity = this.$data.sprintResetData[index].sprintBaseCapacity
+        props.row.sprintRequiredSkills = this.$data.sprintResetData[index].sprintRequiredSkills
+        props.row.sprintStatus = this.$data.sprintResetData[index].sprintStatus
+        props.row.sprintDataSource = this.$data.sprintResetData[index].sprintDataSource
+        props.row.sprintLeaderId = this.$data.sprintResetData[index].sprintLeaderId
       } else {
         this.$data.sprintData.splice(index, 1)
       }
