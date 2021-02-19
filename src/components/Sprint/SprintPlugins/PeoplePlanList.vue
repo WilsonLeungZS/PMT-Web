@@ -84,7 +84,7 @@ export default {
           for (var i=0; i<userList.length; i++) {
             var usedCapacity = userList[i].userUsedCapacity
             var capacity = Number(userList[i].userWorkingHrs) * sprintWorkingDays - usedCapacity
-            console.log('User ', userList[i].userName, ' capacity = ', capacity)
+            // console.log('User ', userList[i].userName, ' capacity = ', capacity)
             if (capacity == 0) {
               userList.splice(i, 1)
               i = i-1

@@ -81,9 +81,14 @@ Remark:
                   <el-col :span="12" :lg="5" class="sprint-card-header-col">
                     <span v-if="sprintStatus == 'Active'? true: false">
                       <i class="el-icon-table-lamp"></i> Status: <b style="color: #409EFF">{{sprintStatus}}</b>
-                      <el-popconfirm @confirm="changeSprintStatus" title="Change Sprint status to 'Running'？" ref="popconfirmRunning">
+                      <el-popover placement="bottom" width="200" v-model="changeSprintStatusVisible">
+                        <p>Change Sprint status to 'Running'</p>
+                        <div style="text-align: right; margin: 0">
+                          <el-button size="mini" type="text" @click="changeSprintStatusVisible = false">Cancel</el-button>
+                          <el-button type="primary" size="mini" @click="changeSprintStatus">OK</el-button>
+                        </div>
                         <el-button slot="reference" type="success" size="mini" icon="el-icon-d-arrow-right"></el-button>
-                      </el-popconfirm>
+                      </el-popover>
                     </span>
                     <span v-if="sprintStatus == 'Running'? true: false"><i class="el-icon-table-lamp"></i> Status: <b style="color: #67C23A">{{sprintStatus}}</b></span>
                   </el-col>
@@ -156,9 +161,13 @@ Remark:
                                   <span v-if="!planListHide">{{sprintTask.taskAssignee}}</span>
                                   <el-select v-if="planListHide" @visible-change="getAssigneeListByTasks($event, sprintTask, null)" @change="changeTaskAssignee(sprintTask.taskId, sprintTask.taskAssigneeId)" v-model="sprintTask.taskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 75%;" filterable>
                                     <el-option label="" value=""></el-option>
-                                    <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
+                                    <!--<el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
                                       <span style="float: left; margin-right:20px">{{ assignee.userFullName }}</span>
                                       <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ assignee.userLevel }}</span>
+                                    </el-option>-->
+                                    <el-option v-for="(assignee, index) in plannedPeopleList" :key="index" :label="assignee.sprintUserFullName" :value="assignee.sprintUserId">
+                                      <span style="float: left; margin-right:20px">{{ assignee.sprintUserFullName }}</span>
+                                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ assignee.sprintUserLevel }}</span>
                                     </el-option>
                                   </el-select>
                                 </span>
@@ -196,9 +205,9 @@ Remark:
                                 <template slot-scope="scope">
                                   <el-select v-if="planListHide" @visible-change="getAssigneeListByTasks($event, null, scope.row)" @change="changeTaskAssignee(scope.row.subtaskId, scope.row.subtaskAssigneeId)" v-model="scope.row.subtaskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 100%;" filterable>
                                     <el-option label="" value=""></el-option>
-                                    <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
-                                      <span style="float: left; margin-right:20px">{{ assignee.userFullName }}</span>
-                                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ assignee.userLevel }}</span>
+                                    <el-option v-for="(assignee, index) in plannedPeopleList" :key="index" :label="assignee.sprintUserFullName" :value="assignee.sprintUserId">
+                                      <span style="float: left; margin-right:20px">{{ assignee.sprintUserFullName }}</span>
+                                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{ assignee.sprintUserLevel }}</span>
                                     </el-option>
                                   </el-select>
                                 </template>
@@ -323,24 +332,17 @@ Remark:
           </el-col>
         </el-row>
       </el-main>
-      <el-drawer title="Sprint Capacity" size="25%" :direction="direction" :visible.sync="peopleResVisible" class="sprint-plan-people-res-drawer">
+      <el-drawer title="Sprint Capacity" size="28%" :direction="direction" :visible.sync="peopleResVisible" class="sprint-plan-people-res-drawer">
         <el-row>
-          <!--<el-col :offset="2" :span="20">
-            <el-button icon="el-icon-check" type="primary" size="small" style="width: 100%; margin-bottom: 15px">Save Adjustment</el-button>
-          </el-col>-->
           <el-col :span="24">
             <el-table v-loading="sprintCapacityLoading" :data="plannedPeopleList" :summary-method="getSummaries" show-summary width="100%">
               <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
               <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
               <el-table-column prop="sprintUserName" label="Name" align="center"></el-table-column>
-              <!--<el-table-column prop="sprintUserCapacity" label="Planned Capacity" align="center" width="180">
-                <template slot-scope="scope">
-                  <el-input-number v-model="scope.row.sprintUserCapacity" :step="scope.row.sprintUserWorkingHrs" step-strictly :min="0" :max="scope.row.sprintUserMaxCapacity" controls-position="right" size="mini"></el-input-number>
-                </template>
-              </el-table-column>-->
+              <el-table-column prop="sprintUserNickname" label="Nickname" align="center"></el-table-column>
               <el-table-column prop="sprintUserCapacity" label="Planned Capacity" align="center" width="180">
               </el-table-column>
-              <el-table-column align="right" fixed="right" width="80">
+              <el-table-column align="right" fixed="right" width="70">
                 <template slot-scope="scope">
                   <el-tooltip class="item" effect="dark" content="Remove from Sprint" placement="top">
                     <el-button :disabled="sprintStatus == 'Running'? true: false" @click="removeUserFromSprint(scope.row)" type="danger" icon="el-icon-d-arrow-left" size="mini"></el-button>
@@ -413,12 +415,14 @@ export default {
       sprintRequiredSkillsStr: '',
       sprintEffort: 0,
       sprintEstimation: 0,
+      sprintEstimationCopy: 0,
       sprintBuffer: 0,
       sprintActualCapacity: 0,
       sprintBaseCapacity: 0,
       sprintPeopleCount: 0,
       sprintRequiredSkills: [],
       sprintObj: {},
+      changeSprintStatusVisible: false,
       // Sprint Task Value
       sprintTasksList: [],
       sprintUnplanTasksList: [],
@@ -465,13 +469,6 @@ export default {
         }
       },
       immediate: true
-    },
-    sprintEstimation: {
-      handler (newVal, oldVal) {
-        if(newVal) {
-          this.$data.sprintBuffer = this.$data.sprintActualCapacity - this.$data.sprintEstimation
-        }
-      },
     }
   },
   methods: {
@@ -496,12 +493,16 @@ export default {
       this.$data.sprintBaseCapacity = 0
       this.$data.sprintRequiredSkills = []
       this.$data.sprintObj = {}
+      this.$data.sprintEstimationCopy = 0
+      this.$data.tabTaskActive = 'tab_planned_tasks',
+      this.$data.changeSprintStatusVisible = false
     },
     initSprintTask () {
       this.$data.sprintEffort = 0
       this.$data.sprintEstimation = 0
       this.$data.sprintBuffer = 0
       this.$data.sprintTasksList = []
+      this.$data.sprintUnplanTasksList = []
     },
     initSprintUser () {
       this.$data.sprintActualCapacity = 0
@@ -522,6 +523,7 @@ export default {
       this.getSprintInfo()
     },
     async changeSprintStatus () {
+      this.$data.changeSprintStatusVisible = false
       var reqSprintStatus = 'Running'
       var reqSprintId = this.$data.sprintSelect
       var reqSprintCapacity = this.$data.sprintBaseCapacity
@@ -585,12 +587,8 @@ export default {
         var sprintTasksData = res.data.data
         this.$data.sprintEffort = sprintTasksData.sprintEffortSum[0].EffortSum
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
+        this.$data.sprintEstimationCopy = this.$data.sprintEstimation
         this.$data.sprintTasksList = sprintTasksData.sprintTasks
-      } else {
-        this.$data.sprintEffort = 0
-        this.$data.sprintEstimation = 0
-        this.$data.sprintBuffer = 0
-        this.$data.sprintTasksList = []
       }
       this.$forceUpdate()
       this.$data.sprintTasksListLoading = false
@@ -616,12 +614,8 @@ export default {
         this.$data.sprintEffort = sprintTasksData.sprintEffortSum[0].EffortSum
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
         this.$data.sprintUnplanTasksList = sprintTasksData.sprintTasks
-      } else {
-        this.$data.sprintEffort = 0
-        this.$data.sprintEstimation = 0
-        this.$data.sprintBuffer = 0
-        this.$data.sprintUnplanTasksList = []
       }
+      this.$data.sprintBuffer = this.$data.sprintActualCapacity - this.$data.sprintEstimationCopy
       this.$forceUpdate()
       this.$data.sprintUnplanTasksListLoading = false
       console.log('Active tabs array -> ', this.$data.unplanTaskActiveArray)
