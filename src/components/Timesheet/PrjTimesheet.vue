@@ -23,11 +23,13 @@
                 <el-col :span="11" :lg="6">
                   <span><i class="el-icon-data-line"></i> Sprint</span>
                   <el-select @change="getPeopleListBySprint" v-model="sprintSelect" style="width: 72%;margin-left: 5px;">
-                    <el-option label=" " value=""></el-option>
-                    <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
-                      <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
-                      <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
-                    </el-option>
+                    <el-option label="No Select" value=""></el-option>
+                    <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
+                      <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
+                        <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
+                        <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
+                      </el-option>
+                    </el-option-group>
                   </el-select>
                 </el-col>
                 <el-col :span="11" :lg="6">
@@ -117,7 +119,7 @@ export default {
     async getActiveSprintsList () {
       var res = await http.get('/sprints/getActiveSprintsList')
       if (res != null && res.data.status == 0) {
-        this.$data.sprintsList = res.data.data
+        this.$data.sprintsList = this.sortListBySprintTimeGroup(res.data.data)
       } else {
         this.$data.sprintsList = []
       }
@@ -152,6 +154,24 @@ export default {
       }
     },
     // Common Method
+    sortListBySprintTimeGroup (iSprintList) {
+      var result = []
+      if (iSprintList != null && iSprintList.length > 0) {
+        for (var i=0; i<iSprintList.length; i++) {
+          var timeGroup = iSprintList[i].sprintTimeGroup
+          var index = this.getIndexOfValueInArr(result, 'Label', timeGroup)
+          if (index == -1) {
+            result.push({
+              Label: timeGroup,
+              Options: [iSprintList[i]]
+            })
+          } else {
+            result[index].Options.push(iSprintList[i])
+          }
+        }
+      }
+      return result
+    },
     getIndexOfValueInArr(iArray, iKey, iValue) {
       for(var i=0; i<iArray.length;i++) {
         var item = iArray[i];
