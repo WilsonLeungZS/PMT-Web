@@ -20,7 +20,7 @@ Remark:
         <span style="justify-content: center">{{worklog.worklogTaskTitle}}</span>
       </el-form-item>
       <el-form-item label="Date">
-        <el-date-picker v-model="worklog.worklogDate" type="date" value-format="yyyy-MM-dd" style="width:100%"></el-date-picker>
+        <el-date-picker :picker-options="pickerOptions" v-model="worklog.worklogDate" type="date" value-format="yyyy-MM-dd" style="width:100%"></el-date-picker>
       </el-form-item>
       <el-form-item label="Effort" >
         <el-input v-model="worklog.worklogEffort" type="number">
@@ -67,7 +67,14 @@ Remark:
         disabledState: {
           disabledName: false
         },
-        showDeleteWorklogBtn: true
+        showDeleteWorklogBtn: true,
+        worklogTaskStartTime: null,
+        worklogTaskEndTime: null,
+        pickerOptions: {
+          disabledDate: (date) => {
+            return this.dealDisabledDate(date);
+          }
+        }
       }
     },
     props: {
@@ -114,9 +121,12 @@ Remark:
           disabledName: false
         }
         this.$data.disabledState = disabledState
+        this.$data.worklogTaskStartTime = null
+        this.$data.worklogTaskEndTime = null
       },
       async editWorklog (actionObj) {
         this.initWorklog()
+        console.log('Start to edit worklog -> ', actionObj.action)
         if (actionObj.action == 'EDIT-WORKLOG-BY-TASK') {
           this.$data.worklogAction = 'EDIT-WORKLOG-BY-TASK'
           this.$data.showDeleteWorklogBtn = false
@@ -126,6 +136,16 @@ Remark:
             worklogTaskTitle : actionObj.taskTitle,
             worklogDate: actionObj.worklogDate != null? actionObj.worklogDate: null,
             worklogUserId: actionObj.userId
+          }
+          var result = await this.getWorklogTaskTimeRange(actionObj.taskId)
+          // Validate if worklog date is between sprint start time and end time
+          if (result) {
+            var worklogTaskStartTime = this.$data.worklogTaskStartTime
+            var worklogTaskEndTime = this.$data.worklogTaskEndTime
+            if (actionObj.worklogDate != null && (actionObj.worklogDate < worklogTaskStartTime || actionObj.worklogDate > worklogTaskEndTime)) {
+              this.$message.error('Could not record worklog out of task sprint start time[' + worklogTaskStartTime + '] and end time[' + worklogTaskEndTime + ']!')
+              return
+            }
           }
         }
         if (actionObj.action == 'EDIT-WORKLOG-BY-DATE') {
@@ -137,7 +157,6 @@ Remark:
           }
         }
         if (actionObj.action == 'EDIT-WORKLOG') {
-          console.log('Start to edit worklog')
           this.$data.worklogAction = 'EDIT-WORKLOG'
           var worklogDate = actionObj.worklogDate.split('-')
           var reqWorklogMonth = worklogDate[0] + '-' + worklogDate[1]
@@ -159,6 +178,16 @@ Remark:
               worklogDate: worklog.worklogDate,
               worklogRemark: worklog.worklogRemark,
               worklogUserId: worklog.worklogUserId
+            }
+            var result = await this.getWorklogTaskTimeRange(worklog.worklogTaskId)
+            // Validate if worklog date is between sprint start time and end time
+            if (result) {
+              var worklogTaskStartTime = this.$data.worklogTaskStartTime
+              var worklogTaskEndTime = this.$data.worklogTaskEndTime
+              if (actionObj.worklogDate != null && (actionObj.worklogDate < worklogTaskStartTime || actionObj.worklogDate > worklogTaskEndTime)) {
+                this.$message.error('Could not record worklog out of task sprint start time[' + worklogTaskStartTime + '] and end time[' + worklogTaskEndTime + ']!')
+                return
+              }
             }
           }
         }
@@ -272,9 +301,11 @@ Remark:
         console.log('Query String: ' + queryString)
         var returnArr = []
         var reqTaskAssigneeId = this.$data.userId
+        var reqDate = this.$data.worklog.worklogDate
         const res = await http.post('/tasks/getTasksByWorklogKeyword', {
           reqKeyword: queryString,
-          reqTaskAssigneeId: reqTaskAssigneeId
+          reqTaskAssigneeId: reqTaskAssigneeId,
+          reqDate: reqDate
         })
         if (res.data.status === 0) {
           var queryResult = res.data.data
@@ -294,10 +325,54 @@ Remark:
         this.$data.worklog.worklogTaskName = item.value
         this.$data.worklog.worklogTaskTitle = item.title
         this.$data.worklog.worklogUserId = this.$data.userId
+        this.getWorklogTaskTimeRange(item.id)
       },
       clearWorklogSelectedTask () {
         this.initWorklog()
-      }
+      },
+      // Get worklog task allow time range by task sprint
+      getWorklogTaskTimeRange (iTaskId) {
+        return new Promise(async (resolve, reject) =>{
+          console.log('getWorklogTaskTimeRange: ', iTaskId)
+          const res = await http.get('/tasks/getTaskById', {
+            reqTaskId: iTaskId
+          })
+          if (res.data != null && res.data.status == 0) {
+            this.$data.worklogTaskStartTime = res.data.data.taskSprintStartTime
+            this.$data.worklogTaskEndTime = res.data.data.taskSprintEndTime
+            resolve(true)
+          }
+          resolve(false)
+        })
+      },
+      dealDisabledDate (date) {
+        var worklogTaskStartTime = this.$data.worklogTaskStartTime
+        var worklogTaskEndTime = this.$data.worklogTaskEndTime
+        if (worklogTaskStartTime != null && worklogTaskEndTime != null) {
+          return !(date.getTime() >= (new Date(worklogTaskStartTime).getTime() - 24*60*60*1000) && date.getTime() <= new Date(worklogTaskEndTime).getTime())
+        }
+      },
+      // Common Method
+      formatDate (date, fmt) { 
+        var o = { 
+          "M+" : date.getMonth()+1,                 
+          "d+" : date.getDate(),                     
+          "h+" : date.getHours(),                    
+          "m+" : date.getMinutes(),                 
+          "s+" : date.getSeconds(),                  
+          "q+" : Math.floor((date.getMonth()+3)/3),
+          "S"  : date.getMilliseconds()            
+        }; 
+        if(/(y+)/.test(fmt)) {
+              fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+        }
+        for(var k in o) {
+          if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt; 
+      } 
     }
   }
 </script>

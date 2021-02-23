@@ -10,7 +10,6 @@ import SptManagement from '@/components/Management/SptManagement'
 import PrjManagement from '@/components/Management/PrjManagement'
 import RptManagement from '@/components/Management/RptManagement'
 import Charts from '@/components/Others/Charts'
-import TasksList from '@/components/TaskList/TasksList'
 import Error from '@/components/Error'
 
 Vue.use(Router)
@@ -109,15 +108,6 @@ export default new Router({
           meta: {
             needAdmin: true,
             needLogin: false
-          }
-        },
-        {
-          path: 'TaskList/TasksList',
-          name: 'TasksList',
-          component: TasksList,
-          meta: {
-            needAdmin: false,
-            needLogin: true
           }
         }
       ]

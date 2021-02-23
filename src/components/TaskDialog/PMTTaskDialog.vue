@@ -104,10 +104,12 @@ Remark:
             <el-form-item v-show="showState.showSprint" label="Sprint">
               <el-select :disabled="disabledState.disabledSprint" v-model="PMTTask.taskSprintId" style="width: 100%" clearable>
                 <el-option label=" " value=""></el-option>
-                <el-option v-for="(sprint, index) in sprintsList" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
-                  <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
-                  <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
-                </el-option>
+                <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
+                  <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
+                    <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
+                    <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
+                  </el-option>
+                </el-option-group>
               </el-select>
             </el-form-item>
             <el-form-item v-show="showState.showTitle" label="Title" prop="taskTitle">
@@ -169,7 +171,7 @@ Remark:
               </el-col>
               <el-col :span="24" :lg="{span: 12, offset: 1}">
                 <el-form-item v-show="showState.showAssignee" label="Assign To">
-                  <el-select :disabled="disabledState.disabledAssignee" @visible-change="getAssigneeListByTasks($event, PMTTask, null)" v-model="PMTTask.taskAssigneeId" filterable style="width: 100%">
+                  <el-select :disabled="disabledState.disabledAssignee" v-model="PMTTask.taskAssigneeId" filterable style="width: 100%">
                     <el-option label=" " value=""></el-option>
                     <el-option v-for="(user, index) in usersList" :key="index" :label="user.userFullName" :value="user.userId">
                       <span style="float: left; margin-right:20px">{{ user.userFullName }}</span>
@@ -219,13 +221,13 @@ Remark:
                         </template>
                       </el-table-column>
                       <el-table-column width="120" align="center" prop="subtaskAssignee" label="Assign To" sortable key="4"></el-table-column>
-                      <el-table-column width="30" align="center" fixed="right">
+                      <!--<el-table-column width="30" align="center" fixed="right">
                         <template slot-scope="scope">
                           <el-row>
                             <el-col :span="1"><i class="el-icon-arrow-right"></i></el-col>
                           </el-row>
                         </template>
-                      </el-table-column>
+                      </el-table-column>-->
                     </el-table>
                 </el-card>
               </el-col>
@@ -289,7 +291,6 @@ Remark:
           {value: 'UAT In Support', label: 'UAT In Support'},
           {value: 'Ready to PROD', label: 'Ready to PROD'}
         ],
-        sprintsList: [],
         disabledState: {
           disabledParent: false,
           disabledParentTitle: false,
@@ -469,7 +470,6 @@ Remark:
         this.$data.usersList = []
         this.$data.sprintsList = []
         this.getAllSkillsList()
-        this.getActiveUsersList()
         this.getActiveSprintsList()
       },
       createTask () {
@@ -510,17 +510,25 @@ Remark:
         this.$data.PMTTaskReferenceTaskTitle = iObj.taskReferenceTaskTitle
         this.$data.PMTTask.taskTitle = iObj.taskReferenceTaskTitle
         this.$data.PMTTask.taskRespLeaderId = iObj.taskRespLeaderId
-        if (iObj.sprintStatus == 'Active') {
+        if (iObj.taskTypeTag == 'Public Task') {
+          this.$data.PMTTask.taskSprintIndicator = 'PUBLIC'
+        }
+        if (iObj.sprintStatus == 'Active' && iObj.taskTypeTag == 'One-Off Task') {
           this.$data.PMTTask.taskSprintIndicator = 'PLANNED'
         }
-        if (iObj.sprintStatus == 'Running') {
+        if (iObj.sprintStatus == 'Running' && iObj.taskTypeTag == 'One-Off Task') {
           this.$data.PMTTask.taskSprintIndicator = 'UNPLAN'
         }
+        this.getActiveUsersListBySprintId(iObj.taskSprintId)
         // Set new Task default state
         this.$data.disabledState.disabledReferenceTask = true
+        this.$data.disabledState.disabledSprint = true
         // Set new Task default state(show)
         this.$data.showState.showParent = false
         this.$data.showState.showParentTitle = false
+        if (iObj.taskTypeTag == 'Public Task') {
+          this.$data.showState.showAssignee = false
+        }
         // Hide sub tasks and worklog histories tabs
         this.$nextTick(() => {
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
@@ -545,7 +553,12 @@ Remark:
         this.$data.PMTTask.taskRespLeaderId = iObj.taskRespLeaderId
         this.$data.PMTTask.taskSprintIndicator = iObj.taskSprintIndicator
         this.setReferenceTaskTitleByName(iObj.taskReferenceTask)
-        // Set new Task default state
+        this.getActiveUsersListBySprintId(iObj.taskSprintId)
+        // Set sub task show state
+        if (iObj.taskTypeTag == 'Public Task') {
+          this.$data.showState.showAssignee = false
+        }
+        // Set sub Task disabled state
         this.$data.disabledState.disabledParent = true
         this.$data.disabledState.disabledType = true
         this.$data.disabledState.disabledTypeTag = true
@@ -579,7 +592,8 @@ Remark:
           })
         }
         // Validate task category and hide related fields
-        var taskCategory = res.data.data.taskCategory
+        var task = res.data.data
+        var taskCategory = task.taskCategory
         if (taskCategory == 'PMT-TASK') {
           // Hide field
           this.$data.showState.showParent = false
@@ -623,6 +637,8 @@ Remark:
               this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = '' // Show "Worklog Histories" Tab
             })
           }
+          // Get assignee list by sprint Id
+          this.getActiveUsersListBySprintId(res.data.data.taskSprintId)
         }
         if (taskCategory == 'PMT-TASK-SUB') {
           this.$data.disabledState.disabledType = true
@@ -645,10 +661,18 @@ Remark:
               this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = '' // Show "Worklog Histories" Tab
             })
           }
+          // Get assignee list by sprint Id
+          this.getActiveUsersListBySprintId(res.data.data.taskSprintId)
         }
         // Apply for all category task
-        if (this.$data.sprintStatus == 'Running') {
+        if (this.$data.sprintStatus == 'Running' || task.taskStatus == 'Running' || task.taskStatus == 'Done') {
           this.$data.disabledState.disabledEstimation = true
+        }
+        if (task.taskTypeTag == 'Public Task') {
+          this.$data.showState.showAssignee = false
+          this.$data.showState.showEstimation = false
+          this.$data.showState.showDeliverableTag = false
+          this.$data.disabledState.disabledTypeTag = true
         }
         this.$data.PMTTaskDialogVisible = true
       },
@@ -752,46 +776,27 @@ Remark:
           this.$data.skillsList = []
         }
       },
-      getIndexOfValueInArr(iArray, iKey, iValue) {
-        for(var i=0; i<iArray.length;i++) {
-          var item = iArray[i];
-          if(iKey != null){
-            if(item[iKey] == iValue){
-              return i;
-            }
-          } 
-          if(iKey == null){
-            if(item == iValue){
-              return i;
-            }
-          }
-        }
-        return -1;
-      },
-      async getActiveUsersList () {
+      async getActiveUsersListBySprintId (iSprintId) {
         this.$data.usersList = []
-        const res = await http.get('/users/getActiveUsersListByLevelLimit', {reqUserLevelLimit: 13})
-        if (res.data.status === 0) {
-          this.$data.usersList = res.data.data
-        } else {
-          this.$data.usersList = []
-        }
-      },
-      getAssigneeListByTasks (iFlag, iTask, iSubtask) {
-        console.log(iFlag, iTask, iSubtask)
-        if (iFlag) {
-          var taskRequiredSkillsArray = iTask != null? iTask.taskRequiredSkills: iSubtask.subtaskRequiredSkills
-          var assigneeList = this.$data.usersList
-          for(var i=0; i<assigneeList.length; i++) {
-            var userSkillsArray = assigneeList[i].userSkills
-            var existSameSkills = taskRequiredSkillsArray.some(item => userSkillsArray.includes(item))
-            if (!existSameSkills) {
-              assigneeList.splice(i, 1)
-              i--
+        if (iSprintId != null && iSprintId != '') {
+          const res = await http.get('/sprints/getSprintUsersById', {reqSprintId: iSprintId})
+          if (res.data.status === 0) {
+            var sprintUserList = res.data.data.sprintUsers
+            if (sprintUserList != null && sprintUserList.length > 0) {
+              for (var i=0; i<sprintUserList.length; i++) {
+                var userObj = {}
+                userObj.userId = sprintUserList[i].sprintUserId
+                userObj.userFullName = sprintUserList[i].sprintUserFullName
+                userObj.userLevel = sprintUserList[i].sprintUserLevel
+                this.$data.usersList.push(userObj)
+              }
             }
           }
         } else {
-          this.getActiveUsersList()
+          const res = await http.get('/users/getActiveUsersListByLevelLimit', {reqUserLevelLimit: 13})
+          if (res.data.status === 0) {
+            this.$data.usersList = res.data.data
+          }
         }
       },
       async getActiveSprintsList () {
@@ -800,12 +805,11 @@ Remark:
           reqRequiredSkills: reqRequiredSkills
         })
         if (res != null && res.data.status == 0) {
-          this.$data.sprintsList = res.data.data
+          this.$data.sprintsList = this.sortListBySprintTimeGroup(res.data.data)
         } else {
           this.$data.sprintsList = []
         }
       },
-      // Common Method
       async setParentTaskTitleByName (iTaskName) {
         this.$data.PMTTaskParentTaskTitle = ''
         if (iTaskName != null && iTaskName != '') {
@@ -849,6 +853,41 @@ Remark:
             this.$data.PMTTaskWorklogHistories = res.data.data
           }
         }
+      },
+      // Common Method
+      sortListBySprintTimeGroup (iSprintList) {
+        var result = []
+        if (iSprintList != null && iSprintList.length > 0) {
+          for (var i=0; i<iSprintList.length; i++) {
+            var timeGroup = iSprintList[i].sprintTimeGroup
+            var index = this.getIndexOfValueInArr(result, 'Label', timeGroup)
+            if (index == -1) {
+              result.push({
+                Label: timeGroup,
+                Options: [iSprintList[i]]
+              })
+            } else {
+              result[index].Options.push(iSprintList[i])
+            }
+          }
+        }
+        return result
+      },
+      getIndexOfValueInArr(iArray, iKey, iValue) {
+        for(var i=0; i<iArray.length;i++) {
+          var item = iArray[i];
+          if(iKey != null){
+            if(item[iKey] == iValue){
+              return i;
+            }
+          } 
+          if(iKey == null){
+            if(item == iValue){
+              return i;
+            }
+          }
+        }
+        return -1;
       },
       formatDate (date, fmt) { 
         var o = { 

@@ -87,6 +87,7 @@
               <el-select v-model="props.row.sprintDataSource" size="small" style="width: 100%" multiple>
                 <el-option label="Manual" value="Manual"></el-option>
                 <el-option label="Service Now" value="ServiceNow"></el-option>
+                <el-option label="TRLS" value="TRLS"></el-option>
               </el-select>
             </el-col>
             <el-col :span="8" :lg="2" class="sm-table-expand-item">
@@ -139,6 +140,7 @@ export default {
   methods: {
     // Skill & User List Handling
     async getAllSkillsList () {
+      console.log('Start getAllSkillsList')
       this.$data.skillsList = []
       const res = await http.get('/users/getAllSkillsList')
       if (res.data.status === 0) {
@@ -257,6 +259,9 @@ export default {
         for (var i=0; i<sprint.sprintRequiredSkills.length; i++) {
           sprint.sprintRequiredSkills[i] = '#' + sprint.sprintRequiredSkills[i] + '#'
         }
+      } else {
+        this.showMessage('Required skills could not be empty!', 'error')
+        return
       }
       const res = await http.post('/sprints/updateSprint', {
         reqSprintId: sprint.sprintId,
@@ -271,7 +276,63 @@ export default {
         reqSprintDataSource: sprint.sprintDataSource != null? sprint.sprintDataSource.toString(): null,
         reqSprintLeaderId: sprint.sprintLeaderId
       })
-      if (res.data.status === 0) {
+      if (res.data != null && res.data.status === 0) {
+        // Create public task for new sprint
+        var resultSprint = res.data.data
+        console.log('resultSprint -> ', resultSprint)
+        if (res.data.message.startsWith('Create')) {
+          console.log('Start to create public task')
+          var publicTaskObj = {
+            reqTaskId: 0,
+            reqTaskParentTaskName: null,
+            reqTaskCategory: 'PMT-TASK-REF',
+            reqTaskType: null,
+            reqTaskDescription: null,
+            reqTaskReferenceTask: 'Public',
+            reqTaskTypeTag: 'Public Task',
+            reqTaskDeliverableTag: null,
+            reqTaskCreator: 'PMT:System',
+            reqTaskRequiredSkills: resultSprint.RequiredSkills,
+            reqTaskCustomer: 'PMO',
+            reqTaskStatus: 'Running',
+            reqTaskEstimation: 0,
+            reqTaskIssueDate: this.formatDate(new Date(), 'yyyy-MM-dd'),
+            reqTaskTargetComplete: resultSprint.EndTime,
+            reqTaskActualComplete: resultSprint.EndTime,
+            reqTaskRespLeaderId: resultSprint.LeaderId,
+            reqTaskAssigneeId: null,
+            reqTaskSprintId: resultSprint.Id,
+            reqTaskSprintIndicator: 'PUBLIC'
+          }
+          var publicTaskStr = JSON.stringify(publicTaskObj)
+          var publicTaskArray = []
+          // Leave task (annual/sick/others)
+          var nonFlexLeave = JSON.parse(publicTaskStr)
+          nonFlexLeave.reqTaskName = 'Leave - ' + resultSprint.Id
+          nonFlexLeave.reqTaskTitle = 'Annual/Sick/Others Leave'
+          publicTaskArray.push(nonFlexLeave)
+          // Leave task (flex)
+          var flexLeave = JSON.parse(publicTaskStr)
+          flexLeave.reqTaskName = 'FlexLeave - ' + resultSprint.Id
+          flexLeave.reqTaskTitle = 'Flex Leave'
+          publicTaskArray.push(flexLeave)
+          // Training task (training)
+          var training = JSON.parse(publicTaskStr)
+          training.reqTaskName = 'Training - ' + resultSprint.Id
+          training.reqTaskTitle = 'Company Training'
+          publicTaskArray.push(training)
+          console.log(publicTaskArray)
+
+          for (var i=0; i<publicTaskArray.length; i++) {
+            const res = await http.post('/tasks/updateTask', publicTaskArray[i])
+            if (res.data != null && res.data.status == 0) {
+              console.log('Create public task successfully -> ', publicTaskArray[i].reqTaskName)
+            } else {
+              console.log('Create public task fail -> ', publicTaskArray[i].reqTaskName)
+            }
+          }
+        }
+        console.log('resultSprint -> Done')
         this.getAllSkillsList()
         this.getActiveLeadersList()
         this.getSprintsList()
@@ -316,7 +377,27 @@ export default {
         message: iMsg,
         type: iType
       })
-    }
+    },
+    formatDate (date, fmt) { 
+      var o = { 
+        "M+" : date.getMonth()+1,                 
+        "d+" : date.getDate(),                     
+        "h+" : date.getHours(),                    
+        "m+" : date.getMinutes(),                 
+        "s+" : date.getSeconds(),                  
+        "q+" : Math.floor((date.getMonth()+3)/3),
+        "S"  : date.getMilliseconds()            
+      }; 
+      if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+      }
+      for(var k in o) {
+        if(new RegExp("("+ k +")").test(fmt)){
+              fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+          }
+      }
+      return fmt; 
+    }       
   },
   created () {
     this.getAllSkillsList()
