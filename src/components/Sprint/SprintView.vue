@@ -433,7 +433,7 @@ Remark:
         </el-row>
       </el-drawer>
     </el-container>
-    <pmt-task-dialog @refreshSprint="refreshSprint" :action="pmtTaskDialogAction"></pmt-task-dialog>
+    <pmt-task-dialog @refresh="refreshSprint" :action="pmtTaskDialogAction"></pmt-task-dialog>
     <external-task-dialog :action="externalTaskDialogAction"></external-task-dialog>
     <el-dialog title="Remove Task" :visible.sync="removeTaskDialogVisible" width="25%" top="15%">
       <div class="tl-remove-task">
@@ -603,6 +603,7 @@ export default {
     changeSprint () {
       this.$data.plannedTaskActiveArray = []
       this.$data.unplanTaskActiveArray = []
+      this.$data.publicTaskActiveArray = []
       this.getSprintInfo()
     },
     async changeSprintStatus () {
@@ -734,7 +735,7 @@ export default {
       if (this.$data.publicTaskActiveArray != null && this.$data.publicTaskActiveArray.length > 0) {
         let publicTaskActiveArray = this.$data.publicTaskActiveArray
         for (var i=0; i<publicTaskActiveArray.length; i++ ) {
-          this.getSprintSubtasksForUnplan(publicTaskActiveArray[i])
+          this.getSprintSubtasksForPublic(publicTaskActiveArray[i])
         }
       }
     },
@@ -810,16 +811,22 @@ export default {
     },
     // Task Tab Method
     changeTaskTab (tab, event) {
+      this.$data.plannedTaskActiveArray = []
+      this.$data.unplanTaskActiveArray = []
+      this.$data.publicTaskActiveArray = []
       if (tab.name == 'tab_planned_tasks') {
         console.log('Tab planned tasks')
+        this.$data.tabTaskActive = 'tab_planned_tasks'
         this.getSprintPlannedTasks()
       } 
       if (tab.name == 'tab_unplan_tasks') {
         console.log('Tab unplan tasks')
+        this.$data.tabTaskActive = 'tab_unplan_tasks'
         this.getSprintUnplanTasks()
       }
       if (tab.name == 'tab_public_tasks') {
         console.log('Tab public tasks')
+        this.$data.tabTaskActive = 'tab_public_tasks'
         this.getSprintPublicTasks()
       }
     },
