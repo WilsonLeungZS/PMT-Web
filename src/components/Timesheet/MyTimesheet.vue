@@ -17,7 +17,13 @@
         </el-row>
         <el-row>
           <el-col :span="24" class="content-main-col">
-            <timesheet @getCurrentMonthTimesheet="getCurrentMonthTimesheet" :timesheetObj="timesheetObj"></timesheet>
+            <timesheet @refresh="refreshTaskTable" @getCurrentMonthTimesheet="getCurrentMonthTimesheet" :timesheetObj="timesheetObj"></timesheet>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24" class="content-main-col" style="padding: 0 5px;">
+            <el-divider content-position="center"><b>Current Sprint Tasks (Assign To Me)</b></el-divider>
+            <task-table @refresh="refreshTimesheet" :taskTableObj="taskTableObj"></task-table>
           </el-col>
         </el-row>
       </el-main>
@@ -29,10 +35,12 @@
 import http from '../../utils/http'
 import utils from '../../utils/utils'
 import Timesheet from './TimesheetPlugins/Timesheet'
+import TaskTable from '../Task/TaskPlugins/TaskTable'
 export default {
   name: 'MyTimesheet',
   components: {
-    Timesheet
+    Timesheet,
+    TaskTable
   },
   data () {
     return {
@@ -43,6 +51,10 @@ export default {
         timesheetUserId: this.$store.getters.getUserId,
         timesheetStartDate: null,
         timesheetEndDate: null
+      },
+      taskTableObj: {
+        taskTableUserId: this.$store.getters.getUserId,
+        taskTableDate: null
       }
     }
   },
@@ -67,6 +79,20 @@ export default {
         date: new Date()
       }
     },
+    getAssignToMeTasks () {
+      this.$data.taskTableObj = {
+        taskTableSource: 'MyTimesheet',
+        taskTableUserId: this.$store.getters.getUserId,
+        taskTableDate: this.formatDate(new Date(), 'yyyy-MM-dd'),
+        date: new Date().getTime()
+      }
+    },
+    refreshTimesheet () {
+      this.getCurrentMonthTimesheet()
+    },
+    refreshTaskTable() {
+      this.getAssignToMeTasks()
+    },
     formatDate (date, fmt) { 
       var o = { 
         "M+" : date.getMonth()+1,                 
@@ -90,6 +116,7 @@ export default {
   },
   created () {
     this.getCurrentMonthTimesheet()
+    this.getAssignToMeTasks()
   }
 }
 </script>

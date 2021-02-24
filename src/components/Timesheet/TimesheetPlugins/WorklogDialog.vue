@@ -97,10 +97,8 @@ Remark:
     created () {
     },
     mounted () {
-      console.log('Mounted')
     },
     updated () {
-      console.log('Updated')
     },
     methods: {
       initWorklog () {

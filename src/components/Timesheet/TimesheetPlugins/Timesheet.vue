@@ -258,6 +258,7 @@ export default {
     },
     refreshTimesheet () {
       this.selectTimesheetDateRange()
+      this.$emit('refresh')
     },
     // Common Method
     debug(row, column) {
