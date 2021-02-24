@@ -132,10 +132,8 @@ Remark:
       this.initTaskForm('External Task Details', 'tab_basic_info')
     },
     mounted () {
-      console.log('Mounted')
     },
     updated () {
-      console.log('Updated')
     },
     methods: {
       // Style method

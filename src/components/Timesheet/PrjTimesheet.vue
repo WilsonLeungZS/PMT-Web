@@ -51,6 +51,12 @@
             <timesheet v-if="showTimesheet" :timesheetObj="timesheetObj"></timesheet>
           </el-col>
         </el-row>
+        <el-row v-if="showTaskTable">
+          <el-col :span="24" class="content-main-col" style="padding: 0 5px;">
+            <el-divider content-position="center"><b>Selected Sprint Tasks</b></el-divider>
+            <task-table :taskTableObj="taskTableObj"></task-table>
+          </el-col>
+        </el-row>
       </el-main>
     </el-container>
   </div>
@@ -60,10 +66,12 @@
 import http from '../../utils/http'
 import utils from '../../utils/utils'
 import Timesheet from './TimesheetPlugins/Timesheet'
+import TaskTable from '../Task/TaskPlugins/TaskTable'
 export default {
   name: 'PrjTimesheet',
   components: {
-    Timesheet
+    Timesheet,
+    TaskTable
   },
   data () {
     return {
@@ -82,7 +90,12 @@ export default {
         timesheetUserId: 0,
         timesheetStartDate: null,
         timesheetEndDate: null
-      }
+      },
+      taskTableObj: {
+        taskTableUserId: null,
+        taskTableDate: null
+      },
+      showTaskTable: false
     }
   },
   watch: {
@@ -103,8 +116,10 @@ export default {
         var peopleSelect = val
         if (peopleSelect != null && peopleSelect != '') {
           this.$data.showTimesheet = true
+          this.$data.showTaskTable = true
         } else {
           this.$data.showTimesheet = false
+          this.$data.showTaskTable = false
         }
       },
       immediate: true,
@@ -136,12 +151,23 @@ export default {
       }
     },
     async getTimesheet () {
-      var sprintIndex = this.getIndexOfValueInArr(this.$data.sprintsList, 'sprintId', this.$data.sprintSelect)
+      var sprintList = this.$data.sprintsList
+      var sprintIndex = -1
+      var targetSprintList = []
+      if (sprintList != null && sprintList.length > 0) {
+        for (var i=0; i<sprintList.length; i++) {
+          sprintIndex = this.getIndexOfValueInArr(sprintList[i].Options, 'sprintId', this.$data.sprintSelect)
+          if (sprintIndex != -1) {
+            targetSprintList = sprintList[i].Options
+            break;
+          }
+        }
+      }
       var timesheetStartTime = null
       var timesheetEndTime = null
       if (sprintIndex != -1) {
-        timesheetStartTime = this.$data.sprintsList[sprintIndex].sprintStartTime
-        timesheetEndTime = this.$data.sprintsList[sprintIndex].sprintEndTime
+        timesheetStartTime = targetSprintList[sprintIndex].sprintStartTime
+        timesheetEndTime = targetSprintList[sprintIndex].sprintEndTime
       }
       if (timesheetStartTime != null && timesheetEndTime != null) {
         this.$data.timesheetObj = {
@@ -151,6 +177,19 @@ export default {
           timesheetEndDate: timesheetEndTime,
           date: new Date()
         }
+        if (this.$data.peopleSelect != null) {
+          this.getTaskTable(this.$data.peopleSelect, timesheetStartTime)
+        }
+      } else {
+        this.$message({message: 'Invalid Sprint!', type: 'error'})
+      }
+    },
+    getTaskTable (iUserId, iDate) {
+      this.$data.taskTableObj = {
+        taskTableSource: 'PrjTimesheet',
+        taskTableUserId: iUserId,
+        taskTableDate: iDate,
+        date: new Date().getTime()
       }
     },
     // Common Method

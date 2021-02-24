@@ -404,10 +404,8 @@ Remark:
       this.initTaskForm('PMT Task Details', 'tab_basic_info')
     },
     mounted () {
-      console.log('Mounted')
     },
     updated () {
-      console.log('Updated')
     },
     methods: {
       // Style method
@@ -722,12 +720,12 @@ Remark:
         } else {
           this.$message({message: 'Task created/updated failed!', type: 'error'})
         }
-        this.$emit('refreshSprint')
+        this.$emit('refresh')
         this.$data.disabledSaveBtn = false
       },
       refreshTask (iTaskId) {
         this.editTask(iTaskId)
-        this.$emit('refreshSprint')
+        this.$emit('refresh')
       },
       addWorklog () {
         var task = this.$data.PMTTask
@@ -800,6 +798,7 @@ Remark:
         }
       },
       async getActiveSprintsList () {
+        this.$data.sprintsList = []
         var reqRequiredSkills = this.$data.sprintRequiredSkills != ''? this.$data.sprintRequiredSkills.toString(): null;
         var res = await http.get('/sprints/getActiveSprintsListBySkills', {
           reqRequiredSkills: reqRequiredSkills
@@ -844,7 +843,7 @@ Remark:
         }
       },
       async setWorklogHistoriesById (iTaskId) {
-        this.$data.PMTTaskSubtasksList = []
+        this.$data.PMTTaskWorklogHistories = []
         if (iTaskId != null && iTaskId != '') {
           const res = await http.get('/worklogs/getWorklogHistoriesByTaskId', {
             reqTaskId: iTaskId
