@@ -32,7 +32,12 @@
                 <el-table-column label="Assign To Sprints" prop="sprintUserAssignToSprints" align="left" min-width="250" sortable show-overflow-tooltip></el-table-column>
                 <el-table-column label="Skills" prop="sprintUserSkills" align="center" width="250" sortable show-overflow-tooltip></el-table-column>
                 <el-table-column label="Planned Capacity" prop="sprintUserPlannedCapacity" align="center" width="250" sortable></el-table-column>
-                <el-table-column label="Remaining Capacity" prop="sprintUserRemainingCapacity" align="center" width="250" sortable></el-table-column>
+                <el-table-column label="Remaining Capacity" prop="sprintUserRemainingCapacity" align="center" width="250" sortable>
+                  <template slot-scope="scope">
+                    <el-tag v-if="scope.row.sprintUserRemainingCapacity  > 0" size="small" type="danger" effect="dark">{{scope.row.sprintUserRemainingCapacity}}</el-tag>
+                    <el-tag v-if="scope.row.sprintUserRemainingCapacity == 0" size="small" type="info" effect="dark">{{scope.row.sprintUserRemainingCapacity}}</el-tag>
+                  </template>
+                </el-table-column>
               </el-table>
             </div>
           </el-collapse-item>
