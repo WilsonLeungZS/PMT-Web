@@ -110,7 +110,7 @@ Remark:
                 <!-- Sprint KPI -->
                 <el-row>
                   <el-col :span="12" :lg="6" class="sprint-card-header-col sprint-card-header-col-center" style="border-radius: 4px 0 0 4px; border-right: none">
-                    <span>Effort: <b>{{sprintEffort}}</b> mhrs</span>
+                    <span>Effort: <b>{{sprintEffort}}</b> / <b>{{sprintTotalEffort}}</b> mhrs</span>
                   </el-col>
                   <el-col :span="12" :lg="7" class="sprint-card-header-col sprint-card-header-col-center">
                     <span v-if="tabTaskActive == 'tab_planned_tasks'? true: false">Estimation: <b>{{sprintEstimation}}</b> mhrs</span>
@@ -181,7 +181,7 @@ Remark:
                           <!-- Sprint Task Sub Task List -->
                           <div class="sprint-card-content-sub-task">
                             <el-divider content-position="left">Sub-Tasks List</el-divider>
-                            <el-table v-loading="sprintTask.sprintTaskSubtasksListLoading" :data="sprintTask.sprintTaskSubtasksList" max-height="300px" size="mini" style="width: 100%;">
+                            <el-table v-loading="sprintTask.sprintTaskSubtasksListLoading" :data="sprintTask.sprintTaskSubtasksList" :summary-method="getSummaries" show-summary max-height="300px" size="mini" style="width: 100%;">
                               <el-table-column v-if="false" prop="subtaskId" label="Id"></el-table-column>
                               <el-table-column v-if="false" prop="subtaskParentTaskName" label="Parent Task"></el-table-column>
                               <el-table-column width="150px" align="left" prop="subtaskName" label="Name" show-overflow-tooltip key="1">
@@ -198,8 +198,8 @@ Remark:
                                   <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
                                 </template>
                               </el-table-column>
-                              <el-table-column width="60px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
-                              <el-table-column width="60px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
+                              <el-table-column width="70px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
+                              <el-table-column width="70px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
                               <el-table-column v-if="!planListHide" width="130px" align="center" prop="subtaskAssignee" label="Assignee" show-overflow-tooltip key="6"></el-table-column>
                               <el-table-column v-if="planListHide" width="220px" align="center" prop="subtaskAssigneeId" label="Assignee" show-overflow-tooltip key="6">
                                 <template slot-scope="scope">
@@ -280,7 +280,7 @@ Remark:
                           <!-- Sprint Task Sub Task List -->
                           <div class="sprint-card-content-sub-task">
                             <el-divider content-position="left">Sub-Tasks List</el-divider>
-                            <el-table v-loading="sprintTask.sprintTaskSubtasksListLoading" :data="sprintTask.sprintTaskSubtasksList" max-height="300px" size="mini" style="width: 100%;">
+                            <el-table v-loading="sprintTask.sprintTaskSubtasksListLoading" :data="sprintTask.sprintTaskSubtasksList" :summary-method="getSummaries" show-summary max-height="300px" size="mini" style="width: 100%;">
                               <el-table-column v-if="false" prop="subtaskId" label="Id"></el-table-column>
                               <el-table-column v-if="false" prop="subtaskParentTaskName" label="Parent Task"></el-table-column>
                               <el-table-column width="150px" align="left" prop="subtaskName" label="Name" show-overflow-tooltip key="1">
@@ -297,8 +297,8 @@ Remark:
                                   <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
                                 </template>
                               </el-table-column>
-                              <el-table-column width="60px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
-                              <el-table-column width="60px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
+                              <el-table-column width="70px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
+                              <el-table-column width="70px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
                               <el-table-column v-if="!planListHide" width="130px" align="center" prop="subtaskAssignee" label="Assignee" show-overflow-tooltip key="6"></el-table-column>
                               <el-table-column v-if="planListHide" width="220px" align="center" prop="subtaskAssigneeId" label="Assignee" show-overflow-tooltip key="6">
                                 <template slot-scope="scope">
@@ -371,7 +371,7 @@ Remark:
                           <!-- Sprint Task Sub Task List -->
                           <div class="sprint-card-content-sub-task">
                             <el-divider content-position="left">Sub-Tasks List</el-divider>
-                            <el-table v-loading="sprintTask.sprintTaskSubtasksListLoading" :data="sprintTask.sprintTaskSubtasksList" max-height="300px" size="mini" style="width: 100%;">
+                            <el-table v-loading="sprintTask.sprintTaskSubtasksListLoading" :data="sprintTask.sprintTaskSubtasksList" :summary-method="getSummaries" show-summary max-height="300px" size="mini" style="width: 100%;">
                               <el-table-column v-if="false" prop="subtaskId" label="Id"></el-table-column>
                               <el-table-column v-if="false" prop="subtaskParentTaskName" label="Parent Task"></el-table-column>
                               <el-table-column width="150px" align="left" prop="subtaskName" label="Name" show-overflow-tooltip key="1">
@@ -388,8 +388,8 @@ Remark:
                                   <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
                                 </template>
                               </el-table-column>
-                              <el-table-column width="60px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
-                              <el-table-column width="60px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
+                              <el-table-column width="70px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
+                              <el-table-column width="70px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
                               <el-table-column width="70px" align="right" fixed="right" class="sprint-card-content-task-btn">>
                                 <template slot-scope="scope">
                                   <el-button-group>
@@ -494,6 +494,7 @@ export default {
       sprintBaseline: '',
       sprintRequiredSkillsStr: '',
       sprintEffort: 0,
+      sprintTotalEffort: 0,
       sprintEstimation: 0,
       sprintEstimationCopy: 0,
       sprintBuffer: 0,
@@ -576,7 +577,8 @@ export default {
       this.$data.sprintRequiredSkills = []
       this.$data.sprintObj = {}
       this.$data.sprintEstimationCopy = 0
-      this.$data.tabTaskActive = 'tab_planned_tasks',
+      this.$data.sprintTotalEffort = 0
+      this.$data.tabTaskActive = 'tab_planned_tasks'
       this.$data.changeSprintStatusVisible = false
     },
     initSprintTask () {
@@ -639,6 +641,7 @@ export default {
         this.$data.sprintRequiredSkillsStr = sprint.sprintRequiredSkillsStr
         this.$data.sprintBaseCapacity = sprint.sprintBaseCapacity
         this.$data.sprintRequiredSkills = sprint.sprintRequiredSkills
+        this.$data.sprintTotalEffort = sprint.sprintTotalEffort
         this.$data.sprintObj = {
           sprintId: sprint.sprintId,
           sprintRequiredSkills: sprint.sprintRequiredSkills,
@@ -954,6 +957,11 @@ export default {
           sums[index] = 'Sum';
           return;
         }
+        // Hide sub task list assignee column
+        if (index === 5) {
+          sums[index] = '';
+          return;
+        }
         const values = data.map(item => Number(item[column.property]));
         if (!values.every(value => isNaN(value))) {
           sums[index] = values.reduce((prev, curr) => {
@@ -964,7 +972,7 @@ export default {
               return prev;
             }
           }, 0);
-          sums[index] += ' mhrs';
+          sums[index] += ' hrs';
         } else {
           sums[index] = '';
         }
