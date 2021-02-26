@@ -682,13 +682,24 @@ Remark:
       },
       async saveTask () {
         console.log('Save PMT task')
-        this.$data.disabledSaveBtn = true
         var reqTask = this.$data.PMTTask
+        if (reqTask.taskTitle == null || reqTask.taskTitle == '') {
+          this.$message({message: 'Task title cannnot be empty!', type: 'error'})
+          return
+        }
+        if ((reqTask.taskStatus == 'Running' || reqTask.taskStatus == 'Done') && reqTask.taskEstimation == 0) {
+          this.$message({message: 'Task estimation cannnot be 0 when task is running or done!', type: 'error'})
+          return
+        }
         if (reqTask.taskRequiredSkills.length > 0) {
           for (var i=0; i<reqTask.taskRequiredSkills.length; i++) {
             reqTask.taskRequiredSkills[i] = '#' + reqTask.taskRequiredSkills[i] + '#'
           }
+        } else {
+          this.$message({message: 'Task required skills cannnot be empty!', type: 'error'})
+          return
         }
+        this.$data.disabledSaveBtn = true
         const res = await http.post('/tasks/updateTask', {
           reqTaskId: reqTask.taskId,
           reqTaskParentTaskName: reqTask.taskParentTaskName,
