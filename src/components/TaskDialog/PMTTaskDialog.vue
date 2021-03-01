@@ -65,7 +65,7 @@ Remark:
             </el-row>
             <el-row>
               <el-col :span="24" :lg="11">
-                <el-form-item v-show="showState.showCustomer" label="Customer">
+                <el-form-item v-show="showState.showCustomer" label="Customer" prop="taskCustomer">
                   <el-input :disabled="disabledState.disabledCustomer" v-model="PMTTask.taskCustomer" style="width: 100%" ></el-input>
                 </el-form-item>
               </el-col>
@@ -105,7 +105,7 @@ Remark:
               <el-select :disabled="disabledState.disabledSprint" v-model="PMTTask.taskSprintId" style="width: 100%" clearable>
                 <el-option label=" " value=""></el-option>
                 <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
-                  <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
+                  <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="'【' + sprintGroup.Label + '】 ' + sprint.sprintName" :value="sprint.sprintId">
                     <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
                     <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
                   </el-option>
@@ -281,6 +281,7 @@ Remark:
         sprintsList: [],
         PMTTaskFormRules: {
           taskTitle: [{required: true, message: 'Not allow empty', trigger: 'blur'}],
+          taskCustomer: [{required: true, message: 'Not allow empty', trigger: 'blur'}],
           taskRequiredSkills: [{required: true, message: 'Not allow empty', trigger: 'change'}]
         },
         DeliverableOptions: [
@@ -685,6 +686,10 @@ Remark:
         var reqTask = this.$data.PMTTask
         if (reqTask.taskTitle == null || reqTask.taskTitle == '') {
           this.$message({message: 'Task title cannnot be empty!', type: 'error'})
+          return
+        }
+        if (reqTask.taskCustomer == null || reqTask.taskCustomer == '') {
+          this.$message({message: 'Task customer cannnot be empty!', type: 'error'})
           return
         }
         if ((reqTask.taskStatus == 'Running' || reqTask.taskStatus == 'Done') && reqTask.taskEstimation == 0) {
