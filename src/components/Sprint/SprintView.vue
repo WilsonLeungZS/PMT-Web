@@ -22,11 +22,11 @@ Remark:
           <el-col :span="planListLength" :lg="planListLengthlg">
             <el-tabs @tab-click="changeTab" v-model="tabActive" :tab-position="tabPosition" class="sv-content-plan-list">
               <el-tab-pane name="tab_people_resource">
-                <span slot="label"><i class="el-icon-user-solid sv-content-tab-icon"></i> <span v-if="planListHide">People Res</span></span>
+                <span slot="label"><i class="el-icon-user-solid sv-content-tab-icon"></i> <span v-if="planListHide">Resources</span></span>
                 <people-plan-list :sprint="sprintObj" @refreshSprint="refreshSprint"></people-plan-list>
               </el-tab-pane>
               <el-tab-pane name="tab_task_backlog">
-                <span slot="label"><i class="el-icon-s-order sv-content-tab-icon"></i> <span v-if="planListHide">Tasks List</span></span>
+                <span slot="label"><i class="el-icon-s-order sv-content-tab-icon"></i> <span v-if="planListHide">Backlogs</span></span>
                 <task-plan-list :sprint="sprintObj" @createTask="createTask" @createRefTask="createRefTask" @editTask="editTask"></task-plan-list>
               </el-tab-pane>
               <el-tab-pane name="tab_hide">
@@ -411,15 +411,16 @@ Remark:
           </el-col>
         </el-row>
       </el-main>
-      <el-drawer title="Sprint Capacity" size="28%" :direction="direction" :visible.sync="peopleResVisible" class="sprint-plan-people-res-drawer">
+      <el-drawer title="Sprint Capacity" size="700px" :direction="direction" :visible.sync="peopleResVisible" class="sprint-plan-people-res-drawer">
         <el-row>
           <el-col :span="24">
-            <el-table v-loading="sprintCapacityLoading" :data="plannedPeopleList" :summary-method="getSummaries" show-summary width="100%">
+            <el-table v-loading="sprintCapacityLoading" :data="plannedPeopleList" :summary-method="getSummaries" show-summary width="100%" max-height="750px">
               <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
               <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
-              <el-table-column prop="sprintUserName" label="Name" align="center" min-width="120"></el-table-column>
-              <el-table-column prop="sprintUserNickname" label="Nickname" align="center"></el-table-column>
-              <el-table-column prop="sprintUserCapacity" label="Planned Capacity" align="center" width="180">
+              <el-table-column prop="sprintUserNickname" label="Nickname" align="center" width="120" sortable></el-table-column>
+              <el-table-column prop="sprintUserName" label="Name" align="left" width="150" sortable></el-table-column>
+              <el-table-column prop="sprintUserSkillsStr" label="Skills" align="left" min-width="120" sortable></el-table-column>
+              <el-table-column prop="sprintUserCapacity" label="Capacity" align="center" width="110" sortable>
               </el-table-column>
               <el-table-column align="right" fixed="right" width="70">
                 <template slot-scope="scope">
@@ -850,6 +851,8 @@ export default {
         taskTypeTag: iTaskObj.taskTypeTag,
         taskReferenceTask: iTaskObj.taskName,
         taskReferenceTaskTitle: iTaskObj.taskTitle,
+        taskReferenceTaskEffort: iTaskObj.taskEffort,
+        taskReferenceTaskEstimation: iTaskObj.taskEstimation,
         taskCustomer: iTaskObj.taskCustomer,
         taskRequiredSkills: iTaskObj.taskRequiredSkills,
         taskSprintId: this.$data.sprintSelect,
@@ -1233,7 +1236,7 @@ export default {
   padding: 2px 0;
 }
 .sprint-card-content-task-hide-icon>>>.el-collapse-item__arrow {
-  visibility: hidden;
+  display: none;
 }
 
 /* Drawer Style */

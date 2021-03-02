@@ -93,7 +93,10 @@ Remark:
                       </template>
                     </el-autocomplete>
                   </el-col>
-                  <el-col :span="24" :lg="{span: 17, offset: 1}">
+                  <el-col :span="24" :lg="{span: 16, offset: 2}">
+                    <span style="font-size: 19px">Ref Task Effort / Estimation: <b>{{PMTTaskReferenceTaskEffort}}</b> / <b>{{PMTTaskReferenceTaskEstimation}}</b> hrs</span>
+                  </el-col>
+                  <el-col :span="24" :lg="24" style="margin-top: 5px">
                     <el-tooltip :content="PMTTaskReferenceTaskTitle" class="item" effect="dark" placement="top-start">
                       <div v-show="showState.showReferenceTaskTitle" class="pmt-task-dialog-form-desc">{{PMTTaskReferenceTaskTitle}}</div>
                     </el-tooltip>
@@ -360,6 +363,8 @@ Remark:
           taskEstimation: 0,
         },
         PMTTaskParentTaskTitle: '',
+        PMTTaskReferenceTaskEffort: 0,
+        PMTTaskReferenceTaskEstimation: 0,
         PMTTaskReferenceTaskTitle: '',
         PMTTaskSubtasksList: [],
         PMTTaskWorklogHistories: [],
@@ -456,6 +461,8 @@ Remark:
           taskEstimation: 0,
         }
         this.$data.PMTTaskParentTaskTitle = ''
+        this.$data.PMTTaskReferenceTaskEffort = 0,
+        this.$data.PMTTaskReferenceTaskEstimation = 0,
         this.$data.PMTTaskReferenceTaskTitle = ''
         for(let key in this.$data.disabledState) {
           this.$data.disabledState[key] = false
@@ -506,6 +513,8 @@ Remark:
         this.$data.PMTTask.taskCustomer = iObj.taskCustomer
         this.$data.PMTTask.taskRequiredSkills = iObj.taskRequiredSkills
         this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
+        this.$data.PMTTaskReferenceTaskEffort = iObj.taskReferenceTaskEffort
+        this.$data.PMTTaskReferenceTaskEstimation = iObj.taskReferenceTaskEstimation
         this.$data.PMTTaskReferenceTaskTitle = iObj.taskReferenceTaskTitle
         this.$data.PMTTask.taskTitle = iObj.taskReferenceTaskTitle
         this.$data.PMTTask.taskRespLeaderId = iObj.taskRespLeaderId
@@ -716,7 +725,7 @@ Remark:
           reqTaskReferenceTask: reqTask.taskReferenceTask,
           reqTaskTypeTag: reqTask.taskTypeTag,
           reqTaskDeliverableTag: reqTask.taskDeliverableTag != null? reqTask.taskDeliverableTag.toString(): null,
-          reqTaskCreator: 'PMT:' + this.$data.userName,
+          reqTaskCreator: (reqTask.taskCreator == null || reqTask.taskCreator == '')? 'PMT:'+this.$data.userName: 'PMT:'+reqTask.taskCreator,
           reqTaskRequiredSkills: reqTask.taskRequiredSkills.toString(),
           reqTaskCustomer: reqTask.taskCustomer,
           reqTaskStatus: reqTask.taskStatus,
@@ -837,6 +846,8 @@ Remark:
         }
       },
       async setReferenceTaskTitleByName (iTaskName) {
+        this.$data.PMTTaskReferenceTaskEffort = 0
+        this.$data.PMTTaskReferenceTaskEstimation = 0
         this.$data.PMTTaskReferenceTaskTitle = ''
         if (iTaskName != null && iTaskName != '') {
           const res = await http.get('/tasks/getTaskByName', {
@@ -844,6 +855,8 @@ Remark:
           })
           if (res.data != null && res.data.status == 0) {
             this.$data.PMTTaskReferenceTaskTitle = res.data.data.taskTitle
+            this.$data.PMTTaskReferenceTaskEffort = res.data.data.taskEffort
+        this.$data.PMTTaskReferenceTaskEstimation = res.data.data.taskEstimation
           }
         }
       },

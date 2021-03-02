@@ -2,7 +2,7 @@
   <div class="sv-content-people-plan-list">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>People Resource</span>
+        <span>Resources</span>
       </div>
       <div class="people-plan-list-table">
         <el-table v-loading="userPlanListLoading" :data="userPlanList" width="100%" size="small">
