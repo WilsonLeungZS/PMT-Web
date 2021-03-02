@@ -2,7 +2,7 @@
   <div class="sv-content-task-plan-list">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>Task Backlog</span>
+        <span>Backlogs</span>
       </div>
       <div>
         <el-row :gutter="10">
@@ -121,6 +121,7 @@ export default {
       this.$data.taskPlanListLoading = false
     },
     handlePageChange(val) {
+      console.log('Page change -> ', val)
       this.$data.taskReqPage = val
       this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer)
     },
