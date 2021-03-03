@@ -219,7 +219,23 @@ export default {
         reqMonth: monthArr.toString()
       })
       if (res.data.status === 0) {
-        this.$data.timesheetData = res.data.data
+        var timesheetArray = res.data.data
+        for (var i=0; i<timesheetArray.length; i++) {
+          var timesheet = timesheetArray[i]
+          var flag = false
+          for(var key in timesheet){
+            if (key.startsWith('day')) {
+              var timesheetDate = key.replace('day', '')
+              if (timesheetDate > iStartDate && timesheetDate < iEndDate) {
+                flag = true
+              }
+            }
+          }
+          if (!flag) {
+            timesheetArray.splice(i, 1)
+          }
+        }
+        this.$data.timesheetData = timesheetArray
       }
     },
     editWorklogByDate (column) {
