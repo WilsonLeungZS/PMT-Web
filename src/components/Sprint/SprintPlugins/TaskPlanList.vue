@@ -6,32 +6,44 @@
       </div>
       <div>
         <el-row :gutter="10">
-          <el-col :span="6">
-            <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchCustomer" placeholder="Search Customer..." size="small" clearable></el-input>
+          <el-col :span="8" :lg="5" style="margin: 5px 0">
+            <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchCustomer" placeholder="Customer..." size="small" clearable></el-input>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="16" :lg="9" style="margin: 5px 0">
             <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchKeyword" placeholder="Search Task..." size="small" clearable>
-              <el-button @click="searchTask" slot="append" icon="el-icon-search"></el-button>
+              <el-button v-if="taskSearchKeyword != ''" @click="searchTask" slot="append" icon="el-icon-search"></el-button>
+              <el-button v-if="taskSearchKeyword == ''" @click="searchTask" slot="append" icon="el-icon-refresh"></el-button>
             </el-input>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="12" :lg="4" style="margin: 5px 0">
             <el-button @click="createTask" type="success" icon="el-icon-plus" size="small" style="width: 100%">New Task</el-button>
+          </el-col>
+          <el-col :span="12" :lg="6" style="margin: 5px 0">
+            <el-checkbox @change="searchTask" v-model="taskCheckboxShowDoneTask" label="Show 'Done' Task" border size="small" style="width: 100%; height: 100%; padding: 6px"></el-checkbox>
           </el-col>
         </el-row>
         <el-row class="task-plan-list-table">
           <el-col :span="24">
             <el-table v-loading="taskPlanListLoading" :data="taskPlanList" width="100%" size="mini">
               <el-table-column prop="taskTypeTag" label="TypeTag" v-if="false"></el-table-column>
-              <el-table-column prop="taskName" label="Name" align="left" width="150">
+              <el-table-column prop="taskName" label="Name" align="left" width="130" fixed="left">
                 <template slot-scope="scope">
                   <el-button @click="editTask(scope.row.taskId, scope.row.taskCategory)" type="text">{{scope.row.taskName}}</el-button>
                 </template>
               </el-table-column>
               <el-table-column prop="taskTitle" label="Title" align="left" min-width="200" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="taskCustomer" label="Customer" align="center" min-width="70" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="taskStatus" label="Status" align="center"  width="68px">
+                <template slot-scope="scope">
+                  <el-tag effect="dark" type="warning" size="mini" v-if="scope.row.taskStatus == 'Drafting'">{{scope.row.taskStatus}}</el-tag>
+                  <el-tag effect="dark" type="primary" size="mini" v-if="scope.row.taskStatus == 'Planning'">{{scope.row.taskStatus}}</el-tag>
+                  <el-tag effect="dark" type="success" size="mini" v-if="scope.row.taskStatus == 'Running'" >{{scope.row.taskStatus}}</el-tag>
+                  <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.taskStatus == 'Done'"    >{{scope.row.taskStatus}}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="taskCustomer" label="Customer" align="center" width="77" show-overflow-tooltip></el-table-column>
               <el-table-column prop="taskEffort" label="Effort" align="center" width="55"></el-table-column>
               <el-table-column prop="taskEstimation" label="Est" align="center" width="55"></el-table-column>
-              <el-table-column align="right" width="50" >
+              <el-table-column align="right" width="50" fixed="right">
                 <template slot-scope="scope">
                   <el-tooltip class="item" effect="dark" content="Create PMT Task" placement="top">
                     <el-button @click="createRefTask(scope.row)" type="primary" icon="el-icon-document-add" class="task-plan-list-table-btn"></el-button>
@@ -61,6 +73,7 @@ export default {
       taskPlanList: [],
       taskSearchCustomer: '',
       taskSearchKeyword: '',
+      taskCheckboxShowDoneTask: false,
       taskPlanListSize: 30,
       taskPlanListPage: 1,
       taskPlanListTotal: 0,
@@ -79,7 +92,7 @@ export default {
         var sprintObj = val
         if (sprintObj != null && sprintObj != '') {
           this.$data.taskSprintObj = sprintObj
-          this.getTaskPlanListBySkills(sprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer)
+          this.getTaskPlanListBySkills(sprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
         } else {
           this.$data.taskSprintObj = null
           this.taskPlanList = []
@@ -90,17 +103,17 @@ export default {
     }
   },
   methods: {
-    async getTaskPlanListBySkills (iSprintObj, iKeyword, iCustomer) {
+    async getTaskPlanListBySkills (iSprintObj, iKeyword, iCustomer, iShowDoneTask) {
       this.$data.taskPlanListLoading = true
       this.$data.taskPlanList = []
       this.$data.taskPlanListTotal = 0
       if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
         var skillsArray = iSprintObj.sprintRequiredSkills.toString()
-        console.log(skillsArray)
         var resCount = await http.post('/tasks/getTasksListCountBySkill', {
           reqSkillsArray: skillsArray,
           reqTaskKeyword: iKeyword,
-          reqTaskCustomer: iCustomer
+          reqTaskCustomer: iCustomer,
+          reqShowDoneTask: iShowDoneTask
         })
         if (resCount != null && resCount.data.status == 0) {
           this.$data.taskPlanListTotal = resCount.data.data
@@ -109,6 +122,7 @@ export default {
           reqSkillsArray: skillsArray,
           reqTaskKeyword: iKeyword,
           reqTaskCustomer: iCustomer,
+          reqShowDoneTask: iShowDoneTask,
           reqPage: this.$data.taskReqPage,
           reqSize: this.$data.taskPlanListSize
         })
@@ -123,10 +137,10 @@ export default {
     handlePageChange(val) {
       console.log('Page change -> ', val)
       this.$data.taskReqPage = val
-      this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer)
+      this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
     },
     searchTask () {
-      this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer)
+      this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
     },
     createTask () {
       this.$emit('createTask')
@@ -166,5 +180,12 @@ export default {
 }
 .task-plan-list-table>>>.el-button--primary {
   font-size: 16px;
+}
+.task-plan-list-table>>>.el-tag {
+  font-size: 10px;
+  padding: 0 3px;
+}
+.task-plan-list-table>>>.el-button {
+  font-size: 12px;
 }
 </style>
