@@ -2,26 +2,26 @@
   <div class="sv-content-task-plan-list">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>Backlogs</span>
+        <span>Backlogs ({{taskPlanListTotal}})</span>
       </div>
       <div>
         <el-row :gutter="10">
           <el-col :span="8" :lg="5" style="margin: 5px 0">
             <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchCustomer" placeholder="Customer..." size="small" clearable></el-input>
           </el-col>
-          <el-col :span="16" :lg="9" style="margin: 5px 0">
+          <el-col :span="16" :lg="10" style="margin: 5px 0">
             <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchKeyword" placeholder="Search Task..." size="small" clearable>
               <el-button v-if="taskSearchKeyword != ''" @click="searchTask" slot="append" icon="el-icon-search"></el-button>
               <el-button v-if="taskSearchKeyword == ''" @click="searchTask" slot="append" icon="el-icon-refresh"></el-button>
             </el-input>
           </el-col>
+          <el-col :span="12" :lg="5" style="margin: 5px 0">
+            <el-checkbox @change="searchTask" v-model="taskCheckboxShowDoneTask" label="Show 'Done'" border size="small" style="width: 100%; height: 100%; padding: 6px"></el-checkbox>
+          </el-col>
           <el-col :span="12" :lg="4" style="margin: 5px 0">
             <el-tooltip class="item" effect="dark" content="Only allow level < 10 user can create new backlog" placement="top">
               <el-button @click="createTask" :disabled="userLevel>10" type="success" icon="el-icon-plus" size="small" style="width: 100%">New Task</el-button>
             </el-tooltip>
-          </el-col>
-          <el-col :span="12" :lg="6" style="margin: 5px 0">
-            <el-checkbox @change="searchTask" v-model="taskCheckboxShowDoneTask" label="Show 'Done' Task" border size="small" style="width: 100%; height: 100%; padding: 6px"></el-checkbox>
           </el-col>
         </el-row>
         <el-row class="task-plan-list-table">
