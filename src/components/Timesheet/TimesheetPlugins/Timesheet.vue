@@ -226,7 +226,7 @@ export default {
           for(var key in timesheet){
             if (key.startsWith('day')) {
               var timesheetDate = key.replace('day', '')
-              if (timesheetDate > iStartDate && timesheetDate < iEndDate) {
+              if (timesheetDate >= iStartDate && timesheetDate <= iEndDate) {
                 flag = true
               }
             }
