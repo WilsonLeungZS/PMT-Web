@@ -414,18 +414,19 @@ Remark:
       <el-drawer title="Sprint Capacity" size="700px" :direction="direction" :visible.sync="peopleResVisible" class="sprint-plan-people-res-drawer">
         <el-row>
           <el-col :span="24">
-            <el-table v-loading="sprintCapacityLoading" :data="plannedPeopleList" :summary-method="getSummaries" show-summary width="100%" max-height="750px">
+            <el-table v-loading="sprintCapacityLoading" :data="plannedPeopleList" :row-class-name="highlightLeaderRow" :summary-method="getSummaries" show-summary width="100%" max-height="750px">
               <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
               <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
               <el-table-column prop="sprintUserNickname" label="Nickname" align="center" width="120" sortable></el-table-column>
               <el-table-column prop="sprintUserName" label="Name" align="left" width="150" sortable></el-table-column>
-              <el-table-column prop="sprintUserSkillsStr" label="Skills" align="left" min-width="120" sortable></el-table-column>
+              <el-table-column prop="sprintUserSkillsStr" label="Skills" align="left" min-width="100" sortable show-overflow-tooltip></el-table-column>
+              <el-table-column prop="sprintUserLevel" label="Level" align="center" width="100" sortable></el-table-column>
               <el-table-column prop="sprintUserCapacity" label="Capacity" align="center" width="110" sortable>
               </el-table-column>
               <el-table-column align="right" fixed="right" width="70">
                 <template slot-scope="scope">
-                  <el-tooltip class="item" effect="dark" content="Remove from Sprint" placement="top">
-                    <el-button :disabled="sprintStatus == 'Running'? true: false" @click="removeUserFromSprint(scope.row)" type="danger" icon="el-icon-d-arrow-left" size="mini"></el-button>
+                  <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
+                    <el-button :disabled="disabledRemovePeopleFromSprintBtn" @click="removeUserFromSprint(scope.row)" type="danger" icon="el-icon-d-arrow-left" size="mini"></el-button>
                   </el-tooltip>
                 </template>
               </el-table-column>
@@ -514,6 +515,8 @@ export default {
       direction: 'rtl',
       peopleResVisible: false,
       plannedPeopleList: [],
+      disabledRemovePeopleFromSprintBtn: false,
+      disabledMessage: 'Remove from sprint',
       // Task Dialog handling value
       pmtTaskDialogAction: null,
       externalTaskDialogAction: null,
@@ -556,6 +559,23 @@ export default {
     }
   },
   methods: {
+    validateSprint () {
+      var sprintEndTime = this.$data.sprintEndTime
+      var sprintStatus = this.$data.sprintStatus
+      var currentTime = this.formatDate(new Date(), 'yyyy-MM-dd')
+      if (currentTime > sprintEndTime) {
+        this.$data.disabledMessage = 'Not allow to edit sprint after the sprint end'
+        this.$data.disabledRemovePeopleFromSprintBtn = true
+      }
+      else if (sprintStatus == 'Running') {
+        this.$data.disabledMessage = 'Not allow to remove people from sprint when it is running'
+        this.$data.disabledRemovePeopleFromSprintBtn = true
+      }
+      else {
+        this.$data.disabledMessage = 'Remove from sprint'
+        this.$data.disabledRemovePeopleFromSprintBtn = false
+      }
+    },
     changeTab (tab, event) {
       if (tab.name == 'tab_hide') {
         this.$data.planListHide = true
@@ -949,7 +969,14 @@ export default {
       }
     },
     // Sprint Drawer Method
+    highlightLeaderRow ({row, rowIndex}) {
+      if (rowIndex === 0) {
+        return 'highlight-leader-row';
+      }
+      return '';
+    },
     showPlannedPeopleRes () {
+      this.validateSprint()
       this.$data.peopleResVisible = true
     },
     getSummaries(param) {
@@ -1053,6 +1080,27 @@ export default {
         }
       }
       return -1;
+    },
+    // Common Method
+    formatDate (date, fmt) { 
+      var o = { 
+        "M+" : date.getMonth()+1,                 
+        "d+" : date.getDate(),                     
+        "h+" : date.getHours(),                    
+        "m+" : date.getMinutes(),                 
+        "s+" : date.getSeconds(),                  
+        "q+" : Math.floor((date.getMonth()+3)/3),
+        "S"  : date.getMilliseconds()            
+      }; 
+      if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+      }
+      for(var k in o) {
+        if(new RegExp("("+ k +")").test(fmt)){
+              fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+          }
+      }
+      return fmt; 
     }
   },
   created () {
@@ -1269,5 +1317,8 @@ export default {
 .sv-content .el-collapse-item.is-disabled .el-collapse-item__header {
   color: #303133;
   cursor: default;
+}
+.el-table .highlight-leader-row {
+  background: #fff9c4;
 }
 </style>

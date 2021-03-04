@@ -346,7 +346,7 @@ export default {
       }
       // Get Working Days
       if (sprint.sprintStartTime != null && sprint.sprintEndTime != null) {
-        var res = await http.get('https://sitipo.gzatc.mtl/api/others/workdays', {
+        var res = await http.get('https://ipo.gzatcc.com/api/others/workdays', {
           start_date: sprint.sprintStartTime,
           end_date: sprint.sprintEndTime,
         })

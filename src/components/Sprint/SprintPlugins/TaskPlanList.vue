@@ -16,7 +16,9 @@
             </el-input>
           </el-col>
           <el-col :span="12" :lg="4" style="margin: 5px 0">
-            <el-button @click="createTask" type="success" icon="el-icon-plus" size="small" style="width: 100%">New Task</el-button>
+            <el-tooltip class="item" effect="dark" content="Only allow level < 10 user can create new backlog" placement="top">
+              <el-button @click="createTask" :disabled="userLevel>10" type="success" icon="el-icon-plus" size="small" style="width: 100%">New Task</el-button>
+            </el-tooltip>
           </el-col>
           <el-col :span="12" :lg="6" style="margin: 5px 0">
             <el-checkbox @change="searchTask" v-model="taskCheckboxShowDoneTask" label="Show 'Done' Task" border size="small" style="width: 100%; height: 100%; padding: 6px"></el-checkbox>
@@ -45,8 +47,8 @@
               <el-table-column prop="taskEstimation" label="Est" align="center" width="55"></el-table-column>
               <el-table-column align="right" width="50" fixed="right">
                 <template slot-scope="scope">
-                  <el-tooltip class="item" effect="dark" content="Create PMT Task" placement="top">
-                    <el-button @click="createRefTask(scope.row)" type="primary" icon="el-icon-document-add" class="task-plan-list-table-btn"></el-button>
+                  <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
+                    <el-button :disabled="disabledCreateRefTaskBtn" @click="createRefTask(scope.row)" type="primary" icon="el-icon-document-add" class="task-plan-list-table-btn"></el-button>
                   </el-tooltip>
                 </template>
               </el-table-column>
@@ -80,7 +82,10 @@ export default {
       taskSprintObj: null,
       taskReqPage: 1,
       // Loading
-      taskPlanListLoading: false
+      taskPlanListLoading: false,
+      userLevel: this.$store.getters.getUserLevel,
+      disabledCreateRefTaskBtn: false,
+      disabledMessage: 'Create PMT Task'
     }
   },
   props: {
@@ -93,6 +98,7 @@ export default {
         if (sprintObj != null && sprintObj != '') {
           this.$data.taskSprintObj = sprintObj
           this.getTaskPlanListBySkills(sprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
+          this.validateSprint(sprintObj)
         } else {
           this.$data.taskSprintObj = null
           this.taskPlanList = []
@@ -103,6 +109,18 @@ export default {
     }
   },
   methods: {
+    validateSprint (iSprintObj) {
+      var sprintEndTime = iSprintObj.sprintEndTime
+      var currentTime = this.formatDate(new Date(), 'yyyy-MM-dd')
+      if (currentTime > sprintEndTime) {
+        this.$data.disabledMessage = 'Not allow to edit sprint after the sprint end'
+        this.$data.disabledCreateRefTaskBtn = true
+      }
+      else {
+        this.$data.disabledMessage = 'Create PMT Task'
+        this.$data.disabledCreateRefTaskBtn = false
+      }
+    },
     async getTaskPlanListBySkills (iSprintObj, iKeyword, iCustomer, iShowDoneTask) {
       this.$data.taskPlanListLoading = true
       this.$data.taskPlanList = []
@@ -150,6 +168,27 @@ export default {
     },
     editTask (iTaskId, iTaskCategory) {
       this.$emit('editTask', iTaskId, iTaskCategory)
+    },
+    // Common Method
+    formatDate (date, fmt) { 
+      var o = { 
+        "M+" : date.getMonth()+1,                 
+        "d+" : date.getDate(),                     
+        "h+" : date.getHours(),                    
+        "m+" : date.getMinutes(),                 
+        "s+" : date.getSeconds(),                  
+        "q+" : Math.floor((date.getMonth()+3)/3),
+        "S"  : date.getMilliseconds()            
+      }; 
+      if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+      }
+      for(var k in o) {
+        if(new RegExp("("+ k +")").test(fmt)){
+              fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+          }
+      }
+      return fmt; 
     }
   },
   created () {

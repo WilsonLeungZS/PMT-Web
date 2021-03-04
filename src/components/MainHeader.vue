@@ -3,7 +3,7 @@
     <el-container>
       <el-header>
         <el-row class="main-el-row" :style="{'background': mainColor}" justify="center" align="middle">
-          <el-col :span="8" :class="this.$store.getters.getIsShowMainBar == false? 'hide-view': ''">
+          <el-col :span="6" :lg="8" :class="this.$store.getters.getIsShowMainBar == false? 'hide-view': ''">
             <div class="main-grid-content" style="justify-content: flex-start; margin-left: 13px">
               <el-button @click="handleMenuCommand('sprint')" class="main-menu-btn btn-hover" icon="el-icon-data-line">Sprints</el-button>
               <el-button @click="handleMenuCommand('timesheet')" class="main-menu-btn btn-hover" icon="el-icon-date">Timesheet</el-button>
@@ -11,12 +11,12 @@
               <el-button @click="handleMenuCommand('management')" class="main-menu-btn btn-hover" icon="el-icon-setting">Management</el-button>
             </div>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12" :lg="8">
             <div class="main-grid-content">
               <span class="main-logo">{{logo}}</span>
             </div>
           </el-col>
-          <el-col :span="8" :class="this.$store.getters.getIsShowMainBar == false? 'hide-view': ''">
+          <el-col :span="6" :lg="8" :class="this.$store.getters.getIsShowMainBar == false? 'hide-view': ''">
             <div class="main-grid-content" style="justify-content:flex-end;">
               <el-dropdown trigger="click" style="padding: 0" @command="handleUserCommand">
                 <el-popover class="info-content" placement="left-start" trigger="hover">
@@ -57,7 +57,7 @@
       </el-header>
       <!-- Switch Each Page -->
       <el-main>
-        <router-view/>
+        <router-view />
       </el-main>
     </el-container>
     <el-dialog title="Theme Style" :visible.sync="centerDialogVisible" width="360px" center>
