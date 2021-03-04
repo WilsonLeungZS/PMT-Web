@@ -1284,7 +1284,7 @@ export default {
   padding: 2px 0;
 }
 .sprint-card-content-task-hide-icon>>>.el-collapse-item__arrow {
-  display: none;
+  visibility: hidden;
 }
 
 /* Drawer Style */
