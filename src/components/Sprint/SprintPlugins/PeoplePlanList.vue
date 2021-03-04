@@ -18,8 +18,8 @@
           </el-table-column>
           <el-table-column align="right" width="50">
             <template slot-scope="scope">
-              <el-tooltip class="item" effect="dark" content="Assigen to Sprint" placement="top">
-                <el-button :disabled="sprintObj.sprintStatus == 'Running'? true: false" @click="assignUserToSprint(scope.row)" type="primary" icon="el-icon-d-arrow-right"></el-button>
+              <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
+                <el-button :disabled="disabledAddPeopleBtn" @click="assignUserToSprint(scope.row)" type="primary" icon="el-icon-d-arrow-right"></el-button>
               </el-tooltip>
             </template>
           </el-table-column>
@@ -42,6 +42,8 @@ export default {
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
       userPlanList: [],
       sprintObj: null,
+      disabledAddPeopleBtn: false,
+      disabledMessage: 'Assigen to Sprint',
       // Loading
       userPlanListLoading: false
     }
@@ -55,6 +57,7 @@ export default {
         var sprintObj = val
         if (sprintObj != null && sprintObj != '') {
           this.getUserListBySkills(sprintObj)
+          this.validateSprint(sprintObj)
           this.sprintObj = sprintObj
         } else {
           this.userPlanList = []
@@ -66,6 +69,23 @@ export default {
     }
   },
   methods: {
+    validateSprint (iSprintObj) {
+      var sprintEndTime = iSprintObj.sprintEndTime
+      var sprintStatus = iSprintObj.sprintStatus
+      var currentTime = this.formatDate(new Date(), 'yyyy-MM-dd')
+      if (currentTime > sprintEndTime) {
+        this.$data.disabledMessage = 'Not allow to edit sprint after the sprint end'
+        this.$data.disabledAddPeopleBtn = true
+      }
+      else if (sprintStatus == 'Running') {
+        this.$data.disabledMessage = 'Not allow to assign people to sprint when it is running'
+        this.$data.disabledAddPeopleBtn = true
+      }
+      else {
+        this.$data.disabledMessage = 'Assigen to Sprint'
+        this.$data.disabledAddPeopleBtn = false
+      }
+    },
     async getUserListBySkills (iSprintObj) {
       this.$data.userPlanList = []
       if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
@@ -118,6 +138,27 @@ export default {
           this.$emit('refreshSprint')
         }
       }
+    },
+    // Common Method
+    formatDate (date, fmt) { 
+      var o = { 
+        "M+" : date.getMonth()+1,                 
+        "d+" : date.getDate(),                     
+        "h+" : date.getHours(),                    
+        "m+" : date.getMinutes(),                 
+        "s+" : date.getSeconds(),                  
+        "q+" : Math.floor((date.getMonth()+3)/3),
+        "S"  : date.getMilliseconds()            
+      }; 
+      if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+      }
+      for(var k in o) {
+        if(new RegExp("("+ k +")").test(fmt)){
+              fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+          }
+      }
+      return fmt; 
     }
   },
   created () {
