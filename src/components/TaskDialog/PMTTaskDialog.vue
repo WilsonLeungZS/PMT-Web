@@ -49,7 +49,7 @@ Remark:
             <el-row>
               <el-col :span="24" :lg="11">
                 <el-form-item v-show="showState.showTypeTag" label="Type Tag" prop="taskTypeTag">
-                  <el-select :disabled="disabledState.disabledTypeTag" v-model="PMTTask.taskTypeTag" style="width: 100%">
+                  <el-select disabled v-model="PMTTask.taskTypeTag" style="width: 100%">
                     <el-option label="One-Off Task" value="One-Off Task"></el-option>
                     <el-option label="Public Task" value="Public Task"></el-option>
                   </el-select>
@@ -569,7 +569,6 @@ Remark:
         // Set sub Task disabled state
         this.$data.disabledState.disabledParent = true
         this.$data.disabledState.disabledType = true
-        this.$data.disabledState.disabledTypeTag = true
         this.$data.disabledState.disabledRequiredSkills = true
         this.$data.disabledState.disabledCustomer = true
         this.$data.disabledState.disabledReferenceTask = true
@@ -613,8 +612,6 @@ Remark:
           this.$data.showState.showRespLeader = false
           this.$data.showState.showAssignee = false
           this.$data.showAddWorklogBtn = false
-          // Disabled field
-          this.$data.disabledState.disabledTypeTag = true
           // Hide all tabs
           if (this.$refs.PMTTaskDialogTabs != undefined) {
             this.$nextTick(() => {
@@ -650,7 +647,6 @@ Remark:
         }
         if (taskCategory == 'PMT-TASK-SUB') {
           this.$data.disabledState.disabledType = true
-          this.$data.disabledState.disabledTypeTag = true
           this.$data.disabledState.disabledCustomer = true
           this.$data.disabledState.disabledRequiredSkills = true
           this.$data.disabledState.disabledReferenceTask = true
@@ -680,7 +676,6 @@ Remark:
           this.$data.showState.showAssignee = false
           this.$data.showState.showEstimation = false
           this.$data.showState.showDeliverableTag = false
-          this.$data.disabledState.disabledTypeTag = true
         }
         this.$data.PMTTaskDialogVisible = true
       },
