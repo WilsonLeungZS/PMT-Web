@@ -59,10 +59,10 @@
                   <el-table @row-click="clickPeopleToGetTimesheet" v-loading="peopleListLoading" :data="peopleList" :row-class-name="highlightLeaderRow" width="100%" max-height="680px" highlight-current-row class="prj-timesheet-content-table">
                     <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
                     <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
-                    <el-table-column prop="sprintUserFullName" label="Name" align="left" min-width="210" fixed="left" show-overflow-tooltip>
+                    <el-table-column prop="sprintUserFullName" label="Name" align="left" min-width="240" fixed="left">
                       <template slot="header" slot-scope="scope">
                         <span><i class="el-icon-date"></i> Date</span>
-                        <el-select @change="getDailyScrum" v-model="dateSelect" placeholder="Select Date..." style="margin-left: 5px; width: 60%;" size="small">
+                        <el-select @change="getDailyScrum" v-model="dateSelect" placeholder="Select Date..." style="margin-left: 10px; width: 70%;" size="small">
                           <el-option v-for="(date, index) in dateRange" :key="index" :label="date" :value="date"></el-option>
                         </el-select>
                       </template>
