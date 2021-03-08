@@ -19,42 +19,95 @@
           <el-col :span="24" class="content-main-col" style="margin-bottom:0 !important">
             <el-card class="box-card" shadow="hover">
               <el-row>
-                <el-col :span="1" :lg="6">&nbsp;</el-col>
-                <el-col :span="11" :lg="6">
+                <el-col :span="1" :lg="5">&nbsp;</el-col>
+                <el-col :span="22" :lg="14">
                   <span><i class="el-icon-data-line"></i> Sprint</span>
-                  <el-select @change="getPeopleListBySprint" v-model="sprintSelect" style="width: 72%;margin-left: 5px;">
+                  <el-select @change="getDailyScrum" v-model="sprintSelect" style="width: 72%;margin-left: 5px;">
                     <el-option label="No Select" value=""></el-option>
                     <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
-                      <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
+                      <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="'【' + sprintGroup.Label + '】' +sprint.sprintName" :value="sprint.sprintId">
                         <span style="float: left; margin-right:20px">{{sprint.sprintName}}</span>
                         <span style="float: right; color: #8492a6; font-size: 12px">{{sprint.sprintLeader}}</span>
                       </el-option>
                     </el-option-group>
                   </el-select>
                 </el-col>
-                <el-col :span="11" :lg="6">
-                  <span><i class="el-icon-user"></i> People</span>
-                  <el-select @change="getTimesheet" :disabled="disabledPeopleList" v-model="peopleSelect" style="width: 72%;margin-left: 5px;" filterable clearable>
-                    <el-option label=" " value=""></el-option>
-                    <el-option v-for="(people, index) in peopleList" :key="index" :label="people.sprintUserName" :value="people.sprintUserId">
-                      <span style="float: left; margin-right:20px">{{people.sprintUserName}} ({{people.sprintUserNickname}})</span>
-                      <span style="float: right; color: #8492a6; font-size: 12px">Level - {{people.sprintUserLevel}}</span>
-                    </el-option>
-                  </el-select>
-                </el-col>
               </el-row>
             </el-card>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="24" class="content-main-col">
-            <timesheet v-if="showTimesheet" :timesheetObj="timesheetObj"></timesheet>
+        <el-row v-if="showContent" class="prj-timesheet-content" :gutter="5">
+          <el-col :span="15">
+            <el-card class="box-card" shadow="never">
+              <el-row>
+                <el-col :span="24" class="content-main-col">
+                  <timesheet v-if="showTimesheet" :timesheetObj="timesheetObj"></timesheet>
+                </el-col>
+              </el-row>
+              <el-row v-if="showTaskTable">
+                <el-col :span="24" class="content-main-col" style="padding: 0 5px;">
+                  <el-divider content-position="center"><b>Selected Sprint Tasks</b></el-divider>
+                  <task-table :taskTableObj="taskTableObj"></task-table>
+                </el-col>
+              </el-row>
+            </el-card>
           </el-col>
-        </el-row>
-        <el-row v-if="showTaskTable">
-          <el-col :span="24" class="content-main-col" style="padding: 0 5px;">
-            <el-divider content-position="center"><b>Selected Sprint Tasks</b></el-divider>
-            <task-table :taskTableObj="taskTableObj"></task-table>
+          <el-col :span="9">
+            <el-card class="box-card" shadow="never">
+              <el-row>
+                <el-col :span="24">
+                  <el-table @row-click="clickPeopleToGetTimesheet" v-loading="peopleListLoading" :data="peopleList" :row-class-name="highlightLeaderRow" width="100%" max-height="680px" highlight-current-row class="prj-timesheet-content-table">
+                    <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
+                    <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
+                    <el-table-column prop="sprintUserFullName" label="Name" align="left" min-width="210" fixed="left" show-overflow-tooltip>
+                      <template slot="header" slot-scope="scope">
+                        <span><i class="el-icon-date"></i> Date</span>
+                        <el-select @change="getDailyScrum" v-model="dateSelect" placeholder="Select Date..." style="margin-left: 5px; width: 60%;" size="small">
+                          <el-option v-for="(date, index) in dateRange" :key="index" :label="date" :value="date"></el-option>
+                        </el-select>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="sprintUserLevel" label="Level" align="center" width="80"></el-table-column>
+                    <el-table-column prop="sprintUserCapacity" label="Capacity" align="center" width="80"></el-table-column>
+                    <el-table-column prop="sprintDailyScrumUserCompletion" label="Completion" align="center" width="135">
+                      <template slot-scope="scope">
+                        <div @click.stop="stopClick">
+                          <el-checkbox v-if="scope.row.sprintDailyScrumUserCompletion"  :disabled="userRole != 'Admin'? true: false" v-model="scope.row.sprintDailyScrumUserCompletion" label="Completed" border size="mini" style="padding:4px 6px" class="prj-timesheet-content-table-checkbox-checked"></el-checkbox>
+                          <el-checkbox v-if="!scope.row.sprintDailyScrumUserCompletion" :disabled="userRole != 'Admin'? true: false" v-model="scope.row.sprintDailyScrumUserCompletion" label="Incomplete" border size="mini" style="padding:4px 6px" class="prj-timesheet-content-table-checkbox-not-check"></el-checkbox>
+                          </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="sprintDailyScrumUserAttendance" label="Attendance" align="center" width="140">
+                      <template slot-scope="scope">
+                        <div @click.stop="stopClick">
+                          <el-dropdown v-if="scope.row.sprintDailyScrumUserAttendance == 'Attend' || scope.row.sprintDailyScrumUserAttendance == 'Attend (Late)'" @command="changeAttendance" trigger="click">
+                            <el-button type="success" size="mini">{{scope.row.sprintDailyScrumUserAttendance}}</el-button>
+                            <el-dropdown-menu slot="dropdown">
+                              <el-dropdown-item v-for="(attendanceOption, index) in attendanceOptions" :key="index" :command="beforeHandleCommand(attendanceOption.Value ,scope.row)">{{attendanceOption.Label}}</el-dropdown-item>
+                            </el-dropdown-menu>
+                          </el-dropdown>
+                          <el-dropdown v-if="scope.row.sprintDailyScrumUserAttendance == 'Leave' || scope.row.sprintDailyScrumUserAttendance == 'Optional'" @command="changeAttendance" trigger="click">
+                            <el-button type="info" size="mini">{{scope.row.sprintDailyScrumUserAttendance}}</el-button>
+                            <el-dropdown-menu slot="dropdown">
+                              <el-dropdown-item v-for="(attendanceOption, index) in attendanceOptions" :key="index" :command="beforeHandleCommand(attendanceOption.Value ,scope.row)">{{attendanceOption.Label}}</el-dropdown-item>
+                            </el-dropdown-menu>
+                          </el-dropdown>
+                          <el-dropdown v-if="scope.row.sprintDailyScrumUserAttendance == 'Absent'" @command="changeAttendance" trigger="click">
+                            <el-button type="danger" size="mini">{{scope.row.sprintDailyScrumUserAttendance}}</el-button>
+                            <el-dropdown-menu slot="dropdown">
+                              <el-dropdown-item v-for="(attendanceOption, index) in attendanceOptions" :key="index" :command="beforeHandleCommand(attendanceOption.Value ,scope.row)">{{attendanceOption.Label}}</el-dropdown-item>
+                            </el-dropdown-menu>
+                          </el-dropdown>
+                        </div>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </el-col>
+                <el-col :span="24">
+                  <el-button v-if="userRole == 'Admin' && peopleList != null && peopleList.length > 0" @click="saveDailyScrum" type="primary" size="small" style="width: 100%; margin-top: 10px">Save</el-button>
+                </el-col>
+              </el-row>
+            </el-card>
           </el-col>
         </el-row>
       </el-main>
@@ -80,12 +133,15 @@ export default {
       isActive: true,
       headerColor: utils.themeStyle[this.$store.getters.getThemeStyle].headerColor,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
+      userRole: this.$store.getters.getUserRole,
       sprintSelect: null,
       sprintsList: [],
       peopleSelect: null,
       peopleList: [],
-      disabledPeopleList: true,
+      peopleListLoading: false,
+      showContent: false,
       showTimesheet: false,
+      showTaskTable: false,
       timesheetObj: {
         timesheetUserId: 0,
         timesheetStartDate: null,
@@ -95,7 +151,15 @@ export default {
         taskTableUserId: null,
         taskTableDate: null
       },
-      showTaskTable: false
+      dateRange: [],
+      dateSelect: null,
+      attendanceOptions: [
+        {Label: 'Attend', Value: 'Attend'},
+        {Label: 'Attend (Late)', Value: 'Attend (Late)'},
+        {Label: 'Leave', Value: 'Leave'},
+        {Label: 'Optional', Value: 'Optional'},
+        {Label: 'Absent', Value: 'Absent'},
+      ]
     }
   },
   watch: {
@@ -103,9 +167,11 @@ export default {
       handler (val, oldVal) {
         var sprintSelect = val
         if (sprintSelect != null && sprintSelect != '') {
-          this.$data.disabledPeopleList = false
+          this.$data.showContent = true
+          this.$data.showTimesheet = true
         } else {
-          this.$data.disabledPeopleList = true
+          this.$data.showContent = false
+          this.$data.showTimesheet = false
         }
       },
       immediate: true,
@@ -115,10 +181,8 @@ export default {
       handler (val, oldVal) {
         var peopleSelect = val
         if (peopleSelect != null && peopleSelect != '') {
-          this.$data.showTimesheet = true
           this.$data.showTaskTable = true
         } else {
-          this.$data.showTimesheet = false
           this.$data.showTaskTable = false
         }
       },
@@ -139,16 +203,9 @@ export default {
         this.$data.sprintsList = []
       }
     },
-    async getPeopleListBySprint () {
-      this.$data.peopleSelect = null
-      this.$data.peopleList = []
-      var requestSprintId = this.$data.sprintSelect
-      var res = await http.get('/sprints/getSprintUsersById', {
-        reqSprintId: requestSprintId
-      })
-      if (res != null && res.data.status == 0) {
-        this.$data.peopleList = res.data.data.sprintUsers
-      }
+    clickPeopleToGetTimesheet (row, column, event) {
+      this.$data.peopleSelect = row.sprintUserId
+      this.getTimesheet()
     },
     async getTimesheet () {
       var sprintList = this.$data.sprintsList
@@ -192,6 +249,114 @@ export default {
         date: new Date().getTime()
       }
     },
+    // People list Method
+    highlightLeaderRow ({row, rowIndex}) {
+      if (rowIndex === 0) {
+        return 'highlight-leader-row';
+      }
+      return '';
+    },
+    getDailyScrum () {
+      var sprintList = this.$data.sprintsList
+      var sprintIndex = -1
+      var targetSprintList = []
+      var sprintStartTime = null
+      var sprintEndTime = null
+      if (sprintList != null && sprintList.length > 0) {
+        for (var i=0; i<sprintList.length; i++) {
+          sprintIndex = this.getIndexOfValueInArr(sprintList[i].Options, 'sprintId', this.$data.sprintSelect)
+          if (sprintIndex != -1) {
+            targetSprintList = sprintList[i].Options
+            break;
+          }
+        }
+      }
+      if (sprintIndex != -1) {
+        sprintStartTime = targetSprintList[sprintIndex].sprintStartTime
+        sprintEndTime = targetSprintList[sprintIndex].sprintEndTime
+      }
+      if (this.$data.dateSelect == null || this.$data.dateSelect == '') {
+        this.$data.dateSelect = sprintStartTime
+      }
+      if (this.$data.dateSelect < sprintStartTime || this.$data.dateSelect > sprintEndTime) {
+        this.$data.dateSelect = sprintStartTime
+      }
+      this.getPeopleListBySprint()
+      this.getSprintDateRange(sprintStartTime, sprintEndTime)
+    },
+    async getPeopleListBySprint () {
+      this.$data.peopleListLoading = true
+      this.$data.peopleSelect = null
+      this.$data.timesheetObj = {
+        type: 'PrjTimesheet',
+        timesheetUserId: 0,
+        timesheetStartDate: null,
+        timesheetEndDate: null,
+        date: new Date()
+      }
+      this.$data.peopleList = []
+      var requestSprintId = this.$data.sprintSelect
+      var requestDate = this.$data.dateSelect
+      var res = await http.get('/sprints/getSprintUsersById', {
+        reqSprintId: requestSprintId,
+        reqScrumDate: requestDate
+      })
+      if (res != null && res.data.status == 0) {
+        this.$data.peopleList = res.data.data.sprintUsers
+      }
+      this.$data.peopleListLoading = false
+    },
+    async getSprintDateRange (iStartDate, iEndDate) {
+      this.$data.dateRange = []
+      var sprintStartDate = iStartDate
+      var sprintEndDate = iEndDate
+      if (sprintStartDate != null && sprintEndDate != null) {
+        var res = await http.get('https://ipo.gzatcc.com/api/others/workdays', {
+          start_date: sprintStartDate,
+          end_date: sprintEndDate,
+        })
+        if (res != null && res.data != null != null) {
+          this.$data.dateRange = res.data.workday_list
+        }
+      }
+    },
+    changeAttendance (command) {
+      console.log('changeAttendance --> ', command)
+      var rowRecord = command.row
+      var attendanceStatus = command.command
+      rowRecord.sprintDailyScrumUserAttendance = attendanceStatus
+    },
+    beforeHandleCommand(item, row){
+      return {
+        'command': item,
+        'row': row
+      }
+    },
+    async saveDailyScrum () {
+      var scrumList = this.$data.peopleList
+      var dateSelect = this.$data.dateSelect
+      if (dateSelect == '' || dateSelect == null || dateSelect == undefined) {
+        this.$message.error('Invalid Date!');
+        return
+      }
+      if (scrumList == '' || scrumList == null || scrumList == undefined) {
+        this.$message.error('Invalid List!');
+        return
+      }
+      var sprintSelect = this.$data.sprintSelect
+      var res = await http.post('/sprints/updateDailyScrum', {
+        reqSprintId: sprintSelect,
+        reqScrumDate: dateSelect,
+        reqScrumList: JSON.stringify(scrumList)
+      })
+      if (res.data != null && res.data.status == 0) {
+        this.$message({
+          message: 'Save Daily Scrum Successfully!',
+          type: 'success'
+        });
+        this.getDailyScrum()
+      }
+    },
     // Common Method
     sortListBySprintTimeGroup (iSprintList) {
       var result = []
@@ -226,6 +391,29 @@ export default {
         }
       }
       return -1;
+    },
+    formatDate (date, fmt) { 
+      var o = { 
+        "M+" : date.getMonth()+1,                 
+        "d+" : date.getDate(),                     
+        "h+" : date.getHours(),                    
+        "m+" : date.getMinutes(),                 
+        "s+" : date.getSeconds(),                  
+        "q+" : Math.floor((date.getMonth()+3)/3),
+        "S"  : date.getMilliseconds()            
+      }; 
+      if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+      }
+      for(var k in o) {
+        if(new RegExp("("+ k +")").test(fmt)){
+              fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+          }
+      }
+      return fmt; 
+    },
+    stopClick () {
+      return
     }
   },
   created () {
@@ -273,8 +461,19 @@ export default {
 }
 /* Main style*/
 .content-main-col {
-  margin-top: 10px;
-  margin-bottom: 30px;
+  width: 100%;
+}
+.prj-timesheet-content {
+ margin: 10px 0;
+}
+.prj-timesheet-content>>>.el-card__body {
+  padding: 5px;
+}
+.prj-timesheet-content>>>.el-table td {
+  padding: 8px 0;
+}
+.prj-timesheet-content>>>.el-table th {
+  padding: 5px 0;
 }
 /*Common Style*/
 .bg-color {
@@ -287,4 +486,13 @@ export default {
 }
 </style>
 <style>
+.el-table .highlight-leader-row {
+  background: #fff9c4;
+}
+.prj-timesheet-content-table-checkbox-checked .el-checkbox__input.is-disabled+span.el-checkbox__label {
+  color: #409EFF;
+}
+.prj-timesheet-content-table-checkbox-not-check .el-checkbox__input.is-disabled+span.el-checkbox__label {
+  color: #606266;
+}
 </style>

@@ -52,6 +52,9 @@ export default {
         }
         var timesheetObj = val
         if (timesheetObj.timesheetUserId == 0 || timesheetObj.timesheetUserId == null) {
+          this.$data.timesheetData = []
+          this.$data.timesheetHeaders = []
+          this.$data.timesheetSelectDateArray = []
           return
         }
         if (timesheetObj.type == 'MyTimesheet') {
@@ -276,6 +279,7 @@ export default {
       this.selectTimesheetDateRange()
       this.$emit('refresh')
     },
+    // Daily Scrum
     // Common Method
     debug(row, column) {
       console.log('ROW: ', row)

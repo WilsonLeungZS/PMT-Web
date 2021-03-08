@@ -21,8 +21,8 @@
         </el-table-column>
         <el-table-column prop="taskEffort" label="Effort" align="center" width="100" sortable></el-table-column>
         <el-table-column prop="taskEstimation" label="Est" align="center" width="70"></el-table-column>
-        <el-table-column prop="taskSprintName" label="Sprint" align="center" width="200" show-overflow-tooltip sortable></el-table-column>
-        <el-table-column prop="taskIssueDate" label="Issue Date" align="center" width="150" show-overflow-tooltip sortable></el-table-column>
+        <el-table-column prop="taskSprintName" label="Sprint" align="center" width="200" show-overflow-tooltip sortable v-if="taskTableObj.taskTableSource != 'PrjTimesheet'"></el-table-column>
+        <el-table-column prop="taskIssueDate" label="Issue Date" align="center" width="150" show-overflow-tooltip sortable v-if="taskTableObj.taskTableSource != 'PrjTimesheet'"></el-table-column>
         <el-table-column v-if="taskTableObj.taskTableSource == 'MyTimesheet'" label="Worklog" align="center" width="80" >
           <template slot-scope="scope">
             <el-tooltip class="item" effect="dark" content="Add Worklog" placement="top">
@@ -31,7 +31,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination @current-change="handlePageChange" :current-page="taskTablePage" :total="taskTableTotal" :page-size="taskTableSize" layout="total, prev, pager, next" style="float: right; margin-top: 5px"></el-pagination>
+      <el-pagination v-if="showPage" @current-change="handlePageChange" :current-page.sync="taskTablePage" :total="taskTableTotal" :page-size="taskTableSize" layout="total, prev, pager, next" style="float: right; margin-top: 5px"></el-pagination>
     </el-card>
     <pmt-task-dialog @refresh="refreshTaskTable" :action="pmtTaskDialogAction"></pmt-task-dialog>
     <external-task-dialog></external-task-dialog>
@@ -57,7 +57,8 @@
         reqUserId: null,
         reqDate: null,
         pmtTaskDialogAction: null,
-        worklogAction: null
+        worklogAction: null,
+        showPage: true
       }
     },
     components: {
@@ -130,6 +131,12 @@
         }
       },
       handlePageChange (iPage) {
+        this.$data.showPage = false
+        this.$data.taskTablePage = iPage
+        this.getTaskList()
+        this.$nextTick(() => {
+          this.showPage = true
+      })
       },
       refreshTaskTable () {
         this.getTaskList()
