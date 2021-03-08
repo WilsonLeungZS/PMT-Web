@@ -639,13 +639,13 @@ export default {
 }
 </style>
 <style>
-.el-card__body {
+.sm-content .el-card__body {
   padding: 5px 10px;
 }
-.el-table td {
+.sm-content .el-table td {
   padding: 8px 0;
 }
-.el-table th {
+.sm-content .el-table th {
   padding: 3px 0;
 }
 .sm-content .el-divider--horizontal {
