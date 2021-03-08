@@ -362,10 +362,10 @@ export default {
 }
 </style>
 <style>
-.el-card__body {
+.pm-content .el-card__body {
   padding: 5px 10px;
 }
-.el-table td, .el-table th {
+.pm-content .el-table td, .el-table th {
   padding: 8px 0;
 }
 .pm-content .el-divider--horizontal {

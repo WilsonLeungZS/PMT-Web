@@ -1,5 +1,5 @@
 <template>
-  <div class="charts-body">
+  <div class="rpt-managment">
     <el-container>
       <el-main>
         <el-row>
@@ -460,7 +460,7 @@ export default {
 </script>
 
 <style scoped>
-.charts-body {
+.rpt-managment {
   width: 100%;
   height: auto;
 }
@@ -550,13 +550,13 @@ export default {
 }
 </style>
 <style>
-.el-card__body {
+.rpt-managment .el-card__body {
   padding: 5px;
 }
-.el-divider {
+.rpt-managment .el-divider {
   background-color: #57606f;
 }
-.el-table th {
+.rpt-managment .el-table th {
   padding: 5px 0;
 }
 /* google、safari */
