@@ -211,7 +211,7 @@ Remark:
         var reqWorklogDay = dateArray[2]
         // Get worklog Effort
         var reqWorklogEffort = reqWorklog.worklogEffort
-        if (reqWorklogEffort < 1 || reqWorklogEffort > 25 || (reqWorklogEffort%0.5) != 0) {
+        if (reqWorklogEffort <= 0 || reqWorklogEffort > 25 || (reqWorklogEffort%0.5) != 0) {
           this.$message.error('Invalid Effort!')
           return
         }

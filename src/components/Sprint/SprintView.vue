@@ -475,7 +475,7 @@ export default {
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
       tabPosition: 'left',
       tabActive: 'tab_hide',
-      tabTaskActive: 'tab_planned_tasks',
+      tabTaskActive: '',
       plannedTaskActiveArray: [],
       unplanTaskActiveArray: [],
       publicTaskActiveArray: [],
@@ -599,7 +599,9 @@ export default {
       this.$data.sprintObj = {}
       this.$data.sprintEstimationCopy = 0
       this.$data.sprintTotalEffort = 0
-      this.$data.tabTaskActive = 'tab_planned_tasks'
+      if (this.$data.tabTaskActive == '' || this.$data.tabTaskActive == null) {
+        this.$data.tabTaskActive = 'tab_planned_tasks'
+      }
       this.$data.changeSprintStatusVisible = false
     },
     initSprintTask () {
@@ -627,6 +629,7 @@ export default {
       this.$data.plannedTaskActiveArray = []
       this.$data.unplanTaskActiveArray = []
       this.$data.publicTaskActiveArray = []
+      this.$data.tabTaskActive = 'tab_planned_tasks'
       this.getSprintInfo()
     },
     async changeSprintStatus () {
