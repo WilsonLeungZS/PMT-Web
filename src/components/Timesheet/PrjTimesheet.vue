@@ -56,7 +56,7 @@
             <el-card class="box-card" shadow="never">
               <el-row>
                 <el-col :span="24">
-                  <el-table @row-click="clickPeopleToGetTimesheet" v-loading="peopleListLoading" :data="peopleList" :row-class-name="highlightLeaderRow" width="100%" max-height="680px" highlight-current-row class="prj-timesheet-content-table">
+                  <el-table @row-click="clickPeopleToGetTimesheet" v-loading="peopleListLoading" :data="peopleList" :row-class-name="highlightLeaderRow" :row-style="{'cursor': 'pointer'}" width="100%" max-height="680px" highlight-current-row class="prj-timesheet-content-table">
                     <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
                     <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
                     <el-table-column prop="sprintUserFullName" label="Name" align="left" min-width="240" fixed="left">
@@ -202,6 +202,7 @@ export default {
       } else {
         this.$data.sprintsList = []
       }
+      // this.$data.dateSelect = this.formatDate(new Date(), 'yyyy-MM-dd')
     },
     clickPeopleToGetTimesheet (row, column, event) {
       this.$data.peopleSelect = row.sprintUserId
@@ -494,5 +495,9 @@ export default {
 }
 .prj-timesheet-content-table-checkbox-not-check .el-checkbox__input.is-disabled+span.el-checkbox__label {
   color: #606266;
+}
+.el-table .cell, .el-table th div .el-table .cell, .el-table th div {
+  padding-right: 0;
+  overflow: unset;
 }
 </style>
