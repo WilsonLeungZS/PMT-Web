@@ -496,7 +496,7 @@ export default {
 .prj-timesheet-content-table-checkbox-not-check .el-checkbox__input.is-disabled+span.el-checkbox__label {
   color: #606266;
 }
-.el-table .cell, .el-table th div .el-table .cell, .el-table th div {
+.prj-timesheet-content-table .el-table .cell, .el-table th div .el-table .cell, .el-table th div {
   padding-right: 0;
   overflow: unset;
 }
