@@ -15,14 +15,14 @@
             </div>
           </el-col>
         </el-row>
-        <el-row> <!-- Select Sprint and People -->
+        <el-row> <!-- Select Sprint -->
           <el-col :span="24" class="content-main-col" style="margin-bottom:0 !important">
             <el-card class="box-card" shadow="hover">
               <el-row>
                 <el-col :span="1" :lg="5">&nbsp;</el-col>
                 <el-col :span="22" :lg="14">
                   <span><i class="el-icon-data-line"></i> Sprint</span>
-                  <el-select @change="getDailyScrum" v-model="sprintSelect" style="width: 72%;margin-left: 5px;">
+                  <el-select @change="getDailyScrum" v-model="sprintSelect" style="width: 80%; margin-left: 5px;">
                     <el-option label="No Select" value=""></el-option>
                     <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
                       <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="'【' + sprintGroup.Label + '】' +sprint.sprintName" :value="sprint.sprintId">
@@ -120,11 +120,13 @@ import http from '../../utils/http'
 import utils from '../../utils/utils'
 import Timesheet from './TimesheetPlugins/Timesheet'
 import TaskTable from '../Task/TaskPlugins/TaskTable'
+import SprintProgress from '../Sprint/SprintPlugins/SprintProgress'
 export default {
   name: 'PrjTimesheet',
   components: {
     Timesheet,
-    TaskTable
+    TaskTable,
+    SprintProgress
   },
   data () {
     return {
@@ -253,9 +255,12 @@ export default {
     // People list Method
     highlightLeaderRow ({row, rowIndex}) {
       if (rowIndex === 0) {
-        return 'highlight-leader-row';
+        return 'highlight-leader-row'
       }
-      return '';
+      if (row != null && row.sprintDailyScrumUserAttendance == 'Optional') {
+        return 'optional-user-row'
+      }
+      return ''
     },
     getDailyScrum () {
       var sprintList = this.$data.sprintsList
@@ -276,14 +281,34 @@ export default {
         sprintStartTime = targetSprintList[sprintIndex].sprintStartTime
         sprintEndTime = targetSprintList[sprintIndex].sprintEndTime
       }
-      if (this.$data.dateSelect == null || this.$data.dateSelect == '') {
-        this.$data.dateSelect = sprintStartTime
+      this.getSprintDateRange(sprintStartTime, sprintEndTime)
+    },
+    async getSprintDateRange (iStartDate, iEndDate) {
+      this.$data.dateRange = []
+      var sprintStartDate = iStartDate
+      var sprintEndDate = iEndDate
+      if (sprintStartDate != null && sprintEndDate != null) {
+        var res = await http.get('https://ipo.gzatcc.com/api/others/workdays', {
+          start_date: sprintStartDate,
+          end_date: sprintEndDate,
+        })
+        if (res != null && res.data != null != null) {
+          this.$data.dateRange = res.data.workday_list
+        }
       }
-      if (this.$data.dateSelect < sprintStartTime || this.$data.dateSelect > sprintEndTime) {
-        this.$data.dateSelect = sprintStartTime
+      if (this.$data.dateSelect == null || this.$data.dateSelect == '') {
+        this.$data.dateSelect = iStartDate
+        var curDay = this.formatDate(new Date(), 'yyyy-MM-dd')
+        if (this.$data.dateRange != null && this.$data.dateRange.length > 0) {
+          if (this.$data.dateRange.indexOf(curDay) != -1) {
+            this.$data.dateSelect = curDay
+          }
+        }
+      }
+      if (this.$data.dateSelect < iStartDate || this.$data.dateSelect > iEndDate) {
+        this.$data.dateSelect = iStartDate
       }
       this.getPeopleListBySprint()
-      this.getSprintDateRange(sprintStartTime, sprintEndTime)
     },
     async getPeopleListBySprint () {
       this.$data.peopleListLoading = true
@@ -306,20 +331,6 @@ export default {
         this.$data.peopleList = res.data.data.sprintUsers
       }
       this.$data.peopleListLoading = false
-    },
-    async getSprintDateRange (iStartDate, iEndDate) {
-      this.$data.dateRange = []
-      var sprintStartDate = iStartDate
-      var sprintEndDate = iEndDate
-      if (sprintStartDate != null && sprintEndDate != null) {
-        var res = await http.get('https://ipo.gzatcc.com/api/others/workdays', {
-          start_date: sprintStartDate,
-          end_date: sprintEndDate,
-        })
-        if (res != null && res.data != null != null) {
-          this.$data.dateRange = res.data.workday_list
-        }
-      }
     },
     changeAttendance (command) {
       console.log('changeAttendance --> ', command)
@@ -489,6 +500,9 @@ export default {
 <style>
 .el-table .highlight-leader-row {
   background: #fff9c4;
+}
+.el-table .optional-user-row {
+  background: #eeeeee;
 }
 .prj-timesheet-content-table-checkbox-checked .el-checkbox__input.is-disabled+span.el-checkbox__label {
   color: #409EFF;
