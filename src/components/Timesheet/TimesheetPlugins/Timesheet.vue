@@ -16,7 +16,7 @@
           <span>{{scope.row.taskName}} - {{scope.row.taskTitle}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label" align="center" width="48" :class-name="changeCol(timesheetHeader.isWeekday)">
+      <el-table-column v-for="(timesheetHeader, index) in timesheetHeaders" :key="index" :prop="timesheetHeader.prop" :label="timesheetHeader.label" align="center" width="48" :class-name="changeCol(timesheetHeader.isWeekday, timesheetHeader.isToday)">
         <template slot="header" slot-scope="scope">
           <span v-if="!disabledEditableFunction" @click="editWorklogByDate(scope.column)" style="font-size:16px; text-decoration:underline; cursor:pointer;">{{scope.column.label}}</span>
           <span v-if="disabledEditableFunction" style="font-size:16px;">{{scope.column.label}}</span>
@@ -91,9 +91,14 @@ export default {
         return 'timesheet-header-cell-weekday'
       } else {
         var isWeekday = this.$data.timesheetHeaders[columnIndex - 1].isWeekday
+        var isToday = this.$data.timesheetHeaders[columnIndex - 1].isToday
+        if (isToday) {
+          return 'timesheet-header-cell-today'
+        } 
         if (isWeekday) {
           return 'timesheet-header-cell-weekday'
-        } else {
+        }
+        else {
           return 'timesheet-header-cell'
         }
       }
@@ -104,10 +109,14 @@ export default {
     timesheetRowStyle ({row, rowIndex}) {
       return 'timesheet-row'
     },
-    changeCol (isWeekday) {
-      if (!isWeekday) {
+    changeCol (isWeekday, isToday) {
+      if (isToday) {
+        return 'timesheet-col-today'
+      }
+      if (isWeekday) {
         return 'timesheet-col-weekday'
-      } else {
+      } 
+      else {
         return 'timesheet-col-nonweekday'
       }
     },
@@ -208,6 +217,12 @@ export default {
         } else {
           timesheetJson.isWeekday = true
         }
+        var curDate = this.formatDate(new Date(), 'yyyy-MM-dd')
+        if (curDate == arr[i]) {
+          timesheetJson.isToday = true
+        } else {
+          timesheetJson.isToday = false
+        }
         timesheetHeadersArray.push(timesheetJson)
         weekday++
         if (weekday === 7) {
@@ -285,6 +300,26 @@ export default {
       console.log('ROW: ', row)
       console.log('COL', column)
       console.log('Debug, ', row[column.property])
+    },
+    formatDate (date, fmt) { 
+      var o = { 
+        "M+" : date.getMonth()+1,                 
+        "d+" : date.getDate(),                     
+        "h+" : date.getHours(),                    
+        "m+" : date.getMinutes(),                 
+        "s+" : date.getSeconds(),                  
+        "q+" : Math.floor((date.getMonth()+3)/3),
+        "S"  : date.getMilliseconds()            
+      }; 
+      if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+      }
+      for(var k in o) {
+        if(new RegExp("("+ k +")").test(fmt)){
+              fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+          }
+      }
+      return fmt; 
     }
   },
   created () {
@@ -313,6 +348,12 @@ export default {
   padding: 0 !important;
   color: white;
 }
+.timesheet-content>>>.timesheet-header-cell-today {
+  font-size: 13px;
+  border-top: 1px solid #f1f2f6;
+  padding: 0 !important;
+  color: #fff59d;
+}
 .timesheet-content>>>.timesheet-row {
   height: 40px;
 }
@@ -323,11 +364,14 @@ export default {
 }
 </style>
 <style>
+.timesheet-col-today {
+  background-color: #fff59d;
+}
 .timesheet-col-weekday {
-  background-color: #ced6e0;
+  background-color: white;
 }
 .timesheet-col-nonweekday {
-  background-color: white;
+  background-color: #ced6e0;
 }
 .timesheet-content .el-table__footer-wrapper tbody td {
   color: #747d8c !important;
