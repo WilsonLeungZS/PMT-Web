@@ -125,6 +125,7 @@ export default {
       this.$data.taskPlanListLoading = true
       this.$data.taskPlanList = []
       this.$data.taskPlanListTotal = 0
+      this.$data.taskPlanListPage = 1
       if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
         var skillsArray = iSprintObj.sprintRequiredSkills.toString()
         var resCount = await http.post('/tasks/getTasksListCountBySkill', {
@@ -158,6 +159,7 @@ export default {
       this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
     },
     searchTask () {
+      this.$data.taskReqPage = 1
       this.getTaskPlanListBySkills(this.$data.taskSprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
     },
     createTask () {
