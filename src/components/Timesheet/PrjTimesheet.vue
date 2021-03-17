@@ -19,8 +19,7 @@
           <el-col :span="24" class="content-main-col" style="margin-bottom:0 !important">
             <el-card class="box-card" shadow="hover">
               <el-row>
-                <el-col :span="1" :lg="5">&nbsp;</el-col>
-                <el-col :span="22" :lg="14">
+                <el-col :span="10" :lg="10">
                   <span><i class="el-icon-data-line"></i> Sprint</span>
                   <el-select @change="getDailyScrum" v-model="sprintSelect" style="width: 80%; margin-left: 5px;">
                     <el-option label="No Select" value=""></el-option>
@@ -31,6 +30,9 @@
                       </el-option>
                     </el-option-group>
                   </el-select>
+                </el-col>
+                <el-col :span="14" :lg="14">
+                  <sprint-progress v-if="showProgress" :sprintObj="sprintObj"></sprint-progress>
                 </el-col>
               </el-row>
             </el-card>
@@ -144,6 +146,7 @@ export default {
       showContent: false,
       showTimesheet: false,
       showTaskTable: false,
+      showProgress: false,
       timesheetObj: {
         timesheetUserId: 0,
         timesheetStartDate: null,
@@ -161,7 +164,8 @@ export default {
         {Label: 'Leave', Value: 'Leave'},
         {Label: 'Optional', Value: 'Optional'},
         {Label: 'Absent', Value: 'Absent'},
-      ]
+      ],
+      sprintObj: null
     }
   },
   watch: {
@@ -171,9 +175,11 @@ export default {
         if (sprintSelect != null && sprintSelect != '') {
           this.$data.showContent = true
           this.$data.showTimesheet = true
+          this.$data.showProgress = true
         } else {
           this.$data.showContent = false
           this.$data.showTimesheet = false
+          this.$data.showProgress = false
         }
       },
       immediate: true,
@@ -282,6 +288,13 @@ export default {
         sprintEndTime = targetSprintList[sprintIndex].sprintEndTime
       }
       this.getSprintDateRange(sprintStartTime, sprintEndTime)
+      // Show sprint progress
+      this.$data.sprintObj = {
+        sprintId: this.$data.sprintSelect,
+        sprintStartTime: sprintStartTime,
+        sprintEndTime: sprintEndTime,
+        date: new Date()
+      }
     },
     async getSprintDateRange (iStartDate, iEndDate) {
       this.$data.dateRange = []
