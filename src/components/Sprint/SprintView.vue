@@ -108,7 +108,18 @@ Remark:
                   </el-col>
                 </el-row>
                 <!-- Sprint KPI -->
-                <el-row>
+                <el-row style="background-color: #f5f5f5; margin: 0 -10px">
+                  <el-col :span="24" :lg="18" class="sprint-card-header-col" style="height: 28px">
+                    <span style="margin-left: 10px"><i class="el-icon-pie-chart"></i> Capacity:</span>
+                    <span style="margin-left: 10px; font-size: 15px">Contract <b>{{sprintBaseCapacity}}</b> mhrs </span><el-divider direction="vertical"></el-divider>
+                    <span style="margin-left: 10px; font-size: 15px">Planned <b>{{sprintActualCapacity}}</b> mhrs </span><el-divider direction="vertical"></el-divider>
+                    <span style="margin-left: 10px; font-size: 15px">Actual <b>{{sprintTotalEffort}}</b> mhrs</span>
+                  </el-col>
+                  <el-col :span="24" :lg="6" class="sprint-card-header-col" style="height: 28px">
+                    <el-button @click="showPlannedPeopleRes" size="mini" type="info" icon="el-icon-user-solid" style="width: 98%">Sprint Members: <el-tag effect="dark" type="danger" size="mini">{{sprintPeopleCount}}</el-tag></el-button>
+                  </el-col>
+                </el-row>
+                <el-row v-if="false">
                   <el-col :span="12" :lg="6" class="sprint-card-header-col sprint-card-header-col-center" style="border-radius: 4px 0 0 4px; border-right: none">
                     <span>Effort: <b>{{sprintEffort}}</b> / <b>{{sprintTotalEffort}}</b> mhrs</span>
                   </el-col>
@@ -129,7 +140,14 @@ Remark:
               <!-- Card Content -->
               <el-tabs @tab-click="changeTaskTab" v-model="tabTaskActive" class="sprint-card-tabs">
                 <!-- Planned Task -->
-                <el-tab-pane label="Planned Tasks" style="padding: 10px 5px" name="tab_planned_tasks">
+                <el-tab-pane :label="plannedTaskTabLabel" style="padding: 10px 5px" name="tab_planned_tasks">
+                  <span slot="label">
+                    <span class="sprint-card-tabs-label">
+                      <span style="margin-right: 10px">{{plannedTaskTabLabel}}</span>
+                      <el-tag v-if="tabTaskActive == 'tab_planned_tasks'" effect="plain" size="small" > Effort [{{plannedTaskEffort}}] / Est [{{plannedTaskEst}}]</el-tag>
+                      <el-tag v-if="tabTaskActive != 'tab_planned_tasks'" effect="plain" size="small" type="info"> Effort [{{plannedTaskEffort}}] / Est [{{plannedTaskEst}}]</el-tag>
+                    </span>
+                  </span>
                   <div v-loading="sprintTasksListLoading" class="sprint-card-content">
                     <el-row v-if="sprintTasksList.length == 0? true: false">
                       <el-col :span="24" style="margin: 10px 0">
@@ -228,7 +246,14 @@ Remark:
                   </div>
                 </el-tab-pane>
                 <!-- Unplan Task -->
-                <el-tab-pane label="Unplan Tasks" style="padding: 10px 5px" name="tab_unplan_tasks">
+                <el-tab-pane :label="unplanTaskTabLabel" style="padding: 10px 5px" name="tab_unplan_tasks">
+                  <span slot="label">
+                    <span class="sprint-card-tabs-label">
+                      <span style="margin-right: 10px">{{unplanTaskTabLabel}}</span>
+                      <el-tag v-if="tabTaskActive == 'tab_unplan_tasks'" effect="plain" size="small"> Effort [{{unplanTaskEffort}}] / Buffer [{{nonplannedTaskBuffer}}]</el-tag>
+                      <el-tag v-if="tabTaskActive != 'tab_unplan_tasks'" effect="plain" size="small" type="info"> Effort [{{unplanTaskEffort}}] / Buffer [{{nonplannedTaskBuffer}}]</el-tag>
+                    </span>
+                  </span>
                   <div v-loading="sprintUnplanTasksListLoading" class="sprint-card-content">
                     <el-row v-if="sprintUnplanTasksList.length == 0? true: false">
                       <el-col :span="24" style="margin: 10px 0">
@@ -326,7 +351,14 @@ Remark:
                     </el-card>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="Public Tasks" style="padding: 10px 5px" name="tab_public_tasks">
+                <el-tab-pane :label="publicTaskTabLabel" style="padding: 10px 5px" name="tab_public_tasks">
+                  <span slot="label">
+                    <span class="sprint-card-tabs-label">
+                      <span style="margin-right: 10px">{{publicTaskTabLabel}}</span>
+                      <el-tag v-if="tabTaskActive == 'tab_public_tasks'" effect="plain" size="small"> Effort [{{publicTaskEffort}}] / Buffer [{{nonplannedTaskBuffer}}]</el-tag>
+                      <el-tag v-if="tabTaskActive != 'tab_public_tasks'" effect="plain" size="small" type="info"> Effort [{{publicTaskEffort}}] / Buffer [{{nonplannedTaskBuffer}}]</el-tag>
+                    </span>
+                  </span>
                   <div v-loading="sprintPublicTasksListLoading" class="sprint-card-content">
                     <el-row v-if="sprintPublicTasksList.length == 0? true: false">
                       <el-col :span="24" style="margin: 10px 0">
@@ -411,18 +443,18 @@ Remark:
           </el-col>
         </el-row>
       </el-main>
-      <el-drawer title="Sprint Capacity" size="700px" :direction="direction" :visible.sync="peopleResVisible" class="sprint-plan-people-res-drawer">
+      <el-drawer title="Sprint Capacity" size="900px" :direction="direction" :visible.sync="peopleResVisible" class="sprint-plan-people-res-drawer">
         <el-row>
           <el-col :span="24">
             <el-table v-loading="sprintCapacityLoading" :data="plannedPeopleList" :row-class-name="highlightLeaderRow" :summary-method="getSummaries" show-summary width="100%" max-height="750px">
               <el-table-column v-if="false" prop="sprintId" label="SprintId" align="center"></el-table-column>
               <el-table-column v-if="false" prop="sprintUserId" label="UserId" align="center"></el-table-column>
-              <el-table-column prop="sprintUserNickname" label="Nickname" align="center" width="120" sortable></el-table-column>
-              <el-table-column prop="sprintUserName" label="Name" align="left" width="150" sortable></el-table-column>
-              <el-table-column prop="sprintUserSkillsStr" label="Skills" align="left" min-width="100" sortable show-overflow-tooltip></el-table-column>
-              <el-table-column prop="sprintUserLevel" label="Level" align="center" width="100" sortable></el-table-column>
-              <el-table-column prop="sprintUserCapacity" label="Capacity" align="center" width="110" sortable>
-              </el-table-column>
+              <el-table-column prop="sprintUserNickname" label="Nickname" align="center" width="120"></el-table-column>
+              <el-table-column prop="sprintUserName" label="Name" align="left" width="150"></el-table-column>
+              <el-table-column prop="sprintUserSkillsStr" label="Skills" align="left" min-width="100" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="sprintUserLevel" label="Level" align="center" width="100"></el-table-column>
+              <el-table-column prop="sprintUserCapacity" label="Planned Capacity" align="center" width="150"></el-table-column>
+              <el-table-column prop="sprintUserActualCapacity" label="Actual Capacity" align="center" width="150"></el-table-column>
               <el-table-column align="right" fixed="right" width="70">
                 <template slot-scope="scope">
                   <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
@@ -531,7 +563,16 @@ export default {
       sprintTasksListLoading: false,
       sprintUnplanTasksListLoading: false,
       sprintPublicTasksListLoading: false,
-      sprintCapacityLoading: false
+      sprintCapacityLoading: false,
+      // Task tab label
+      plannedTaskTabLabel: 'Planned',
+      plannedTaskEffort: 1000,
+      plannedTaskEst: 1000,
+      unplanTaskTabLabel: 'Unplan',
+      unplanTaskEffort: 1000,
+      publicTaskTabLabel: 'Public',
+      publicTaskEffort: 1000,
+      nonplannedTaskBuffer: 1000,
     }
   },
   computed: {
@@ -617,6 +658,24 @@ export default {
       this.$data.sprintPeopleCount = 0
       this.$data.plannedPeopleList = []
     },
+    async setSprintTabLabelValue (iSprintId) {
+      this.$data.plannedTaskEffort = 0
+      this.$data.plannedTaskEst = 0
+      this.$data.unplanTaskEffort = 0
+      this.$data.publicTaskEffort = 0
+      this.$data.nonplannedTaskBuffer = 0
+      var res = await http.get('/sprints/getSprintProgressById', {
+        reqSprintId: iSprintId,
+      })
+      if (res != null && res.data != null) {
+        var sprintTabLabelValueArray = res.data.data
+        this.$data.plannedTaskEffort = sprintTabLabelValueArray[2].plannedTaskEffort
+        this.$data.plannedTaskEst = sprintTabLabelValueArray[2].plannedTaskEst
+        this.$data.unplanTaskEffort = sprintTabLabelValueArray[3].unplanTaskEffort
+        this.$data.publicTaskEffort = sprintTabLabelValueArray[3].publicTaskEffort
+        this.$data.nonplannedTaskBuffer = sprintTabLabelValueArray[3].sprintBuffer
+      }
+    },
     async getActiveSprintsList () {
       var res = await http.get('/sprints/getActiveSprintsList')
       if (res != null && res.data.status == 0) {
@@ -686,6 +745,7 @@ export default {
         }
         this.getSprintUsers()
         this.getAssigneeList()
+        this.setSprintTabLabelValue(requestSprintId)
       }
     },
     async getSprintPlannedTasks () {
@@ -987,30 +1047,34 @@ export default {
       const sums = [];
       columns.forEach((column, index) => {
         if (index === 0) {
-          sums[index] = 'Sum';
-          return;
+          sums[index] = 'Sum'
+          return
         }
         // Hide sub task list assignee column
-        if (index === 5) {
-          sums[index] = '';
-          return;
+        if (column.property == 'subtaskAssignee' || column.property == 'subtaskAssigneeId') {
+          sums[index] = ''
+          return
+        }
+        if (column.property == 'sprintUserLevel') {
+          sums[index] = ''
+          return
         }
         const values = data.map(item => Number(item[column.property]));
         if (!values.every(value => isNaN(value))) {
           sums[index] = values.reduce((prev, curr) => {
-            const value = Number(curr);
+            const value = Number(curr)
             if (!isNaN(value)) {
-              return prev + curr;
+              return prev + curr
             } else {
-              return prev;
+              return prev
             }
           }, 0);
-          sums[index] += ' hrs';
+          sums[index] += ' hrs'
         } else {
-          sums[index] = '';
+          sums[index] = ''
         }
       });
-      return sums;
+      return sums
     },
     async removeUserFromSprint (iObj) {
       var reqSprintId = iObj.sprintId
@@ -1202,7 +1266,6 @@ export default {
   white-space: nowrap;
 }
 .sprint-card-header-col .el-tag {
-  text-decoration: underline;
   font-size: 18px;
   padding: 0 7px;
   cursor: pointer;
@@ -1231,6 +1294,15 @@ export default {
   width: 33.3%;
   font-size: 18px;
   font-weight: bold;
+}
+.sprint-card-tabs-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+}
+.sprint-card-tabs-label>>>.el-tag {
+  font-size: 14px;
 }
 .sprint-card-content {
   width: 100%;
