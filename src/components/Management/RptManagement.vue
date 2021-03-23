@@ -14,9 +14,14 @@
               <span class="content-title-item-header">{{header2}}</span>
             </div>
             <el-divider direction="vertical"></el-divider>
+            <div class="content-title-item " @click="switchToCustomerManagement">
+              <i class="el-icon-office-building content-title-item-icon"></i>
+              <span class="content-title-item-header">{{header3}}</span>
+            </div>
+            <el-divider direction="vertical"></el-divider>
             <div :class="{'content-title-item':true, 'active':isActive}">
               <i class="el-icon-monitor content-title-item-icon"></i>
-              <span class="content-title-item-header">{{header3}}</span>
+              <span class="content-title-item-header">{{header4}}</span>
             </div>
           </el-col>
         </el-row>
@@ -167,7 +172,8 @@ export default {
     return {
       header1: 'Sprint',
       header2: 'User',
-      header3: 'Report',
+      header3: 'Customer',
+      header4: 'Report',
       isActive: true,
       monthSelect: '',
       monthValue: '',
@@ -222,6 +228,10 @@ export default {
     switchToSprintManagement () {
       this.$data.isActive = false
       this.$router.push({path: 'SptManagement'})
+    },
+    switchToCustomerManagement () {
+      this.$data.isActive = false
+      this.$router.push({path: 'CtmManagement'})
     },
     switchToProjectManagement () {
       this.$data.isActive = false

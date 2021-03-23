@@ -39,9 +39,9 @@ Remark:
                 <el-form-item v-show="showState.showType" label="Task Type" prop="taskType">
                   <el-select :disabled="disabledState.disabledType" v-model="PMTTask.taskType" style="width: 100%">
                     <el-option label=" " value=""></el-option>
-                    <el-option label="Development(Change, Problem)" value="Development(Change, Problem)"></el-option>
-                    <el-option label="Maintenance(Incident, Service Request, ITSR)" value="Maintenance(Incident, Service Request, ITSR)"></el-option>
-                    <el-option label="Others" value="Others"></el-option>
+                    <el-option label="Development(Change, Problem)" value="Development"></el-option>
+                    <el-option label="Maintenance(Incident)" value="Maintenance"></el-option>
+                    <el-option label="Others(Service Request, ITSR, Others)" value="Others"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -65,8 +65,10 @@ Remark:
             </el-row>
             <el-row>
               <el-col :span="24" :lg="11">
-                <el-form-item v-show="showState.showCustomer" label="Customer" prop="taskCustomer">
-                  <el-input :disabled="disabledState.disabledCustomer" v-model="PMTTask.taskCustomer" style="width: 100%" ></el-input>
+                <el-form-item v-show="showState.showCustomer" label="Customer" prop="taskCustomerId">
+                  <el-select :disabled="disabledState.disabledCustomer" v-model="PMTTask.taskCustomerId" style="width: 100%">
+                    <el-option v-for="(customer, index) in customersList" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="24" :lg="{span: 12, offset: 1}">
@@ -284,7 +286,7 @@ Remark:
         sprintsList: [],
         PMTTaskFormRules: {
           taskTitle: [{required: true, message: 'Not allow empty', trigger: 'blur'}],
-          taskCustomer: [{required: true, message: 'Not allow empty', trigger: 'blur'}],
+          taskCustomerId: [{required: true, message: 'Not allow empty', trigger: 'blur'}],
           taskRequiredSkills: [{required: true, message: 'Not allow empty', trigger: 'change'}]
         },
         DeliverableOptions: [
@@ -346,7 +348,7 @@ Remark:
           taskType: '',
           taskTypeTag: '',
           taskDeliverableTag: [],
-          taskCustomer: '',
+          taskCustomerId: '',
           taskSprintId: null,
           taskRequiredSkills: [], 
           taskReferenceTask: '',
@@ -371,6 +373,7 @@ Remark:
         sprintStatus: '',
         sprintRequiredSkills: '',
         worklogAction: null,
+        customersList: []
       }
     },
     components: {
@@ -444,7 +447,7 @@ Remark:
           taskType: '',
           taskTypeTag: '',
           taskDeliverableTag: [],
-          taskCustomer: '',
+          taskCustomerId: '',
           taskSprintId: null,
           taskRequiredSkills: [],
           taskReferenceTask: '',
@@ -477,6 +480,7 @@ Remark:
         this.$data.sprintsList = []
         this.getAllSkillsList()
         this.getActiveSprintsList()
+        this.getCustomerList()
       },
       createTask () {
         console.log('Create PMT task')
@@ -510,7 +514,7 @@ Remark:
         this.$data.PMTTask.taskCategory = 'PMT-TASK-REF'
         this.$data.PMTTask.taskTypeTag = iObj.taskTypeTag
         this.$data.PMTTask.taskSprintId = iObj.taskSprintId
-        this.$data.PMTTask.taskCustomer = iObj.taskCustomer
+        this.$data.PMTTask.taskCustomerId = iObj.taskCustomerId
         this.$data.PMTTask.taskRequiredSkills = iObj.taskRequiredSkills
         this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
         this.$data.PMTTaskReferenceTaskEffort = iObj.taskReferenceTaskEffort
@@ -554,7 +558,7 @@ Remark:
         this.$data.PMTTaskParentTaskTitle = iObj.taskParentTaskTitle
         this.$data.PMTTask.taskType = iObj.taskType
         this.$data.PMTTask.taskTypeTag = iObj.taskTypeTag
-        this.$data.PMTTask.taskCustomer = iObj.taskCustomer
+        this.$data.PMTTask.taskCustomerId = iObj.taskCustomerId
         this.$data.PMTTask.taskReferenceTask = iObj.taskReferenceTask
         this.$data.PMTTask.taskSprintId = iObj.taskSprintId
         this.$data.PMTTask.taskRequiredSkills = iObj.taskRequiredSkills
@@ -692,7 +696,7 @@ Remark:
           this.$message({message: 'Task title cannnot be empty!', type: 'error'})
           return
         }
-        if (reqTask.taskCustomer == null || reqTask.taskCustomer == '') {
+        if (reqTask.taskCustomerId == null || reqTask.taskCustomerId == '') {
           this.$message({message: 'Task customer cannnot be empty!', type: 'error'})
           return
         }
@@ -722,7 +726,7 @@ Remark:
           reqTaskDeliverableTag: reqTask.taskDeliverableTag != null? reqTask.taskDeliverableTag.toString(): null,
           reqTaskCreator: (reqTask.taskCreator == null || reqTask.taskCreator == '')? 'PMT:'+this.$data.userName: 'PMT:'+reqTask.taskCreator,
           reqTaskRequiredSkills: reqTask.taskRequiredSkills.toString(),
-          reqTaskCustomer: reqTask.taskCustomer,
+          reqTaskCustomerId: reqTask.taskCustomerId,
           reqTaskStatus: reqTask.taskStatus,
           reqTaskEstimation: reqTask.taskEstimation,
           reqTaskIssueDate: reqTask.taskIssueDate,
@@ -827,6 +831,13 @@ Remark:
           this.$data.sprintsList = this.sortListBySprintTimeGroup(res.data.data)
         } else {
           this.$data.sprintsList = []
+        }
+      },
+      async getCustomerList () {
+        this.$data.customersList = []
+        const res = await http.get('/sprints/getAllCustomersList')
+        if (res.data.status === 0) {
+          this.$data.customersList = res.data.data
         }
       },
       async setParentTaskTitleByName (iTaskName) {
@@ -990,7 +1001,7 @@ Remark:
 }
 
 .pmt-task-dialog-history-tab {
-  height: 200px;
+  height: 400px;
   overflow: auto;
 }
 </style>

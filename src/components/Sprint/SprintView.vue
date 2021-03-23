@@ -67,7 +67,7 @@ Remark:
                  <!-- Sprint Info -->
                 <el-divider content-position="left">Sprint (Range: <b>{{sprintStartTime}} ~ {{sprintEndTime}}</b> / Working days: <b>{{sprintWorkingDays}}</b>)</el-divider>
                 <el-row>
-                  <el-col :span="24" :lg="12" class="sprint-card-header-col">
+                  <el-col :span="24" :lg="10" class="sprint-card-header-col">
                     <span><i class="el-icon-data-line"></i> Sprint</span>
                     <el-select @change="changeSprint" v-model="sprintSelect" size="small" style="width: 72%;">
                       <el-option label=" " value=""></el-option>
@@ -79,10 +79,10 @@ Remark:
                       </el-option-group>
                     </el-select>
                   </el-col>
-                  <el-col :span="12" :lg="7" class="sprint-card-header-col">
+                  <el-col :span="12" :lg="8" class="sprint-card-header-col">
                     <span><i class="el-icon-guide"></i> Leader: <b>{{sprintLeader}}</b></span>
                   </el-col>
-                  <el-col :span="12" :lg="5" class="sprint-card-header-col">
+                  <el-col :span="12" :lg="6" class="sprint-card-header-col">
                     <span v-if="sprintStatus == 'Active'? true: false">
                       <i class="el-icon-table-lamp"></i> Status: <b style="color: #409EFF">{{sprintStatus}}</b>
                       <el-popover placement="bottom" width="200" v-model="changeSprintStatusVisible">
@@ -96,14 +96,19 @@ Remark:
                     </span>
                     <span v-if="sprintStatus == 'Running'? true: false"><i class="el-icon-table-lamp"></i> Status: <b style="color: #67C23A">{{sprintStatus}}</b></span>
                   </el-col>
-                  <el-col :span="24" :lg="12" class="sprint-card-header-col">
+                  <el-col :span="24" :lg="10" class="sprint-card-header-col">
                     <el-scrollbar style="height: 100%; margin-right: 20px">
                       <span><i class="el-icon-collection"></i> Baseline: <b>{{sprintBaseline}}</b></span>
                     </el-scrollbar>
                   </el-col>
-                  <el-col :span="24" :lg="12" class="sprint-card-header-col">
+                  <el-col :span="24" :lg="8" class="sprint-card-header-col">
                     <el-scrollbar style="height: 100%">
                       <span><i class="el-icon-notebook-1"></i> Required Skills: <b>{{sprintRequiredSkillsStr}}</b></span>
+                    </el-scrollbar>
+                  </el-col>
+                  <el-col :span="24" :lg="6" class="sprint-card-header-col">
+                    <el-scrollbar style="height: 100%">
+                      <span><i class="el-icon-office-building"></i> Customers: <b>{{sprintCustomersStr}}</b></span>
                     </el-scrollbar>
                   </el-col>
                 </el-row>
@@ -154,7 +159,27 @@ Remark:
                         <b>No Task</b>
                       </el-col>
                     </el-row>
-                    <el-card @click.native="getSprintSubtasks(index)" v-for="(sprintTask, index) in sprintTasksList" :key="index" class="box-card" style="margin-bottom: 2px;" shadow="hover">
+                    <!--
+                    <el-row v-if="sprintTasksList.length == 0? false: true" style="margin-bottom: 15px">
+                      <el-col :span="8">
+                        Task Name
+                        <el-input v-model="plannedTaskNameSearch" placeholder="Select Task Name..." size="small" style="width: 70%; margin-left: 10px">
+                          <el-button slot="append" icon="el-icon-search"></el-button>
+                        </el-input>
+                      </el-col>
+                      <el-col :span="8">
+                        Task Type
+                        <el-select v-model="plannedTaskTypeSelect" size="small" style="width: 70%; margin-left: 10px">
+                          <el-option label=" " value=""></el-option>
+                          <el-option label="Development(Change, Problem)" value="Development"></el-option>
+                          <el-option label="Maintenance(Incident)" value="Maintenance"></el-option>
+                          <el-option label="Others(Service Request, ITSR, Others)" value="Others"></el-option>
+                          <el-option label="All" value="All"></el-option>
+                        </el-select>
+                      </el-col>
+                    </el-row>
+                    -->
+                    <el-card @click.native="getSprintSubtasks(index)" v-for="(sprintTask, index) in sprintTasksList" :key="index" class="box-card sprint-card-content-planned" :style="{'margin-bottom':'5px',  'background-color':sprintTask.taskBackgroundColor}" shadow="hover">
                       <el-collapse v-model="plannedTaskActiveArray">
                         <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}" :name="index">
                           <!-- Sprint Task Header -->
@@ -260,7 +285,7 @@ Remark:
                         <b>No Task</b>
                       </el-col>
                     </el-row>
-                    <el-card @click.native="getSprintSubtasksForUnplan(index)" v-for="(sprintTask, index) in sprintUnplanTasksList" :key="index" class="box-card" style="margin-bottom: 2px;" shadow="hover">
+                    <el-card @click.native="getSprintSubtasksForUnplan(index)" v-for="(sprintTask, index) in sprintUnplanTasksList" :key="index" class="box-card sprint-card-content-unplan" :style="{'margin-bottom':'5px',  'background-color':sprintTask.taskBackgroundColor}" shadow="hover">
                       <el-collapse v-model="unplanTaskActiveArray">
                         <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}" :name="index">
                           <!-- Sprint Task Header -->
@@ -365,7 +390,7 @@ Remark:
                         <b>No Task</b>
                       </el-col>
                     </el-row>
-                    <el-card @click.native="getSprintSubtasksForPublic(index)" v-for="(sprintTask, index) in sprintPublicTasksList" :key="index" class="box-card" style="margin-bottom: 2px;" shadow="hover">
+                    <el-card @click.native="getSprintSubtasksForPublic(index)" v-for="(sprintTask, index) in sprintPublicTasksList" :key="index" class="box-card sprint-card-content-public" :style="{'margin-bottom':'5px',  'background-color':sprintTask.taskBackgroundColor}" shadow="hover">
                       <el-collapse v-model="publicTaskActiveArray">
                         <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}" :name="index">
                           <!-- Sprint Task Header -->
@@ -527,6 +552,7 @@ export default {
       sprintStatus: 'Active',
       sprintBaseline: '',
       sprintRequiredSkillsStr: '',
+      sprintCustomersStr: '',
       sprintEffort: 0,
       sprintTotalEffort: 0,
       sprintEstimation: 0,
@@ -573,6 +599,9 @@ export default {
       publicTaskTabLabel: 'Public',
       publicTaskEffort: 1000,
       nonplannedTaskBuffer: 1000,
+      // Task Tab filter value
+      plannedTaskTypeSelect: '',
+      plannedTaskNameSearch: '',
     }
   },
   computed: {
@@ -635,6 +664,7 @@ export default {
       this.$data.sprintStatus = 'Active'
       this.$data.sprintBaseline = ''
       this.$data.sprintRequiredSkillsStr = ''
+      this.$data.sprintCustomersStr = ''
       this.$data.sprintBaseCapacity = 0
       this.$data.sprintRequiredSkills = []
       this.$data.sprintObj = {}
@@ -722,12 +752,14 @@ export default {
         this.$data.sprintStatus = sprint.sprintStatus
         this.$data.sprintBaseline = sprint.sprintBaseline
         this.$data.sprintRequiredSkillsStr = sprint.sprintRequiredSkillsStr
+        this.$data.sprintCustomersStr = sprint.sprintCustomersStr
         this.$data.sprintBaseCapacity = sprint.sprintBaseCapacity
         this.$data.sprintRequiredSkills = sprint.sprintRequiredSkills
         this.$data.sprintTotalEffort = sprint.sprintTotalEffort
         this.$data.sprintObj = {
           sprintId: sprint.sprintId,
           sprintRequiredSkills: sprint.sprintRequiredSkills,
+          sprintCustomers: sprint.sprintCustomers,
           sprintWorkingDays: sprint.sprintWorkingDays,
           sprintStartTime: sprint.sprintStartTime,
           sprintEndTime: sprint.sprintEndTime,
@@ -936,7 +968,7 @@ export default {
         taskReferenceTaskTitle: iTaskObj.taskTitle,
         taskReferenceTaskEffort: iTaskObj.taskEffort,
         taskReferenceTaskEstimation: iTaskObj.taskEstimation,
-        taskCustomer: iTaskObj.taskCustomer,
+        taskCustomerId: iTaskObj.taskCustomerId,
         taskRequiredSkills: iTaskObj.taskRequiredSkills,
         taskSprintId: this.$data.sprintSelect,
         taskRespLeader: this.$data.sprintLeader,
@@ -953,7 +985,7 @@ export default {
         taskParentTaskTitle: iTask.taskTitle,
         taskType: iTask.taskType,
         taskTypeTag: iTask.taskTypeTag,
-        taskCustomer: iTask.taskCustomer,
+        taskCustomerId: iTask.taskCustomerId,
         taskRequiredSkills: iTask.taskRequiredSkills,
         taskReferenceTask: iTask.taskReferenceTask,
         taskSprintId: this.$data.sprintSelect,
@@ -1303,6 +1335,15 @@ export default {
 }
 .sprint-card-tabs-label>>>.el-tag {
   font-size: 14px;
+}
+.sprint-card-content-planned>>>.el-collapse-item__header {
+  background-color: transparent;
+}
+.sprint-card-content-unplan>>>.el-collapse-item__header {
+  background-color: transparent;
+}
+.sprint-card-content-public>>>.el-collapse-item__header {
+  background-color: transparent;
 }
 .sprint-card-content {
   width: 100%;
