@@ -8,6 +8,7 @@ import PrjTimesheet from '@/components/Timesheet/PrjTimesheet'
 import TaskList from '@/components/Task/TaskList'
 import SptManagement from '@/components/Management/SptManagement'
 import PrjManagement from '@/components/Management/PrjManagement'
+import CtmManagement from '@/components/Management/CtmManagement'
 import RptManagement from '@/components/Management/RptManagement'
 import Charts from '@/components/Others/Charts'
 import Error from '@/components/Error'
@@ -87,6 +88,15 @@ export default new Router({
           path: 'Management/PrjManagement',
           name: 'PrjManagement',
           component: PrjManagement,
+          meta: {
+            needAdmin: true,
+            needLogin: true
+          }
+        },
+        {
+          path: 'Management/CtmManagement',
+          name: 'CtmManagement',
+          component: CtmManagement,
           meta: {
             needAdmin: true,
             needLogin: true

@@ -4,6 +4,13 @@
       <el-table v-loading="taskTableLoading" :data="taskTableData" style="width: 100%" class="task-table-content">
         <el-table-column prop="taskId" label="Id" v-if="false"></el-table-column>
         <el-table-column prop="taskName" label="Name" width="180" show-overflow-tooltip sortable v-if="taskTableObj.taskTableSource != 'MyTimesheet'"></el-table-column>
+        <el-table-column v-if="taskTableObj.taskTableSource == 'MyTimesheet'" label="Worklog" align="left" width="80" >
+          <template slot-scope="scope">
+            <el-tooltip class="item" effect="dark" content="Add Worklog" placement="top">
+              <el-button @click="addWorklog(scope.row)" type="primary" icon="el-icon-document-add" size="small"></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column prop="taskName" label="Name" width="180" show-overflow-tooltip sortable v-if="taskTableObj.taskTableSource == 'MyTimesheet'">
           <template slot-scope="scope">
             <el-button @click="editTask(scope.row)" type="text">{{scope.row.taskName}}</el-button>
@@ -23,13 +30,6 @@
         <el-table-column prop="taskEstimation" label="Est" align="center" width="70"></el-table-column>
         <el-table-column prop="taskSprintName" label="Sprint" align="center" width="200" show-overflow-tooltip sortable v-if="taskTableObj.taskTableSource != 'PrjTimesheet'"></el-table-column>
         <el-table-column prop="taskIssueDate" label="Issue Date" align="center" width="150" show-overflow-tooltip sortable v-if="taskTableObj.taskTableSource != 'PrjTimesheet'"></el-table-column>
-        <el-table-column v-if="taskTableObj.taskTableSource == 'MyTimesheet'" label="Worklog" align="center" width="80" >
-          <template slot-scope="scope">
-            <el-tooltip class="item" effect="dark" content="Add Worklog" placement="top">
-              <el-button @click="addWorklog(scope.row)" type="primary" icon="el-icon-document-add" size="small"></el-button>
-            </el-tooltip>
-          </template>
-        </el-table-column>
       </el-table>
       <el-pagination v-if="showPage" @current-change="handlePageChange" :current-page.sync="taskTablePage" :total="taskTableTotal" :page-size="taskTableSize" layout="total, prev, pager, next" style="float: right; margin-top: 5px"></el-pagination>
     </el-card>
