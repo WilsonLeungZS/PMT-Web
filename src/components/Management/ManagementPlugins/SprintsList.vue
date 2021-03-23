@@ -13,13 +13,13 @@
           <el-collapse-item @click.native="getSprintUserList(index, sprints.StartTime, sprints.EndTime, sprints.WorkingDays)">
             <template slot="title">
               <el-row style="width: 100%; background-color: #eceff1">
-                <el-col :span="5" class="sm-content-sprint-header-col">
+                <el-col :span="8" :lg="7" class="sm-content-sprint-header-col">
                   <span>Time Range: <b>{{sprints.Label}}</b></span>
                 </el-col>
-                <el-col :span="3" class="sm-content-sprint-header-col">
+                <el-col :span="4" :lg="3" class="sm-content-sprint-header-col">
                   <span>Working Days: <b>{{sprints.WorkingDays}}</b></span>
                 </el-col>
-                <el-col :span="6" class="sm-content-sprint-header-col">
+                <el-col :span="12" :lg="8" class="sm-content-sprint-header-col">
                   <span>Planned Capacity: <b>{{sprints.PlannedCapacity}}</b></span>
                   <el-divider direction="vertical"></el-divider>
                   <span>Contract Capacity: <b>{{sprints.ContractCapacity}}</b></span>
@@ -106,7 +106,7 @@
               <el-col :span="4" :lg="2" class="sm-table-expand-label">
                 <span>Required Skills</span>
               </el-col>
-              <el-col :span="8" :lg="7" class="sm-table-expand-item">
+              <el-col :span="8" :lg="6" class="sm-table-expand-item">
                 <el-select v-model="props.row.sprintRequiredSkills" size="small" style="width: 100%" multiple>
                   <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
                     <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
@@ -119,17 +119,25 @@
               <el-col :span="4" :lg="2" class="sm-table-expand-label">
                 <span>Data Source</span>
               </el-col>
-              <el-col :span="12" :lg="5" class="sm-table-expand-item">
+              <el-col :span="8" :lg="4" class="sm-table-expand-item">
                 <el-select v-model="props.row.sprintDataSource" size="small" style="width: 100%" multiple>
                   <el-option label="Manual" value="Manual"></el-option>
                   <el-option label="Service Now" value="ServiceNow"></el-option>
                   <el-option label="TRLS" value="TRLS"></el-option>
                 </el-select>
               </el-col>
-              <el-col :span="8" :lg="3" class="sm-table-expand-item">
-                <el-button type="danger" size="small" style="width:100%" >Obsolete</el-button>
+              <el-col :span="4" :lg="2" class="sm-table-expand-label">
+                <span>Customers</span>
               </el-col>
               <el-col :span="8" :lg="5" class="sm-table-expand-item">
+                <el-select v-model="props.row.sprintCustomers" size="small" style="width: 100%" multiple>
+                  <el-option v-for="(customer, index) in customersList" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="6" :lg="2" class="sm-table-expand-item">
+                <el-button type="danger" size="small" style="width:100%" >Obsolete</el-button>
+              </el-col>
+              <el-col :span="6" :lg="1" class="sm-table-expand-item">
                 <el-button @click="saveSprint(props.row)" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small" style="width:100%">Save</el-button>
               </el-col>
             </el-row>
@@ -138,10 +146,11 @@
         <el-table-column label="Id" prop="sprintId" v-if="false" :key="1"></el-table-column>
         <el-table-column label="Name" prop="sprintName" align="left" min-width="100" sortable show-overflow-tooltip :key="2"></el-table-column>
         <el-table-column label="Base Capacity" prop="sprintBaseCapacity" align="center" width="150" :key="3"></el-table-column>
-        <el-table-column label="Required Skills" prop="sprintRequiredSkillsStr" align="center" min-width="100" :key="4"></el-table-column>
+        <el-table-column label="Required Skills" prop="sprintRequiredSkillsStr" align="center" min-width="100" show-overflow-tooltip :key="4"></el-table-column>
         <el-table-column label="Baseline" prop="sprintBaseline" align="left" min-width="200" show-overflow-tooltip :key="5"></el-table-column>
-        <el-table-column label="Leader" prop="sprintLeader" align="center" width="150" sortable :key="6"></el-table-column>
-        <el-table-column label="Status" prop="sprintStatus" align="center" width="100" :key="7">
+        <el-table-column label="Customers" prop="sprintCustomersStr" align="left" show-overflow-tooltip :key="6"></el-table-column>
+        <el-table-column label="Leader" prop="sprintLeader" align="center" width="150" sortable :key="7"></el-table-column>
+        <el-table-column label="Status" prop="sprintStatus" align="center" width="100" :key="8">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.sprintStatus === 'Active'" size="small" type="primary" effect="dark">{{scope.row.sprintStatus}}</el-tag>
             <el-tag v-if="scope.row.sprintStatus === 'Running'" size="small" type="success" effect="dark">{{scope.row.sprintStatus}}</el-tag>
@@ -251,6 +260,7 @@ export default {
     return {
       skillsList: [],
       leadersList: [],
+      customersList: [],
       sprintData: {
         sprintId: 0,
         sprintName: null,
@@ -260,6 +270,7 @@ export default {
         sprintWorkingDays: 0,
         sprintBaseCapacity: 0,
         sprintRequiredSkills: [],
+        sprintCustomers: [],
         sprintStatus: 'Active',
         sprintDataSource: ['Manual'],
         sprintLeaderId: null
@@ -374,6 +385,13 @@ export default {
         this.$data.sprintGroup[index].SprintUsers = []
       }
     },
+    async getCustomerList () {
+      this.$data.customersList = []
+      const res = await http.get('/sprints/getAllCustomersList')
+      if (res.data.status === 0) {
+        this.$data.customersList = res.data.data
+      }
+    },
     // Sprint Management
     async getSprintsList () {
       this.$data.sprintGroup = []
@@ -395,6 +413,7 @@ export default {
         sprintWorkingDays: 0,
         sprintBaseCapacity: 0,
         sprintRequiredSkills: [],
+        sprintCustomers: [],
         sprintStatus: 'Active',
         sprintDataSource: ['Manual'],
         sprintLeaderId: null
@@ -412,6 +431,11 @@ export default {
         this.showMessage('Required skills could not be empty!', 'error')
         return
       }
+      if (sprint.sprintCustomers.length > 0) {
+        for (var i=0; i<sprint.sprintCustomers.length; i++) {
+          sprint.sprintCustomers[i] = '#' + sprint.sprintCustomers[i] + '#'
+        }
+      }
       const res = await http.post('/sprints/updateSprint', {
         reqSprintId: sprint.sprintId,
         reqSprintName: sprint.sprintName,
@@ -421,6 +445,7 @@ export default {
         reqSprintWorkingDays: sprint.sprintWorkingDays,
         reqSprintBaseCapacity: sprint.sprintBaseCapacity,
         reqSprintRequiredSkills: sprint.sprintRequiredSkills != null? sprint.sprintRequiredSkills.toString(): null,
+        reqSprintCustomers: sprint.sprintCustomers != null? sprint.sprintCustomers.toString(): null,
         reqSprintStatus: sprint.sprintStatus,
         reqSprintDataSource: sprint.sprintDataSource != null? sprint.sprintDataSource.toString(): null,
         reqSprintLeaderId: sprint.sprintLeaderId
@@ -488,6 +513,7 @@ export default {
         console.log('resultSprint -> Done')
         this.getAllSkillsList()
         this.getActiveLeadersList()
+        this.getCustomerList()
         this.getSprintsList()
         this.showMessage('Add/Update sprint successfully!', 'success')
         this.$data.newSprintDialogVisible = false
@@ -539,6 +565,7 @@ export default {
   created () {
     this.getAllSkillsList()
     this.getActiveLeadersList()
+    this.getCustomerList()
     this.getSprintsList()
   }
 }

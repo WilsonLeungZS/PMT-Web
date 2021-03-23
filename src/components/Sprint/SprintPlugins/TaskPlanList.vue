@@ -6,10 +6,10 @@
       </div>
       <div>
         <el-row :gutter="10">
-          <el-col :span="8" :lg="5" style="margin: 5px 0">
+          <!--<el-col :span="8" :lg="5" style="margin: 5px 0">
             <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchCustomer" placeholder="Customer..." size="small" clearable></el-input>
-          </el-col>
-          <el-col :span="16" :lg="10" style="margin: 5px 0">
+          </el-col>-->
+          <el-col :span="24" :lg="15" style="margin: 5px 0">
             <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchKeyword" placeholder="Search Task..." size="small" clearable>
               <el-button v-if="taskSearchKeyword != ''" @click="searchTask" slot="append" icon="el-icon-search"></el-button>
               <el-button v-if="taskSearchKeyword == ''" @click="searchTask" slot="append" icon="el-icon-refresh"></el-button>
@@ -128,10 +128,11 @@ export default {
       this.$data.taskPlanListPage = 1
       if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
         var skillsArray = iSprintObj.sprintRequiredSkills.toString()
+        var customersArray = iSprintObj.sprintCustomers != null? iSprintObj.sprintCustomers.toString(): null
         var resCount = await http.post('/tasks/getTasksListCountBySkill', {
           reqSkillsArray: skillsArray,
           reqTaskKeyword: iKeyword,
-          reqTaskCustomer: iCustomer,
+          reqTaskCustomer: customersArray,
           reqShowDoneTask: iShowDoneTask
         })
         if (resCount != null && resCount.data.status == 0) {
@@ -140,7 +141,7 @@ export default {
         var resData = await http.post('/tasks/getTasksListBySkill', {
           reqSkillsArray: skillsArray,
           reqTaskKeyword: iKeyword,
-          reqTaskCustomer: iCustomer,
+          reqTaskCustomer: customersArray,
           reqShowDoneTask: iShowDoneTask,
           reqPage: this.$data.taskReqPage,
           reqSize: this.$data.taskPlanListSize
