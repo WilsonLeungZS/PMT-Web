@@ -248,6 +248,7 @@ export default {
         }
       }
       const res = await http.post('/users/updateUser', {
+        reqUserId: user.userId,
         reqUserName: user.userName,
         reqUserNickname : user.userNickname,
         reqUserEmployeeNbr: user.userEmployeeNbr,

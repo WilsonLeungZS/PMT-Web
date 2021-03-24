@@ -963,6 +963,7 @@ export default {
       this.$data.pmtTaskDialogAction = {
         action: 'CREATE-REF',
         sprintStatus: this.$data.sprintStatus,
+        taskType: iTaskObj.taskType,
         taskTypeTag: iTaskObj.taskTypeTag,
         taskReferenceTask: iTaskObj.taskName,
         taskReferenceTaskTitle: iTaskObj.taskTitle,

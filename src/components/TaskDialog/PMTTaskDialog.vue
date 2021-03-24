@@ -512,6 +512,7 @@ Remark:
         this.initTaskForm('New PMT Task', 'tab_basic_info')
         // Set new Task default value
         this.$data.PMTTask.taskCategory = 'PMT-TASK-REF'
+        this.$data.PMTTask.taskType = iObj.taskType
         this.$data.PMTTask.taskTypeTag = iObj.taskTypeTag
         this.$data.PMTTask.taskSprintId = iObj.taskSprintId
         this.$data.PMTTask.taskCustomerId = iObj.taskCustomerId
