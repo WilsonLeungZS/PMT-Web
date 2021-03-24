@@ -6,10 +6,12 @@
       </div>
       <div>
         <el-row :gutter="10">
-          <!--<el-col :span="8" :lg="5" style="margin: 5px 0">
-            <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchCustomer" placeholder="Customer..." size="small" clearable></el-input>
-          </el-col>-->
-          <el-col :span="24" :lg="15" style="margin: 5px 0">
+          <el-col :span="8" :lg="5" style="margin: 5px 0">
+            <el-select v-model="taskSearchCustomer" multiple collapse-tags placeholder="Customers..." size="small">
+              <el-option v-for="(customer, index) in customerData" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="16" :lg="10" style="margin: 5px 0">
             <el-input @keyup.enter.native="searchTask" @clear="searchTask" v-model="taskSearchKeyword" placeholder="Search Task..." size="small" clearable>
               <el-button v-if="taskSearchKeyword != ''" @click="searchTask" slot="append" icon="el-icon-search"></el-button>
               <el-button v-if="taskSearchKeyword == ''" @click="searchTask" slot="append" icon="el-icon-refresh"></el-button>
@@ -26,7 +28,7 @@
         </el-row>
         <el-row class="task-plan-list-table">
           <el-col :span="24">
-            <el-table v-loading="taskPlanListLoading" :data="taskPlanList" width="100%" size="mini">
+            <el-table v-loading="taskPlanListLoading" :data="taskPlanList" :row-style="setTaskListBackgroundColor" width="100%" size="mini">
               <el-table-column prop="taskTypeTag" label="TypeTag" v-if="false"></el-table-column>
               <el-table-column prop="taskName" label="Name" align="left" width="130" fixed="left">
                 <template slot-scope="scope">
@@ -73,7 +75,7 @@ export default {
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
       taskPlanList: [],
-      taskSearchCustomer: '',
+      taskSearchCustomer: [],
       taskSearchKeyword: '',
       taskCheckboxShowDoneTask: false,
       taskPlanListSize: 30,
@@ -81,6 +83,7 @@ export default {
       taskPlanListTotal: 0,
       taskSprintObj: null,
       taskReqPage: 1,
+      customerData: [],
       // Loading
       taskPlanListLoading: false,
       userLevel: this.$store.getters.getUserLevel,
@@ -97,18 +100,26 @@ export default {
         var sprintObj = val
         if (sprintObj != null && sprintObj != '') {
           this.$data.taskSprintObj = sprintObj
+          this.$data.taskSearchCustomer = []
           this.getTaskPlanListBySkills(sprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
           this.validateSprint(sprintObj)
         } else {
           this.$data.taskSprintObj = null
           this.taskPlanList = []
+          this.$data.taskSearchCustomer = []
         }
+        this.getCustomerList()
       },
       immediate: true,
       deep: true
     }
   },
   methods: {
+    // Style Method
+    setTaskListBackgroundColor ({row, column, rowIndex, columnIndex}) {
+      return { 'background-color': row.taskBackgroundColor }
+    },
+    // Functional Method
     validateSprint (iSprintObj) {
       var sprintEndTime = iSprintObj.sprintEndTime
       var currentTime = this.formatDate(new Date(), 'yyyy-MM-dd')
@@ -128,11 +139,24 @@ export default {
       this.$data.taskPlanListPage = 1
       if (iSprintObj.sprintRequiredSkills != null && iSprintObj.sprintRequiredSkills != '') {
         var skillsArray = iSprintObj.sprintRequiredSkills.toString()
-        var customersArray = iSprintObj.sprintCustomers != null? iSprintObj.sprintCustomers.toString(): null
+        var customersArrayStr = iSprintObj.sprintCustomers != null? iSprintObj.sprintCustomers.toString(): null
+        // Compare filter customer and sprint customer
+        if (iCustomer != null && iCustomer.length > 0) {
+          if (customersArrayStr != null && customersArrayStr.length > 0) {
+            var customersArray = this.getSame(customersArrayStr.split(','), iCustomer.map(String))
+            if (customersArray != null && customersArray.length > 0) {
+              customersArrayStr = customersArray.toString()
+            }
+            this.$data.taskSearchCustomer = customersArray.map(Number)
+            console.log('Same Customer -> ', customersArrayStr)
+          } else {
+            customersArrayStr = iCustomer.toString()
+          }
+        }
         var resCount = await http.post('/tasks/getTasksListCountBySkill', {
           reqSkillsArray: skillsArray,
           reqTaskKeyword: iKeyword,
-          reqTaskCustomer: customersArray,
+          reqTaskCustomer: customersArrayStr,
           reqShowDoneTask: iShowDoneTask
         })
         if (resCount != null && resCount.data.status == 0) {
@@ -141,7 +165,7 @@ export default {
         var resData = await http.post('/tasks/getTasksListBySkill', {
           reqSkillsArray: skillsArray,
           reqTaskKeyword: iKeyword,
-          reqTaskCustomer: customersArray,
+          reqTaskCustomer: customersArrayStr,
           reqShowDoneTask: iShowDoneTask,
           reqPage: this.$data.taskReqPage,
           reqSize: this.$data.taskPlanListSize
@@ -172,6 +196,31 @@ export default {
     editTask (iTaskId, iTaskCategory) {
       this.$emit('editTask', iTaskId, iTaskCategory)
     },
+    async getCustomerList () {
+      this.$data.customerData = []
+      var customersArrayStr = this.$data.taskSprintObj.sprintCustomers != null? this.$data.taskSprintObj.sprintCustomers.toString(): null
+      const res = await http.get('/sprints/getAllCustomersList')
+      if (res.data.status === 0) {
+        var allCustomerList = res.data.data
+        var result = []
+        if (allCustomerList != null && allCustomerList.length > 0) {
+          if (customersArrayStr != null && customersArrayStr.length > 0) {
+            var customersArray = customersArrayStr.split(',').map(Number)
+            for (var i=0; i<allCustomerList.length; i++) {
+              var customer = allCustomerList[i]
+              console.log('Customer Id -> ', customer)
+              console.log(customersArray)
+              if (customersArray.indexOf(customer.customerId) != -1) {
+                result.push(customer)
+              }
+            }
+          } else {
+            result = allCustomerList
+          }
+        }
+        this.$data.customerData = result
+      }
+    },
     // Common Method
     formatDate (date, fmt) { 
       var o = { 
@@ -192,9 +241,18 @@ export default {
           }
       }
       return fmt; 
+    },
+    getSame(arr1, arr2) {
+      let newArr = [];
+      for (let i=0; i<arr2.length; i++) {
+        for (let j=0; j<arr1.length; j++) {
+          if (arr1[j] === arr2[i]) {
+            newArr.push(arr1[j])
+          }
+        }
+      }
+      return newArr
     }
-  },
-  created () {
   }
 }
 </script>
