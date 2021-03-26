@@ -4,24 +4,12 @@
       <el-main>
         <el-row>
           <el-col :span="24" class="content-title-col">
-            <div :class="{'content-title-item':true, 'active':isActive}">
-              <i class="el-icon-data-line content-title-item-icon"></i>
-              <span class="content-title-item-header">{{header1}}</span>
-            </div>
-            <el-divider direction="vertical"></el-divider>
-            <div class="content-title-item " @click="switchToProjectManagement">
-              <i class="el-icon-user content-title-item-icon"></i>
-              <span class="content-title-item-header">{{header2}}</span>
-            </div>
-            <el-divider direction="vertical"></el-divider>
-            <div class="content-title-item " @click="switchToCustomerManagement">
-              <i class="el-icon-office-building content-title-item-icon"></i>
-              <span class="content-title-item-header">{{header3}}</span>
-            </div>
-            <el-divider direction="vertical"></el-divider>
-            <div class="content-title-item " @click="switchToReportManagement">
-              <i class="el-icon-monitor content-title-item-icon"></i>
-              <span class="content-title-item-header">{{header4}}</span>
+            <div v-for="(header, index) in headersArray" :key="index" class="content-title-item" @click="switchTo(header.headerPath)">
+              <span :class="{'active': header.headerName == 'Sprint'? true: false}">
+                <i class="content-title-item-icon" :class="header.headerIcon"></i>
+                <span class="content-title-item-header">{{header.headerName}}</span>
+              </span>
+              <el-divider v-if="header.headerDivider" direction="vertical"></el-divider>
             </div>
           </el-col>
         </el-row>
@@ -37,7 +25,6 @@
 </template>
 
 <script>
-import http from '../../utils/http'
 import utils from '../../utils/utils'
 import SprintsList from './ManagementPlugins/SprintsList'
 export default {
@@ -47,27 +34,14 @@ export default {
   },
   data () {
     return {
-      header1: 'Sprint',
-      header2: 'User',
-      header3: 'Customer',
-      header4: 'Report',
-      isActive: true,
+      headersArray: utils.headersArray,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
     }
   },
   methods: {
-    switchToProjectManagement () {
-      this.$data.isActive = false
-      this.$router.push({path: 'PrjManagement'})
-    },
-    switchToCustomerManagement () {
-      this.$data.isActive = false
-      this.$router.push({path: 'CtmManagement'})
-    },
-    switchToReportManagement () {
-      this.$data.isActive = false
-      this.$router.push({path: 'RptManagement'})
+    switchTo (iPath) {
+      this.$router.push({path: iPath})
     }
   },
   created () {
@@ -81,6 +55,7 @@ export default {
   color: #ff6348;
   border-bottom: 1px solid #ff6348;
   cursor: default;
+  padding-bottom: 5px;
 }
 .sm-body {
   width: 100%;
@@ -104,7 +79,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 10px;
+  margin-right: 10px;
   cursor: pointer;
 }
 .content-title-item-icon {
@@ -113,7 +88,8 @@ export default {
   font-size: 20px;
 }
 .content-title-item-header {
-  margin-left:5px;
+  margin-left: 5px;
+  margin-right: 10px;
   height:20px;
   width: auto;
   font-size: 20px;
