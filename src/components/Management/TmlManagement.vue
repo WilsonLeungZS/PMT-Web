@@ -1,11 +1,11 @@
 <template>
-  <div class="cm-body">
+  <div class="tm-body">
     <el-container>
       <el-main>
         <el-row>
           <el-col :span="24" class="content-title-col">
             <div v-for="(header, index) in headersArray" :key="index" class="content-title-item" @click="switchTo(header.headerPath)">
-              <span :class="{'active': header.headerName == 'Customer'? true: false}">
+              <span :class="{'active': header.headerName == 'Timeline'? true: false}">
                 <i class="content-title-item-icon" :class="header.headerIcon"></i>
                 <span class="content-title-item-header">{{header.headerName}}</span>
               </span>
@@ -15,7 +15,7 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <customers-list></customers-list>
+            <timelines-list></timelines-list>
           </el-col>
         </el-row>
       </el-main>
@@ -25,11 +25,11 @@
 
 <script>
 import utils from '../../utils/utils'
-import CustomersList from './ManagementPlugins/CustomersList'
+import TimelinesList from './ManagementPlugins/TimelinesList'
 export default {
-  name: 'CustomerManagement',
+  name: 'TimelineManagement',
   components: {
-    CustomersList
+    TimelinesList
   },
   data () {
     return {
@@ -49,14 +49,13 @@ export default {
 </script>
 
 <style scoped>
-/* Header Style */
 .active {
   color: #ff6348;
   border-bottom: 1px solid #ff6348;
   cursor: default;
   padding-bottom: 5px;
 }
-.cm-body {
+.tm-body {
   width: 100%;
   height: auto;
 }

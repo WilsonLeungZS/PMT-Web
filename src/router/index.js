@@ -6,6 +6,7 @@ import SprintView from '@/components/Sprint/SprintView'
 import MyTimesheet from '@/components/Timesheet/MyTimesheet'
 import PrjTimesheet from '@/components/Timesheet/PrjTimesheet'
 import TaskList from '@/components/Task/TaskList'
+import TmlManagement from '@/components/Management/TmlManagement'
 import SptManagement from '@/components/Management/SptManagement'
 import PrjManagement from '@/components/Management/PrjManagement'
 import CtmManagement from '@/components/Management/CtmManagement'
@@ -22,7 +23,7 @@ export default new Router({
     {path: '/Sprint', redirect: '/Sprint/SprintView'},
     {path: '/Timesheet', redirect: '/Timesheet/MyTimesheet'},
     {path: '/Task', redirect: '/Task/TaskList'},
-    {path: '/Management', redirect: '/Management/SptManagement'},
+    {path: '/Management', redirect: '/Management/TmlManagement'},
     {path: '/Others', redirect: '/Others/Charts'},
     {
       path: '/',
@@ -72,6 +73,15 @@ export default new Router({
           component: TaskList,
           meta: {
             needAdmin: false,
+            needLogin: true
+          }
+        },
+        {
+          path: 'Management/TmlManagement',
+          name: 'TmlManagement',
+          component: TmlManagement,
+          meta: {
+            needAdmin: true,
             needLogin: true
           }
         },
