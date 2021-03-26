@@ -4,30 +4,36 @@
     <div slot="header" class="clearfix">
       <span class="sm-content-header">
         <span>Sprints List</span>
-        <el-button @click="createSprint" class="sm-content-header-btn" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini">Create New Sprint</el-button>
       </span>
     </div>
-    <el-card v-for="(sprints, index) in sprintGroup" :key="index" class="box-card sm-content-sprint" shadow="hover">
+    <el-card v-loading="sprintListLoading" v-for="(timeline, index) in timelineData" :key="index" class="box-card sm-content-sprint" shadow="hover">
       <div slot="header" class="clearfix">
         <el-collapse>
-          <el-collapse-item @click.native="getSprintUserList(index, sprints.StartTime, sprints.EndTime, sprints.WorkingDays)">
+          <el-collapse-item @click.native="getSprintUserList(index, timeline.timelineStartTime, timeline.timelineEndTime, timeline.timelineWorkingDays)">
             <template slot="title">
               <el-row style="width: 100%; background-color: #eceff1">
+                <el-col :span="4" :lg="4" class="sm-content-sprint-header-col">
+                  <span style="margin-left: 10px"><b>{{timeline.timelineName}}</b></span>
+                </el-col>
+                <el-col :span="8" :lg="6" class="sm-content-sprint-header-col">
+                  <span><b>Time Range:</b> {{timeline.timelineStartTime}} ~ {{timeline.timelineEndTime}}</span>
+                </el-col>
+                <el-col :span="4" :lg="4" class="sm-content-sprint-header-col">
+                  <span><b>Working Days:</b> {{timeline.timelineWorkingDays}}</span>
+                </el-col>
                 <el-col :span="8" :lg="7" class="sm-content-sprint-header-col">
-                  <span>Time Range: <b>{{sprints.Label}}</b></span>
-                </el-col>
-                <el-col :span="4" :lg="3" class="sm-content-sprint-header-col">
-                  <span>Working Days: <b>{{sprints.WorkingDays}}</b></span>
-                </el-col>
-                <el-col :span="12" :lg="8" class="sm-content-sprint-header-col">
-                  <span>Planned Capacity: <b>{{sprints.PlannedCapacity}}</b></span>
+                  <span><b>Capacity ( Planned:</b> {{timeline.timelinePlannedCapacity}}</span>
                   <el-divider direction="vertical"></el-divider>
-                  <span>Contract Capacity: <b>{{sprints.ContractCapacity}}</b></span>
+                  <span><b>Contract:</b> {{timeline.timelineContractCapacity}}<b> )</b></span>
+                </el-col>
+                <el-col :span="2" :lg="3" class="sm-content-sprint-header-col">
+                  <el-button type="danger" size="mini">Obsolete</el-button>
+                  <el-button @click.stop="createSprint(timeline)" type="primary" size="mini">New Sprint</el-button>
                 </el-col>
               </el-row>
             </template>
             <div style="margin: 0 20px">
-              <el-table :data="sprints.SprintUsers" height="300px" :row-class-name="highlightRowClassName" class="sm-content-sprint-user-list-table">
+              <el-table :data="timeline.timelineUsers" height="300px" :row-class-name="highlightRowClassName" class="sm-content-sprint-user-list-table">
                 <el-table-column label="Name" prop="sprintUserFullName" align="left" min-width="100" sortable></el-table-column>
                 <el-table-column label="Assign To Sprints" prop="sprintUserAssignToSprints" align="left" min-width="250" sortable show-overflow-tooltip></el-table-column>
                 <el-table-column label="Skills" prop="sprintUserSkills" align="center" width="250" sortable show-overflow-tooltip></el-table-column>
@@ -43,55 +49,16 @@
           </el-collapse-item>
         </el-collapse>
       </div>
-      <el-table :data="sprints.Options" fit>
+      <el-table :data="timeline.timelineSprints" fit>
         <el-table-column type="expand">
           <template slot-scope="props">
             <el-row :gutter="15">
               <el-col :span="4" :lg="2" class="sm-table-expand-label">
                 <span>Name</span>
               </el-col>
-              <el-col :span="8" :lg="7" class="sm-table-expand-item">
+              <el-col :span="8" :lg="8" class="sm-table-expand-item">
                 <el-input v-model="props.row.sprintName" size="small" style="width: 100%"></el-input>
               </el-col>
-              <el-col :span="4" :lg="2" class="sm-table-expand-label">
-                <span>Start Time</span>
-              </el-col>
-              <el-col :span="8" :lg="3" class="sm-table-expand-item">
-                <el-date-picker @change="changeSprintTime(props.row)" v-model="props.row.sprintStartTime" size="small" type="date" value-format="yyyy-MM-dd" placeholder="Select Date..." style="width: 100%" clearable></el-date-picker>
-              </el-col>
-              <el-col :span="4" :lg="2" class="sm-table-expand-label">
-                <span>End Time</span>
-              </el-col>
-              <el-col :span="8" :lg="3" class="sm-table-expand-item">
-                <el-date-picker @change="changeSprintTime(props.row)" v-model="props.row.sprintEndTime" size="small" type="date" value-format="yyyy-MM-dd" placeholder="Select Date..." style="width: 100%" clearable></el-date-picker>
-              </el-col>
-              <el-col :span="4" :lg="2" class="sm-table-expand-label">
-                <span>Leader</span>
-              </el-col>
-              <el-col :span="8" :lg="3" class="sm-table-expand-item">
-                <el-select v-model="props.row.sprintLeaderId" size="small" style="width: 100%" filterable>
-                  <el-option label="" value=""></el-option>
-                  <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userName" :value="leader.userId">
-                    <span style="float: left; margin-right:20px">{{leader.userName}} ({{leader.userNickname}})</span>
-                    <span style="float: right; color: #8492a6; font-size: 12px">Level - {{leader.userLevel}}</span>
-                  </el-option>
-                </el-select>
-              </el-col>                    
-            </el-row>
-            <el-divider></el-divider>
-            <el-row :gutter="15">
-              <el-col :span="4" :lg="2" class="sm-table-expand-label">
-                <span>Baseline</span>
-              </el-col>
-              <el-col :span="20" :lg="12" class="sm-table-expand-item">
-                <el-input v-model="props.row.sprintBaseline" size="small" style="width: 100%"></el-input>
-              </el-col>
-              <el-col :span="4" :lg="2" class="sm-table-expand-label">
-                <span>Working Days</span>
-              </el-col>
-              <el-col :span="8" :lg="3" class="sm-table-expand-item">
-                <span>Total <b style="text-decoration:underline; margin: 0 5px; font-size: 16px">{{props.row.sprintWorkingDays}}</b> days</span> 
-              </el-col> 
               <el-col :span="4" :lg="2" class="sm-table-expand-label">
                 <span>Base Capacity</span>
               </el-col>
@@ -100,13 +67,42 @@
                   <template slot="append">hrs</template>
                 </el-input>
               </el-col>
+              <el-col :span="4" :lg="2" class="sm-table-expand-label">
+                <span>Leader</span>
+              </el-col>
+              <el-col :span="8" :lg="7" class="sm-table-expand-item">
+                <el-select v-model="props.row.sprintLeaderId" size="small" style="width: 100%" filterable>
+                  <el-option label="" value=""></el-option>
+                  <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userName" :value="leader.userId">
+                    <span style="float: left; margin-right:20px">{{leader.userName}} ({{leader.userNickname}})</span>
+                    <span style="float: right; color: #8492a6; font-size: 12px">Level - {{leader.userLevel}}</span>
+                  </el-option>
+                </el-select>
+              </el-col>              
+            </el-row>
+            <el-divider></el-divider>
+            <el-row :gutter="15">
+              <el-col :span="4" :lg="2" class="sm-table-expand-label">
+                <span>Baseline</span>
+              </el-col>
+              <el-col :span="20" :lg="13" class="sm-table-expand-item">
+                <el-input v-model="props.row.sprintBaseline" size="small" style="width: 100%"></el-input>
+              </el-col>
+              <el-col :span="4" :lg="2" class="sm-table-expand-label">
+                <span>Customers</span>
+              </el-col>
+              <el-col :span="8" :lg="7" class="sm-table-expand-item">
+                <el-select v-model="props.row.sprintCustomers" size="small" style="width: 100%" multiple>
+                  <el-option v-for="(customer, index) in customersList" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
+                </el-select>
+              </el-col>
             </el-row>
             <el-divider></el-divider>
             <el-row :gutter="15">
               <el-col :span="4" :lg="2" class="sm-table-expand-label">
                 <span>Required Skills</span>
               </el-col>
-              <el-col :span="8" :lg="6" class="sm-table-expand-item">
+              <el-col :span="8" :lg="13" class="sm-table-expand-item">
                 <el-select v-model="props.row.sprintRequiredSkills" size="small" style="width: 100%" multiple>
                   <el-option-group v-for="(skillGroup, index) in skillsList" :key="index" :label="skillGroup.Label">
                     <el-option v-for="(skill, index) in skillGroup.Options" :key="index" :label="skill.skillName" :value="skill.skillId">
@@ -119,25 +115,14 @@
               <el-col :span="4" :lg="2" class="sm-table-expand-label">
                 <span>Data Source</span>
               </el-col>
-              <el-col :span="8" :lg="4" class="sm-table-expand-item">
+              <el-col :span="8" :lg="5" class="sm-table-expand-item">
                 <el-select v-model="props.row.sprintDataSource" size="small" style="width: 100%" multiple>
                   <el-option label="Manual" value="Manual"></el-option>
                   <el-option label="Service Now" value="ServiceNow"></el-option>
                   <el-option label="TRLS" value="TRLS"></el-option>
                 </el-select>
               </el-col>
-              <el-col :span="4" :lg="2" class="sm-table-expand-label">
-                <span>Customers</span>
-              </el-col>
-              <el-col :span="8" :lg="5" class="sm-table-expand-item">
-                <el-select v-model="props.row.sprintCustomers" size="small" style="width: 100%" multiple>
-                  <el-option v-for="(customer, index) in customersList" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
-                </el-select>
-              </el-col>
               <el-col :span="6" :lg="2" class="sm-table-expand-item">
-                <el-button type="danger" size="small" style="width:100%" >Obsolete</el-button>
-              </el-col>
-              <el-col :span="6" :lg="1" class="sm-table-expand-item">
                 <el-button @click="saveSprint(props.row)" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small" style="width:100%">Save</el-button>
               </el-col>
             </el-row>
@@ -148,7 +133,7 @@
         <el-table-column label="Base Capacity" prop="sprintBaseCapacity" align="center" width="150" :key="3"></el-table-column>
         <el-table-column label="Required Skills" prop="sprintRequiredSkillsStr" align="center" min-width="100" show-overflow-tooltip :key="4"></el-table-column>
         <el-table-column label="Baseline" prop="sprintBaseline" align="left" min-width="200" show-overflow-tooltip :key="5"></el-table-column>
-        <el-table-column label="Customers" prop="sprintCustomersStr" align="left" show-overflow-tooltip :key="6"></el-table-column>
+        <el-table-column label="Customers" prop="sprintCustomersStr" align="center" show-overflow-tooltip :key="6"></el-table-column>
         <el-table-column label="Leader" prop="sprintLeader" align="center" width="150" sortable :key="7"></el-table-column>
         <el-table-column label="Status" prop="sprintStatus" align="center" width="100" :key="8">
           <template slot-scope="scope">
@@ -159,35 +144,35 @@
       </el-table>
     </el-card>
   </el-card>
-  <!-- Create new sprint -->
+  <!-- Create new sprint dialog -->
   <el-dialog title="Create New Sprint" :visible.sync="newSprintDialogVisible" width="800px" class="sm-dialog">
     <div>
       <el-card class="box-card" shadow="never">
         <el-row :gutter="20">
           <el-col :span="3" class="sm-dialog-label">
-            <span>Name</span>
-          </el-col>
-          <el-col :span="21" class="sm-dialog-item">
-            <el-input v-model="sprintData.sprintName" size="small" style="width: 100%"></el-input>
-          </el-col>
-          <el-col :span="3" class="sm-dialog-label">
             <span>Start Time</span>
           </el-col>
           <el-col :span="5" class="sm-dialog-item">
-            <el-date-picker @change="changeSprintTime(sprintData)" v-model="sprintData.sprintStartTime" size="small" type="date" value-format="yyyy-MM-dd" placeholder="Select Date..." style="width: 100%" clearable></el-date-picker>
+            <span>{{sprintData.sprintStartTime}}</span>
           </el-col>
           <el-col :span="3" class="sm-dialog-label">
             <span>End Time</span>
           </el-col>
           <el-col :span="5" class="sm-dialog-item">
-            <el-date-picker @change="changeSprintTime(sprintData)" v-model="sprintData.sprintEndTime" size="small" type="date" value-format="yyyy-MM-dd" placeholder="Select Date..." style="width: 100%" clearable></el-date-picker>
+            <span>{{sprintData.sprintEndTime}}</span>
           </el-col>
           <el-col :span="4" class="sm-dialog-label">
             <span>Working Days</span>
           </el-col>
           <el-col :span="4" class="sm-dialog-item">
             <span>Total <b style="text-decoration:underline; margin: 0 5px; font-size: 16px">{{sprintData.sprintWorkingDays}}</b> days</span> 
-          </el-col> 
+          </el-col>
+          <el-col :span="3" class="sm-dialog-label">
+            <span>Name</span>
+          </el-col>
+          <el-col :span="21" class="sm-dialog-item">
+            <el-input v-model="sprintData.sprintName" size="small" style="width: 100%"></el-input>
+          </el-col>
           <el-col :span="3" class="sm-dialog-label">
             <span>Leader</span>
           </el-col>
@@ -240,6 +225,14 @@
               <el-option label="TRLS" value="TRLS"></el-option>
             </el-select>
           </el-col>
+          <el-col :span="4" class="sm-dialog-label">
+                <span>Customers</span>
+              </el-col>
+              <el-col :span="20" class="sm-dialog-item">
+                <el-select v-model="sprintData.sprintCustomers" size="small" style="width: 100%" multiple>
+                  <el-option v-for="(customer, index) in customersList" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
+                </el-select>
+              </el-col>
         </el-row>
       </el-card>
     </div>
@@ -261,6 +254,7 @@ export default {
       skillsList: [],
       leadersList: [],
       customersList: [],
+      timelineData: [],
       sprintData: {
         sprintId: 0,
         sprintName: null,
@@ -273,10 +267,13 @@ export default {
         sprintCustomers: [],
         sprintStatus: 'Active',
         sprintDataSource: ['Manual'],
-        sprintLeaderId: null
+        sprintLeaderId: null,
+        sprintTimelineId: null,
+        sprintCustomers: []
       },
       sprintGroup: [],
       newSprintDialogVisible: false,
+      sprintListLoading: false,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
     }
@@ -285,7 +282,6 @@ export default {
     // Style Method
     highlightRowClassName ({row, rowIndex}) {
       if (row.sprintUserRemainingCapacity > 0) {
-        console.log('Highlight row')
         return 'highlight-row'
       } else {
         return ''
@@ -345,44 +341,17 @@ export default {
         this.$data.leadersList = []
       }
     },
-    async changeSprintTime (sprint) {
-      // Validate sprint start time should bigger than end time
-      if (sprint.sprintStartTime != null && sprint.sprintEndTime != null) {
-        if (sprint.sprintStartTime > sprint.sprintEndTime) {
-          sprint.sprintStartTime = sprint.sprintEndTime
-          sprint.sprintEndTime = null
-          this.showMessage('Sprint start time could not later than end time!', 'error')
-          return
-        }
-      }
-      // Get Working Days
-      if (sprint.sprintStartTime != null && sprint.sprintEndTime != null) {
-        var res = await http.get('https://ipo.gzatcc.com/api/others/workdays', {
-          start_date: sprint.sprintStartTime,
-          end_date: sprint.sprintEndTime,
-        })
-        var workingDays = 0
-        if (res != null && res.data != null) {
-          workingDays = Number(res.data.workday_count)
-        }
-        sprint.sprintWorkingDays = workingDays
-      } 
-      if (sprint.sprintStartTime == null && sprint.sprintEndTime == null) {
-        sprint.sprintWorkingDays = 0
-      }
-    },
     async getSprintUserList (index, iStartTime, iEndTime, iWorkingDays) {
       console.log('getSprintUserList -> ', index, iStartTime, iEndTime)
-      this.$data.sprintGroup[index].SprintUsers = []
+      this.$data.timelineData[index].timelineUsers = []
       var res = await http.get('/sprints/getSprintsGroupUserList', {
         reqStartTime: iStartTime,
         reqEndTime: iEndTime,
         reqWorkingDays: iWorkingDays
       })
       if (res.data != null && res.data.status == 0) {
-        this.$data.sprintGroup[index].SprintUsers = res.data.data
-      } else {
-        this.$data.sprintGroup[index].SprintUsers = []
+        this.$data.timelineData[index].timelineUsers = res.data.data
+        this.$forceUpdate()
       }
     },
     async getCustomerList () {
@@ -390,6 +359,13 @@ export default {
       const res = await http.get('/sprints/getAllCustomersList')
       if (res.data.status === 0) {
         this.$data.customersList = res.data.data
+      }
+    },
+    async getTimelineList () {
+      this.$data.timelineData = []
+      const res = await http.get('/sprints/getAllTimelinesList')
+      if (res.data.status === 0) {
+        this.$data.timelineData = res.data.data
       }
     },
     // Sprint Management
@@ -403,20 +379,21 @@ export default {
         this.$data.sprintGroup = []
       }
     },
-    createSprint () {
+    createSprint (iTimeline) {
       this.$data.sprintData = {
         sprintId: 0,
         sprintName: null,
-        sprintStartTime : null,
-        sprintEndTime : null,
         sprintBaseline: null,
-        sprintWorkingDays: 0,
+        sprintStartTime: iTimeline.timelineStartTime,
+        sprintEndTime: iTimeline.timelineEndTime,
+        sprintWorkingDays: iTimeline.timelineWorkingDays,
         sprintBaseCapacity: 0,
         sprintRequiredSkills: [],
         sprintCustomers: [],
         sprintStatus: 'Active',
         sprintDataSource: ['Manual'],
-        sprintLeaderId: null
+        sprintLeaderId: null,
+        sprintTimelineId: iTimeline.timelineId
       }
       this.$data.newSprintDialogVisible = true
     },
@@ -448,7 +425,8 @@ export default {
         reqSprintCustomers: sprint.sprintCustomers != null? sprint.sprintCustomers.toString(): null,
         reqSprintStatus: sprint.sprintStatus,
         reqSprintDataSource: sprint.sprintDataSource != null? sprint.sprintDataSource.toString(): null,
-        reqSprintLeaderId: sprint.sprintLeaderId
+        reqSprintLeaderId: sprint.sprintLeaderId,
+        reqSprintTimelineId: sprint.sprintTimelineId
       })
       if (res.data != null && res.data.status === 0) {
         // Create public task for new sprint
@@ -514,6 +492,7 @@ export default {
         this.getAllSkillsList()
         this.getActiveLeadersList()
         this.getCustomerList()
+        this.getTimelineList()
         this.getSprintsList()
         this.showMessage('Add/Update sprint successfully!', 'success')
         this.$data.newSprintDialogVisible = false
@@ -563,10 +542,13 @@ export default {
     }       
   },
   created () {
+    this.$data.sprintListLoading = true
     this.getAllSkillsList()
     this.getActiveLeadersList()
     this.getCustomerList()
+    this.getTimelineList()
     this.getSprintsList()
+    this.$data.sprintListLoading = false
   }
 }
 </script>
@@ -622,10 +604,11 @@ export default {
 }
 .sm-content-sprint>>>.el-collapse-item__header {
   border: 0;
+  height: 38px;
+  line-height: 38px;
 }
 .sm-content-sprint-header-col {
-  height: 100%;
-  padding-left: 10px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
