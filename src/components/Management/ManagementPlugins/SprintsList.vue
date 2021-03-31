@@ -73,8 +73,8 @@
               <el-col :span="8" :lg="7" class="sm-table-expand-item">
                 <el-select v-model="props.row.sprintLeaderId" size="small" style="width: 100%" filterable>
                   <el-option label="" value=""></el-option>
-                  <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userName" :value="leader.userId">
-                    <span style="float: left; margin-right:20px">{{leader.userName}} ({{leader.userNickname}})</span>
+                  <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
+                    <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
                     <span style="float: right; color: #8492a6; font-size: 12px">Level - {{leader.userLevel}}</span>
                   </el-option>
                 </el-select>
@@ -179,8 +179,8 @@
           <el-col :span="9" class="sm-dialog-item">
             <el-select v-model="sprintData.sprintLeaderId" size="small" style="width: 100%" filterable>
               <el-option label="" value=""></el-option>
-              <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userName" :value="leader.userId">
-                <span style="float: left; margin-right:20px">{{leader.userName}} ({{leader.userNickname}})</span>
+              <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
+                <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
                 <span style="float: right; color: #8492a6; font-size: 12px">Level - {{leader.userLevel}}</span>
               </el-option>
             </el-select>
