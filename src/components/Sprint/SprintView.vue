@@ -159,26 +159,6 @@ Remark:
                         <b>No Task</b>
                       </el-col>
                     </el-row>
-                    <!--
-                    <el-row v-if="sprintTasksList.length == 0? false: true" style="margin-bottom: 15px">
-                      <el-col :span="8">
-                        Task Name
-                        <el-input v-model="plannedTaskNameSearch" placeholder="Select Task Name..." size="small" style="width: 70%; margin-left: 10px">
-                          <el-button slot="append" icon="el-icon-search"></el-button>
-                        </el-input>
-                      </el-col>
-                      <el-col :span="8">
-                        Task Type
-                        <el-select v-model="plannedTaskTypeSelect" size="small" style="width: 70%; margin-left: 10px">
-                          <el-option label=" " value=""></el-option>
-                          <el-option label="Development(Change, Problem)" value="Development"></el-option>
-                          <el-option label="Maintenance(Incident)" value="Maintenance"></el-option>
-                          <el-option label="Others(Service Request, ITSR, Others)" value="Others"></el-option>
-                          <el-option label="All" value="All"></el-option>
-                        </el-select>
-                      </el-col>
-                    </el-row>
-                    -->
                     <el-card @click.native="getSprintSubtasks(index)" v-for="(sprintTask, index) in sprintTasksList" :key="index" class="box-card sprint-card-content-planned" :style="{'margin-bottom':'5px',  'background-color':sprintTask.taskBackgroundColor}" shadow="hover">
                       <el-collapse v-model="plannedTaskActiveArray">
                         <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}" :name="index">
@@ -201,11 +181,15 @@ Remark:
                               </el-col>
                               <el-col :span="15" :lg="6">
                                 <span class="sprint-card-content-task-info">
+                                  <el-tooltip class="item" effect="dark" content="Task and sub task total effort" placement="top">
+                                    <span><el-tag effect="dark" type="info" size="mini">{{sprintTask.taskSubTaskEffort + sprintTask.taskEffort}}</el-tag></span>
+                                  </el-tooltip>
+                                  <el-divider direction="vertical"></el-divider>
                                   <span>{{sprintTask.taskEffort}}</span>
                                   <el-divider direction="vertical"></el-divider>
                                   <span>{{sprintTask.taskEstimation}}</span>
                                   <el-divider direction="vertical"></el-divider>
-                                  <span v-if="!planListHide">{{sprintTask.taskAssignee}}</span>
+                                  <span v-if="!planListHide" style="font-size: 12px">{{sprintTask.taskAssigneeFullNickname}}</span>
                                   <el-select v-if="planListHide" @visible-change="getAssigneeListByTasks($event, sprintTask, null)" @change="changeTaskAssignee(sprintTask.taskId, sprintTask.taskAssigneeId)" v-model="sprintTask.taskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 75%;" filterable>
                                     <el-option label="" value=""></el-option>
                                     <el-option v-for="(assignee, index) in plannedPeopleList" :key="index" :label="assignee.sprintUserFullName" :value="assignee.sprintUserId">
@@ -307,11 +291,15 @@ Remark:
                               </el-col>
                               <el-col :span="15" :lg="6">
                                 <span class="sprint-card-content-task-info">
+                                  <el-tooltip class="item" effect="dark" content="Task and sub task total effort" placement="top">
+                                    <span><el-tag effect="dark" type="info" size="mini">{{sprintTask.taskSubTaskEffort + sprintTask.taskEffort}}</el-tag></span>
+                                  </el-tooltip>
+                                  <el-divider direction="vertical"></el-divider>
                                   <span>{{sprintTask.taskEffort}}</span>
                                   <el-divider direction="vertical"></el-divider>
                                   <span>{{sprintTask.taskEstimation}}</span>
                                   <el-divider direction="vertical"></el-divider>
-                                  <span v-if="!planListHide">{{sprintTask.taskAssignee}}</span>
+                                  <span v-if="!planListHide" style="font-size: 12px">{{sprintTask.taskAssigneeFullNickname}}</span>
                                   <el-select v-if="planListHide" @visible-change="getAssigneeListByTasks($event, sprintTask, null)" @change="changeTaskAssignee(sprintTask.taskId, sprintTask.taskAssigneeId)" v-model="sprintTask.taskAssigneeId" placeholder="Select Assignee..." size="mini" style="width: 75%;" filterable>
                                     <el-option label="" value=""></el-option>
                                     <el-option v-for="(assignee, index) in assigneeList" :key="index" :label="assignee.userFullName" :value="assignee.userId">
@@ -390,7 +378,7 @@ Remark:
                         <b>No Task</b>
                       </el-col>
                     </el-row>
-                    <el-card @click.native="getSprintSubtasksForPublic(index)" v-for="(sprintTask, index) in sprintPublicTasksList" :key="index" class="box-card sprint-card-content-public" :style="{'margin-bottom':'5px',  'background-color':sprintTask.taskBackgroundColor}" shadow="hover">
+                    <el-card v-for="(sprintTask, index) in sprintPublicTasksList" :key="index" class="box-card sprint-card-content-public" :style="{'margin-bottom':'5px',  'background-color':sprintTask.taskBackgroundColor}" shadow="hover">
                       <el-collapse v-model="publicTaskActiveArray">
                         <el-collapse-item :disabled="sprintTask.taskHasSubtask == 'N'? true: false" :class="{'sprint-card-content-task-hide-icon': sprintTask.taskHasSubtask == 'N'? true: false}" :name="index">
                           <!-- Sprint Task Header -->
@@ -410,8 +398,8 @@ Remark:
                                 <el-tag effect="dark" type="success" size="mini" v-if="sprintTask.taskStatus == 'Running'" >{{sprintTask.taskStatus}}</el-tag>
                                 <el-tag effect="dark" type="info"    size="mini" v-if="sprintTask.taskStatus == 'Done'"    >{{sprintTask.taskStatus}}</el-tag>
                               </el-col>
-                              <el-col :span="15" :lg="6">
-                                <span class="sprint-card-content-task-info">
+                              <el-col :span="19" :lg="8">
+                                <span class="sprint-card-content-task-info" style="padding: 0 10px;">
                                   <span>{{sprintTask.taskEffort}}</span>
                                   <el-divider direction="vertical"></el-divider>
                                   <span>{{sprintTask.taskEstimation}}</span>
@@ -419,43 +407,8 @@ Remark:
                                   <span style="color: #909399">No Need Assignee</span>
                                 </span>
                               </el-col>
-                              <el-col :span="4" :lg="2" class="sprint-card-content-task-btn" style="justify-content: flex-end;">
-                                <el-button @click.stop="createSubTask(sprintTask)" size="mini" type="success" icon="el-icon-plus"></el-button>
-                                <el-button v-show="sprintTask.taskHasSubtask == 'N'? true: false" @click.stop="removeTask(null, sprintTask.taskId, null, sprintTask.taskName, sprintTask.taskTitle)" size="mini" type="danger" icon="el-icon-delete" style="margin-left: 3px;"></el-button>
-                              </el-col>
                             </el-row>
                           </template>
-                          <!-- Sprint Task Sub Task List -->
-                          <div class="sprint-card-content-sub-task">
-                            <el-divider content-position="left">Sub-Tasks List</el-divider>
-                            <el-table v-loading="sprintTask.sprintTaskSubtasksListLoading" :data="sprintTask.sprintTaskSubtasksList" :summary-method="getSummaries" show-summary max-height="300px" size="mini" style="width: 100%;">
-                              <el-table-column v-if="false" prop="subtaskId" label="Id"></el-table-column>
-                              <el-table-column v-if="false" prop="subtaskParentTaskName" label="Parent Task"></el-table-column>
-                              <el-table-column width="150px" align="left" prop="subtaskName" label="Name" show-overflow-tooltip key="1">
-                                <template slot-scope="scope">
-                                  <el-button @click.stop="editTask(scope.row.subtaskId, scope.row.subtaskCategory)" type="text">{{scope.row.subtaskName}}</el-button>
-                                </template>
-                              </el-table-column>
-                              <el-table-column min-width="200px" align="left" prop="subtaskTitle" label="Title" show-overflow-tooltip key="2"></el-table-column>
-                              <el-table-column width="80px" align="center" prop="subtaskStatus" label="Status" show-overflow-tooltip key="3">
-                                <template slot-scope="scope">
-                                  <el-tag effect="dark" type="warning" size="mini" v-if="scope.row.subtaskStatus == 'Drafting'">{{scope.row.subtaskStatus}}</el-tag>
-                                  <el-tag effect="dark" type="primary" size="mini" v-if="scope.row.subtaskStatus == 'Planning'">{{scope.row.subtaskStatus}}</el-tag>
-                                  <el-tag effect="dark" type="success" size="mini" v-if="scope.row.subtaskStatus == 'Running'" >{{scope.row.subtaskStatus}}</el-tag>
-                                  <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
-                                </template>
-                              </el-table-column>
-                              <el-table-column width="70px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
-                              <el-table-column width="70px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
-                              <el-table-column width="70px" align="right" fixed="right" class="sprint-card-content-task-btn">>
-                                <template slot-scope="scope">
-                                  <el-button-group>
-                                    <el-button @click.stop="removeTask(index, scope.row.subtaskId, scope.row.subtaskParentTaskName, scope.row.subtaskName, scope.row.subtaskTitle)"  type="danger" size="mini" icon="el-icon-delete"></el-button>
-                                  </el-button-group>
-                                </template>
-                              </el-table-column>
-                            </el-table>
-                          </div>
                           <!-- End Sprint Task Sub Task List -->
                         </el-collapse-item>
                       </el-collapse>
@@ -850,13 +803,6 @@ export default {
       this.$data.sprintBuffer = this.$data.sprintActualCapacity - this.$data.sprintEstimationCopy
       this.$forceUpdate()
       this.$data.sprintPublicTasksListLoading = false
-      console.log('Active tabs array -> ', this.$data.publicTaskActiveArray)
-      if (this.$data.publicTaskActiveArray != null && this.$data.publicTaskActiveArray.length > 0) {
-        let publicTaskActiveArray = this.$data.publicTaskActiveArray
-        for (var i=0; i<publicTaskActiveArray.length; i++ ) {
-          this.getSprintSubtasksForPublic(publicTaskActiveArray[i])
-        }
-      }
     },
     async getSprintUsers () {
       this.$data.sprintCapacityLoading = true
@@ -906,23 +852,6 @@ export default {
           this.$forceUpdate()
         }
         this.$data.sprintUnplanTasksList[index].sprintTaskSubtasksListLoading = false
-      }
-    },
-    async getSprintSubtasksForPublic (index) {
-      console.log('Get sub task list for row -> ', index)
-      var publicTaskActiveArray = this.$data.publicTaskActiveArray
-      this.$data.sprintPublicTasksList[index].sprintTaskSubtasksList = []
-      if (publicTaskActiveArray.indexOf(index) > -1) {
-        this.$data.sprintPublicTasksList[index].sprintTaskSubtasksListLoading = true
-        var task = this.$data.sprintPublicTasksList[index]
-        var res = await http.get('/tasks/getSubtasksListByName', {
-          reqTaskName: task.taskName
-        })
-        if (res != null && res.data.status == 0) {
-          this.$data.sprintPublicTasksList[index].sprintTaskSubtasksList = res.data.data
-          this.$forceUpdate()
-        }
-        this.$data.sprintPublicTasksList[index].sprintTaskSubtasksListLoading = false
       }
     },
     refreshSprint () {
@@ -1376,8 +1305,7 @@ export default {
   border-radius: 4px;
   width: 100%;
   height: 30px;
-  padding-left: 15px;
-  margin-right: 5px;
+  padding: 0 2px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
