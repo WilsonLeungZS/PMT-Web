@@ -242,17 +242,25 @@ export default {
         var timesheetList = []
         var timesheetArray = res.data.data
         for (var i=0; i<timesheetArray.length; i++) {
+          var flag = false
           var timesheet = timesheetArray[i]
-          for(var key in timesheet){
+          for(var key in timesheet) {
             if (key.startsWith('day')) {
               var timesheetDate = key.replace('day', '')
               if (timesheetDate >= iStartDate && timesheetDate <= iEndDate) {
-                timesheetList.push(timesheet)
+                flag = true
                 continue
+              } else {
+                flag = false
               }
             }
           }
+          if (flag) {
+            timesheetList.push(timesheet)
+            continue
+          }
         }
+        console.log('debug timesheet -> ', timesheetList)
         this.$data.timesheetData = timesheetList
       }
     },
