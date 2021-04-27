@@ -10,7 +10,7 @@
       <el-table-column prop="taskId" label="Id" v-if="false"></el-table-column>
       <el-table-column align="left" :show-overflow-tooltip="true" min-width="200px">
         <template slot="header" slot-scope="scope">
-          <el-date-picker :disabled="disabledEditableFunction" @change="selectTimesheetDateRange" v-model="timesheetSelectDateArray" type="daterange" range-separator="-" start-placeholder="Start" end-placeholder="End" value-format="yyyy-MM-dd" size="mini" style="width: 100%; max-width: 250px"></el-date-picker>
+          <el-date-picker @change="selectTimesheetDateRange" v-model="timesheetSelectDateArray" type="daterange" range-separator="-" start-placeholder="Start" end-placeholder="End" value-format="yyyy-MM-dd" size="mini" style="width: 100%; max-width: 250px"></el-date-picker>
         </template>
         <template slot-scope="scope">
           <span>{{scope.row.taskName}} - {{scope.row.taskTitle}}</span>
@@ -152,6 +152,8 @@ export default {
         var startDate = timesheetDateRange[0]
         var endDate = timesheetDateRange[1]
         this.generateTimesheet(this.$store.getters.getUserId, startDate, endDate)
+        // Submit the select date range to parent component for each user in one sprint
+        this.submitDateRange(startDate, endDate)
       } else {
         this.$emit('getCurrentMonthTimesheet')
       }
@@ -237,23 +239,21 @@ export default {
         reqMonth: monthArr.toString()
       })
       if (res.data.status === 0) {
+        var timesheetList = []
         var timesheetArray = res.data.data
         for (var i=0; i<timesheetArray.length; i++) {
           var timesheet = timesheetArray[i]
-          var flag = false
           for(var key in timesheet){
             if (key.startsWith('day')) {
               var timesheetDate = key.replace('day', '')
               if (timesheetDate >= iStartDate && timesheetDate <= iEndDate) {
-                flag = true
+                timesheetList.push(timesheet)
+                continue
               }
             }
           }
-          if (!flag) {
-            timesheetArray.splice(i, 1)
-          }
         }
-        this.$data.timesheetData = timesheetArray
+        this.$data.timesheetData = timesheetList
       }
     },
     editWorklogByDate (column) {
@@ -320,6 +320,9 @@ export default {
           }
       }
       return fmt; 
+    },
+    submitDateRange (startDate, endDate) {
+      this.$emit('submitDateRange', startDate, endDate)
     }
   },
   created () {

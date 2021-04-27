@@ -43,7 +43,7 @@
             <el-card class="box-card" shadow="never">
               <el-row>
                 <el-col :span="24" class="content-main-col">
-                  <timesheet v-if="showTimesheet" :timesheetObj="timesheetObj"></timesheet>
+                  <timesheet v-if="showTimesheet" :timesheetObj="timesheetObj" @submitDateRange="submitDateRange"></timesheet>
                 </el-col>
               </el-row>
               <el-row v-if="showTaskTable">
@@ -165,7 +165,9 @@ export default {
         {Label: 'Optional', Value: 'Optional'},
         {Label: 'Absent', Value: 'Absent'},
       ],
-      sprintObj: null
+      sprintObj: null,
+      timesheetSelectedStartDate: null,
+      timesheetSelectedEndDate: null
     }
   },
   watch: {
@@ -236,6 +238,10 @@ export default {
         timesheetEndTime = targetSprintList[sprintIndex].sprintEndTime
       }
       if (timesheetStartTime != null && timesheetEndTime != null) {
+        if(this.$data.timesheetSelectedStartDate != null && this.$data.timesheetSelectedEndDate != null) {
+          timesheetStartTime = this.$data.timesheetSelectedStartDate
+          timesheetEndTime = this.$data.timesheetSelectedEndDate
+        }
         this.$data.timesheetObj = {
           type: 'PrjTimesheet',
           timesheetUserId: this.$data.peopleSelect,
@@ -439,6 +445,11 @@ export default {
     },
     stopClick () {
       return
+    },
+    submitDateRange (startDate, endDate) {
+      console.log('Date range -> ', startDate, endDate)
+      this.$data.timesheetSelectedStartDate = startDate
+      this.$data.timesheetSelectedEndDate = endDate
     }
   },
   created () {
