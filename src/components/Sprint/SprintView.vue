@@ -225,8 +225,8 @@ Remark:
                                   <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
                                 </template>
                               </el-table-column>
-                              <el-table-column width="70px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
-                              <el-table-column width="70px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
+                              <el-table-column width="80px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
+                              <el-table-column width="80px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
                               <el-table-column v-if="!planListHide" width="130px" align="center" prop="subtaskAssignee" label="Assignee" show-overflow-tooltip key="6"></el-table-column>
                               <el-table-column v-if="planListHide" width="220px" align="center" prop="subtaskAssigneeId" label="Assignee" show-overflow-tooltip key="6">
                                 <template slot-scope="scope">
@@ -335,8 +335,8 @@ Remark:
                                   <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
                                 </template>
                               </el-table-column>
-                              <el-table-column width="70px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
-                              <el-table-column width="70px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
+                              <el-table-column width="80px" align="center" prop="subtaskEffort" label="Effort" show-overflow-tooltip key="4"></el-table-column>
+                              <el-table-column width="80px"  align="center" prop="subtaskEstimation" label="Est" show-overflow-tooltip key="5"></el-table-column>
                               <el-table-column v-if="!planListHide" width="130px" align="center" prop="subtaskAssignee" label="Assignee" show-overflow-tooltip key="6"></el-table-column>
                               <el-table-column v-if="planListHide" width="220px" align="center" prop="subtaskAssigneeId" label="Assignee" show-overflow-tooltip key="6">
                                 <template slot-scope="scope">

@@ -1,34 +1,34 @@
 <template>
 <div class="sm-content">
-  <el-card class="box-card">
+  <el-card v-loading="sprintListLoading" class="box-card">
     <div slot="header" class="clearfix">
       <span class="sm-content-header">
         <span>Sprints List</span>
       </span>
     </div>
-    <el-card v-loading="sprintListLoading" v-for="(timeline, index) in timelineData" :key="index" class="box-card sm-content-sprint" shadow="hover">
+    <el-card v-for="(timeline, index) in timelineData" :key="index" class="box-card sm-content-sprint" shadow="hover">
       <div slot="header" class="clearfix">
         <el-collapse>
           <el-collapse-item @click.native="getSprintUserList(index, timeline.timelineStartTime, timeline.timelineEndTime, timeline.timelineWorkingDays)">
             <template slot="title">
               <el-row style="width: 100%; background-color: #eceff1">
                 <el-col :span="4" :lg="4" class="sm-content-sprint-header-col">
-                  <span style="margin-left: 10px"><b>{{timeline.timelineName}}</b></span>
-                </el-col>
-                <el-col :span="8" :lg="6" class="sm-content-sprint-header-col">
-                  <span><b>Time Range:</b> {{timeline.timelineStartTime}} ~ {{timeline.timelineEndTime}}</span>
-                </el-col>
-                <el-col :span="4" :lg="4" class="sm-content-sprint-header-col">
-                  <span><b>Working Days:</b> {{timeline.timelineWorkingDays}}</span>
+                  <span style="margin-left: 10px"><b>{{timeline.timelineName}} <i @click.stop="copySprints(timeline.timelineId)" class="el-icon-document-copy sm-content-sprint-copy-item"></i></b></span>
                 </el-col>
                 <el-col :span="8" :lg="7" class="sm-content-sprint-header-col">
+                  <span><b>Time Range:</b> {{timeline.timelineStartTime}} ~ {{timeline.timelineEndTime}}</span>
+                </el-col>
+                <el-col :span="3" :lg="4" class="sm-content-sprint-header-col">
+                  <span><b>Working Days:</b> {{timeline.timelineWorkingDays}}</span>
+                </el-col>
+                <el-col :span="7" :lg="7" class="sm-content-sprint-header-col">
                   <span><b>Capacity ( Planned:</b> {{timeline.timelinePlannedCapacity}}</span>
                   <el-divider direction="vertical"></el-divider>
                   <span><b>Contract:</b> {{timeline.timelineContractCapacity}}<b> )</b></span>
                 </el-col>
-                <el-col :span="2" :lg="3" class="sm-content-sprint-header-col">
-                  <el-button type="danger" size="mini">Obsolete</el-button>
-                  <el-button @click.stop="createSprint(timeline)" type="primary" size="mini">New Sprint</el-button>
+                <el-col :span="2" :lg="2" class="sm-content-sprint-header-col" style="justify-content: center;">
+                  <el-button v-if="timeline.timelineCanObsolete" type="danger" size="mini">Obsolete</el-button>
+                  <el-button v-if="timeline.timelineCanCreate" @click.stop="createSprint(timeline)" type="primary" size="mini">New Sprint</el-button>
                 </el-col>
               </el-row>
             </template>
@@ -241,6 +241,71 @@
       <el-button @click="saveSprint(sprintData)" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="small">Create</el-button>
     </span>
   </el-dialog>
+  <!-- Copy Sprints Dialog -->
+  <el-dialog v-loading="copySprintsLoading" title="Copy Sprints" :visible.sync="copySprintsDialogVisible" width="1200px" class="sm-dialog">
+    <div>
+      <el-row>
+        <el-col :span="11">
+          <el-card class="box-card" shadow="never" style="width: 100%; height: 350px;">
+            <el-row>
+              <el-col :span="7" class="sm-dialog-label">
+                <span>Source Timeline</span>
+              </el-col>
+              <el-col :span="17" class="sm-dialog-item">
+                <el-select disabled v-loading="copySprintsTimelinesListLoading" v-model="copySprintsSourceTimeline" size="small" style="width: 100%">
+                  <el-option v-for="(timeline, index) in copySprintsTimelinesList" :key="index" :label="timeline.timelineName + ' 【' + timeline.timelineStartTime + ' ~ ' + timeline.timelineEndTime + '】'" :value="timeline.timelineId"></el-option>
+                </el-select>
+              </el-col>
+            </el-row>
+            <el-divider></el-divider>
+            <el-table v-loading="copySprintsSourceTimelineSprintsListLoading" @selection-change="handleCopySprintsSelectionChange" :data="copySprintsSourceTimelineSprintsList" style="width: 100%" size="small" height="285px">
+              <el-table-column prop="sprintId" v-if="false"></el-table-column>
+              <el-table-column type="selection" width="50"></el-table-column>
+              <el-table-column prop="sprintName" label="Sprint" align="left" min-width="150" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="sprintCustomersStr" label="Customers" align="center" width="150" show-overflow-tooltip></el-table-column>
+            </el-table>
+          </el-card>
+        </el-col>
+        <el-col :span="2">
+          <div style=" display: flex; justify-content: center; align-items: center; width: 100%; height: 350px">
+            <el-button :disabled="copySprintsBtnDisabled" @click="copySprintsFromSource" type="primary" icon="el-icon-d-arrow-right" size="small" style="font-size: 20px; padding: 5px; width: 80%"></el-button>
+          </div>
+        </el-col>
+        <el-col :span="11">
+          <el-card class="box-card" shadow="never" style="width: 100%; height: 350px;">
+            <el-row>
+              <el-col :span="7" class="sm-dialog-label">
+                <span>Target Timeline</span>
+              </el-col>
+              <el-col :span="17" class="sm-dialog-item">
+                <el-select @change="handleCopySprintsTargetTimelineChange" v-loading="copySprintsTimelinesListLoading" v-model="copySprintsTargetTimeline" size="small" style="width: 100%">
+                  <el-option v-for="(timeline, index) in copySprintsTimelinesList" :key="index" :label="timeline.timelineName + ' 【' + timeline.timelineStartTime + ' ~ ' + timeline.timelineEndTime + '】'" :value="timeline.timelineId" v-if="timeline.timelineCanCreate">
+                    <span style="float: left;">{{ timeline.timelineName }}</span>
+                    <span style="float: right; color: #8492a6; font-size: 12px">{{ timeline.timelineStartTime }} ~ {{ timeline.timelineEndTime }}</span>
+                  </el-option>
+                </el-select>
+              </el-col>
+            </el-row>
+            <el-divider></el-divider>
+            <el-table v-loading="copySprintsTargetTimelineSprintsListLoading" :data="copySprintsTargetTimelineSprintsList" style="width: 100%" size="small" height="285px">
+              <el-table-column prop="sprintId" v-if="false"></el-table-column>
+              <el-table-column prop="sprintName" label="Sprint" align="left" min-width="150" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="sprintCustomersStr" label="Customers" align="center" width="150" show-overflow-tooltip></el-table-column>
+              <el-table-column label="Remove" align="center" fixed="right" width="70">
+                <template slot-scope="scope">
+                  <el-button v-if="scope.row.sprintExistIndicator == 'New'" @click="removeCopySprint(scope.row)" type="danger" icon="el-icon-delete" size="small" style="padding: 4px 8px; font-size: 14px;"></el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="copySprintsDialogVisible = false">Cancel</el-button>
+      <el-button @click="saveCopySprintsList" :disabled="copySprintsSaveBtnDisabled" type="primary">Save</el-button>
+    </span>
+  </el-dialog>
 </div>
 </template>
 
@@ -274,8 +339,45 @@ export default {
       sprintGroup: [],
       newSprintDialogVisible: false,
       sprintListLoading: false,
+      copySprintsDialogVisible: false,
+      copySprintsBtnDisabled: true,
+      copySprintsSaveBtnDisabled: false,
+      copySprintsLoading: false,
+      copySprintsTimelinesList: [],
+      copySprintsSourceTimeline: null,
+      copySprintsSourceTimelineSprintsList: [],
+      copySprintsSelection: [],
+      copySprintsTargetTimeline: null,
+      copySprintsTargetTimelineSprintsList: [],
+      copySprintsTimelinesListLoading: false,
+      copySprintsSourceTimelineSprintsListLoading: false,
+      copySprintsTargetTimelineSprintsListLoading: false,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
+    }
+  },
+  watch: {
+    copySprintsTargetTimeline: {
+      handler (newVal, oldVal) {
+        this.$data.copySprintsBtnDisabled = true
+        if(newVal != null) {
+          if (this.$data.copySprintsSelection != null && this.$data.copySprintsSelection.length > 0) {
+            this.$data.copySprintsBtnDisabled = false
+          }
+        }
+      },
+      immediate: true
+    },
+    copySprintsSelection: {
+      handler (newVal, oldVal) {
+        this.$data.copySprintsBtnDisabled = true
+        if(newVal != null && newVal.length > 0) {
+          if (this.$data.copySprintsTargetTimeline != null) {
+            this.$data.copySprintsBtnDisabled = false
+          } 
+        }
+      },
+      immediate: true
     }
   },
   methods: {
@@ -370,6 +472,8 @@ export default {
     },
     // Sprint Management
     async getSprintsList () {
+      console.log('getSprintsList start')
+      this.$data.sprintListLoading = true
       this.$data.sprintGroup = []
       const res = await http.get('/sprints/getActiveSprintsGroup')
       if (res.data.status === 0) {
@@ -378,6 +482,7 @@ export default {
       } else {
         this.$data.sprintGroup = []
       }
+      this.$data.sprintListLoading = false
     },
     createSprint (iTimeline) {
       this.$data.sprintData = {
@@ -507,6 +612,107 @@ export default {
       // If all task done, will update sprint status to obsolete
       // If exist task not done, return
     },
+    async copySprints (iTimelineId) {
+      console.log('Copy Sprints from timeline ->', iTimelineId)
+      this.$data.copySprintsTimelinesList = []
+      this.$data.copySprintsSourceTimeline = iTimelineId
+      this.$data.copySprintsTargetTimeline = null
+      this.$data.copySprintsSourceTimelineSprintsList = []
+      this.$data.copySprintsTargetTimelineSprintsList = []
+      this.$data.copySprintsDialogVisible = true
+      // Get timeline list
+      this.$data.copySprintsTimelinesListLoading = true
+      const res = await http.get('/sprints/getAllTimelinesList')
+      if (res.data != null && res.data.status === 0) {
+        this.$data.copySprintsTimelinesList = res.data.data
+        this.$data.copySprintsTimelinesListLoading = false
+      }
+      // Get source timeline sprints list
+      this.$data.copySprintsSourceTimelineSprintsListLoading = true
+      const res1 = await http.get('/sprints/getSprintsListByTimelineId', {
+        reqTimelineId: Number(this.$data.copySprintsSourceTimeline)
+      })
+      if (res1.data != null && res1.data.status === 0) {
+        this.$data.copySprintsSourceTimelineSprintsList = res1.data.data
+      }
+      this.$data.copySprintsSourceTimelineSprintsListLoading = false
+    },
+    async handleCopySprintsTargetTimelineChange () {
+      if (this.$data.copySprintsTargetTimeline == this.$data.copySprintsSourceTimeline) {
+        this.$message.error('Source timeline and target timeline cannot be same!')
+        this.$data.copySprintsTargetTimeline = null
+        return
+      }
+      this.$data.copySprintsTargetTimelineSprintsList = []
+      this.$data.copySprintsTargetTimelineSprintsListLoading = true
+      const res = await http.get('/sprints/getSprintsListByTimelineId', {
+        reqTimelineId: Number(this.$data.copySprintsTargetTimeline)
+      })
+      if (res.data != null && res.data.status === 0) {
+        this.$data.copySprintsTargetTimelineSprintsList = res.data.data
+      }
+      this.$data.copySprintsTargetTimelineSprintsListLoading = false
+    },
+    async handleCopySprintsSelectionChange (val) {
+      this.$data.copySprintsSelection = val
+    },
+    copySprintsFromSource () {
+      console.log(this.$data.copySprintsTargetTimelineSprintsList, this.$data.copySprintsSelection)
+      var copySprintsSelection = this.$data.copySprintsSelection
+      var backupList = JSON.stringify(this.$data.copySprintsTargetTimelineSprintsList)
+      for (var i=0; i<copySprintsSelection.length; i++) {
+        var index = this.getIndexOfValueInArr(this.$data.copySprintsTargetTimelineSprintsList, 'sprintName', copySprintsSelection[i].sprintName)
+        if (index != -1) {
+          this.$message.error('Target timeline exist same name sprint!')
+          this.$data.copySprintsTargetTimelineSprintsList = JSON.parse(backupList)
+          return
+        }
+        copySprintsSelection[i].sprintExistIndicator = 'New'
+        this.$data.copySprintsTargetTimelineSprintsList.push(copySprintsSelection[i])
+      }
+    },
+    removeCopySprint (iSprint) {
+      console.log('Sprint -> ', iSprint)
+      if (this.$data.copySprintsTargetTimelineSprintsList != null && this.$data.copySprintsTargetTimelineSprintsList.length > 0) {
+        var index = this.getIndexOfValueInArr(this.$data.copySprintsTargetTimelineSprintsList, 'sprintId', iSprint.sprintId)
+        if (index != -1) {
+          this.$data.copySprintsTargetTimelineSprintsList.splice(index, 1)
+        }
+      }
+    },
+    async saveCopySprintsList () {
+      var copySprintsTargetTimelineSprintsList = this.$data.copySprintsTargetTimelineSprintsList
+      if (copySprintsTargetTimelineSprintsList != null && copySprintsTargetTimelineSprintsList.length > 0) {
+        // Disabeld button and loading
+        this.$data.copySprintsSaveBtnDisabled = true
+        this.$data.copySprintsLoading = true
+        var newSprintIdArray = []
+        for (var i=0; i<copySprintsTargetTimelineSprintsList.length; i++) {
+          if (copySprintsTargetTimelineSprintsList[i].sprintExistIndicator == 'New') {
+            newSprintIdArray.push(copySprintsTargetTimelineSprintsList[i].sprintId)
+          }
+        }
+        if (newSprintIdArray != null && newSprintIdArray.length > 0 && this.$data.copySprintsSourceTimeline != null && this.$data.copySprintsTargetTimeline != null) {
+          var res = await http.post('/sprints/copySprints', {
+            reqSprintIdArray: newSprintIdArray.toString(),
+            reqSourceTimelineId: Number(this.$data.copySprintsSourceTimeline),
+            reqTargetTimelineId: Number(this.$data.copySprintsTargetTimeline)
+          })
+          if (res.data != null && res.data.status === 0) {
+            this.showMessage('Copy sprints to target timeline successfully!', 'success')
+          } else {
+            this.$message.error('Failed to copy sprints to target timeline!')
+          }
+          this.handleCopySprintsTargetTimelineChange()
+        }
+        this.$data.copySprintsSaveBtnDisabled = false
+        this.$data.copySprintsLoading = false
+        this.initSprintsList()
+      } else {
+        this.$message.error('Target timeline no sprint exist!')
+        return
+      }
+    },
     // Common method
     isEmptyField (iField, iFieldName) {
       if (iField == null || iField == '') {
@@ -539,16 +745,33 @@ export default {
           }
       }
       return fmt; 
-    }       
+    },
+    getIndexOfValueInArr(iArray, iKey, iValue) {
+      for(var i=0; i<iArray.length;i++) {
+        var item = iArray[i];
+        if(iKey != null){
+          if(item[iKey] == iValue){
+            return i;
+          }
+        } 
+        if(iKey == null){
+          if(item == iValue){
+            return i;
+          }
+        }
+      }
+      return -1;
+    },
+    initSprintsList () {
+      this.getAllSkillsList()
+      this.getActiveLeadersList()
+      this.getCustomerList()
+      this.getTimelineList()
+      this.getSprintsList()
+    }
   },
   created () {
-    this.$data.sprintListLoading = true
-    this.getAllSkillsList()
-    this.getActiveLeadersList()
-    this.getCustomerList()
-    this.getTimelineList()
-    this.getSprintsList()
-    this.$data.sprintListLoading = false
+    this.initSprintsList()
   }
 }
 </script>
@@ -616,6 +839,15 @@ export default {
 }
 .sm-content-sprint-header-col .span{
   width: 100%;
+}
+.sm-content-sprint-copy-item {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  background-color: #409EFF;
+  border-radius: 3px;
+  padding: 4px 8px;
+  margin-left: 3px;
 }
 .sm-dialog>>>.el-dialog__body {
   padding: 5px 10px;
