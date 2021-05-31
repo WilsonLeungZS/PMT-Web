@@ -36,13 +36,13 @@ Remark:
           </el-col>
           <el-col :span="sprintLength" :lg="sprintLengthlg" class="sv-content-sprint-card">
             <!-- Show for not select sprint -->
-            <el-card v-if="sprintSelect == ''? true: false" class="box-card">
+            <el-card v-if="sprintStartTime == ''? true: false" class="box-card">
               <div slot="header" class="clearfix sprint-card-header">
                 <el-divider content-position="left">Sprint (Please select sprint first)</el-divider>
                 <el-row>
                   <el-col :span="16" :lg="14" class="sprint-card-header-col">
                     <span><i class="el-icon-data-line"></i> Sprint</span>
-                    <el-select @change="changeSprint" v-model="sprintSelect" size="small" style="width: 72%;">
+                    <el-select @change="changeSprint" v-model="sprintSelect" filterable :filter-method='filterMethod' size="small" style="width: 72%;">
                       <el-option label=" " value=""></el-option>
                       <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
                         <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
@@ -61,7 +61,7 @@ Remark:
               </el-row>
             </el-card>
             <!-- Show for selected sprint -->
-            <el-card v-if="sprintSelect != ''? true: false" class="box-card">
+            <el-card v-if="sprintStartTime != ''? true: false" class="box-card">
               <!-- Card Header -->
               <div slot="header" class="clearfix sprint-card-header">
                  <!-- Sprint Info -->
@@ -69,7 +69,7 @@ Remark:
                 <el-row>
                   <el-col :span="24" :lg="10" class="sprint-card-header-col">
                     <span><i class="el-icon-data-line"></i> Sprint</span>
-                    <el-select @change="changeSprint" v-model="sprintSelect" size="small" style="width: 72%;">
+                    <el-select @change="changeSprint" v-model="sprintSelect" filterable :filter-method='filterMethod' size="small" style="width: 72%;">
                       <el-option label=" " value=""></el-option>
                       <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
                         <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="sprint.sprintName" :value="sprint.sprintId">
@@ -1110,6 +1110,41 @@ export default {
       }
       return -1;
     },
+    filterMethod(val){
+      (val == '') && (val = null)
+      this.sprintSelect = val
+      if(!this.$parent.sprintsList){
+        this.$parent.sprintsList = this.sprintsList
+      }
+      let list = this.$parent.sprintsList
+      let transferStationList = []
+      if(val != null){
+        for(let i=0;i<list.length;i++){
+          if(transferStationList.length < 2 ){
+            let transferStation = []
+            for(let j=0;j<list[i].Options.length;j++){
+              if(list[i].Options[j].sprintName.toLowerCase().indexOf(val.toLowerCase()) != -1){
+                transferStation.push(list[i].Options[j])
+                console.log(transferStation);
+              }
+              if(transferStation.length != 0 && j+1 == list[i].Options.length){
+                transferStationList.push({
+                  Label:list[i].Label,
+                  Options:transferStation
+                })
+              }
+            }
+          }else{
+            break
+          }
+        }
+      }
+      if(val == null){
+        this.sprintsList = this.$parent.sprintsList
+      }else{
+        this.sprintsList = transferStationList
+      }
+    },
     // Common Method
     formatDate (date, fmt) { 
       var o = { 
@@ -1139,6 +1174,9 @@ export default {
     this.initSprintTask()
     this.initSprintUser()
     this.getAssigneeList()
+  },
+  destroyed(){
+    this.$parent.sprintsList = undefined
   }
 }
 </script>

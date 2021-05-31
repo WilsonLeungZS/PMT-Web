@@ -23,7 +23,7 @@ export default new Router({
     {path: '/Sprint', redirect: '/Sprint/SprintView'},
     {path: '/Timesheet', redirect: '/Timesheet/MyTimesheet'},
     {path: '/Task', redirect: '/Task/TaskList'},
-    {path: '/Management', redirect: '/Management/TmlManagement'},
+    {path: '/Management', redirect: '/Management/SptManagement'},
     {path: '/Others', redirect: '/Others/Charts'},
     {
       path: '/',

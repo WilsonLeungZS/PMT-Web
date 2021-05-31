@@ -196,9 +196,15 @@ Remark:
               </el-col>
               <el-col :span="24" :lg="{span: 12, offset: 1}">
                 <el-form-item v-show="showState.showEstimation" label="Estimation">
-                  <el-input :disabled="disabledState.disabledEstimation" v-model="PMTTask.taskEstimation">
-                    <template slot="append" style="font-size:16px; width:100%">hrs</template>
-                  </el-input>
+                  <div class="input-number-div">
+                    <el-input :disabled="disabledState.disabledEstimation" v-model="PMTTask.taskEstimation" @input="estimationIpt" :max="40" :min="0">
+                    </el-input>
+                    <div class="input-number-btn">
+                      <span class="add" @click="estimationChange('add',PMTTask.taskEstimation)"><i class="el-icon-arrow-up"></i></span>
+                      <span class="subtract" @click="estimationChange('subtract',PMTTask.taskEstimation)"><i class="el-icon-arrow-down"></i></span>
+                    </div>
+                    <span class="div-span">hrs</span>
+                  </div>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -943,7 +949,51 @@ Remark:
             }
         }
         return fmt; 
-      }       
+      },     
+      estimationChange(type,number){
+        if(0>=number){
+          this.PMTTask.taskEstimation=2
+          if(type == 'subtract'){
+            this.PMTTask.taskEstimation=0
+          }
+        }else if(2==number){
+          this.PMTTask.taskEstimation=6
+          if(type == 'subtract'){
+            this.PMTTask.taskEstimation=0
+          }
+        }else if(6>=number){
+          this.PMTTask.taskEstimation=12
+          if(type == 'subtract'){
+            this.PMTTask.taskEstimation=2
+          }
+        }else if(12>=number){
+          this.PMTTask.taskEstimation=20
+          if(type == 'subtract'){
+            this.PMTTask.taskEstimation=6
+          }
+        }else if(20>=number){
+          this.PMTTask.taskEstimation=40
+          if(type == 'subtract'){
+            this.PMTTask.taskEstimation=12
+          }
+        }else if(40>=number){
+          this.PMTTask.taskEstimation=40
+          if(type == 'subtract'){
+            this.PMTTask.taskEstimation=20
+          }
+        }else{}
+      },
+      estimationIpt(val){
+        if(isNaN(Number(val))){
+            this.PMTTask.taskEstimation=0
+        }
+        if(val > 40){
+            this.PMTTask.taskEstimation=40
+        }
+        if(val < 0){
+            this.PMTTask.taskEstimation=0
+        }
+      }
     },
   }
 </script>
@@ -1037,5 +1087,61 @@ Remark:
   content: '*';
   color: #F56C6C;
   margin-left: 4px;
+}
+.input-number-div{
+  display: flex;
+  width: 100%;
+  border: 1px solid #DCDFE6;
+  border-radius: 4px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.input-number-div .div-span{
+  background-color: #F5F7FA;
+  color: #909399;
+  vertical-align: middle;
+  display: table-cell;
+  position: relative;
+  border-left: 1px solid #DCDFE6;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+.input-number-div .el-input{
+  flex: 1;
+}
+.input-number-div .el-input .el-input__inner{
+  border: none;
+  text-align: left;
+}
+.input-number-div .input-number-btn{
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: auto;
+    line-height: 20px;
+    text-align: center;
+    background: #F5F7FA;
+    color: #606266;
+    cursor: pointer;
+    border-left: 1px solid #DCDFE6;
+
+}
+
+.input-number-div .input-number-btn span{
+  position: absolute;
+  width: 40px;
+  line-height: 20px;
+}
+.input-number-div .input-number-btn span:active{
+  color: #409EFF;
+}
+.input-number-div .input-number-btn .add{
+  top: 0px;
+  right: 0px;
+  border-bottom: 1px solid #DCDFE6;
+}
+.input-number-div .input-number-btn .subtract{
+  bottom: 0px;
+  right: 0px;
 }
 </style>
