@@ -438,7 +438,7 @@ export default {
       this.$data.leadersList = []
       const res = await http.get('/users/getActiveUsersListByLevelLimit', {reqUserLevelLimit: 10})
       if (res.data.status === 0) {
-        this.$data.leadersList = res.data.data
+        this.$data.leadersList = res.data.data.filter(item => item.userLevel <= 10)
       } else {
         this.$data.leadersList = []
       }
