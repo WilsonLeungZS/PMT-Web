@@ -21,7 +21,7 @@
               <el-row>
                 <el-col :span="10" :lg="10">
                   <span><i class="el-icon-data-line"></i> Sprint</span>
-                  <el-select @change="getDailyScrum" v-model="sprintSelect" style="width: 80%; margin-left: 5px;">
+                  <el-select @change="getDailyScrum" v-model="sprintSelect" filterable :filter-method='filterMethod' style="width: 80%; margin-left: 5px;">
                     <el-option label="No Select" value=""></el-option>
                     <el-option-group v-for="(sprintGroup, index) in sprintsList" :key="index" :label="sprintGroup.Label">
                       <el-option v-for="(sprint, index) in sprintGroup.Options" :key="index" :label="'【' + sprintGroup.Label + '】' +sprint.sprintName" :value="sprint.sprintId">
@@ -422,6 +422,42 @@ export default {
         }
       }
       return -1;
+    },
+    filterMethod(val){
+      (val == '') && (val = null)
+      this.sprintSelect = val
+      if(!this.$parent.sprintsList){
+        this.$parent.sprintsList = this.sprintsList
+      }
+      let list = this.$parent.sprintsList
+      let transferStationList = []
+      if(val != null){
+        for(let i=0;i<list.length;i++){
+          if(transferStationList.length < 2 ){
+            let transferStation = []
+            for(let j=0;j<list[i].Options.length;j++){
+              let testedData = list[i].Options[j].sprintName + list[i].Options[j].sprintLeader
+              if(testedData.toLowerCase().indexOf(val.toLowerCase()) != -1){
+                transferStation.push(list[i].Options[j])
+                console.log(transferStation);
+              }
+              if(transferStation.length != 0 && j+1 == list[i].Options.length){
+                transferStationList.push({
+                  Label:list[i].Label,
+                  Options:transferStation
+                })
+              }
+            }
+          }else{
+            break
+          }
+        }
+      }
+      if(val == null){
+        this.sprintsList = this.$parent.sprintsList
+      }else{
+        this.sprintsList = transferStationList
+      }
     },
     formatDate (date, fmt) { 
       var o = { 
