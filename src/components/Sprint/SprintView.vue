@@ -1123,7 +1123,8 @@ export default {
           if(transferStationList.length < 2 ){
             let transferStation = []
             for(let j=0;j<list[i].Options.length;j++){
-              if(list[i].Options[j].sprintName.toLowerCase().indexOf(val.toLowerCase()) != -1){
+              let testedData = list[i].Options[j].sprintName + list[i].Options[j].sprintLeader
+              if(testedData.toLowerCase().indexOf(val.toLowerCase()) != -1){
                 transferStation.push(list[i].Options[j])
                 console.log(transferStation);
               }
