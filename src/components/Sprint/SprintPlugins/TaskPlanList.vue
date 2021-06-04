@@ -100,13 +100,16 @@ export default {
         var sprintObj = val
         if (sprintObj != null && sprintObj != '') {
           this.$data.taskSprintObj = sprintObj
-          this.$data.taskSearchCustomer = []
+          /**
+           * 2021-06-04 keep the customer selected after backlog task updated
+           */
+          // this.$data.taskSearchCustomer = []
           this.getTaskPlanListBySkills(sprintObj, this.$data.taskSearchKeyword, this.$data.taskSearchCustomer, this.$data.taskCheckboxShowDoneTask)
           this.validateSprint(sprintObj)
         } else {
           this.$data.taskSprintObj = null
           this.taskPlanList = []
-          this.$data.taskSearchCustomer = []
+          // this.$data.taskSearchCustomer = []
         }
         this.getCustomerList()
       },
