@@ -511,6 +511,7 @@ export default {
       sprintRequiredSkillsStr: '',
       sprintCustomersList: [],
       sprintCustomersActive:[],
+      sprintActiveOnoff:true,
       sprintEffort: 0,
       sprintTotalEffort: 0,
       sprintEstimation: 0,
@@ -592,8 +593,11 @@ export default {
         'tab_planned_tasks':'sprintTasksList',
         'tab_unplan_tasks':'sprintUnplanTasksList'
       }[this.tabTaskActive]
-      this.$parent.tasksAndUnplanTasksList = this[activeList]
-      this[activeList] = this[activeList].filter((item)=>{
+      if(this.sprintActiveOnoff){
+        this.$parent.tasksAndUnplanTasksList = this[activeList]
+        this.sprintActiveOnoff = false
+      }
+      this[activeList] = this.$parent.tasksAndUnplanTasksList.filter((item)=>{
         return this.sprintCustomersActive.indexOf(item.taskCustomer) != -1
       })
       if(this.sprintCustomersActive.length == 0){
@@ -749,6 +753,8 @@ export default {
         this.getSprintUsers()
         this.getAssigneeList()
         this.setSprintTabLabelValue(requestSprintId)
+
+        this.sprintActiveOnoff = true
       }
     },
     async getSprintPlannedTasks () {
