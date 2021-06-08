@@ -108,7 +108,11 @@ Remark:
                   </el-col>
                   <el-col :span="24" :lg="6" class="sprint-card-header-col">
                     <el-scrollbar style="height: 100%">
-                      <span><i class="el-icon-office-building"></i> Customers: <b>{{sprintCustomersStr}}</b></span>
+                      <span><i class="el-icon-office-building"></i> Customers:
+                        <el-select v-model="sprintCustomersActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
+                          <el-option v-for="(customer, index) in sprintCustomersList" :key="index" :label="customer" :value="customer"></el-option>
+                        </el-select>
+                      </span>
                     </el-scrollbar>
                   </el-col>
                 </el-row>
@@ -505,7 +509,9 @@ export default {
       sprintStatus: 'Active',
       sprintBaseline: '',
       sprintRequiredSkillsStr: '',
-      sprintCustomersStr: '',
+      sprintCustomersList: [],
+      sprintCustomersActive:[],
+      sprintActiveOnoff:true,
       sprintEffort: 0,
       sprintTotalEffort: 0,
       sprintEstimation: 0,
@@ -582,6 +588,22 @@ export default {
     }
   },
   methods: {
+    customerChange(){
+      let activeList = {
+        'tab_planned_tasks':'sprintTasksList',
+        'tab_unplan_tasks':'sprintUnplanTasksList'
+      }[this.tabTaskActive]
+      if(this.sprintActiveOnoff){
+        this.$parent.tasksAndUnplanTasksList = this[activeList]
+        this.sprintActiveOnoff = false
+      }
+      this[activeList] = this.$parent.tasksAndUnplanTasksList.filter((item)=>{
+        return this.sprintCustomersActive.indexOf(item.taskCustomer) != -1
+      })
+      if(this.sprintCustomersActive.length == 0){
+        this[activeList] = this.$parent.tasksAndUnplanTasksList
+      }
+    },
     validateSprint () {
       var sprintEndTime = this.$data.sprintEndTime
       var sprintStatus = this.$data.sprintStatus
@@ -617,7 +639,7 @@ export default {
       this.$data.sprintStatus = 'Active'
       this.$data.sprintBaseline = ''
       this.$data.sprintRequiredSkillsStr = ''
-      this.$data.sprintCustomersStr = ''
+      this.$data.sprintCustomersList = []
       this.$data.sprintBaseCapacity = 0
       this.$data.sprintRequiredSkills = []
       this.$data.sprintObj = {}
@@ -705,7 +727,7 @@ export default {
         this.$data.sprintStatus = sprint.sprintStatus
         this.$data.sprintBaseline = sprint.sprintBaseline
         this.$data.sprintRequiredSkillsStr = sprint.sprintRequiredSkillsStr
-        this.$data.sprintCustomersStr = sprint.sprintCustomersStr
+        this.$data.sprintCustomersList = sprint.sprintCustomersStr.split(',')
         this.$data.sprintBaseCapacity = sprint.sprintBaseCapacity
         this.$data.sprintRequiredSkills = sprint.sprintRequiredSkills
         this.$data.sprintTotalEffort = sprint.sprintTotalEffort
@@ -731,6 +753,8 @@ export default {
         this.getSprintUsers()
         this.getAssigneeList()
         this.setSprintTabLabelValue(requestSprintId)
+
+        this.sprintActiveOnoff = true
       }
     },
     async getSprintPlannedTasks () {
@@ -1178,6 +1202,7 @@ export default {
   },
   destroyed(){
     this.$parent.sprintsList = undefined
+    this.$parent.tasksAndUnplanTasksList = undefined
   }
 }
 </script>
