@@ -5,10 +5,11 @@
         <el-row class="main-el-row" :style="{'background': mainColor}" justify="center" align="middle">
           <el-col :span="6" :lg="8" :class="this.$store.getters.getIsShowMainBar == false? 'hide-view': ''">
             <div class="main-grid-content" style="justify-content: flex-start; margin-left: 13px">
-              <el-button @click="handleMenuCommand('sprint')" class="main-menu-btn btn-hover" icon="el-icon-data-line">Sprints</el-button>
-              <el-button @click="handleMenuCommand('timesheet')" class="main-menu-btn btn-hover" icon="el-icon-date">Timesheet</el-button>
-              <el-button v-if="false" @click="handleMenuCommand('task')" class="main-menu-btn btn-hover" icon="el-icon-tickets">Tasks</el-button>
-              <el-button @click="handleMenuCommand('management')" class="main-menu-btn btn-hover" icon="el-icon-setting">Management</el-button>
+              <el-button @click="handleMenuCommand('sprint')" class="main-menu-btn" :class="{'active': active == 1}" icon="el-icon-data-line">Sprints</el-button>
+              <el-button @click="handleMenuCommand('timesheet')" class="main-menu-btn" :class="{'active': active == 2}" icon="el-icon-date">Timesheet</el-button>
+              <el-button v-if="false" @click="handleMenuCommand('task')" class="main-menu-btn" :class="{'active': active == 3}" icon="el-icon-tickets">Tasks</el-button>
+              <el-button @click="handleMenuCommand('management')" class="main-menu-btn" :class="{'active': active == 4}" icon="el-icon-setting">Management</el-button>
+              <!-- <el-button @click="handleMenuCommand('people')" class="main-menu-btn" :class="{'active': active == 5}" icon="el-icon-user-solid">People</el-button> -->
             </div>
           </el-col>
           <el-col :span="12" :lg="8">
@@ -99,25 +100,33 @@ export default {
       userInfo:{
         userSkills: [],
         userEmailGroups: []
-      }
+      },
+      active:null
     }
   },
   methods: {
     handleMenuCommand (command) {
       if (command === 'timesheet') {
         this.$router.push({path: '/Timesheet'})
+        this.active = 2
       }
       else if (command === 'task') {
         this.$router.push({path: '/Task'})
+        this.active = 3
       }
       else if (command === 'management') {
         this.$router.push({path: '/Management'})
+        this.active = 4
       }
       else if (command === 'others') {
         this.$router.push({path: '/Others'})
       }
       else if (command === 'sprint') {
         this.$router.push({path: '/Sprint'})
+        this.active = 1
+      }else if (command === 'people') {
+        this.$router.push({path: '/People'})
+        this.active = 5
       }
     },
     setCurrent (row) {
@@ -171,7 +180,13 @@ export default {
     }
   },
   mounted () {
-    this.getEmailGroupsAndSkills()
+    this.active = {
+      'SprintView':1,
+      'MyTimesheet':2,
+      'SptManagement':4,
+      'People':5,
+    }[this.$route.name]
+    this.getEmailGroupsAndSkills()    
   }
 }
 </script>
@@ -216,6 +231,14 @@ export default {
   max-width: 151px;
 }
 .main-menu-btn:hover>>>span {
+  display: inline;
+}
+.active{
+  width: auto;
+  max-width: 151px;
+  overflow: hidden;
+}
+.active>>>span {
   display: inline;
 }
 .main-menu-dropdown-text {

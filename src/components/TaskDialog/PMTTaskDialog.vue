@@ -951,6 +951,9 @@ Remark:
         return fmt; 
       },     
       estimationChange(type,number){
+        if(this.disabledState.disabledEstimation){
+          return
+        }
         if(0>=number){
           this.PMTTask.taskEstimation=2
           if(type == 'subtract'){

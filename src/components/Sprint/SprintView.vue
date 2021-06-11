@@ -1147,7 +1147,7 @@ export default {
           if(transferStationList.length < 2 ){
             let transferStation = []
             for(let j=0;j<list[i].Options.length;j++){
-              let testedData = list[i].Options[j].sprintName + list[i].Options[j].sprintLeader
+              let testedData = list[i].Options[j].sprintName + list[i].Options[j].sprintLeader + list[i].Options[j].sprintNickname
               if(testedData.toLowerCase().indexOf(val.toLowerCase()) != -1){
                 transferStation.push(list[i].Options[j])
                 console.log(transferStation);
