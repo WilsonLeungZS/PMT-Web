@@ -11,34 +11,62 @@
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-row :gutter="15">
-            <el-col :span="4" :lg="2" class="cm-table-expand-label">
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
               <span>Name</span>
             </el-col>
-            <el-col :span="6" :lg="4" class="cm-table-expand-item">
+            <el-col :span="6" :lg="9" class="cm-table-expand-item">
               <el-input v-model="props.row.customerName" size="small" style="width: 100%"></el-input>
             </el-col>
-            <el-col :span="4" :lg="2" class="cm-table-expand-label">
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
               <span>Description</span>
             </el-col>
-            <el-col :span="10" :lg="8" class="cm-table-expand-item">
+            <el-col :span="10" :lg="9" class="cm-table-expand-item">
               <el-input v-model="props.row.customerDescription" size="small" style="width: 100%"></el-input>
             </el-col>
-            <el-col :span="4" :lg="2" class="cm-table-expand-label">
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
               <span>Email Domain</span>
             </el-col>
-            <el-col :span="10" :lg="6" class="cm-table-expand-item">
+            <el-col :span="10" :lg="9" class="cm-table-expand-item">
               <el-input v-model="props.row.customerEmailDomain" size="small" style="width: 100%"></el-input>
             </el-col>
-            <el-col :span="4" :lg="2" class="cm-table-expand-label">
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
               <span>Home Page</span>
             </el-col>
-            <el-col :span="10" :lg="14" class="cm-table-expand-item">
+            <el-col :span="10" :lg="9" class="cm-table-expand-item">
               <el-input v-model="props.row.customerHomepage" size="small" style="width: 100%"></el-input>
             </el-col>
-            <el-col :span="8" :lg="4" class="pm-table-expand-item">
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
+              <span>OnSite Client Lead</span>
+            </el-col>
+            <el-col :span="1" :lg="9" class="cm-table-expand-item">
+              <el-select v-model="props.row.customerRoleClientLeadId" size="small" style="width: 100%" filterable>
+                <el-option label="" value=""></el-option>
+                <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
+                  <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
+                  <span style="float: right; color: #8492a6; font-size: 12px">Level - {{leader.userLevel}}</span>
+                </el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
+              <span>OffSite Client Lead</span>
+            </el-col>
+            <el-col :span="10" :lg="9" class="cm-table-expand-item">
+              <el-select v-model="props.row.customerSprintLeadId" size="small" style="width: 100%" filterable>
+                <el-option label="" value=""></el-option>
+                <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
+                  <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
+                  <span style="float: right; color: #8492a6; font-size: 12px">Level - {{leader.userLevel}}</span>
+                </el-option>
+              </el-select>
+            </el-col> 
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
+            </el-col>
+            <el-col :span="8" :lg="9" class="pm-table-expand-item">
               <el-button @click="cancelCustomer(props)" type="info" size="small" style="width:100%" >Cancel</el-button>
             </el-col>
-            <el-col :span="8" :lg="4" class="pm-table-expand-item">
+            <el-col :span="4" :lg="3" class="cm-table-expand-label">
+            </el-col>
+            <el-col :span="8" :lg="9" class="pm-table-expand-item">
               <el-button @click="saveCustomer(props)" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small" style="width:100%">Save</el-button>
             </el-col>                    
           </el-row>
@@ -48,6 +76,8 @@
       <el-table-column label="Name" prop="customerName" align="left" min-width="50"></el-table-column>
       <el-table-column label="Description" prop="customerDescription" align="left"></el-table-column>
       <el-table-column label="Email Domain" prop="customerEmailDomain" align="left"></el-table-column>
+      <el-table-column label="OnSite Client Lead" prop="customerRoleClientLeadId" align="left" :formatter="roleClientLeadFormatter"></el-table-column>
+      <el-table-column label="OffSite Client Lead" prop="customerSprintLeadId" align="left" :formatter="sprintLeadFormatter"></el-table-column>
       <el-table-column label="Home Page" prop="customerHomepage" align="left">
         <template slot-scope="scope">
           <a :href="scope.row.customerHomepage" target="_blank">{{scope.row.customerHomepage}}</a>
@@ -69,7 +99,8 @@ export default {
       customerData: [],
       customerResetData: [],
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
-      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      leadersList:[]
     }
   },
   methods: {
@@ -106,6 +137,8 @@ export default {
         reqCustomerDescription : customer.customerDescription,
         reqCustomerHomepage: customer.customerHomepage,
         reqCustomerEmailDomain: customer.customerEmailDomain,
+        reqCustomerRoleClientLeadId: customer.customerRoleClientLeadId,
+        reqCustomerSprintLeadId: customer.customerSprintLeadId,
       })
       if (res.data.status === 0) {
         this.getCustomerList()
@@ -137,10 +170,38 @@ export default {
         message: iMsg,
         type: iType
       })
+    },
+    async getActiveLeadersList () {
+      this.$data.leadersList = []
+      const res = await http.get('/users/getActiveUsersListByLevelLimit', {reqUserLevelLimit: 10})
+      if (res.data.status === 0) {
+        this.$data.leadersList = res.data.data.filter(item => item.userLevel <= 10)
+      } else {
+        this.$data.leadersList = []
+      }
+    },
+    roleClientLeadFormatter(row){
+      let name = null ;  
+      this.leadersList.forEach((item,index)=>{
+        if(row.customerRoleClientLeadId == item.userId){
+          name =  item.userFullName
+        }
+      })
+      return name
+    },
+    sprintLeadFormatter(row){
+      let name = null ;  
+      this.leadersList.forEach((item,index)=>{
+        if(row.customerSprintLeadId == item.userId){
+          name =  item.userFullName
+        }
+      })
+      return name
     }
   },
-  created () {
-    this.getCustomerList()
+  async created () {
+    await this.getActiveLeadersList()
+    this.getCustomerList();
   }
 }
 </script>
