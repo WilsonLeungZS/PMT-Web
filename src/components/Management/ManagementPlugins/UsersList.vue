@@ -315,7 +315,7 @@ export default {
 .pm-content {
   width: auto;
   height: auto;
-  padding: 20px 5px 0px 5px;
+  /* padding: 20px 5px 0px 5px; */
   text-align: left;
 }
 .pm-content-header {
