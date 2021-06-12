@@ -6,6 +6,7 @@ import SprintView from '@/components/Sprint/SprintView'
 import MyTimesheet from '@/components/Timesheet/MyTimesheet'
 import PrjTimesheet from '@/components/Timesheet/PrjTimesheet'
 import TaskList from '@/components/Task/TaskList'
+import People from '@/components/People/people'
 import TmlManagement from '@/components/Management/TmlManagement'
 import SptManagement from '@/components/Management/SptManagement'
 import PrjManagement from '@/components/Management/PrjManagement'
@@ -125,6 +126,15 @@ export default new Router({
           path: 'Others/Charts',
           name: 'Charts',
           component: Charts,
+          meta: {
+            needAdmin: true,
+            needLogin: false
+          }
+        },
+        {
+          path: 'People',
+          name: 'People',
+          component: People,
           meta: {
             needAdmin: true,
             needLogin: false

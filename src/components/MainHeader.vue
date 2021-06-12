@@ -9,7 +9,7 @@
               <el-button @click="handleMenuCommand('timesheet')" class="main-menu-btn" :class="{'active': active == 2}" icon="el-icon-date">Timesheet</el-button>
               <el-button v-if="false" @click="handleMenuCommand('task')" class="main-menu-btn" :class="{'active': active == 3}" icon="el-icon-tickets">Tasks</el-button>
               <el-button @click="handleMenuCommand('management')" class="main-menu-btn" :class="{'active': active == 4}" icon="el-icon-setting">Management</el-button>
-              <!-- <el-button @click="handleMenuCommand('people')" class="main-menu-btn" :class="{'active': active == 5}" icon="el-icon-user-solid">People</el-button> -->
+              <el-button @click="handleMenuCommand('people')" class="main-menu-btn" :class="{'active': active == 5}" icon="el-icon-user-solid">People</el-button>
             </div>
           </el-col>
           <el-col :span="12" :lg="8">
