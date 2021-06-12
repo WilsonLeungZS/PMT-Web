@@ -39,7 +39,7 @@
               <span>OnSite Client Lead</span>
             </el-col>
             <el-col :span="1" :lg="9" class="cm-table-expand-item">
-              <el-select v-model="props.row.customerRoleClientLeadId" size="small" style="width: 100%" filterable>
+              <el-select v-model="props.row.customerOnSiteClientLeadId" size="small" style="width: 100%" filterable>
                 <el-option label="" value=""></el-option>
                 <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
                   <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
@@ -51,7 +51,7 @@
               <span>OffSite Client Lead</span>
             </el-col>
             <el-col :span="10" :lg="9" class="cm-table-expand-item">
-              <el-select v-model="props.row.customerSprintLeadId" size="small" style="width: 100%" filterable>
+              <el-select v-model="props.row.customerOffSiteClientLeadId" size="small" style="width: 100%" filterable>
                 <el-option label="" value=""></el-option>
                 <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
                   <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
@@ -76,8 +76,8 @@
       <el-table-column label="Name" prop="customerName" align="left" min-width="50"></el-table-column>
       <el-table-column label="Description" prop="customerDescription" align="left"></el-table-column>
       <el-table-column label="Email Domain" prop="customerEmailDomain" align="left"></el-table-column>
-      <el-table-column label="OnSite Client Lead" prop="customerRoleClientLeadId" align="left" :formatter="roleClientLeadFormatter"></el-table-column>
-      <el-table-column label="OffSite Client Lead" prop="customerSprintLeadId" align="left" :formatter="sprintLeadFormatter"></el-table-column>
+      <el-table-column label="OnSite Client Lead" prop="customerOnSiteClientLeadId" align="left" :formatter="roleClientLeadFormatter"></el-table-column>
+      <el-table-column label="OffSite Client Lead" prop="customerOffSiteClientLeadId" align="left" :formatter="sprintLeadFormatter"></el-table-column>
       <el-table-column label="Home Page" prop="customerHomepage" align="left">
         <template slot-scope="scope">
           <a :href="scope.row.customerHomepage" target="_blank">{{scope.row.customerHomepage}}</a>
@@ -137,8 +137,8 @@ export default {
         reqCustomerDescription : customer.customerDescription,
         reqCustomerHomepage: customer.customerHomepage,
         reqCustomerEmailDomain: customer.customerEmailDomain,
-        reqCustomerRoleClientLeadId: customer.customerRoleClientLeadId,
-        reqCustomerSprintLeadId: customer.customerSprintLeadId,
+        reqCustomerOnSiteClientLeadId: customer.customerOnSiteClientLeadId,
+        reqCustomerOffSiteClientLeadId: customer.customerOffSiteClientLeadId,
       })
       if (res.data.status === 0) {
         this.getCustomerList()
@@ -183,7 +183,7 @@ export default {
     roleClientLeadFormatter(row){
       let name = null ;  
       this.leadersList.forEach((item,index)=>{
-        if(row.customerRoleClientLeadId == item.userId){
+        if(row.customerOnSiteClientLeadId == item.userId){
           name =  item.userFullName
         }
       })
@@ -192,7 +192,7 @@ export default {
     sprintLeadFormatter(row){
       let name = null ;  
       this.leadersList.forEach((item,index)=>{
-        if(row.customerSprintLeadId == item.userId){
+        if(row.customerOffSiteClientLeadId == item.userId){
           name =  item.userFullName
         }
       })
