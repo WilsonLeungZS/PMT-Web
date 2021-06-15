@@ -739,6 +739,8 @@ export default {
           sprintStartTime: sprint.sprintStartTime,
           sprintEndTime: sprint.sprintEndTime,
           sprintStatus: sprint.sprintStatus,
+          sprintRequiredSkillsStr: sprint.sprintRequiredSkillsStr,
+          sprintCustomersStr: sprint.sprintCustomersStr,
           datetime: new Date()
         }
         if (this.$data.tabTaskActive == 'tab_planned_tasks') {
@@ -748,12 +750,13 @@ export default {
           this.getSprintUnplanTasks()
         }
         if (this.$data.tabTaskActive == 'tab_public_tasks') {
-          tthis.getSprintPublicTasks()
+          this.getSprintPublicTasks()
         }
         this.getSprintUsers()
         this.getAssigneeList()
         this.setSprintTabLabelValue(requestSprintId)
 
+        
         this.sprintActiveOnoff = true
       }
     },
@@ -772,6 +775,10 @@ export default {
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
         this.$data.sprintEstimationCopy = this.$data.sprintEstimation
         this.$data.sprintTasksList = sprintTasksData.sprintTasks
+        if(this.sprintCustomersActive.length > 0){
+          this.sprintActiveOnoff = true
+          this.customerChange()
+        }
       }
       this.$forceUpdate()
       this.$data.sprintTasksListLoading = false
@@ -797,6 +804,10 @@ export default {
         this.$data.sprintEffort = sprintTasksData.sprintEffortSum[0].EffortSum
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
         this.$data.sprintUnplanTasksList = sprintTasksData.sprintTasks
+        if(this.sprintCustomersActive.length > 0){
+          this.sprintActiveOnoff = true
+          this.customerChange()
+        }
       }
       this.$data.sprintBuffer = this.$data.sprintActualCapacity - this.$data.sprintEstimationCopy
       this.$forceUpdate()

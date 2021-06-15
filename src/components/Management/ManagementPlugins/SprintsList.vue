@@ -381,6 +381,63 @@ export default {
     }
   },
   methods: {
+    // Create public task for new sprint
+    async createPublic(resultSprint){
+      console.log('Start to create public task')
+      var publicTaskObj = {
+        reqTaskId: 0,
+        reqTaskParentTaskName: null,
+        reqTaskCategory: 'PMT-TASK-REF',
+        reqTaskType: null,
+        reqTaskDescription: null,
+        reqTaskReferenceTask: 'Public',
+        reqTaskTypeTag: 'Public Task',
+        reqTaskDeliverableTag: null,
+        reqTaskCreator: 'PMT:System',
+        reqTaskRequiredSkills: resultSprint.RequiredSkills,
+        reqTaskCustomer: 'PMO',
+        reqTaskStatus: 'Running',
+        reqTaskEstimation: 0,
+        reqTaskIssueDate: this.formatDate(new Date(), 'yyyy-MM-dd'),
+        reqTaskTargetComplete: resultSprint.EndTime,
+        reqTaskActualComplete: resultSprint.EndTime,
+        reqTaskRespLeaderId: resultSprint.LeaderId,
+        reqTaskAssigneeId: null,
+        reqTaskSprintId: resultSprint.Id,
+        reqTaskSprintIndicator: 'PUBLIC'
+      }
+      var publicTaskStr = JSON.stringify(publicTaskObj)
+      var publicTaskArray = []
+      // Leave task (annual/sick/others)
+      var nonFlexLeave = JSON.parse(publicTaskStr)
+      nonFlexLeave.reqTaskName = 'Leave - ' + resultSprint.Id
+      nonFlexLeave.reqTaskTitle = 'Annual/Sick/Other Leave'
+      publicTaskArray.push(nonFlexLeave)
+      // Leave task (flex)
+      var flexLeave = JSON.parse(publicTaskStr)
+      flexLeave.reqTaskName = 'FlexLeave - ' + resultSprint.Id
+      flexLeave.reqTaskTitle = 'Flex Leave'
+      publicTaskArray.push(flexLeave)
+      // Training task (training)
+      var training = JSON.parse(publicTaskStr)
+      training.reqTaskName = 'Training - ' + resultSprint.Id
+      training.reqTaskTitle = 'Company Training'
+      publicTaskArray.push(training)
+      // Meeting task (meeting)
+      var meeting = JSON.parse(publicTaskStr)
+      meeting.reqTaskName = 'Meeting - ' + resultSprint.Id
+      meeting.reqTaskTitle = 'Team meeting (Daily Scrum/Retrospective/Planning/Monthly/Other Meeting)'
+      publicTaskArray.push(meeting)
+
+      for (var i=0; i<publicTaskArray.length; i++) {
+        const res = await http.post('/tasks/updateTask', publicTaskArray[i])
+        if (res.data != null && res.data.status == 0) {
+          console.log('Create public task successfully -> ', publicTaskArray[i].reqTaskName)
+        } else {
+          console.log('Create public task fail -> ', publicTaskArray[i].reqTaskName)
+        }
+      }
+    },
     // Style Method
     highlightRowClassName ({row, rowIndex}) {
       if (row.sprintUserRemainingCapacity > 0) {
@@ -538,60 +595,7 @@ export default {
         var resultSprint = res.data.data
         console.log('resultSprint -> ', resultSprint)
         if (res.data.message.startsWith('Create')) {
-          console.log('Start to create public task')
-          var publicTaskObj = {
-            reqTaskId: 0,
-            reqTaskParentTaskName: null,
-            reqTaskCategory: 'PMT-TASK-REF',
-            reqTaskType: null,
-            reqTaskDescription: null,
-            reqTaskReferenceTask: 'Public',
-            reqTaskTypeTag: 'Public Task',
-            reqTaskDeliverableTag: null,
-            reqTaskCreator: 'PMT:System',
-            reqTaskRequiredSkills: resultSprint.RequiredSkills,
-            reqTaskCustomer: 'PMO',
-            reqTaskStatus: 'Running',
-            reqTaskEstimation: 0,
-            reqTaskIssueDate: this.formatDate(new Date(), 'yyyy-MM-dd'),
-            reqTaskTargetComplete: resultSprint.EndTime,
-            reqTaskActualComplete: resultSprint.EndTime,
-            reqTaskRespLeaderId: resultSprint.LeaderId,
-            reqTaskAssigneeId: null,
-            reqTaskSprintId: resultSprint.Id,
-            reqTaskSprintIndicator: 'PUBLIC'
-          }
-          var publicTaskStr = JSON.stringify(publicTaskObj)
-          var publicTaskArray = []
-          // Leave task (annual/sick/others)
-          var nonFlexLeave = JSON.parse(publicTaskStr)
-          nonFlexLeave.reqTaskName = 'Leave - ' + resultSprint.Id
-          nonFlexLeave.reqTaskTitle = 'Annual/Sick/Other Leave'
-          publicTaskArray.push(nonFlexLeave)
-          // Leave task (flex)
-          var flexLeave = JSON.parse(publicTaskStr)
-          flexLeave.reqTaskName = 'FlexLeave - ' + resultSprint.Id
-          flexLeave.reqTaskTitle = 'Flex Leave'
-          publicTaskArray.push(flexLeave)
-          // Training task (training)
-          var training = JSON.parse(publicTaskStr)
-          training.reqTaskName = 'Training - ' + resultSprint.Id
-          training.reqTaskTitle = 'Company Training'
-          publicTaskArray.push(training)
-          // Meeting task (meeting)
-          var meeting = JSON.parse(publicTaskStr)
-          meeting.reqTaskName = 'Meeting - ' + resultSprint.Id
-          meeting.reqTaskTitle = 'Team meeting (Daily Scrum/Retrospective/Planning/Monthly/Other Meeting)'
-          publicTaskArray.push(meeting)
-
-          for (var i=0; i<publicTaskArray.length; i++) {
-            const res = await http.post('/tasks/updateTask', publicTaskArray[i])
-            if (res.data != null && res.data.status == 0) {
-              console.log('Create public task successfully -> ', publicTaskArray[i].reqTaskName)
-            } else {
-              console.log('Create public task fail -> ', publicTaskArray[i].reqTaskName)
-            }
-          }
+          this.createPublic(resultSprint)
         }
         console.log('resultSprint -> Done')
         this.getAllSkillsList()
@@ -699,6 +703,9 @@ export default {
             reqTargetTimelineId: Number(this.$data.copySprintsTargetTimeline)
           })
           if (res.data != null && res.data.status === 0) {
+            res.data.data.forEach(item => {
+              this.createPublic(item)
+            });
             this.showMessage('Copy sprints to target timeline successfully!', 'success')
           } else {
             this.$message.error('Failed to copy sprints to target timeline!')
