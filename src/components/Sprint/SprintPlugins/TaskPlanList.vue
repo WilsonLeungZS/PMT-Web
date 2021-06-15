@@ -174,8 +174,13 @@ export default {
           reqSize: this.$data.taskPlanListSize
         })
         if (resData != null && resData.data.status == 0) {
-          var taskList = resData.data.data
-          this.$data.taskPlanList = taskList
+          // var taskList = resData.data.data
+          this.taskPlanList = resData.data.data.filter(item => {
+            item.taskRequiredSkillsStrList = item.taskRequiredSkillsStr.split(',')
+            for(let i = 0;i<item.taskRequiredSkillsStrList.length;i++){
+              return this.sprint.sprintRequiredSkillsStr.indexOf(item.taskRequiredSkillsStrList[i]) != -1
+            }
+          });
         }
         this.$data.taskPlanListPage = this.$data.taskReqPage
       }

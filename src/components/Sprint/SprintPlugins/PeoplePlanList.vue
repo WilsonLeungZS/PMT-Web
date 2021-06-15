@@ -5,10 +5,11 @@
         <span>Resources</span>
       </div>
       <div class="people-plan-list-table">
-        <el-table v-loading="userPlanListLoading" :data="userPlanList" width="100%" size="small">
+        <el-table v-loading="userPlanListLoading" :data="userPlanList" @selection-change="handleSelectionChange" width="100%" size="small">
+          <el-table-column type="selection" width="30"></el-table-column>
           <el-table-column v-if="false" prop="userId" label="Id"></el-table-column>
           <el-table-column prop="userFullName" label="Name" align="left" width="150" sortable></el-table-column>
-          <el-table-column prop="userSkillsStr" label="Skills" align="left" min-width="190" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="userSkillsStr" label="Skills" align="left" min-width="140" show-overflow-tooltip sortable></el-table-column>
           <el-table-column prop="userLevel" label="Level" align="center" width="60"></el-table-column>
           <el-table-column prop="userWorkingHrs" label="WHrs" align="center" width="60"></el-table-column>
           <el-table-column prop="userCapacity" label="Capacity" align="center" width="100">
@@ -17,6 +18,9 @@
             </template>
           </el-table-column>
           <el-table-column align="right" width="50">
+            <template slot="header">
+              <el-button :disabled="disabledAddPeopleBtn" @click="userAllToSprint" v-if="checkUser.length > 1" type="primary" >ALL</el-button>
+            </template>
             <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
                 <el-button :disabled="disabledAddPeopleBtn" @click="assignUserToSprint(scope.row)" type="primary" icon="el-icon-d-arrow-right"></el-button>
@@ -45,7 +49,8 @@ export default {
       disabledAddPeopleBtn: false,
       disabledMessage: 'Assigen to Sprint',
       // Loading
-      userPlanListLoading: false
+      userPlanListLoading: false,
+      checkUser: [],
     }
   },
   props: {
@@ -69,6 +74,14 @@ export default {
     }
   },
   methods: {
+    userAllToSprint(){
+      this.checkUser.forEach((item)=>{
+        this.assignUserToSprint(item)
+      })
+    },
+    handleSelectionChange(val) {
+      this.checkUser = val
+    },
     validateSprint (iSprintObj) {
       var sprintEndTime = iSprintObj.sprintEndTime
       var sprintStatus = iSprintObj.sprintStatus
@@ -114,7 +127,12 @@ export default {
             }
           }
           // End of calculate
-          this.$data.userPlanList = userList
+          this.$data.userPlanList = userList.filter(item => {
+            item.userSkillsStrList = item.userSkillsStr.split(',')
+            for(let i = 0;i<item.userSkillsStrList.length;i++){
+              return this.sprint.sprintRequiredSkillsStr.indexOf(item.userSkillsStrList[i]) != -1
+            }
+          });
         }
         this.$data.userPlanListLoading = false
       }
