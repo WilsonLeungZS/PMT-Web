@@ -739,6 +739,7 @@ export default {
           sprintStartTime: sprint.sprintStartTime,
           sprintEndTime: sprint.sprintEndTime,
           sprintStatus: sprint.sprintStatus,
+          sprintRequiredSkillsStr: sprint.sprintRequiredSkillsStr,
           datetime: new Date()
         }
         if (this.$data.tabTaskActive == 'tab_planned_tasks') {
