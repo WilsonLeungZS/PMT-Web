@@ -19,13 +19,13 @@
           </el-table-column>
           <el-table-column align="right" width="50">
             <template slot="header">
-              <el-button :disabled="disabledAddPeopleBtn" @click="userAllToSprint" v-if="checkUser.length > 1" type="primary" >ALL</el-button>
+              <el-button :disabled="disabledAddPeopleBtn" @click="userAllToSprint" v-if="checkUser.length > 0" type="primary" icon="el-icon-d-arrow-right"></el-button>
             </template>
-            <template slot-scope="scope">
+            <!-- <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
-                <el-button :disabled="disabledAddPeopleBtn" @click="assignUserToSprint(scope.row)" type="primary" icon="el-icon-d-arrow-right"></el-button>
+                <el-button :disabled="disabledAddPeopleBtn" @click="assignUserT mary" icon="el-icon-d-arrow-right"></el-button>
               </el-tooltip>
-            </template>
+            </template> -->
           </el-table-column>
         </el-table>
       </div>
