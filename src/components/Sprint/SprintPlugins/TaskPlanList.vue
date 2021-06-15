@@ -174,13 +174,15 @@ export default {
           reqSize: this.$data.taskPlanListSize
         })
         if (resData != null && resData.data.status == 0) {
-          // var taskList = resData.data.data
-          this.taskPlanList = resData.data.data.filter(item => {
+          var taskList = resData.data.data.filter(item => {
             item.taskRequiredSkillsStrList = item.taskRequiredSkillsStr.split(',')
             for(let i = 0;i<item.taskRequiredSkillsStrList.length;i++){
               return this.sprint.sprintRequiredSkillsStr.indexOf(item.taskRequiredSkillsStrList[i]) != -1
             }
           });
+          this.taskPlanList = taskList.filter((item)=>{
+            return this.sprint.sprintCustomersStr.indexOf(item.taskCustomer) != -1
+          })
         }
         this.$data.taskPlanListPage = this.$data.taskReqPage
       }
