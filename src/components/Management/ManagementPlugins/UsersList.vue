@@ -54,7 +54,7 @@
               <span>Role</span>
             </el-col>
             <el-col :span="8" :lg="3" class="pm-table-expand-item">
-              <el-select v-model="props.row.userRole" size="small" style="width: 100%">
+              <el-select v-model="props.row.userRole" multiple collapse-tags size="small" style="width: 100%">
                 <el-option label="Admin" value="Admin"></el-option>
                 <el-option label="General" value="General"></el-option>
                 <el-option label="Special" value="Special"></el-option>
@@ -114,9 +114,9 @@
       <el-table-column label="Skills" prop="userSkillsStr" align="center" min-width="200" show-overflow-tooltip :key="6"></el-table-column>
       <el-table-column label="Role" prop="userRole" align="center" width="100" :filters="roleFilter" :filter-method="rolefilterHandler" :key="7">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.userRole === 'Admin'" size="small" effect="dark">{{scope.row.userRole}}</el-tag>
-          <el-tag v-if="scope.row.userRole === 'General'" size="small" type="info" effect="dark">{{scope.row.userRole}}</el-tag>
-          <el-tag v-if="scope.row.userRole === 'Special'" size="small" type="success" effect="dark">{{scope.row.userRole}}</el-tag>
+          <el-tag v-if="scope.row.userRole.indexOf('Admin') != -1 " size="small" effect="dark">{{scope.row.userRole}}</el-tag>
+          <el-tag v-if="scope.row.userRole.indexOf('General') != -1" size="small" type="info" effect="dark">{{scope.row.userRole}}</el-tag>
+          <el-tag v-if="scope.row.userRole.indexOf('Special') != -1 " size="small" type="success" effect="dark">{{scope.row.userRole}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="Active" prop="userIsActive" align="center" width="100" :filters="activeFilter" :filter-method="activefilterHandler" :key="8">
@@ -253,7 +253,7 @@ export default {
         reqUserNickname : user.userNickname,
         reqUserEmployeeNbr: user.userEmployeeNbr,
         reqUserEmail: user.userEmail,
-        reqUserRole: user.userRole,
+        reqUserRole: user.userRole.toString(),
         reqUserThemeStyle: user.userThemeStyle,
         reqUserNameMappings: user.userNameMappings,
         reqUserLevel: user.userLevel,

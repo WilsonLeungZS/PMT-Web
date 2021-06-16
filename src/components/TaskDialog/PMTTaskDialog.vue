@@ -984,7 +984,20 @@ Remark:
           if(type == 'subtract'){
             this.PMTTask.taskEstimation=20
           }
-        }else{}
+          if(this.action.action == 'CREATE-NEW'){
+            this.PMTTask.taskEstimation += 20
+            if(type == 'subtract'){
+              this.PMTTask.taskEstimation -= 20
+            }
+          }
+        }else{
+          if(this.action.action == 'CREATE-NEW'){
+            this.PMTTask.taskEstimation += 20
+            if(type == 'subtract'){
+              this.PMTTask.taskEstimation -= 40
+            }
+          }
+        }
       },
       estimationIpt(val){
         if(isNaN(Number(val))){

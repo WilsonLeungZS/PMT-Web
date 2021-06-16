@@ -66,7 +66,7 @@ router.beforeEach(async (to, from, next) => {
         store.dispatch('setNewThemeStyle', userThemeStyle)
         store.dispatch('setShowMainBar')
         if (needAdmin) {
-          if (userRole === 'Admin') {
+          if (userRole.indexOf('Admin') != -1) {
             next()
           } else {
             alert('You can not access these pages as you are not admin user!')

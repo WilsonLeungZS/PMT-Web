@@ -74,8 +74,8 @@
                     <el-table-column prop="sprintDailyScrumUserCompletion" label="Completion" align="center" width="135">
                       <template slot-scope="scope">
                         <div @click.stop="stopClick">
-                          <el-checkbox v-if="scope.row.sprintDailyScrumUserCompletion"  :disabled="userRole != 'Admin'? true: false" v-model="scope.row.sprintDailyScrumUserCompletion" label="Completed" border size="mini" style="padding:4px 6px" class="prj-timesheet-content-table-checkbox-checked"></el-checkbox>
-                          <el-checkbox v-if="!scope.row.sprintDailyScrumUserCompletion" :disabled="userRole != 'Admin'? true: false" v-model="scope.row.sprintDailyScrumUserCompletion" label="Incomplete" border size="mini" style="padding:4px 6px" class="prj-timesheet-content-table-checkbox-not-check"></el-checkbox>
+                          <el-checkbox v-if="scope.row.sprintDailyScrumUserCompletion"  :disabled="userRole.indexOf('Admin') == -1? true: false" v-model="scope.row.sprintDailyScrumUserCompletion" label="Completed" border size="mini" style="padding:4px 6px" class="prj-timesheet-content-table-checkbox-checked"></el-checkbox>
+                          <el-checkbox v-if="!scope.row.sprintDailyScrumUserCompletion" :disabled="userRole.indexOf('Admin') == -1? true: false" v-model="scope.row.sprintDailyScrumUserCompletion" label="Incomplete" border size="mini" style="padding:4px 6px" class="prj-timesheet-content-table-checkbox-not-check"></el-checkbox>
                           </div>
                         </template>
                     </el-table-column>
@@ -106,7 +106,7 @@
                   </el-table>
                 </el-col>
                 <el-col :span="24">
-                  <el-button v-if="userRole == 'Admin' && peopleList != null && peopleList.length > 0" @click="saveDailyScrum" type="primary" size="small" style="width: 100%; margin-top: 10px">Save</el-button>
+                  <el-button v-if="userRole.indexOf('Admin') != -1 && peopleList != null && peopleList.length > 0" @click="saveDailyScrum" type="primary" size="small" style="width: 100%; margin-top: 10px">Save</el-button>
                 </el-col>
               </el-row>
             </el-card>
