@@ -250,8 +250,6 @@ export default {
               if (timesheetDate >= iStartDate && timesheetDate <= iEndDate) {
                 flag = true
                 continue
-              } else {
-                flag = false
               }
             }
           }
