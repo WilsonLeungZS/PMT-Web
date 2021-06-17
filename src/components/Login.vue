@@ -47,7 +47,8 @@ export default {
         reqUserName: reqUserName
       })
       console.log(res.data)
-      if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
+      // if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
+      if (res.data.status === 0 && res.data.user != null && res.data.user.Role.indexOf('Guests') == -1) {
         var userId = res.data.user.Id
         var userName = res.data.user.Name
         localStorage.setItem('Flag', 'isLogin')

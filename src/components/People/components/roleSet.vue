@@ -16,7 +16,15 @@
           </li>
           <li>
             <p>level：</p>
-            <el-input v-model="params.level"></el-input>
+            <el-select v-model="params.level" placeholder="请选择">
+              <el-option
+                v-for="item in 13"
+                :key="item"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
           </li>
           <li>
             <p>remark：</p>
@@ -70,6 +78,12 @@ section ul li {
 }
 section ul li p {
   width: 100px;
+}
+section ul li .el-input {
+  flex: 1;
+}
+section ul li .el-select {
+  flex: 1;
 }
 </style>
 

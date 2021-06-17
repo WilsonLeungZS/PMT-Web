@@ -7,7 +7,7 @@ const store = new Vuex.Store({
     userId: 0,
     userLevel: -1,
     userEmployeeNumber: '',
-    userRole: 'General',
+    userRole: 'Users',
     isLogin: false,
     isShowMainBar: true,
     themeStyle: 0,
