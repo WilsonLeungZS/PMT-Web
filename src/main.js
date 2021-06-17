@@ -23,7 +23,8 @@ router.beforeEach(async (to, from, next) => {
       const res = await http.get('/users/login', {
         reqUserName: reqUserName
       })
-      if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
+      if (res.data.status === 0 && res.data.user != null && res.data.user.Role.indexOf('Guests') == -1) {
+        // if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
         var userId = res.data.user.Id
         var userName = res.data.user.Name
         var userLevel = res.data.user.Level
@@ -51,7 +52,8 @@ router.beforeEach(async (to, from, next) => {
       const res = await http.get('/users/login', {
         reqUserName: reqUserName
       })
-      if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
+      if (res.data.status === 0 && res.data.user != null && res.data.user.Role.indexOf('Guests') == -1) {
+      // if (res.data.status === 0 && res.data.user != null && res.data.user.IsActive) {
         var userId = res.data.user.Id
         var userName = res.data.user.Name
         var userLevel = res.data.user.Level
@@ -66,10 +68,10 @@ router.beforeEach(async (to, from, next) => {
         store.dispatch('setNewThemeStyle', userThemeStyle)
         store.dispatch('setShowMainBar')
         if (needAdmin) {
-          if (userRole === 'Admin') {
+          if (userRole.indexOf('PMOs') != -1) {
             next()
           } else {
-            alert('You can not access these pages as you are not admin user!')
+            alert('You can not access these pages as you are not PMOs user!')
             next(from.path)
           }
         } else {

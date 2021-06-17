@@ -54,10 +54,8 @@
               <span>Role</span>
             </el-col>
             <el-col :span="8" :lg="3" class="pm-table-expand-item">
-              <el-select v-model="props.row.userRole" size="small" style="width: 100%">
-                <el-option label="Admin" value="Admin"></el-option>
-                <el-option label="General" value="General"></el-option>
-                <el-option label="Special" value="Special"></el-option>
+              <el-select v-model="props.row.userRole" multiple collapse-tags size="small" style="width: 100%" @change="roleChange(props.row,props.index)">
+                <el-option v-for="(item,index) in roleList" :key="index" :label="item.Name" :value="item.Name"></el-option>
               </el-select>
             </el-col>
           </el-row>
@@ -91,16 +89,25 @@
             <el-col :span="20" :lg="10" class="pm-table-expand-item">
               <el-input v-model="props.row.userEmailGroups" size="small" style="width: 100%"></el-input>
             </el-col>
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
-              <span>Active</span>
+            <el-col :span="4" :lg="3" class="pm-table-expand-label">
+              <span>Team Type</span>
             </el-col>
-            <el-col :span="4" :lg="2" class="pm-table-expand-item">
-              <el-switch v-model="props.row.userIsActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+            <el-col :span="4" :lg="3" class="pm-table-expand-item">
+              <!-- <el-switch v-model="props.row.userIsActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch> -->
+              <el-select v-model="props.row.userIsActive" size="small">
+                <el-option-group label="people">
+                  <el-option label="T&M" :value="true"></el-option>
+                  <el-option label="MS" :value="false"></el-option>
+                </el-option-group>
+                <el-option-group label="machine">
+                  <el-option label="machine" value=""></el-option>
+                </el-option-group>
+              </el-select>
             </el-col>                
-            <el-col :span="8" :lg="4" class="pm-table-expand-item">
+            <el-col :span="8" :lg="3" class="pm-table-expand-item">
               <el-button @click="cancelUser(props)" type="info" size="small" style="width:100%" >Cancel</el-button>
             </el-col>
-            <el-col :span="8" :lg="4" class="pm-table-expand-item">
+            <el-col :span="8" :lg="3" class="pm-table-expand-item">
               <el-button @click="saveUser(props)" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small" style="width:100%">Save</el-button>
             </el-col>
           </el-row>
@@ -112,17 +119,10 @@
       <el-table-column label="Level" prop="userLevel" align="center" width="100" sortable :key="4"></el-table-column>
       <el-table-column label="Working Hours" prop="userWorkingHrs" align="center" width="180" sortable :key="5"></el-table-column>
       <el-table-column label="Skills" prop="userSkillsStr" align="center" min-width="200" show-overflow-tooltip :key="6"></el-table-column>
-      <el-table-column label="Role" prop="userRole" align="center" width="100" :filters="roleFilter" :filter-method="rolefilterHandler" :key="7">
+      <el-table-column label="Role" prop="userRole" align="center" width="180" :filters="roleFilter" :filter-method="rolefilterHandler" :key="7" :formatter="roleFormatter"></el-table-column>
+      <el-table-column label="Type" prop="userIsActive" align="center" width="100" :filters="activeFilter" :filter-method="activefilterHandler" :key="8">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.userRole === 'Admin'" size="small" effect="dark">{{scope.row.userRole}}</el-tag>
-          <el-tag v-if="scope.row.userRole === 'General'" size="small" type="info" effect="dark">{{scope.row.userRole}}</el-tag>
-          <el-tag v-if="scope.row.userRole === 'Special'" size="small" type="success" effect="dark">{{scope.row.userRole}}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="Active" prop="userIsActive" align="center" width="100" :filters="activeFilter" :filter-method="activefilterHandler" :key="8">
-        <template slot-scope="scope">
-          <i v-if="scope.row.userIsActive" class="el-icon-success" style="font-size: 25px; color: #2ed573"></i>
-          <i v-if="!scope.row.userIsActive" class="el-icon-error" style="font-size: 25px; color: #ff4757"></i>
+          {{scope.row.userIsActive ? 'T&M': scope.row.userIsActive !=='' ?'MS':'machine'}}
         </template>
       </el-table-column>
     </el-table>
@@ -137,6 +137,7 @@ export default {
   name: 'UsersList',
   data () {
     return {
+      
       skillsList: [],
       userLoading: false,
       userData: [],
@@ -145,16 +146,36 @@ export default {
         {text: 'Active', value: true},
         {text: 'Inactive', value: false}
       ],
-      roleFilter: [
-        {text: 'Admin', value: 'Admin'},
-        {text: 'General', value: 'General'},
-        {text: 'Special', value: 'Special'}
-      ],
+      roleFilter: [],
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
-      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      roleList:[]
     }
   },
   methods: {
+    roleChange(row){
+      if(row.userRole.length > 1 && row.userRole.indexOf('Guests') == 0){
+        row.userRole.splice(0,1)
+        return
+      }
+      if(row.userRole.length > 1 && row.userRole.indexOf('Guests') != -1){
+        row.userRole = ['Guests']
+      }
+    },
+    roleFormatter(row){
+      return row.userRole.toString()
+    },
+    async getRoleList() {
+      let res = await http.get("/roles/getRoleList");
+      if (res.data.status == 0 && res.data.data.length != 0) {
+        this.roleList = res.data.data;
+        this.roleFilter = res.data.data.map(item=>{
+          return {text:item.Name, value:item.Name}
+        })
+      } else {
+        this.$message.error("Failed to get role list!");
+      }
+    },
     // Style Method
     activefilterHandler (value, row, column) {
       return row['user_isactive'] === value
@@ -191,7 +212,7 @@ export default {
         this.$data.skillsList = []
       }
     },
-   getIndexOfValueInArr(iArray, iKey, iValue) {
+    getIndexOfValueInArr(iArray, iKey, iValue) {
       for(var i=0; i<iArray.length;i++) {
         var item = iArray[i];
         if(iKey != null){
@@ -213,7 +234,10 @@ export default {
       this.$data.userData = []
       const res = await http.get('/users/getAllUsersList')
       if (res.data.status === 0) {
-        this.$data.userData = res.data.data
+        this.$data.userData = res.data.data.map((item)=> {
+          item.userRole = item.userRole.split(',')
+          return item
+        })
         var jsonString1 = JSON.stringify(this.$data.userData)
         this.$data.userResetData = JSON.parse(jsonString1)
       } else {
@@ -228,7 +252,7 @@ export default {
         userNickname : '',
         userEmployeeNbr: '',
         userEmail: '',
-        userRole: 'General',
+        userRole: 'Users',
         userThemeStyle: 0,
         userNameMappings: '',
         userLevel: 0,
@@ -253,7 +277,7 @@ export default {
         reqUserNickname : user.userNickname,
         reqUserEmployeeNbr: user.userEmployeeNbr,
         reqUserEmail: user.userEmail,
-        reqUserRole: user.userRole,
+        reqUserRole: user.userRole.toString(),
         reqUserThemeStyle: user.userThemeStyle,
         reqUserNameMappings: user.userNameMappings,
         reqUserLevel: user.userLevel,
@@ -304,6 +328,7 @@ export default {
     }
   },
   created () {
+    this.getRoleList()
     this.getUserList()
     this.getAllSkillsList()
   }
