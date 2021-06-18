@@ -357,7 +357,7 @@ export default {
           }
         })
         res.data.data.sprintUsers.sort((a,b)=>{
-          if(a.sprintDailyScrumUserAttendance == b.sprintDailyScrumUserAttendance){
+          if(a.sprintDailyScrumUserAttendance == b.sprintDailyScrumUserAttendance && b.sprintUserCapacity == a.sprintUserCapacity){
             return a.sprintUserName.substr(0,1).charCodeAt(0) - b.sprintUserName.substr(0,1).charCodeAt(0) 
           }else{
             return true
