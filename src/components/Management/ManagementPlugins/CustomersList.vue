@@ -39,7 +39,7 @@
               <span>OnSite Client Lead</span>
             </el-col>
             <el-col :span="1" :lg="9" class="cm-table-expand-item">
-              <el-select v-model="props.row.customerOnSiteClientLeadId" size="small" style="width: 100%" filterable>
+              <el-select v-model="props.row.customerOnSiteClientLeadId" @focus.once="oldOnSite = props.row.customerOnSiteClientLeadId" size="small" style="width: 100%" filterable>
                 <el-option label="" value=""></el-option>
                 <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
                   <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
@@ -51,7 +51,7 @@
               <span>OffSite Client Lead</span>
             </el-col>
             <el-col :span="10" :lg="9" class="cm-table-expand-item">
-              <el-select v-model="props.row.customerOffSiteClientLeadId" size="small" style="width: 100%" filterable>
+              <el-select v-model="props.row.customerOffSiteClientLeadId" @focus.once="oldOffSite = props.row.customerOffSiteClientLeadId" size="small" style="width: 100%" filterable>
                 <el-option label="" value=""></el-option>
                 <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
                   <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
@@ -100,10 +100,44 @@ export default {
       customerResetData: [],
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
       btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
-      leadersList:[]
+      leadersList:[],
+      oldOnSite:null,
+      oldOffSite:null,
     }
   },
   methods: {
+    async checkClientLead(user1,user2){
+      let userIdList = [this.oldOnSite,this.oldOffSite,user1,user2].filter((item)=>{
+        return item != null && item != undefined && item >= 0
+      })
+      // The checkClientLead api returns users who still have Client Lead
+      const res = await http.post('/sprints/checkClientLead', {
+        userIdList:[... new Set(userIdList)]
+      })
+      this.leadersList.forEach(async item => {
+        let index = userIdList.indexOf(item.userId)
+        if(index == -1) return
+        if(res.data.data.length == 0) return
+        // judgment if the user still has a Client Lead
+        if(res.data.data.indexOf(item.userId) != -1){
+          if(item.userRole.indexOf('Client Lead') == -1){
+            await http.post("/users/updateUser", {
+              reqUserId: item.userId,
+              reqUserRole: item.userRole += ',Client Leads',
+              reqUserIsActive:1,
+            });
+          }
+        }else{
+          if(item.userRole.indexOf('Client Lead') != -1){
+            await http.post("/users/updateUser", {
+              reqUserId: item.userId,
+              reqUserRole: item.userRole.replace(',Client Leads',''),
+              reqUserIsActive:1,
+            });
+          }
+        }
+      })
+    },
     // Customer Management
     async getCustomerList () {
       this.$data.customerLoading = true
@@ -142,6 +176,7 @@ export default {
       })
       if (res.data.status === 0) {
         this.getCustomerList()
+        this.checkClientLead(customer.customerOnSiteClientLeadId,customer.customerOffSiteClientLeadId)
         this.showMessage('Add/Update customer successfully!', 'success')
       } else {
         this.$message.error('Add/Update customer Failed!')

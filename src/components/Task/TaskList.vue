@@ -2615,7 +2615,7 @@ export default {
       console.log('Create new task: ' + iTaskLevel)
       this.$data.currentLevel = iTaskLevel
       if (Number(iTaskLevel) === 1) {
-        if (this.$data.userLevel > 8 && this.userRole.indexOf('Admin') == -1) {
+        if (this.$data.userLevel > 8 && this.userRole.indexOf('PMOs') == -1) {
           this.$message.error('No right to create Level 1 task!')
           return
         }
@@ -2638,7 +2638,7 @@ export default {
       if (Number(iTaskLevel) === 2) {
           const res1 =  await http.post('/tasks/getSkillFromReference')
           this.$data.skillTypeOps = res1.data.data
-        if (this.$data.userLevel > 10 && this.userRole.indexOf('Admin') == -1) {
+        if (this.$data.userLevel > 10 && this.userRole.indexOf('PMOs') == -1) {
           this.$message.error('No right to create Level 2 task!')
           return
         }
@@ -2713,7 +2713,7 @@ export default {
     async createNewSubTask (iSubTaskLevel, iParentObj) {
       console.log('Create new sub task: ' + iSubTaskLevel)
       if (Number(iSubTaskLevel) === 2) {
-        if (this.$data.userLevel > 10 && this.userRole.indexOf('Admin') == -1) {
+        if (this.$data.userLevel > 10 && this.userRole.indexOf('PMOs') == -1) {
           this.$message.error('No right to create Level 2 task!')
           return
         }
@@ -2861,7 +2861,7 @@ export default {
     },
     // 3. Level 1 task dialog
     async saveLv1Task () {
-      if (this.$data.userLevel > 8 && this.userRole.indexOf('Admin') == -1) {
+      if (this.$data.userLevel > 8 && this.userRole.indexOf('PMOs') == -1) {
         this.$message.error('No right to create Level 1 task!')
         return
       }

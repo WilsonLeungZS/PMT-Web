@@ -71,7 +71,7 @@
                 <span>Leader</span>
               </el-col>
               <el-col :span="8" :lg="7" class="sm-table-expand-item">
-                <el-select v-model="props.row.sprintLeaderId" size="small" style="width: 100%" filterable>
+                <el-select v-model="props.row.sprintLeaderId" @focus.once="oldCheck = props.row.sprintLeaderId" size="small" style="width: 100%" filterable>
                   <el-option label="" value=""></el-option>
                   <el-option v-for="(leader, index) in leadersList" :key="index" :label="leader.userFullName" :value="leader.userId">
                     <span style="float: left; margin-right:20px">{{leader.userFullName}}</span>
@@ -353,7 +353,8 @@ export default {
       copySprintsSourceTimelineSprintsListLoading: false,
       copySprintsTargetTimelineSprintsListLoading: false,
       btnColor: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor,
-      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2
+      btnColor2: utils.themeStyle[this.$store.getters.getThemeStyle].btnColor2,
+      oldCheck:null
     }
   },
   watch: {
@@ -381,6 +382,27 @@ export default {
     }
   },
   methods: {
+    async updateUser(id) {
+      let user = this.leadersList.filter((item)=>{
+        return item.userId == id
+      })
+
+      let old = this.leadersList.filter((item)=>{
+        return item.userId == this.oldCheck
+      })
+
+      await http.post("/users/updateUser", {
+        reqUserId: user[0].userId,
+        reqUserRole: user[0].userRole += ',Sprint Leads',
+        reqUserIsActive:1,
+      });
+
+      await http.post("/users/updateUser", {
+        reqUserId: old[0].userId,
+        reqUserRole: old[0].userRole.replace(',Sprint Leads',''),
+        reqUserIsActive:1,
+      });
+    },
     // Create public task for new sprint
     async createPublic(resultSprint){
       console.log('Start to create public task')
@@ -560,7 +582,6 @@ export default {
       this.$data.newSprintDialogVisible = true
     },
     async saveSprint (sprint) {
-      console.log(sprint)
       if(this.isEmptyField(sprint.sprintName, 'Name') || this.isEmptyField(sprint.sprintStartTime, 'Start Time') || this.isEmptyField(sprint.sprintEndTime, 'End Time')) return
       if (sprint.sprintRequiredSkills.length > 0) {
         for (var i=0; i<sprint.sprintRequiredSkills.length; i++) {
@@ -598,6 +619,7 @@ export default {
           this.createPublic(resultSprint)
         }
         console.log('resultSprint -> Done')
+        this.updateUser(sprint.sprintLeaderId)
         this.getAllSkillsList()
         this.getActiveLeadersList()
         this.getCustomerList()
