@@ -50,14 +50,29 @@
             <el-col :span="8" :lg="4" class="pm-table-expand-item">
               <el-input v-model="props.row.userWorkingHrs" size="small" style="width: 100%"></el-input>
             </el-col> 
-            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+            <!-- <el-col :span="4" :lg="2" class="pm-table-expand-label">
               <span>Role</span>
             </el-col>
             <el-col :span="8" :lg="3" class="pm-table-expand-item">
               <el-select v-model="props.row.userRole" multiple collapse-tags size="small" style="width: 100%" @change="roleChange(props.row,props.index)">
                 <el-option v-for="(item,index) in roleList" :key="index" :label="item.Name" :value="item.Name"></el-option>
               </el-select>
+            </el-col> -->
+            <el-col :span="4" :lg="2" class="pm-table-expand-label">
+              <span>Team Type</span>
             </el-col>
+            <el-col :span="4" :lg="3" class="pm-table-expand-item">
+              <!-- <el-switch v-model="props.row.userIsActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch> -->
+              <el-select v-model="props.row.userIsActive" size="small">
+                <el-option-group label="people">
+                  <el-option label="T&M" :value="true"></el-option>
+                  <el-option label="MS" :value="false"></el-option>
+                </el-option-group>
+                <el-option-group label="machine">
+                  <el-option label="machine" value=""></el-option>
+                </el-option-group>
+              </el-select>
+            </el-col>  
           </el-row>
           <el-divider></el-divider>
           <el-row :gutter="15">
@@ -88,26 +103,11 @@
             </el-col>
             <el-col :span="20" :lg="10" class="pm-table-expand-item">
               <el-input v-model="props.row.userEmailGroups" size="small" style="width: 100%"></el-input>
-            </el-col>
-            <el-col :span="4" :lg="3" class="pm-table-expand-label">
-              <span>Team Type</span>
-            </el-col>
-            <el-col :span="4" :lg="3" class="pm-table-expand-item">
-              <!-- <el-switch v-model="props.row.userIsActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch> -->
-              <el-select v-model="props.row.userIsActive" size="small">
-                <el-option-group label="people">
-                  <el-option label="T&M" :value="true"></el-option>
-                  <el-option label="MS" :value="false"></el-option>
-                </el-option-group>
-                <el-option-group label="machine">
-                  <el-option label="machine" value=""></el-option>
-                </el-option-group>
-              </el-select>
-            </el-col>                
-            <el-col :span="8" :lg="3" class="pm-table-expand-item">
+            </el-col>              
+            <el-col :span="8" :lg="6" class="pm-table-expand-item">
               <el-button @click="cancelUser(props)" type="info" size="small" style="width:100%" >Cancel</el-button>
             </el-col>
-            <el-col :span="8" :lg="3" class="pm-table-expand-item">
+            <el-col :span="8" :lg="6" class="pm-table-expand-item">
               <el-button @click="saveUser(props)" :style="{'background-color': btnColor2, 'border': 'none', 'color': 'white'}" size="small" style="width:100%">Save</el-button>
             </el-col>
           </el-row>
