@@ -130,7 +130,7 @@ export default {
           this.$data.userPlanList = userList.filter(item => {
             item.userSkillsStrList = item.userSkillsStr.split(',')
             for(let i = 0;i<item.userSkillsStrList.length;i++){
-              return this.sprint.sprintRequiredSkillsStr.indexOf(item.userSkillsStrList[i]) != -1
+              if(this.sprint.sprintRequiredSkillsStr.indexOf(item.userSkillsStrList[i]) != -1) return true
             }
           });
         }
