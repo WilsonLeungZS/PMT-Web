@@ -15,8 +15,8 @@
             <el-input v-model="params.Name"></el-input>
           </li>
           <li>
-            <p>level：</p>
-            <el-select v-model="params.level" placeholder="请选择">
+            <p>Level：</p>
+            <el-select v-model="params.level" placeholder="select">
               <el-option
                 v-for="item in 13"
                 :key="item"
@@ -27,11 +27,11 @@
             </el-select>
           </li>
           <li>
-            <p>remark：</p>
+            <p>Remark：</p>
             <el-input v-model="params.remark"></el-input>
           </li>
           <li>
-            <p>select：</p>
+            <p>Select：</p>
             <el-transfer
               v-model="selected"
               :data="unselected"
@@ -46,7 +46,7 @@
         <el-button type="primary" @click="updaterole">{{
           params.type
         }}</el-button>
-        <el-button type="info" @click="shut">取 消</el-button>
+        <el-button type="info" @click="shut">Cancel</el-button>
       </span>
     </el-dialog>
   </div>

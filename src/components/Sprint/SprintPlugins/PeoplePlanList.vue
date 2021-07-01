@@ -9,7 +9,12 @@
           <el-table-column type="selection" width="30"></el-table-column>
           <el-table-column v-if="false" prop="userId" label="Id"></el-table-column>
           <el-table-column prop="userFullName" label="Name" align="left" width="150" sortable></el-table-column>
-          <el-table-column prop="userSkillsStr" label="Skills" align="left" min-width="140" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="userSkillsStr" label="Skills" align="left" min-width="100" show-overflow-tooltip sortable></el-table-column>
+          <el-table-column prop="userIsActive" label="type" align="left" min-width="100" :filters="activeFilter" :filter-method="activefilterHandler">
+            <template slot-scope="scope">
+              {{scope.row.userIsActive ? 'T&M': scope.row.userIsActive !=='' ?'MS':'machine'}}
+            </template>
+          </el-table-column>
           <el-table-column prop="userLevel" label="Level" align="center" width="60"></el-table-column>
           <el-table-column prop="userWorkingHrs" label="WHrs" align="center" width="60"></el-table-column>
           <el-table-column prop="userCapacity" label="Capacity" align="center" width="100">
@@ -17,9 +22,14 @@
               <el-input-number v-model="scope.row.userCapacity" :step="scope.row.userWorkingHrs" step-strictly :min="0" :max="scope.row.userMaxCapacity" controls-position="right" size="mini"></el-input-number>
             </template>
           </el-table-column>
-          <el-table-column align="right" width="50">
+          <el-table-column align="right">
             <template slot="header">
               <el-button :disabled="disabledAddPeopleBtn" @click="userAllToSprint" v-if="checkUser.length > 0" type="primary" icon="el-icon-d-arrow-right"></el-button>
+
+              <el-select v-model="cec" id="ces" @change="ces" size="mini">
+                <el-option label="T&M" value="true"></el-option>
+                <el-option label="MS" value="false"></el-option>
+              </el-select>
             </template>
             <!-- <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
@@ -51,6 +61,11 @@ export default {
       // Loading
       userPlanListLoading: false,
       checkUser: [],
+      cec:null,
+        activeFilter  : [
+        {text: "T&M", value: true},
+        {text: "MS", value: false}
+      ],
     }
   },
   props: {
@@ -74,6 +89,14 @@ export default {
     }
   },
   methods: {
+    activefilterHandler (value, row, column) {
+      return row['userIsActive'] === value
+    },
+    ces(val){
+      this.$data.userPlanList = this.$parent.userPlanList.filter(item => {
+          if(val == String(item.userIsActive)) return true
+      });
+    },
     userAllToSprint(){
       this.checkUser.forEach((item)=>{
         this.assignUserToSprint(item)
@@ -133,6 +156,10 @@ export default {
               if(this.sprint.sprintRequiredSkillsStr.indexOf(item.userSkillsStrList[i]) != -1) return true
             }
           });
+          this.$parent.userPlanList = this.$data.userPlanList
+          console.log('------------------');
+          console.log(this.$data.userPlanList);
+          console.log('------------------');
         }
         this.$data.userPlanListLoading = false
       }

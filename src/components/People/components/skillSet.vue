@@ -29,7 +29,7 @@
         <el-button type="primary" @click="updateSkill">{{
           params.type
         }}</el-button>
-        <el-button type="info" @click="shut">取 消</el-button>
+        <el-button type="info" @click="shut">cancel</el-button>
       </span>
     </el-dialog>
   </div>
