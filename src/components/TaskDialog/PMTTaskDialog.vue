@@ -197,7 +197,7 @@ Remark:
               <el-col :span="24" :lg="{span: 12, offset: 1}">
                 <el-form-item v-show="showState.showEstimation" label="Estimation">
                   <div class="input-number-div">
-                    <el-input :disabled="disabledState.disabledEstimation" v-model="PMTTask.taskEstimation" @input="estimationIpt" :max="40" :min="0">
+                    <el-input :disabled="disabledState.disabledEstimation" v-model="PMTTask.taskEstimation" @input="estimationIpt" :min="0">
                     </el-input>
                     <div class="input-number-btn">
                       <span class="add" @click="estimationChange('add',PMTTask.taskEstimation)"><i class="el-icon-arrow-up"></i></span>
@@ -985,16 +985,16 @@ Remark:
             this.PMTTask.taskEstimation=20
           }
           if(this.action.action == 'CREATE-NEW'){
-            this.PMTTask.taskEstimation += 20
+            this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 20
             if(type == 'subtract'){
-              this.PMTTask.taskEstimation -= 20
+              this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 20
             }
           }
         }else{
           if(this.action.action == 'CREATE-NEW'){
-            this.PMTTask.taskEstimation += 20
+            this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 20
             if(type == 'subtract'){
-              this.PMTTask.taskEstimation -= 40
+              this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 40
             }
           }
         }
@@ -1004,7 +1004,9 @@ Remark:
             this.PMTTask.taskEstimation=0
         }
         if(val > 40){
-            this.PMTTask.taskEstimation=40
+          if(this.action.action != 'CREATE-NEW'){
+              this.PMTTask.taskEstimation = 40
+          }
         }
         if(val < 0){
             this.PMTTask.taskEstimation=0

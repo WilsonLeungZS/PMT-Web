@@ -546,7 +546,7 @@ export default {
       this.$data.timelineData = []
       const res = await http.get('/sprints/getAllTimelinesList')
       if (res.data.status === 0) {
-        this.$data.timelineData = res.data.data
+        this.$data.timelineData = res.data.data.reverse()
       }
     },
     // Sprint Management
