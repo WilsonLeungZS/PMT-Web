@@ -25,11 +25,6 @@
           <el-table-column align="right">
             <template slot="header">
               <el-button :disabled="disabledAddPeopleBtn" @click="userAllToSprint" v-if="checkUser.length > 0" type="primary" icon="el-icon-d-arrow-right"></el-button>
-
-              <el-select v-model="cec" id="ces" @change="ces" size="mini">
-                <el-option label="T&M" value="true"></el-option>
-                <el-option label="MS" value="false"></el-option>
-              </el-select>
             </template>
             <!-- <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
@@ -61,8 +56,7 @@ export default {
       // Loading
       userPlanListLoading: false,
       checkUser: [],
-      cec:null,
-        activeFilter  : [
+      activeFilter  : [
         {text: "T&M", value: true},
         {text: "MS", value: false}
       ],
@@ -91,11 +85,6 @@ export default {
   methods: {
     activefilterHandler (value, row, column) {
       return row['userIsActive'] === value
-    },
-    ces(val){
-      this.$data.userPlanList = this.$parent.userPlanList.filter(item => {
-          if(val == String(item.userIsActive)) return true
-      });
     },
     userAllToSprint(){
       this.checkUser.forEach((item)=>{
@@ -157,9 +146,6 @@ export default {
             }
           });
           this.$parent.userPlanList = this.$data.userPlanList
-          console.log('------------------');
-          console.log(this.$data.userPlanList);
-          console.log('------------------');
         }
         this.$data.userPlanListLoading = false
       }

@@ -283,7 +283,7 @@ Remark:
         userId: this.$store.getters.getUserId,
         dialogWidth: '70%',
         activeTab: 'tab_basic_info',
-        PMTTaskDialogTitle: 'PMT Task Details',
+        PMTTaskDialogTitle: 'Backlog Details',
         PMTTaskDialogVisible: false,
         showAddWorklogBtn: true,
         disabledSaveBtn: false,
@@ -416,7 +416,7 @@ Remark:
       }
     },
     created () {
-      this.initTaskForm('PMT Task Details', 'tab_basic_info')
+      this.initTaskForm('Backlog Details', 'tab_basic_info')
     },
     mounted () {
     },
@@ -490,7 +490,7 @@ Remark:
       },
       createTask () {
         console.log('Create PMT task')
-        this.initTaskForm('New PMT Task', 'tab_basic_info')
+        this.initTaskForm('New Backlog', 'tab_basic_info')
         // Hide sub tasks and worklog histories tabs
         this.$nextTick(() => {
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
@@ -515,7 +515,7 @@ Remark:
       },
       createRefTask (iObj) {
         console.log('Create PMT Ref task ', iObj)
-        this.initTaskForm('New PMT Task', 'tab_basic_info')
+        this.initTaskForm('New Sprint Task', 'tab_basic_info')
         // Set new Task default value
         this.$data.PMTTask.taskCategory = 'PMT-TASK-REF'
         this.$data.PMTTask.taskType = iObj.taskType
@@ -558,7 +558,7 @@ Remark:
       },
       createSubTask (iObj) {
         console.log('Create PMT Sub task')
-        this.initTaskForm('New PMT Task', 'tab_basic_info')
+        this.initTaskForm('Add Sprint Task Subtask', 'tab_basic_info')
         // Set new Task default value
         this.$data.PMTTask.taskCategory = 'PMT-TASK-SUB'
         this.$data.PMTTask.taskParentTaskName = iObj.taskParentTaskName
@@ -601,7 +601,7 @@ Remark:
         if (res.data != null && res.data.status == 0) {
           this.$data.sprintRequiredSkills = res.data.data.taskRequiredSkills
         }
-        this.initTaskForm('PMT Task Details', 'tab_basic_info')
+        this.initTaskForm(this.action.openTitle || 'Backlog Details' , 'tab_basic_info')
         if (res.data != null && res.data.status == 0) {
           this.$nextTick(() => {
             this.setParentTaskTitleByName(res.data.data.taskParentTaskName)
@@ -680,7 +680,7 @@ Remark:
           this.getActiveUsersListBySprintId(res.data.data.taskSprintId)
         }
         // Apply for all category task
-        if (this.$data.sprintStatus == 'Running' || task.taskStatus == 'Running' || task.taskStatus == 'Done') {
+        if (task.taskStatus == 'Running' || task.taskStatus == 'Done') {
           this.$data.disabledState.disabledEstimation = true
         }
         if (task.taskTypeTag == 'Public Task') {
@@ -692,7 +692,7 @@ Remark:
       },
       closeTask (done) {
         console.log('Close PMT task')
-        this.initTaskForm('PMT Task Details', 'tab_basic_info')
+        this.initTaskForm('Backlog Details', 'tab_basic_info')
         this.$data.PMTTaskDialogVisible = false
         done()
       },
@@ -985,16 +985,17 @@ Remark:
             this.PMTTask.taskEstimation=20
           }
           if(this.action.action == 'CREATE-NEW'){
-            this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 20
+            this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 40
             if(type == 'subtract'){
-              this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 20
+              this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 40
             }
           }
         }else{
           if(this.action.action == 'CREATE-NEW'){
-            this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 20
             if(type == 'subtract'){
               this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 40
+            }else{
+              this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 40
             }
           }
         }
