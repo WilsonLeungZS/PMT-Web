@@ -984,14 +984,14 @@ Remark:
           if(type == 'subtract'){
             this.PMTTask.taskEstimation=20
           }
-          if(this.action.action == 'CREATE-NEW'){
+          if(this.action.action == 'CREATE-NEW' || this.PMTTaskDialogTitle == 'Backlog Details'){
             this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 40
             if(type == 'subtract'){
               this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 40
             }
           }
         }else{
-          if(this.action.action == 'CREATE-NEW'){
+          if(this.action.action == 'CREATE-NEW' || this.PMTTaskDialogTitle == 'Backlog Details'){
             if(type == 'subtract'){
               this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 40
             }else{
@@ -1005,9 +1005,8 @@ Remark:
             this.PMTTask.taskEstimation=0
         }
         if(val > 40){
-          if(this.action.action != 'CREATE-NEW'){
-              this.PMTTask.taskEstimation = 40
-          }
+          if(this.action.action == 'CREATE-NEW' || this.PMTTaskDialogTitle == 'Backlog Details') return
+          this.PMTTask.taskEstimation = 40
         }
         if(val < 0){
             this.PMTTask.taskEstimation=0
