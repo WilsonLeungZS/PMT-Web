@@ -107,25 +107,25 @@ export default {
   methods: {
     handleMenuCommand (command) {
       if (command === 'timesheet') {
-        this.$router.push({path: '/Timesheet'})
+        this.$router.push({name: 'MyTimesheet'})
         this.active = 2
       }
       else if (command === 'task') {
-        this.$router.push({path: '/Task'})
+        this.$router.push({name: 'TaskList'})
         this.active = 3
       }
       else if (command === 'management') {
-        this.$router.push({path: '/Management'})
+        this.$router.push({name: 'SptManagement'})
         this.active = 4
       }
       else if (command === 'others') {
-        this.$router.push({path: '/Others'})
+        this.$router.push({name: 'Charts'})
       }
       else if (command === 'sprint') {
-        this.$router.push({path: '/Sprint'})
+        this.$router.push({name: 'SprintView'})
         this.active = 1
       }else if (command === 'people') {
-        this.$router.push({path: '/People'})
+        this.$router.push({name: 'People'})
         this.active = 5
       }
     },
