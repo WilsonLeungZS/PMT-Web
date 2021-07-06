@@ -136,7 +136,7 @@ Remark:
             <el-row>
               <el-col :span="24" :lg="11">
                 <el-form-item v-show="showState.showStatus" label="Status">
-                  <el-select :disabled="disabledState.disabledStatus" v-model="PMTTask.taskStatus" style="width: 100%">
+                  <el-select :disabled="disabledState.disabledStatus" v-model="PMTTask.taskStatus" style="width: 100%" @change="taskStatusChange">
                     <el-option label="Drafting" value="Drafting"></el-option>
                     <el-option label="Planning" value="Planning"></el-option>
                     <el-option label="Running" value="Running"></el-option>
@@ -153,7 +153,7 @@ Remark:
             <el-row>
               <el-col :span="24" :lg="11">
                 <el-form-item v-show="showState.showTargetComplete" label="Target Complete">
-                  <el-date-picker :disabled="disabledState.disabledTargetComplete" v-model="PMTTask.taskTargetComplete" type="date" placeholder="Select Date..." value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
+                  <el-date-picker :disabled="disabledState.disabledEstimation" v-model="PMTTask.taskTargetComplete" type="date" placeholder="Select Date..." value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="24" :lg="{span: 12, offset: 1}">
@@ -423,6 +423,14 @@ Remark:
     updated () {
     },
     methods: {
+      taskStatusChange(val){
+        if(val == 'Running' || val == 'Done'){
+          if(this.PMTTask.taskTargetComplete == '' || this.PMTTask.taskEstimation == ''){
+            this.PMTTask.taskStatus = 'Drafting'
+            this.$message.error('To select the Running and Done state, you need to enter Target Complete and Estimate first, which has been initialized to Drafting')
+          }
+        }
+      },
       // Style method
       showPointer ({row, rowIndex}) {
         let pointerObj = {
@@ -496,11 +504,11 @@ Remark:
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[2].style.display = 'none' // Hide "Sub Tasks List" Tab
           this.$refs.PMTTaskDialogTabs.$children[0].$refs.tabs[3].style.display = 'none' // Hide "Worklog Histories" Tab
         })
-        // Set new Task default value
+        // Set new Backlog default value
         this.$data.PMTTask.taskCategory = 'PMT-TASK'
         this.$data.PMTTask.taskTypeTag = 'One-Off Task'
         this.$data.PMTTask.taskSprintIndicator = null
-        // Set new Task default state(show)
+        // Set new Backlog default state(show)
         this.$data.showState.showParent = false
         this.$data.showState.showParentTitle = false
         this.$data.showState.showDeliverableTag = false
@@ -516,7 +524,7 @@ Remark:
       createRefTask (iObj) {
         console.log('Create PMT Ref task ', iObj)
         this.initTaskForm('New Sprint Task', 'tab_basic_info')
-        // Set new Task default value
+        // Set new Backlog default value
         this.$data.PMTTask.taskCategory = 'PMT-TASK-REF'
         this.$data.PMTTask.taskType = iObj.taskType
         this.$data.PMTTask.taskTypeTag = iObj.taskTypeTag
@@ -539,10 +547,10 @@ Remark:
           this.$data.PMTTask.taskSprintIndicator = 'UNPLAN'
         }
         this.getActiveUsersListBySprintId(iObj.taskSprintId)
-        // Set new Task default state
+        // Set new Backlog default state
         this.$data.disabledState.disabledReferenceTask = true
         this.$data.disabledState.disabledSprint = true
-        // Set new Task default state(show)
+        // Set new Backlog default state(show)
         this.$data.showState.showParent = false
         this.$data.showState.showParentTitle = false
         if (iObj.taskTypeTag == 'Public Task') {
@@ -559,7 +567,7 @@ Remark:
       createSubTask (iObj) {
         console.log('Create PMT Sub task')
         this.initTaskForm('Add Sprint Task Subtask', 'tab_basic_info')
-        // Set new Task default value
+        // Set new Backlog default value
         this.$data.PMTTask.taskCategory = 'PMT-TASK-SUB'
         this.$data.PMTTask.taskParentTaskName = iObj.taskParentTaskName
         this.$data.PMTTaskParentTaskTitle = iObj.taskParentTaskTitle
@@ -634,7 +642,7 @@ Remark:
         if (taskCategory == 'PMT-TASK-REF') {
           this.$data.showState.showParent = false
           this.$data.showState.showParentTitle = false
-          // Set new Task default state
+          // Set new Backlog default state
           this.$data.disabledState.disabledRequiredSkills = true
           this.$data.disabledState.disabledReferenceTask = true
           if (this.$data.userLevel >8) {
@@ -984,14 +992,14 @@ Remark:
           if(type == 'subtract'){
             this.PMTTask.taskEstimation=20
           }
-          if(this.action.action == 'CREATE-NEW'){
+          if(this.action.action == 'CREATE-NEW' || this.PMTTaskDialogTitle == 'Backlog Details'){
             this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) + 40
             if(type == 'subtract'){
               this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 40
             }
           }
         }else{
-          if(this.action.action == 'CREATE-NEW'){
+          if(this.action.action == 'CREATE-NEW' || this.PMTTaskDialogTitle == 'Backlog Details'){
             if(type == 'subtract'){
               this.PMTTask.taskEstimation = Number(this.PMTTask.taskEstimation) - 40
             }else{
@@ -1005,9 +1013,8 @@ Remark:
             this.PMTTask.taskEstimation=0
         }
         if(val > 40){
-          if(this.action.action != 'CREATE-NEW'){
-              this.PMTTask.taskEstimation = 40
-          }
+          if(this.action.action == 'CREATE-NEW' || this.PMTTaskDialogTitle == 'Backlog Details') return
+          this.PMTTask.taskEstimation = 40
         }
         if(val < 0){
             this.PMTTask.taskEstimation=0

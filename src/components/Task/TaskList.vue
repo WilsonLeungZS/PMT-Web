@@ -23,7 +23,7 @@
           </el-col>
           <el-col :span="1" style="height: 100%">
             <div class="tl-bar-item">
-              <el-tooltip class="item" effect="dark" content="New Task" placement="top-start">
+              <el-tooltip class="item" effect="dark" content="new Backlog" placement="top-start">
                 <el-button size="mini" :disabled="isEx" @click="createNewTask(formFilter.filterTaskLevel)" :style="{'background-color': btnColor, 'color': 'white'}" icon="el-icon-plus" class="tl-bar-item-btn"></el-button>
               </el-tooltip>
             </div>
@@ -2612,7 +2612,7 @@ export default {
       }else if(Boolean(this.$data.showTaskPath) === true && Boolean(this.$data.showForLv1AndLv2) === false){
         iTaskLevel = 3
       }
-      console.log('Create new task: ' + iTaskLevel)
+      console.log('Create new Backlog: ' + iTaskLevel)
       this.$data.currentLevel = iTaskLevel
       if (Number(iTaskLevel) === 1) {
         if (this.$data.userLevel > 8 && this.userRole.indexOf('PMOs') == -1) {
