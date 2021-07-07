@@ -73,11 +73,15 @@
         </template>
       </el-table-column>
       <el-table-column label="Id" prop="customerId" v-if="false"></el-table-column>
-      <el-table-column label="Name" prop="customerName" align="left" min-width="50"></el-table-column>
-      <el-table-column label="Description" prop="customerDescription" align="left"></el-table-column>
+      <el-table-column label="Name" prop="customerName" align="left" min-width="30"></el-table-column>
+      <el-table-column label="Description" prop="customerDescription" align="left" min-width="260"></el-table-column>
+      <el-table-column label="Client Lead" prop="customerOnSiteClientLeadId" align="left">
+        <template slot-scope="scope">
+          <div>OnSite: {{roleClientLeadFormatter(scope.row)}}</div>
+          <div>OffSite: {{sprintLeadFormatter(scope.row)}}</div>
+        </template>
+      </el-table-column>
       <el-table-column label="Email Domain" prop="customerEmailDomain" align="left"></el-table-column>
-      <el-table-column label="OnSite Client Lead" prop="customerOnSiteClientLeadId" align="left" :formatter="roleClientLeadFormatter"></el-table-column>
-      <el-table-column label="OffSite Client Lead" prop="customerOffSiteClientLeadId" align="left" :formatter="sprintLeadFormatter"></el-table-column>
       <el-table-column label="Home Page" prop="customerHomepage" align="left">
         <template slot-scope="scope">
           <a :href="scope.row.customerHomepage" target="_blank">{{scope.row.customerHomepage}}</a>
