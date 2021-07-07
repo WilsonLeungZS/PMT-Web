@@ -74,11 +74,11 @@
       </el-table-column>
       <el-table-column label="Id" prop="customerId" v-if="false"></el-table-column>
       <el-table-column label="Name" prop="customerName" align="left" min-width="30"></el-table-column>
-      <el-table-column label="Description" prop="customerDescription" align="left" min-width="260"></el-table-column>
+      <el-table-column label="Description" prop="customerDescription" align="left" min-width="240"></el-table-column>
       <el-table-column label="Client Lead" prop="customerOnSiteClientLeadId" align="left">
         <template slot-scope="scope">
-          <div>OnSite: {{roleClientLeadFormatter(scope.row)}}</div>
-          <div>OffSite: {{sprintLeadFormatter(scope.row)}}</div>
+          <div v-if="roleClientLeadFormatter(scope.row) != null">On: {{roleClientLeadFormatter(scope.row)}}</div>
+          <div v-if="sprintLeadFormatter(scope.row) != null">Off: {{sprintLeadFormatter(scope.row)}}</div>
         </template>
       </el-table-column>
       <el-table-column label="Email Domain" prop="customerEmailDomain" align="left"></el-table-column>
