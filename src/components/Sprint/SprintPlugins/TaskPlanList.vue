@@ -22,7 +22,7 @@
           </el-col>
           <el-col :span="12" :lg="4" style="margin: 5px 0">
             <el-tooltip class="item" effect="dark" content="Only allow level < 10 user can create new backlog" placement="top">
-              <el-button @click="createTask" :disabled="userLevel>10" type="success" icon="el-icon-plus" size="small" style="width: 100%">new Backlog</el-button>
+              <el-button @click="createTask" :disabled="userLevel>10" type="success" size="small" style="width: 100%">new Backlog</el-button>
             </el-tooltip>
           </el-col>
         </el-row>

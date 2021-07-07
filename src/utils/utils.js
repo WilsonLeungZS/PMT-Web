@@ -45,7 +45,7 @@ const themeStyle = [
 const headersArray = [
   {headerName: 'Sprint',   headerIcon: 'el-icon-data-line',       headerPath: 'SptManagement', headerDivider: true },
   // {headerName: 'User',     headerIcon: 'el-icon-user',            headerPath: 'PrjManagement', headerDivider: true },
-  {headerName: 'Customer', headerIcon: 'el-icon-office-building', headerPath: 'CtmManagement', headerDivider: true },
+  // {headerName: 'Customer', headerIcon: 'el-icon-office-building', headerPath: 'CtmManagement', headerDivider: true },
   {headerName: 'Timeline', headerIcon: 'el-icon-time',            headerPath: 'TmlManagement', headerDivider: true },     
   {headerName: 'Report',   headerIcon: 'el-icon-monitor',         headerPath: 'RptManagement', headerDivider: false}
 ]

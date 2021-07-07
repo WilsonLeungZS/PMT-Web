@@ -4,7 +4,7 @@
     <div slot="header" class="clearfix">
       <span class="pm-content-header">
         <span>Users List</span>
-        <el-button @click="createUser" class="pm-content-header-btn" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini">Create New User</el-button>
+        <el-button @click="createUser" class="pm-content-header-btn" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="mini">Create New User</el-button>
       </span>
     </div>
     <el-table v-loading="userLoading" :data="userData" fit>

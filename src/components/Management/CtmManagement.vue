@@ -2,7 +2,7 @@
   <div class="cm-body">
     <el-container>
       <el-main>
-        <el-row>
+        <!-- <el-row>
           <el-col :span="24" class="content-title-col">
             <div v-for="(header, index) in headersArray" :key="index" class="content-title-item" @click="switchTo(header.headerPath)">
               <span :class="{'active': header.headerName == 'Customer'? true: false}">
@@ -12,7 +12,7 @@
               <el-divider v-if="header.headerDivider" direction="vertical"></el-divider>
             </div>
           </el-col>
-        </el-row>
+        </el-row> -->
         <el-row>
           <el-col :span="24">
             <customers-list></customers-list>

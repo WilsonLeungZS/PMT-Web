@@ -109,7 +109,7 @@ export default new Router({
           name: 'CtmManagement',
           component: CtmManagement,
           meta: {
-            needAdmin: true,
+            needAdmin: false,
             needLogin: true
           }
         },

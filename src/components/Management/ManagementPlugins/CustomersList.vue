@@ -4,11 +4,11 @@
     <div slot="header" class="clearfix">
       <span class="cm-content-header">
         <span>Customers List</span>
-        <el-button @click="createCustomer" class="cm-content-header-btn" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" icon="el-icon-plus" size="mini">Create New Customer</el-button>
+        <el-button @click="createCustomer" v-if="$store.state.userRole.indexOf('PMOs') != -1" class="cm-content-header-btn" :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" size="mini">Create New Customer</el-button>
       </span>
     </div>
     <el-table v-loading="customerLoading" :data="customerData" fit>
-      <el-table-column type="expand">
+      <el-table-column type="expand" v-if="$store.state.userRole.indexOf('PMOs') != -1">
         <template slot-scope="props">
           <el-row :gutter="15">
             <el-col :span="4" :lg="3" class="cm-table-expand-label">
@@ -177,7 +177,7 @@ export default {
       if (res.data.status === 0) {
         this.getCustomerList()
         this.checkClientLead(customer.customerOnSiteClientLeadId,customer.customerOffSiteClientLeadId)
-        this.showMessage('Add/Update customer successfully!', 'success')
+        this.showMessage('Add/Update customer sucexChangesfully!', 'sucexChanges')
       } else {
         this.$message.error('Add/Update customer Failed!')
       }

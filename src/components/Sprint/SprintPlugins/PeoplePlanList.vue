@@ -10,7 +10,7 @@
           <el-table-column v-if="false" prop="userId" label="Id"></el-table-column>
           <el-table-column prop="userFullName" label="Name" align="left" width="150" sortable></el-table-column>
           <el-table-column prop="userSkillsStr" label="Skills" align="left" min-width="100" show-overflow-tooltip sortable></el-table-column>
-          <el-table-column prop="userIsActive" label="type" align="left" min-width="100" :filters="activeFilter" :filter-method="activefilterHandler">
+          <el-table-column prop="userIsActive" label="type" align="left" min-width="60" :filters="activeFilter" :filter-method="activefilterHandler">
             <template slot-scope="scope">
               {{scope.row.userIsActive ? 'T&M': scope.row.userIsActive !=='' ?'MS':'machine'}}
             </template>
