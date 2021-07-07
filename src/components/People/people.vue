@@ -17,7 +17,6 @@
               :style="{
                 'background-color': btnColor,
               }"
-              icon="el-icon-plus"
               size="mini"
               @click="openSkill()"
               >Create New Skill</el-button
@@ -55,7 +54,6 @@
               :style="{
                 'background-color': btnColor,
               }"
-              icon="el-icon-plus"
               size="mini"
               @click="openRole()"
               >Create New Role</el-button

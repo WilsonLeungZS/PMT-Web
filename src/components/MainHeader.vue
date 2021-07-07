@@ -10,6 +10,7 @@
               <el-button v-if="false" @click="handleMenuCommand('task')" class="main-menu-btn" :class="{'active': active == 3}" icon="el-icon-tickets">Tasks</el-button>
               <el-button @click="handleMenuCommand('management')" class="main-menu-btn" :class="{'active': active == 4}" icon="el-icon-setting">Management</el-button>
               <el-button @click="handleMenuCommand('people')" class="main-menu-btn" :class="{'active': active == 5}" icon="el-icon-user-solid">People</el-button>
+              <el-button @click="handleMenuCommand('customer')" class="main-menu-btn" :class="{'active': active == 6}" icon="el-icon-office-building">Customer</el-button>
             </div>
           </el-col>
           <el-col :span="12" :lg="8">
@@ -127,6 +128,9 @@ export default {
       }else if (command === 'people') {
         this.$router.push({name: 'People'})
         this.active = 5
+      }else if (command === 'customer') {
+        this.$router.push({name: 'CtmManagement'})
+        this.active = 6
       }
     },
     setCurrent (row) {
