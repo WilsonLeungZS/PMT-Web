@@ -424,11 +424,17 @@ Remark:
     },
     methods: {
       taskStatusChange(val){
-        if(val == 'Running' || val == 'Done'){
-          if(this.PMTTask.taskTargetComplete == '' || this.PMTTask.taskEstimation == ''){
-            this.PMTTask.taskStatus = 'Drafting'
-            this.$message.error('To select the Running and Done state, you need to enter Target Complete and Estimate first, which has been initialized to Drafting')
-          }
+        if(val == 'Running' && !this.PMTTask.taskTargetComplete){
+          let sprint  = null 
+           this.sprintsList.forEach(item =>{
+              sprint = item.Options.filter(sub =>{
+                return sub.sprintId == this.PMTTask.taskSprintId
+             })
+           })
+           this.PMTTask.taskTargetComplete = sprint[0].sprintEndTime
+        }
+        if(val == 'Done' && !this.PMTTask.taskActualComplete){
+          this.PMTTask.taskActualComplete = new Date()
         }
       },
       // Style method
@@ -707,6 +713,12 @@ Remark:
       async saveTask () {
         console.log('Save PMT task')
         var reqTask = this.$data.PMTTask
+        if(reqTask.taskStatus == 'Running' || reqTask.taskStatus == 'Done'){
+          if(!reqTask.taskTargetComplete || !reqTask.taskEstimation){
+            this.$message.error('To select the Running and Done state, you need to enter Target Complete and Estimate first.')
+            return
+          }
+        }
         if (reqTask.taskTitle == null || reqTask.taskTitle == '') {
           this.$message({message: 'Task title cannnot be empty!', type: 'error'})
           return
