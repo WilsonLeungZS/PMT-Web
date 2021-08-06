@@ -153,12 +153,12 @@ Remark:
             <el-row>
               <el-col :span="24" :lg="11">
                 <el-form-item v-show="showState.showTargetComplete" label="Target Complete">
-                  <el-date-picker :disabled="disabledState.disabledEstimation" v-model="PMTTask.taskTargetComplete" type="date" placeholder="Select Date..." value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
+                  <el-date-picker :disabled="disabledState.disabledEstimation" v-model="PMTTask.taskTargetComplete" type="date" placeholder="Select Date..." value-format="yyyy-MM-dd" style="width: 100%" @change="taskTargetCompleteChange"></el-date-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="24" :lg="{span: 12, offset: 1}">
                 <el-form-item v-show="showState.showActualComplete" label="Actual Complete">
-                  <el-date-picker :disabled="disabledState.disabledActualComplete" v-model="PMTTask.taskActualComplete" type="date" placeholder="Select Date..." value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
+                  <el-date-picker :disabled="disabledState.disabledActualComplete" v-model="PMTTask.taskActualComplete" type="date" placeholder="Select Date..." value-format="yyyy-MM-dd" style="width: 100%" @change="taskActualCompleteChange"></el-date-picker>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -175,7 +175,7 @@ Remark:
                 </el-form-item>
               </el-col>
               <el-col :span="24" :lg="{span: 12, offset: 1}">
-                <el-form-item v-show="showState.showAssignee" label="Assign To">
+                <el-form-item v-show="showState.showAssignee" label="Owner To">
                   <el-select :disabled="disabledState.disabledAssignee" v-model="PMTTask.taskAssigneeId" filterable style="width: 100%">
                     <el-option label=" " value=""></el-option>
                     <el-option v-for="(user, index) in usersList" :key="index" :label="user.userFullName" :value="user.userId">
@@ -231,7 +231,7 @@ Remark:
                           <el-tag effect="dark" type="info"    size="mini" v-if="scope.row.subtaskStatus == 'Done'"    >{{scope.row.subtaskStatus}}</el-tag>
                         </template>
                       </el-table-column>
-                      <el-table-column width="120" align="center" prop="subtaskAssignee" label="Assign To" sortable key="4"></el-table-column>
+                      <el-table-column width="120" align="center" prop="subtaskAssignee" label="Owner To" sortable key="4"></el-table-column>
                       <!--<el-table-column width="30" align="center" fixed="right">
                         <template slot-scope="scope">
                           <el-row>
@@ -423,18 +423,66 @@ Remark:
     updated () {
     },
     methods: {
+      taskActualCompleteChange(val){
+        let sprint = null 
+        this.sprintsList.forEach(item =>{
+          sprint = item.Options.filter(sub =>{
+            return sub.sprintId == this.PMTTask.taskSprintId
+          })
+        })
+        let curDate = new Date(val).getTime();
+        let startDate  = new Date(sprint[0].sprintStartTime).getTime();
+        let endDate = new Date(sprint[0].sprintEndTime).getTime();
+        if (curDate < startDate || curDate > endDate) {
+           this.PMTTask.taskActualComplete = '';
+           this.$message.error('Actual complete should be within sprint timeline for sprint tasks.')
+        }
+      },
+      taskTargetCompleteChange(val){
+        if(this.PMTTaskDialogTitle == 'Backlog Details'){
+          return;
+        }
+        let sprint = null 
+        this.sprintsList.forEach(item =>{
+          sprint = item.Options.filter(sub =>{
+            return sub.sprintId == this.PMTTask.taskSprintId
+          })
+        })
+        let curDate = new Date(val).getTime();
+        let startDate  = new Date(sprint[0].sprintStartTime).getTime();
+        let endDate = new Date(sprint[0].sprintEndTime).getTime();
+        if (curDate < startDate || curDate > endDate) {
+           this.PMTTask.taskTargetComplete = '';
+           this.$message.error('Target complete should be within sprint timeline for sprint tasks .')
+        }
+      },
       taskStatusChange(val){
+        if(val == 'Planning' && !this.PMTTask.taskTargetComplete){
+           this.$message.error('We should input target complete time before planning stage.')
+           this.PMTTask.taskStatus = 'Drafting'
+           return;
+        }
+        if(val == 'Running' && !this.PMTTask.taskAssigneeId){
+           this.$message.error('Tasks owner should be inputted.')
+           this.PMTTask.taskStatus = 'Drafting'
+           return;
+        }
+        if(val == 'Running' && !this.PMTTask.taskEstimation){
+           this.$message.error('Estimation should be inputted and over 0.')
+           this.PMTTask.taskStatus = 'Drafting'
+           return;
+        }
+        let sprint = null 
+        this.sprintsList.forEach(item =>{
+          sprint = item.Options.filter(sub =>{
+            return sub.sprintId == this.PMTTask.taskSprintId
+          })
+        })
         if(val == 'Running' && !this.PMTTask.taskTargetComplete){
-          let sprint  = null 
-           this.sprintsList.forEach(item =>{
-              sprint = item.Options.filter(sub =>{
-                return sub.sprintId == this.PMTTask.taskSprintId
-             })
-           })
            this.PMTTask.taskTargetComplete = sprint[0].sprintEndTime
         }
         if(val == 'Done' && !this.PMTTask.taskActualComplete){
-          this.PMTTask.taskActualComplete = new Date()
+          this.PMTTask.taskActualComplete = sprint[0].sprintEndTime
         }
       },
       // Style method
