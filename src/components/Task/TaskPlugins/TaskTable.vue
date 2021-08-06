@@ -117,6 +117,10 @@
         }
       },
       addWorklog (iTask) {
+        if(iTask.taskStatus == "Drafting"){
+          this.$message.error('Current sprint tasks status is drafting')
+          return;
+        }
         var userId = this.taskTableObj.taskTableUserId
         var taskId = iTask.taskId
         var taskName = iTask.taskName
