@@ -663,7 +663,7 @@ Remark:
         if (res.data != null && res.data.status == 0) {
           this.$data.sprintRequiredSkills = res.data.data.taskRequiredSkills
         }
-        this.initTaskForm(this.action.openTitle || 'Backlog Details' , 'tab_basic_info')
+        this.initTaskForm(this.action.openTitle || 'Sprint Tasks i/o Backlog' , 'tab_basic_info')
         if (res.data != null && res.data.status == 0) {
           this.$nextTick(() => {
             this.setParentTaskTitleByName(res.data.data.taskParentTaskName)
@@ -761,6 +761,15 @@ Remark:
       async saveTask () {
         console.log('Save PMT task')
         var reqTask = this.$data.PMTTask
+        if(this.disabledState.disabledEstimation && !this.PMTTask.taskTargetComplete){
+          let sprint = null 
+          this.sprintsList.forEach(item =>{
+            sprint = item.Options.filter(sub =>{
+              return sub.sprintId == this.PMTTask.taskSprintId
+            })
+          })
+          this.PMTTask.taskTargetComplete = sprint[0].sprintEndTime
+        }
         if(reqTask.taskStatus == 'Running' || reqTask.taskStatus == 'Done'){
           if(!reqTask.taskTargetComplete || !reqTask.taskEstimation){
             this.$message.error('To select the Running and Done state, you need to enter Target Complete and Estimate first.')
