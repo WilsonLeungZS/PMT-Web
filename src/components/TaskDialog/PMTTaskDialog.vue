@@ -244,6 +244,16 @@ Remark:
               </el-col>
             </el-row>
           </el-tab-pane>
+          <!-- History of the sprint Tab -->
+          <el-tab-pane label="History sprint" name="tab_hubtasks_sprint">
+            <el-collapse v-if="hubtasksSprintList.length > 0">
+              <el-collapse-item v-for="(item,index) in hubtasksSprintList" :key="index"  :title="`${item[0].sprint.timeline.StartTime} ~ ${item[0].sprint.timeline.EndTime}`" :name="index" >
+                <div v-for="(sub,subidx) in item" :key="subidx">
+                  {{sub.Title}}
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </el-tab-pane>
           <!-- Worklog Histories Tab -->
           <el-tab-pane label="Worklog Histories" name="tab_worklog_histories">
               <el-card class="box-card pmt-task-dialog-history-tab">
@@ -379,7 +389,8 @@ Remark:
         sprintStatus: '',
         sprintRequiredSkills: '',
         worklogAction: null,
-        customersList: []
+        customersList: [],
+        hubtasksSprintList:[]
       }
     },
     components: {
@@ -500,6 +511,9 @@ Remark:
         }
         if (tab.name == 'tab_worklog_histories') {
           this.setWorklogHistoriesById(this.$data.PMTTask.taskId)
+        }
+        if(tab.name == 'tab_hubtasks_sprint'){
+          this.getTaskListByReferenceTask(this.PMTTask.taskName.split('-')[0])
         }
       },
       // Functional Methods
@@ -922,6 +936,15 @@ Remark:
         const res = await http.get('/sprints/getAllCustomersList')
         if (res.data.status === 0) {
           this.$data.customersList = res.data.data
+        }
+      },
+      async getTaskListByReferenceTask (referenceTask) {
+        const res = await http.get(`/tasks/getTaskListByReferenceTask?referenceTask=${referenceTask}`)
+        if (res.data != null && res.data.status === 0) {
+          this.hubtasksSprintList = res.data.data
+          console.log(this.hubtasksSprintList);
+        } else {
+          this.$data.hubtasksSprintList = []
         }
       },
       async setParentTaskTitleByName (iTaskName) {
