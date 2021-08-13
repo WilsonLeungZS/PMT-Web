@@ -677,7 +677,7 @@ Remark:
         if (res.data != null && res.data.status == 0) {
           this.$data.sprintRequiredSkills = res.data.data.taskRequiredSkills
         }
-        this.initTaskForm(this.action.openTitle || 'Sprint Tasks i/o Backlog' , 'tab_basic_info')
+        this.initTaskForm(this.action.openTitle || 'Backlog Task Details' , 'tab_basic_info')
         if (res.data != null && res.data.status == 0) {
           this.$nextTick(() => {
             this.setParentTaskTitleByName(res.data.data.taskParentTaskName)

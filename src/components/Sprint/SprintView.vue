@@ -286,7 +286,7 @@ Remark:
                                 {{sprintTask.taskCustomer}}
                               </el-col>
                               <el-col :span="5" :lg="3">
-                                <el-button @click.stop="editTask(sprintTask.taskId, sprintTask.taskCategory)" type="text">{{sprintTask.taskName}}</el-button>
+                                <el-button @click.stop="editTask(sprintTask.taskId, sprintTask.taskCategory,'Sprint Task Details')" type="text">{{sprintTask.taskName}}</el-button>
                               </el-col>
                               <el-col :span="19" :lg="10">
                                 <el-tooltip class="item" effect="dark" :content="sprintTask.taskTitle" placement="top-start">
@@ -395,7 +395,7 @@ Remark:
                           <template slot="title">
                             <el-row class="sprint-card-content-task" align="middle">
                               <el-col :span="5" :lg="3">
-                                <el-button @click.stop="editTask(sprintTask.taskId, sprintTask.taskCategory)" type="text">{{sprintTask.taskName}}</el-button>
+                                <el-button @click.stop="editTask(sprintTask.taskId, sprintTask.taskCategory,'Sprint Task Details')" type="text">{{sprintTask.taskName}}</el-button>
                               </el-col>
                               <el-col :span="19" :lg="10">
                                 <el-tooltip class="item" effect="dark" :content="sprintTask.taskTitle" placement="top-start">
