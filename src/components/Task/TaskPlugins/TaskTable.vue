@@ -112,7 +112,8 @@
             action: 'EDIT',
             taskId: iTask.taskId,
             sprintStatus: iTask.taskSprintStatus,
-            datetime: new Date()
+            datetime: new Date(),
+            openTitle:'Sprint Task Details',
           }
         }
       },
