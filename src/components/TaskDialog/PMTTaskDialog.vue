@@ -244,16 +244,6 @@ Remark:
               </el-col>
             </el-row>
           </el-tab-pane>
-          <!-- History of the sprint Tab -->
-          <el-tab-pane label="History sprint" name="tab_hubtasks_sprint">
-            <el-collapse v-if="hubtasksSprintList.length > 0">
-              <el-collapse-item v-for="(item,index) in hubtasksSprintList" :key="index"  :title="`${item[0].sprint.timeline.StartTime} ~ ${item[0].sprint.timeline.EndTime}`" :name="index" >
-                <div v-for="(sub,subidx) in item" :key="subidx">
-                  {{sub.Title}}
-                </div>
-              </el-collapse-item>
-            </el-collapse>
-          </el-tab-pane>
           <!-- Worklog Histories Tab -->
           <el-tab-pane label="Worklog Histories" name="tab_worklog_histories">
               <el-card class="box-card pmt-task-dialog-history-tab">
@@ -264,7 +254,17 @@ Remark:
                   </el-timeline-item>
                 </el-timeline>
               </el-card>
-            </el-tab-pane>
+          </el-tab-pane>
+          <!-- sprint Tab -->
+          <el-tab-pane label="Sprint" name="tab_sprint" v-if="this.PMTTaskDialogTitle == 'Backlog Details'">
+            <el-collapse v-if="sprintList.length > 0">
+              <el-collapse-item v-for="(item,index) in sprintList" :key="index"  :title="item[0].sprintName" :name="index" >
+                <div v-for="(sub,subidx) in item" :key="subidx">
+                  {{`${sub.Name} ( ${sub.Effort} / ${sub.Estimation} hrs )`}}
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </el-tab-pane>
         </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -390,7 +390,7 @@ Remark:
         sprintRequiredSkills: '',
         worklogAction: null,
         customersList: [],
-        hubtasksSprintList:[]
+        sprintList:[]
       }
     },
     components: {
@@ -512,7 +512,7 @@ Remark:
         if (tab.name == 'tab_worklog_histories') {
           this.setWorklogHistoriesById(this.$data.PMTTask.taskId)
         }
-        if(tab.name == 'tab_hubtasks_sprint'){
+        if(tab.name == 'tab_sprint'){
           this.getTaskListByReferenceTask(this.PMTTask.taskName.split('-')[0])
         }
       },
@@ -677,7 +677,7 @@ Remark:
         if (res.data != null && res.data.status == 0) {
           this.$data.sprintRequiredSkills = res.data.data.taskRequiredSkills
         }
-        this.initTaskForm(this.action.openTitle || 'Backlog Task Details' , 'tab_basic_info')
+        this.initTaskForm(this.action.openTitle || 'Backlog Details' , 'tab_basic_info')
         if (res.data != null && res.data.status == 0) {
           this.$nextTick(() => {
             this.setParentTaskTitleByName(res.data.data.taskParentTaskName)
@@ -941,10 +941,20 @@ Remark:
       async getTaskListByReferenceTask (referenceTask) {
         const res = await http.get(`/tasks/getTaskListByReferenceTask?referenceTask=${referenceTask}`)
         if (res.data != null && res.data.status === 0) {
-          this.hubtasksSprintList = res.data.data
-          console.log(this.hubtasksSprintList);
+          this.sprintList = res.data.data.map((item,index)=>{
+            let sumEffort = 0;
+            let sumEstimation = 0;
+            item.forEach((item,index)=>{
+              sumEffort += item.Effort;
+              sumEstimation += item.Estimation;
+            })
+            item[0]['sprintName'] = `${item[0].sprint.timeline.StartTime} ~ ${item[0].sprint.timeline.EndTime} ( Effort/Estimation: ${sumEffort} / ${sumEstimation} hrs)`
+            return item
+          })
+          console.log(this.sprintList);
+          
         } else {
-          this.$data.hubtasksSprintList = []
+          this.$data.sprintList = []
         }
       },
       async setParentTaskTitleByName (iTaskName) {

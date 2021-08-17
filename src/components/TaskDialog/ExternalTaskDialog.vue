@@ -6,7 +6,7 @@ Remark:
 <template>
   <el-dialog :before-close="closeTask" :visible.sync="externalTaskDialogVisible" :title="externalTaskDialogTitle" :width="dialogWidth" top="5%" :close-on-click-modal="false" class="external-task-dialog">
     <el-form :model="externalTask" ref="form" label-width="140px" label-position="left" class="external-task-dialog-form">
-      <el-tabs v-model="activeTab" ref="externalTaskDialogTabs" type="card">
+      <el-tabs v-model="activeTab" @tab-click="changeTab" ref="externalTaskDialogTabs" type="card">
         <!-- Basic Information Tab -->
         <el-tab-pane label="Basic Information" name="tab_basic_info">
           <el-row>
@@ -72,6 +72,16 @@ Remark:
             </el-col>
           </el-row>
         </el-tab-pane>
+        <!-- sprint Tab -->
+        <el-tab-pane label="Sprint" name="tab_sprint" v-if="this.externalTaskDialogTitle == 'External Task Details'">
+          <el-collapse v-if="sprintList.length > 0">
+            <el-collapse-item v-for="(item,index) in sprintList" :key="index"  :title="item[0].sprintName" :name="index" >
+              <div v-for="(sub,subidx) in item" :key="subidx">
+                {{`${sub.Name} ( ${sub.Effort} / ${sub.Estimation} hrs )`}}
+              </div>
+            </el-collapse-item>
+          </el-collapse>
+        </el-tab-pane>
       </el-tabs>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -106,7 +116,8 @@ Remark:
           taskEstimation: 0,
           taskRequiredSkills: []
         },
-        skillsList: []
+        skillsList: [],
+        sprintList: []
       }
     },
     props: {
@@ -136,6 +147,33 @@ Remark:
     updated () {
     },
     methods: {
+      changeTab (tab) {
+        if (tab.name == 'tab_basic_info') {
+          this.editTask(this.action.taskId)
+        }
+        if(tab.name == 'tab_sprint'){
+          this.getTaskListByReferenceTask(this.externalTask.taskName.split('-')[0])
+        }
+      },
+      async getTaskListByReferenceTask (referenceTask) {
+        const res = await http.get(`/tasks/getTaskListByReferenceTask?referenceTask=${referenceTask}`)
+        if (res.data != null && res.data.status === 0) {
+          this.sprintList = res.data.data.map((item,index)=>{
+            let sumEffort = 0;
+            let sumEstimation = 0;
+            item.forEach((item,index)=>{
+              sumEffort += item.Effort;
+              sumEstimation += item.Estimation;
+            })
+            item[0]['sprintName'] = `${item[0].sprint.timeline.StartTime} ~ ${item[0].sprint.timeline.EndTime} ( Effort/Estimation: ${sumEffort} / ${sumEstimation} hrs)`
+            return item
+          })
+          console.log(this.sprintList);
+          
+        } else {
+          this.$data.sprintList = []
+        }
+      },
       // Style method
       showPointer ({row, rowIndex}) {
         let pointerObj = {
