@@ -201,6 +201,10 @@ export default {
       this.$emit('createTask')
     },
     createRefTask (iTaskObj) {
+      if(iTaskObj.taskStatus == "Drafting" || iTaskObj.taskStatus == "Done"){
+        this.$message.error('The backlog task status cannot be Drafting and Done')
+        return
+      }
       this.$emit('createRefTask', iTaskObj)
     },
     editTask (iTaskId, iTaskCategory) {
