@@ -9,7 +9,7 @@
         <span class="login-content-errormsg" v-show="showErrorMsg">{{errorMsg}}</span>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onLogin" style="width: 300px">Login</el-button>
+        <el-button type="primary" @click="onLogin" style="width: 300px" aria-label="登录" role="button">Login</el-button>
       </el-form-item>
     </el-form>
   </div>
