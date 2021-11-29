@@ -11,6 +11,7 @@
               <el-button @click="handleMenuCommand('management')" class="main-menu-btn" :class="{'active': active == 4}" icon="el-icon-setting">Management</el-button>
               <el-button @click="handleMenuCommand('people')" class="main-menu-btn" :class="{'active': active == 5}" icon="el-icon-user-solid">People</el-button>
               <el-button @click="handleMenuCommand('customer')" class="main-menu-btn" :class="{'active': active == 6}" icon="el-icon-office-building">Customers</el-button>
+              <el-button @click="handleMenuCommand('report')" class="main-menu-btn" :class="{'active': active == 7}" icon="el-icon-tickets">Report</el-button>
             </div>
           </el-col>
           <el-col :span="12" :lg="8">
@@ -79,6 +80,33 @@
         <el-button :style="{'background-color': btnColor, 'border': 'none', 'color': 'white'}" @click="submitTheme">Submit</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="Report Download" :visible.sync="reportDialogVisible" :width="reportType.width" custom-class="report-transition">
+      <span>
+        <div>Name: </div>
+        <el-select v-model="reportType.value" @change="reportChange" placeholder="Select">
+          <el-option
+            v-for="item in report"
+            :key="item.value"
+            :label="item.value"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+        <div class="report-date">Date: </div>
+        <el-date-picker
+          v-model="reportType.date"
+          :key="reportType.value"
+          :type="reportType.type"
+          range-separator="To"
+          start-placeholder="Start date"
+          end-placeholder="End date"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      </span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="reportDownload">Download</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -87,6 +115,7 @@
 import {mapState, mapMutations, mapActions, mapGetters} from 'vuex'
 import http from '../utils/http'
 import utils from '../utils/utils'
+import xlsx from 'xlsx'
 export default {
   name: 'Main',
   data () {
@@ -94,6 +123,7 @@ export default {
     return {
       logo: 'Project Management Timesheet',
       centerDialogVisible: false,
+      reportDialogVisible: false,
       themeData: utils.themeStyle,
       currentRow: null,
       mainColor: utils.themeStyle[this.$store.getters.getThemeStyle].mainColor,
@@ -102,10 +132,67 @@ export default {
         userSkills: [],
         userEmailGroups: []
       },
-      active:null
+      active:null,
+      report:[
+        {
+          value: 'Daily scrum status',
+        }, {
+          value: 'Worklog - performance',
+        }, {
+          value: 'Task list',
+        }, {
+          value: 'Worklog - timesheet',
+        }
+      ],
+      reportType:{
+        value:"",
+        type:"daterange",
+        width:"380px",
+        date:[]
+      },
     }
   },
   methods: {
+    async reportDownload(){
+      console.log(this.reportType.date)
+      console.log(this.reportType.value)
+      if(this.reportType.date.length <= 0 || !this.reportType.value){
+        this.$message.error('Name or date cannot be empty')
+        return
+      }
+      let data = JSON.parse(JSON.stringify(this.reportType))
+      let dateTime = null;
+      if(this.reportType.value == "Worklog - performance" || this.reportType.value == 'Worklog - timesheet'){
+        data.date = this.reportType.date.substring(0,7);
+        dateTime = data.date
+      }else{
+        dateTime = this.reportType.date[0] + '~' + this.reportType.date[1]
+      }
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
+      const res = await http.post('/getReport', data)
+      loading.close();
+      const ws= XLSX.utils.json_to_sheet(res.data);
+      /* generate workbook and add the worksheet */
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, dateTime);
+      /* save to file */
+      XLSX.writeFile(wb, `${this.reportType.value + dateTime}.xlsx`);
+    },
+    reportChange(val){
+      this.reportType.type = 'daterange';
+      this.reportType.date = [];
+      this.reportType.width = '380px';
+      if(val == "Worklog - performance" || val == 'Worklog - timesheet'){
+        this.reportType.type = 'month';
+        this.reportType.date = "";
+        this.reportType.width = '260px';
+      }
+    },
     handleMenuCommand (command) {
       if (command === 'timesheet') {
         this.$router.push({name: 'MyTimesheet'})
@@ -131,6 +218,9 @@ export default {
       }else if (command === 'customer') {
         this.$router.push({name: 'CtmManagement'})
         this.active = 6
+      }else if (command === 'report') {
+        this.active = 7
+        this.reportDialogVisible = !this.reportDialogVisible
       }
     },
     setCurrent (row) {
@@ -325,5 +415,13 @@ export default {
 }
 .highlight-info {
   text-decoration: underline ;
+}
+.report-date{
+  margin-top: 10px;
+}
+</style>
+<style>
+.report-transition{
+  transition: width 0.5s ease 0s;
 }
 </style>
