@@ -143,6 +143,11 @@ Remark:
                   </el-col>
                 </el-row>
                 <div class="selectBox">
+                  <el-select v-model="sprintTypeActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
+                    <el-option label="Development(Change, Problem)" value="Development"></el-option>
+                    <el-option label="Maintenance(Incident)" value="Maintenance"></el-option>
+                    <el-option label="Others(Service Request, ITSR, Others)" value="Others"></el-option>
+                  </el-select>
                   <el-select v-model="sprintCustomersActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
                     <el-option v-for="(customer, index) in sprintCustomersList" :key="index" :label="customer" :value="customer"></el-option>
                   </el-select>
@@ -156,7 +161,7 @@ Remark:
                     <el-option key="Done" value="Done"></el-option>
                   </el-select>
                   <el-select v-model="sprintMenberActive" multiple collapse-tags placeholder="Menber..." size="small" @change="customerChange">
-                    <el-option v-for="(customer, index) in plannedPeopleList" :key="index" :label="customer.sprintUserNickname" :value="customer.sprintUserNickname"></el-option>
+                    <el-option v-for="(customer, index) in plannedPeopleList" :key="index" :label="customer.sprintUserNickname" :value="customer.sprintUserId"></el-option>
                   </el-select>
                   <el-button icon="el-icon-close" circle size="small" @click="clearSelect"></el-button>
                 </div>
@@ -531,6 +536,7 @@ export default {
       sprintBaseline: '',
       sprintRequiredSkillsStr: '',
       sprintCustomersList: [],
+      sprintTypeActive:[],
       sprintCustomersActive:[],
       sprintTaskActive:[],
       sprintStatusActive:[],
@@ -613,6 +619,7 @@ export default {
   },
   methods: {
     clearSelect(){
+      this.sprintTypeActive = [];
       this.sprintCustomersActive = [];
       this.sprintTaskActive = [];
       this.sprintStatusActive = [];
@@ -632,6 +639,9 @@ export default {
       }
       this[activeList] = this.$parent.tasksAndUnplanTasksList.filter((item)=>{
         let condition = {};
+        if(this.sprintTypeActive.length > 0){
+          condition.type = this.sprintTypeActive.indexOf(item.taskType) != -1 
+        }
         if(this.sprintCustomersActive.length > 0){
           condition.customers = this.sprintCustomersActive.indexOf(item.taskCustomer) != -1 
         }
@@ -642,7 +652,7 @@ export default {
           condition.status = this.sprintStatusActive.indexOf(item.taskStatus) != -1 
         }
         if(this.sprintMenberActive.length > 0){
-          condition.menber = this.sprintMenberActive.indexOf(item.taskAssigneeFullNickname) != -1 
+          condition.menber = this.sprintMenberActive.indexOf(item.taskAssigneeId) != -1 
         }
         for (const key in condition) {
           if (!condition[key]) {
@@ -651,7 +661,7 @@ export default {
         }
         return true
       })
-      if(this.sprintCustomersActive.length == 0 && this.sprintTaskActive.length == 0 && this.sprintStatusActive.length == 0 && this.sprintMenberActive.length == 0){
+      if(this.sprintTypeActive.length == 0 && this.sprintCustomersActive.length == 0 && this.sprintTaskActive.length == 0 && this.sprintStatusActive.length == 0 && this.sprintMenberActive.length == 0){
         this[activeList] = this.$parent.tasksAndUnplanTasksList
       }
     },
@@ -828,7 +838,7 @@ export default {
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
         this.$data.sprintEstimationCopy = this.$data.sprintEstimation
         this.$data.sprintTasksList = sprintTasksData.sprintTasks
-        if(this.sprintCustomersActive.length > 0 || this.sprintTaskActive.length > 0 || this.sprintStatusActive.length > 0 || this.sprintMenberActive.length > 0){
+        if(this.sprintTypeActive.length > 0 || this.sprintCustomersActive.length > 0 || this.sprintTaskActive.length > 0 || this.sprintStatusActive.length > 0 || this.sprintMenberActive.length > 0){
           this.customerChange()
         }
       }
@@ -858,7 +868,7 @@ export default {
         this.$data.sprintEffort = sprintTasksData.sprintEffortSum[0].EffortSum
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
         this.$data.sprintUnplanTasksList = sprintTasksData.sprintTasks
-        if(this.sprintCustomersActive.length > 0 || this.sprintTaskActive.length > 0 || this.sprintStatusActive.length > 0 || this.sprintMenberActive.length > 0){
+        if(this.sprintTypeActive.length > 0 || this.sprintCustomersActive.length > 0 || this.sprintTaskActive.length > 0 || this.sprintStatusActive.length > 0 || this.sprintMenberActive.length > 0){
           this.customerChange()
         }
       }
