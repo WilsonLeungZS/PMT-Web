@@ -108,10 +108,7 @@ Remark:
                   </el-col>
                   <el-col :span="24" :lg="6" class="sprint-card-header-col">
                     <el-scrollbar style="height: 100%">
-                      <span><i class="el-icon-office-building"></i> Customers:
-                        <el-select v-model="sprintCustomersActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
-                          <el-option v-for="(customer, index) in sprintCustomersList" :key="index" :label="customer" :value="customer"></el-option>
-                        </el-select>
+                      <span><i class="el-icon-office-building"></i> Customers:{{sprintObj.sprintCustomersStr}}
                       </span>
                     </el-scrollbar>
                   </el-col>
@@ -145,6 +142,24 @@ Remark:
                     </el-badge>
                   </el-col>
                 </el-row>
+                <div class="selectBox">
+                  <el-select v-model="sprintCustomersActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
+                    <el-option v-for="(customer, index) in sprintCustomersList" :key="index" :label="customer" :value="customer"></el-option>
+                  </el-select>
+                  <el-select v-model="sprintTaskActive" multiple collapse-tags placeholder="Name..." size="small" @change="customerChange">
+                    <el-option v-for="(customer, index) in sprintTasksList" :key="index" :label="customer.taskReferenceTask" :value="customer.taskReferenceTask"></el-option>
+                  </el-select>
+                  <el-select v-model="sprintStatusActive" multiple collapse-tags placeholder="Status..." size="small" @change="customerChange">
+                    <el-option key="Drafting" value="Drafting"></el-option>
+                    <el-option key="Planning" value="Planning"></el-option>
+                    <el-option key="Running" value="Running"></el-option>
+                    <el-option key="Done" value="Done"></el-option>
+                  </el-select>
+                  <el-select v-model="sprintMenberActive" multiple collapse-tags placeholder="Menber..." size="small" @change="customerChange">
+                    <el-option v-for="(customer, index) in plannedPeopleList" :key="index" :label="customer.sprintUserNickname" :value="customer.sprintUserNickname"></el-option>
+                  </el-select>
+                  <el-button icon="el-icon-close" circle size="small" @click="clearSelect"></el-button>
+                </div>
               </div>
               <!-- Card Content -->
               <el-tabs @tab-click="changeTaskTab" v-model="tabTaskActive" class="sprint-card-tabs">
@@ -517,6 +532,9 @@ export default {
       sprintRequiredSkillsStr: '',
       sprintCustomersList: [],
       sprintCustomersActive:[],
+      sprintTaskActive:[],
+      sprintStatusActive:[],
+      sprintMenberActive:[],
       sprintActiveOnoff:true,
       sprintEffort: 0,
       sprintTotalEffort: 0,
@@ -594,19 +612,46 @@ export default {
     }
   },
   methods: {
+    clearSelect(){
+      this.sprintCustomersActive = [];
+      this.sprintTaskActive = [];
+      this.sprintStatusActive = [];
+      this.sprintMenberActive = [];
+      this.customerChange()
+    },
     customerChange(){
       let activeList = {
         'tab_planned_tasks':'sprintTasksList',
         'tab_unplan_tasks':'sprintUnplanTasksList'
       }[this.tabTaskActive]
       if(this.sprintActiveOnoff){
+        console.log('----------------------------')
+        console.log(this[activeList])
         this.$parent.tasksAndUnplanTasksList = this[activeList]
         this.sprintActiveOnoff = false
       }
       this[activeList] = this.$parent.tasksAndUnplanTasksList.filter((item)=>{
-        return this.sprintCustomersActive.indexOf(item.taskCustomer) != -1
+        let condition = {};
+        if(this.sprintCustomersActive.length > 0){
+          condition.customers = this.sprintCustomersActive.indexOf(item.taskCustomer) != -1 
+        }
+        if(this.sprintTaskActive.length > 0){
+          condition.task = this.sprintTaskActive.indexOf(item.taskReferenceTask) != -1
+        }
+        if(this.sprintStatusActive.length > 0){
+          condition.status = this.sprintStatusActive.indexOf(item.taskStatus) != -1 
+        }
+        if(this.sprintMenberActive.length > 0){
+          condition.menber = this.sprintMenberActive.indexOf(item.taskAssigneeFullNickname) != -1 
+        }
+        for (const key in condition) {
+          if (!condition[key]) {
+            return false
+          }
+        }
+        return true
       })
-      if(this.sprintCustomersActive.length == 0){
+      if(this.sprintCustomersActive.length == 0 && this.sprintTaskActive.length == 0 && this.sprintStatusActive.length == 0 && this.sprintMenberActive.length == 0){
         this[activeList] = this.$parent.tasksAndUnplanTasksList
       }
     },
@@ -767,6 +812,8 @@ export default {
       }
     },
     async getSprintPlannedTasks () {
+      this.sprintActiveOnoff = true
+      this.$parent.tasksAndUnplanTasksList = []
       console.log('Start to get sprint tasks - planned')
       this.$data.sprintTasksListLoading = true
       this.initSprintTask()
@@ -781,8 +828,7 @@ export default {
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
         this.$data.sprintEstimationCopy = this.$data.sprintEstimation
         this.$data.sprintTasksList = sprintTasksData.sprintTasks
-        if(this.sprintCustomersActive.length > 0){
-          this.sprintActiveOnoff = true
+        if(this.sprintCustomersActive.length > 0 || this.sprintTaskActive.length > 0 || this.sprintStatusActive.length > 0 || this.sprintMenberActive.length > 0){
           this.customerChange()
         }
       }
@@ -797,6 +843,8 @@ export default {
       }
     },
     async getSprintUnplanTasks () {
+      this.sprintActiveOnoff = true
+      this.$parent.tasksAndUnplanTasksList = []
       console.log('Start to get sprint tasks - unplan')
       this.$data.sprintUnplanTasksListLoading = true
       this.initSprintTask()
@@ -810,8 +858,7 @@ export default {
         this.$data.sprintEffort = sprintTasksData.sprintEffortSum[0].EffortSum
         this.$data.sprintEstimation = sprintTasksData.sprintEstimationSum[0].EstimationSum
         this.$data.sprintUnplanTasksList = sprintTasksData.sprintTasks
-        if(this.sprintCustomersActive.length > 0){
-          this.sprintActiveOnoff = true
+        if(this.sprintCustomersActive.length > 0 || this.sprintTaskActive.length > 0 || this.sprintStatusActive.length > 0 || this.sprintMenberActive.length > 0){
           this.customerChange()
         }
       }
@@ -1447,5 +1494,9 @@ export default {
 }
 .el-table .highlight-leader-row {
   background: #fff9c4;
+}
+.selectBox{
+  padding-top: 10px;
+  text-align: center;
 }
 </style>
