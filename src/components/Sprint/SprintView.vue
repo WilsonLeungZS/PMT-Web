@@ -143,7 +143,7 @@ Remark:
                   </el-col>
                 </el-row>
                 <div class="selectBox">
-                  <el-select v-model="sprintTypeActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
+                  <el-select v-model="sprintTypeActive" multiple collapse-tags placeholder="Task Type..." size="small" @change="customerChange">
                     <el-option label="Development(Change, Problem)" value="Development"></el-option>
                     <el-option label="Maintenance(Incident)" value="Maintenance"></el-option>
                     <el-option label="Others(Service Request, ITSR, Others)" value="Others"></el-option>
@@ -632,8 +632,6 @@ export default {
         'tab_unplan_tasks':'sprintUnplanTasksList'
       }[this.tabTaskActive]
       if(this.sprintActiveOnoff){
-        console.log('----------------------------')
-        console.log(this[activeList])
         this.$parent.tasksAndUnplanTasksList = this[activeList]
         this.sprintActiveOnoff = false
       }
@@ -701,6 +699,11 @@ export default {
       this.$data.sprintBaseline = ''
       this.$data.sprintRequiredSkillsStr = ''
       this.$data.sprintCustomersList = []
+      this.sprintTypeActive = []
+      this.sprintCustomersActive = []
+      this.sprintTaskActive = []
+      this.sprintStatusActive = []
+      this.sprintMenberActive = []
       this.$data.sprintBaseCapacity = 0
       this.$data.sprintRequiredSkills = []
       this.$data.sprintObj = {}

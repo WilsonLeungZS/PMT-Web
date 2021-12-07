@@ -39,6 +39,14 @@
           </el-col>
         </el-row>
         <el-row v-if="showContent" class="prj-timesheet-content" :gutter="5">
+          <el-col :span="24">
+            <div class="selectBox">
+              <!-- <el-select v-model="customersActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
+                <el-option v-for="(customer, index) in customersList" :key="index" :label="customer" :value="customer"></el-option>
+              </el-select> -->
+              <el-button icon="el-icon-close" circle size="small" @click="clearSelect"></el-button>
+            </div>
+          </el-col>
           <el-col :span="15">
             <el-card class="box-card" shadow="never">
               <el-row>
@@ -208,6 +216,8 @@ export default {
     async getActiveSprintsList () {
       var res = await http.get('/sprints/getActiveSprintsList')
       if (res != null && res.data.status == 0) {
+        console.log('---------------');
+        console.log(res.data);
         this.$data.sprintsList = this.sortListBySprintTimeGroup(res.data.data)
       } else {
         this.$data.sprintsList = []
@@ -276,6 +286,7 @@ export default {
     },
     getDailyScrum () {
       var sprintList = this.$data.sprintsList
+      console.log(this.sprintsList);
       var sprintIndex = -1
       var targetSprintList = []
       var sprintStartTime = null
@@ -583,6 +594,10 @@ export default {
   color: #ff6348;
   border-bottom: 1px solid #ff6348;
   cursor: default;
+}
+.selectBox{
+  text-align: left;
+  margin: 0px 10px 10px;
 }
 </style>
 <style>
