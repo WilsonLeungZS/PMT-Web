@@ -41,17 +41,17 @@
         <el-row v-if="showContent" class="prj-timesheet-content" :gutter="5">
           <el-col :span="24">
             <div class="selectBox">
-              <!-- <el-select v-model="customersActive" multiple collapse-tags placeholder="Customers..." size="small" @change="customerChange">
-                <el-option v-for="(customer, index) in customersList" :key="index" :label="customer" :value="customer"></el-option>
-              </el-select> -->
-              <el-button icon="el-icon-close" circle size="small" @click="clearSelect"></el-button>
+              <el-select v-model="customersActive" multiple collapse-tags placeholder="Customers..." size="small">
+                <el-option v-for="(customer, index) in customersList" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
+              </el-select>
+              <el-button icon="el-icon-close" circle size="small" @click="customerClear('clear')"></el-button>
             </div>
           </el-col>
           <el-col :span="15">
             <el-card class="box-card" shadow="never">
               <el-row>
                 <el-col :span="24" class="content-main-col">
-                  <timesheet v-if="showTimesheet" :timesheetObj="timesheetObj" @submitDateRange="submitDateRange"></timesheet>
+                  <timesheet v-if="showTimesheet" :timesheetObj="timesheetObj" :customersActive="customersActive" @submitDateRange="submitDateRange"></timesheet>
                 </el-col>
               </el-row>
               <el-row v-if="showTaskTable">
@@ -175,7 +175,9 @@ export default {
       ],
       sprintObj: null,
       timesheetSelectedStartDate: null,
-      timesheetSelectedEndDate: null
+      timesheetSelectedEndDate: null,
+      customersList: [],
+      customersActive: [],
     }
   },
   watch: {
@@ -209,6 +211,18 @@ export default {
     }
   },
   methods: {
+    customerClear(val){
+      if(val == 'clear'){
+        this.customersActive = []
+      }
+    },
+    async getCustomerList (groupCustomer) {
+      const res = await http.get('/sprints/getAllCustomersList')
+      this.customersActive= []
+      this.customersList = res.data.data.filter((item)=>{
+        return groupCustomer.indexOf(item.customerId) != -1
+      })
+    },
     switchToMT () {
       this.$data.isActive = false
       this.$router.push({path: 'MyTimesheet'})
@@ -216,8 +230,6 @@ export default {
     async getActiveSprintsList () {
       var res = await http.get('/sprints/getActiveSprintsList')
       if (res != null && res.data.status == 0) {
-        console.log('---------------');
-        console.log(res.data);
         this.$data.sprintsList = this.sortListBySprintTimeGroup(res.data.data)
       } else {
         this.$data.sprintsList = []
@@ -303,6 +315,7 @@ export default {
       if (sprintIndex != -1) {
         sprintStartTime = targetSprintList[sprintIndex].sprintStartTime
         sprintEndTime = targetSprintList[sprintIndex].sprintEndTime
+        this.getCustomerList(targetSprintList[sprintIndex].sprintCustomers)
       }
       this.getSprintDateRange(sprintStartTime, sprintEndTime)
       // Show sprint progress

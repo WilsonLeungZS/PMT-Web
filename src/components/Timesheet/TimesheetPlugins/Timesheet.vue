@@ -41,7 +41,8 @@ export default {
     WorklogDialog
   },
   props: {
-    'timesheetObj': Object
+    'timesheetObj': Object,
+    'customersActive':Array
   },
   watch: {
     timesheetObj: {
@@ -66,6 +67,13 @@ export default {
       },
       immediate: true,
       deep: true
+    },
+    customersActive: {
+      handler (val, oldVal) {
+          this.customerChange();
+      },
+      immediate: true,
+      deep: true
     }
   },
   data () {
@@ -78,10 +86,33 @@ export default {
       timesheetSelectDateArray: [],
       sumHoursArray: [],
       worklogAction: null,
-      disabledEditableFunction: false
+      disabledEditableFunction: false,
+      sprintActiveOnoff:true
     }
   },
   methods: {
+    customerChange(){
+      if(this.sprintActiveOnoff){
+        this.$parent.tasksAndUnplanTasksList = this.timesheetData
+        this.sprintActiveOnoff = false
+      }
+      console.log(this.timesheetData)
+      this.timesheetData = this.$parent.tasksAndUnplanTasksList.filter((item)=>{
+        let condition = {};
+        if(this.customersActive.length > 0){
+          condition.customers = this.customersActive.indexOf(item.taskCustomerId) != -1 
+        }
+        for (const key in condition) {
+          if (!condition[key]) {
+            return false
+          }
+        }
+        return true
+      })
+      if(this.customersActive.length == 0){
+        this.timesheetData = this.$parent.tasksAndUnplanTasksList
+      }
+    },
     // Timesheet Style Method
     timesheetHeaderRowStyle ({row, rowIndex}) {
       return 'timesheet-header-row'
@@ -259,7 +290,10 @@ export default {
           }
         }
         console.log('debug timesheet -> ', timesheetList)
+        console.log('timesheetObj---------------------------------------')
+        console.log(this.timesheetObj)
         this.$data.timesheetData = timesheetList
+        this.sprintActiveOnoff = true
       }
     },
     editWorklogByDate (column) {
