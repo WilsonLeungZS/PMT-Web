@@ -57,7 +57,7 @@
               <el-row v-if="showTaskTable">
                 <el-col :span="24" class="content-main-col" style="padding: 0 5px;">
                   <el-divider content-position="center"><b>Selected Sprint Tasks</b></el-divider>
-                  <task-table :taskTableObj="taskTableObj"></task-table>
+                  <task-table :taskTableObj="taskTableObj" :customersActive="customersActive"></task-table>
                 </el-col>
               </el-row>
             </el-card>

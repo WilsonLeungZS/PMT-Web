@@ -290,10 +290,9 @@ export default {
           }
         }
         console.log('debug timesheet -> ', timesheetList)
-        console.log('timesheetObj---------------------------------------')
-        console.log(this.timesheetObj)
         this.$data.timesheetData = timesheetList
         this.sprintActiveOnoff = true
+        this.customerChange()
       }
     },
     editWorklogByDate (column) {
@@ -366,6 +365,9 @@ export default {
     }
   },
   created () {
+  },
+  destroyed(){
+    this.$parent.tasksAndUnplanTasksList = undefined
   }
 }
 </script>

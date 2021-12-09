@@ -58,7 +58,8 @@
         reqDate: null,
         pmtTaskDialogAction: null,
         worklogAction: null,
-        showPage: true
+        showPage: true,
+        sprintActiveOnoff:true,
       }
     },
     components: {
@@ -67,7 +68,8 @@
       WorklogDialog
     },
     props: {
-      'taskTableObj': Object
+      'taskTableObj': Object,
+      'customersActive':Array,
     },
     watch: {
       taskTableObj: {
@@ -80,9 +82,38 @@
         },
         immediate: true,
         deep: true
+      },
+      customersActive: {
+        handler (val, oldVal) {
+            this.customerChange();
+        },
+        immediate: true,
+        deep: true
       }
     },
     methods: {
+      customerChange(){
+        if(this.sprintActiveOnoff){
+          this.$parent.TasksTableList = this.taskTableData
+          this.sprintActiveOnoff = false
+        }
+        console.log(this.taskTableData)
+        this.taskTableData = this.$parent.TasksTableList.filter((item)=>{
+          let condition = {};
+          if(this.customersActive.length > 0){
+            condition.customers = this.customersActive.indexOf(item.taskCustomerId) != -1 
+          }
+          for (const key in condition) {
+            if (!condition[key]) {
+              return false
+            }
+          }
+          return true
+        })
+        if(this.customersActive.length == 0){
+          this.taskTableData = this.$parent.TasksTableList
+        }
+      },
       async getTaskList () {
         this.$data.taskTableLoading = true
         this.$data.taskTableData = []
@@ -101,6 +132,8 @@
         const resData = await http.get('/tasks/getTasksList', reqParam)
         if (resData != null && resData.data.status == 0) {
           this.$data.taskTableData = resData.data.data
+          this.sprintActiveOnoff = true
+          this.customerChange()
         }
         this.$data.taskTableLoading = false
       },
