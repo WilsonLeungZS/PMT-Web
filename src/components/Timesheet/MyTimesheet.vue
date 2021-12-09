@@ -16,14 +16,22 @@
           </el-col>
         </el-row>
         <el-row>
+          <el-col :span="24">
+            <div class="selectBox">
+              <el-select v-model="customersActive" multiple collapse-tags placeholder="Customers..." size="small">
+                <el-option v-for="(customer, index) in customersList" :key="index" :label="customer.customerName" :value="customer.customerId"></el-option>
+              </el-select>
+              <el-button icon="el-icon-close" circle size="small" @click="customerClear('clear')"></el-button>
+            </div>
+          </el-col>
           <el-col :span="24" class="content-main-col">
-            <timesheet @refresh="refreshTaskTable" @getCurrentMonthTimesheet="getCurrentMonthTimesheet" :timesheetObj="timesheetObj"></timesheet>
+            <timesheet @refresh="refreshTaskTable" @getCurrentMonthTimesheet="getCurrentMonthTimesheet" :timesheetObj="timesheetObj" :customersActive="customersActive"></timesheet>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24" class="content-main-col" style="padding: 0 5px;">
             <el-divider content-position="center"><b>Current Sprint Tasks (Assign To Me)</b></el-divider>
-            <task-table @refresh="refreshTimesheet" :taskTableObj="taskTableObj"></task-table>
+            <task-table @refresh="refreshTimesheet" :taskTableObj="taskTableObj" :customersActive="customersActive"></task-table>
           </el-col>
         </el-row>
       </el-main>
@@ -55,10 +63,22 @@ export default {
       taskTableObj: {
         taskTableUserId: this.$store.getters.getUserId,
         taskTableDate: null
-      }
+      },
+      customersList: [],
+      customersActive: [],
     }
   },
   methods: {
+    customerClear(val){
+      if(val == 'clear'){
+        this.customersActive = []
+      }
+    },
+    async getCustomerList (groupCustomer) {
+      const res = await http.get('/sprints/getAllCustomersList')
+      this.customersActive= []
+      this.customersList = res.data.data
+    },
     switchToPT () {
       this.$data.isActive = false
       this.$router.push({path: 'ProjectTimesheet'})
@@ -117,6 +137,7 @@ export default {
   created () {
     this.getCurrentMonthTimesheet()
     this.getAssignToMeTasks()
+    this.getCustomerList()
   }
 }
 </script>
@@ -169,5 +190,9 @@ export default {
   color: #ff6348;
   border-bottom: 1px solid #ff6348;
   cursor: default;
+}
+.selectBox{
+  text-align: left;
+  margin: 0px 10px;
 }
 </style>

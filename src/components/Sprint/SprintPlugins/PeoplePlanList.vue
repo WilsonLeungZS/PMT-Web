@@ -25,11 +25,6 @@
           <el-table-column align="right">
             <template slot="header">
               <el-button :disabled="disabledAddPeopleBtn" @click="userAllToSprint" v-if="checkUser.length > 0" type="primary" icon="el-icon-d-arrow-right"></el-button>
-
-              <el-select v-model="cec" id="ces" @change="ces" size="mini">
-                <el-option label="T&M" value="true"></el-option>
-                <el-option label="MS" value="false"></el-option>
-              </el-select>
             </template>
             <!-- <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" :content="disabledMessage" placement="top">
